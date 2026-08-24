@@ -13,6 +13,40 @@ type PopupPageProps = {
   pageSummary?: PageAnalysisSummary | null;
 };
 
+const ESSENTIAL_LABELS = {
+  identity: 'Your name',
+  contact: 'Contact details',
+  links: 'Professional links',
+  experience: 'Work experience',
+  education: 'Education',
+  skills: 'Skills',
+} as const;
+
+function getMissingEssentials(
+  sections: ReturnType<typeof calculateProfileReadiness>['sections'],
+): string[] {
+  return (Object.entries(sections) as Array<
+    [keyof typeof ESSENTIAL_LABELS, boolean]
+  >)
+    .filter(([, complete]) => !complete)
+    .slice(0, 3)
+    .map(([section]) => ESSENTIAL_LABELS[section]);
+}
+
+function getPrimaryActionLabel(
+  profileComplete: boolean,
+  pageSummary: PageAnalysisSummary | null | undefined,
+): string {
+  if (!profileComplete) return 'Open profile settings';
+  if (pageSummary === null || pageSummary === undefined) {
+    return 'Open profile settings';
+  }
+  if (pageSummary.ready > 0) return 'Fill safe fields';
+  if (pageSummary.needsReview > 0) return 'Review fields';
+  if (pageSummary.sensitive > 0) return 'Open vault settings';
+  return 'Open profile settings';
+}
+
 export function PopupPage({
   repository,
   openOptions,
@@ -63,34 +97,66 @@ export function PopupPage({
 
   const readiness = calculateProfileReadiness(profile.baseProfile);
   const variantCount = profile.variants.length;
+  const missingEssentials = getMissingEssentials(readiness.sections);
+  const primaryActionLabel = getPrimaryActionLabel(
+    readiness.completed === readiness.total,
+    pageSummary,
+  );
 
   return (
     <main className="popup-page">
-      <header>
-        <p className="popup-eyebrow">Fillio</p>
-        <h1>{readiness.percentage}% ready</h1>
-        <p className="popup-muted">
+      <header className="popup-header">
+        <div>
+          <p className="popup-eyebrow">Fillio</p>
+          <h1>Ready to apply</h1>
+        </div>
+        <strong className="popup-readiness">{readiness.percentage}% ready</strong>
+        <p className="popup-muted popup-header__summary">
           {readiness.completed} of {readiness.total} profile sections ready
         </p>
       </header>
 
-      <section className="popup-card">
-        <h2>Current page</h2>
+      {missingEssentials.length > 0 ? (
+        <section className="popup-card popup-card--essentials">
+          <div className="popup-section-heading">
+            <h2>Missing essentials</h2>
+            <span className="fillio-chip">Next up</span>
+          </div>
+          <ul className="popup-essentials-list">
+            {missingEssentials.map((essential) => (
+              <li key={essential}>{essential}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="popup-card popup-card--page">
+        <div className="popup-section-heading">
+          <h2>Current page</h2>
+          {pageSummary !== null && pageSummary !== undefined ? (
+            <span className="fillio-chip fillio-chip-strong">Form found</span>
+          ) : null}
+        </div>
         {pageSummary === null || pageSummary === undefined ? (
-          <p className="popup-muted popup-empty">No supported form detected.</p>
+          <p className="popup-muted popup-empty">
+            Open a job application form to see safe fields Fillio can help
+            with.
+          </p>
         ) : (
           <div className="page-summary" aria-label="Current page form analysis">
-            <span>{pageSummary.ready} ready</span>
-            <span>{pageSummary.needsReview} needs review</span>
-            <span>{pageSummary.sensitive} sensitive</span>
-            <span>{pageSummary.unknown} unknown</span>
+            <span className="fillio-chip">{pageSummary.ready} ready</span>
+            <span className="fillio-chip">
+              {pageSummary.needsReview} needs review
+            </span>
+            <span className="fillio-chip">{pageSummary.sensitive} sensitive</span>
+            <span className="fillio-chip">{pageSummary.unknown} unknown</span>
           </div>
         )}
       </section>
 
-      <section className="popup-card">
-        <div className="popup-row">
-          <span>Application profiles</span>
+      <section className="popup-card popup-card--variants">
+        <div className="popup-section-heading">
+          <h2>Application profiles</h2>
           <strong>
             {variantCount} application{' '}
             {variantCount === 1 ? 'variant' : 'variants'}
@@ -110,11 +176,11 @@ export function PopupPage({
       </section>
 
       <button
-        className="popup-primary"
+        className="fillio-button fillio-button-primary popup-primary"
         type="button"
         onClick={() => void openOptions()}
       >
-        Open profile settings
+        {primaryActionLabel}
       </button>
     </main>
   );

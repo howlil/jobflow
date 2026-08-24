@@ -37,6 +37,19 @@ describe('PopupPage', () => {
     await waitFor(() => expect(openOptions).toHaveBeenCalledTimes(1));
   });
 
+  it('guides people to open a job application form when none is detected', async () => {
+    render(
+      <PopupPage repository={createRepository(null)} openOptions={vi.fn()} />,
+    );
+
+    expect(
+      await screen.findByText(/open a job application form/i),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: /open profile settings/i }),
+    ).toBeTruthy();
+  });
+
   it('shows readiness and variant count from persisted profile data', async () => {
     const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
     profile.baseProfile.personal.legalName.first = 'Ulil';
@@ -64,6 +77,15 @@ describe('PopupPage', () => {
     expect(await screen.findByText('50% ready')).toBeTruthy();
     expect(screen.getByText('1 application variant')).toBeTruthy();
     expect(screen.getByText('Backend Engineer')).toBeTruthy();
+  });
+
+  it('limits incomplete-profile essentials to the next three items', async () => {
+    render(
+      <PopupPage repository={createRepository(null)} openOptions={vi.fn()} />,
+    );
+
+    expect(await screen.findByText('Missing essentials')).toBeTruthy();
+    expect(screen.getAllByRole('listitem').length).toBeLessThanOrEqual(3);
   });
 
   it('shows the current page form analysis summary', async () => {
