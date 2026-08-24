@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { calculateProfileReadiness } from '../../application/profile/profile-readiness';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import type {
@@ -128,6 +129,27 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
   }
 
   const { baseProfile } = profile;
+  const readiness = calculateProfileReadiness(baseProfile);
+  const missingEssentials = [
+    {
+      label: 'First name',
+      missing: baseProfile.personal.legalName.first.trim() === '',
+    },
+    {
+      label: 'Email',
+      missing: primaryContactValue(baseProfile.contact.emails).trim() === '',
+    },
+    {
+      label: 'Phone',
+      missing: primaryContactValue(baseProfile.contact.phones).trim() === '',
+    },
+  ].filter((essential) => essential.missing);
+  const saveStateText =
+    saveState === 'saving'
+      ? 'Saving profile...'
+      : saveState === 'saved'
+        ? 'Profile saved.'
+        : 'Changes not saved.';
 
   return (
     <main className="profile-page">
@@ -140,18 +162,51 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             here.
           </p>
         </div>
-        <button
-          className="primary-button"
-          type="button"
-          onClick={() => void saveProfile()}
-          disabled={saveState === 'saving'}
-        >
-          {saveState === 'saving' ? 'Saving…' : 'Save profile'}
-        </button>
+        <div className="profile-save-action">
+          <p className="profile-save-state" aria-live="polite">
+            {saveStateText}
+          </p>
+          <button
+            className="fillio-button fillio-button-primary"
+            type="button"
+            onClick={() => void saveProfile()}
+            disabled={saveState === 'saving'}
+          >
+            {saveState === 'saving' ? 'Saving...' : 'Save profile'}
+          </button>
+        </div>
       </header>
 
       {error !== null ? <p role="alert">{error}</p> : null}
-      {saveState === 'saved' ? <p role="status">Profile saved.</p> : null}
+
+      <section
+        className="profile-readiness"
+        aria-labelledby="profile-readiness-title"
+      >
+        <div className="fillio-section-heading">
+          <div>
+            <p className="eyebrow">Profile readiness</p>
+            <h2 id="profile-readiness-title">
+              {readiness.completed} of {readiness.total} sections ready
+            </h2>
+          </div>
+          <span className="fillio-chip fillio-chip-strong">
+            {readiness.percentage}% complete
+          </span>
+        </div>
+        <div className="profile-readiness-details">
+          <p className="profile-readiness-label">Missing essentials</p>
+          {missingEssentials.length > 0 ? (
+            <ul className="profile-readiness-list">
+              {missingEssentials.map((essential) => (
+                <li key={essential.label}>{essential.label}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted">Your core contact details are ready.</p>
+          )}
+        </div>
+      </section>
 
       <section className="profile-section">
         <h2>Basic information</h2>
@@ -303,9 +358,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
       </section>
 
       <section className="profile-section">
-        <div className="section-heading">
+        <div className="fillio-section-heading">
           <h2>Experience</h2>
           <button
+            className="fillio-button"
             type="button"
             onClick={() =>
               changeProfile((draft) => {
@@ -327,57 +383,67 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             Add experience
           </button>
         </div>
-        <div className="record-list">
-          {baseProfile.professional.experiences.map((experience, index) => (
-            <article className="record-card" key={experience.id}>
-              <div className="form-grid">
-                <label>
-                  Company {index + 1}
-                  <input
-                    value={experience.company}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined)
-                          item.company = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Job title {index + 1}
-                  <input
-                    value={experience.title}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined) item.title = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    draft.baseProfile.professional.experiences.splice(index, 1);
-                  })
-                }
-              >
-                Remove experience {index + 1}
-              </button>
-            </article>
-          ))}
-        </div>
+        {baseProfile.professional.experiences.length === 0 ? (
+          <div className="fillio-empty-row">No experience added yet.</div>
+        ) : (
+          <div className="record-list">
+            {baseProfile.professional.experiences.map((experience, index) => (
+              <article className="record-card" key={experience.id}>
+                <div className="form-grid">
+                  <label>
+                    Company {index + 1}
+                    <input
+                      value={experience.company}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.experiences[index];
+                          if (item !== undefined)
+                            item.company = event.target.value;
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Job title {index + 1}
+                    <input
+                      value={experience.title}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.experiences[index];
+                          if (item !== undefined)
+                            item.title = event.target.value;
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+                <button
+                  className="fillio-button"
+                  type="button"
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      draft.baseProfile.professional.experiences.splice(
+                        index,
+                        1,
+                      );
+                    })
+                  }
+                >
+                  Remove experience {index + 1}
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="profile-section">
-        <div className="section-heading">
+        <div className="fillio-section-heading">
           <h2>Education</h2>
           <button
+            className="fillio-button"
             type="button"
             onClick={() =>
               changeProfile((draft) => {
@@ -399,59 +465,65 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             Add education
           </button>
         </div>
-        <div className="record-list">
-          {baseProfile.professional.education.map((education, index) => (
-            <article className="record-card" key={education.id}>
-              <div className="form-grid">
-                <label>
-                  Institution {index + 1}
-                  <input
-                    value={education.institution}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.education[index];
-                        if (item !== undefined) {
-                          item.institution = event.target.value;
-                        }
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Degree {index + 1}
-                  <input
-                    value={education.degree}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.education[index];
-                        if (item !== undefined)
-                          item.degree = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    draft.baseProfile.professional.education.splice(index, 1);
-                  })
-                }
-              >
-                Remove education {index + 1}
-              </button>
-            </article>
-          ))}
-        </div>
+        {baseProfile.professional.education.length === 0 ? (
+          <div className="fillio-empty-row">No education added yet.</div>
+        ) : (
+          <div className="record-list">
+            {baseProfile.professional.education.map((education, index) => (
+              <article className="record-card" key={education.id}>
+                <div className="form-grid">
+                  <label>
+                    Institution {index + 1}
+                    <input
+                      value={education.institution}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.education[index];
+                          if (item !== undefined) {
+                            item.institution = event.target.value;
+                          }
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Degree {index + 1}
+                    <input
+                      value={education.degree}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.education[index];
+                          if (item !== undefined)
+                            item.degree = event.target.value;
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+                <button
+                  className="fillio-button"
+                  type="button"
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      draft.baseProfile.professional.education.splice(index, 1);
+                    })
+                  }
+                >
+                  Remove education {index + 1}
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="profile-section">
-        <div className="section-heading">
+        <div className="fillio-section-heading">
           <h2>Skills</h2>
           <button
+            className="fillio-button"
             type="button"
             onClick={() =>
               changeProfile((draft) => {
@@ -467,34 +539,40 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             Add skill
           </button>
         </div>
-        <div className="record-list">
-          {baseProfile.professional.skills.map((skill, index) => (
-            <article className="record-card" key={skill.id}>
-              <label>
-                Skill {index + 1}
-                <input
-                  value={skill.name}
-                  onChange={(event) =>
+        {baseProfile.professional.skills.length === 0 ? (
+          <div className="fillio-empty-row">No skills added yet.</div>
+        ) : (
+          <div className="record-list">
+            {baseProfile.professional.skills.map((skill, index) => (
+              <article className="record-card" key={skill.id}>
+                <label>
+                  Skill {index + 1}
+                  <input
+                    value={skill.name}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.skills[index];
+                        if (item !== undefined) item.name = event.target.value;
+                      })
+                    }
+                  />
+                </label>
+                <button
+                  className="fillio-button"
+                  type="button"
+                  onClick={() =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.skills[index];
-                      if (item !== undefined) item.name = event.target.value;
+                      draft.baseProfile.professional.skills.splice(index, 1);
                     })
                   }
-                />
-              </label>
-              <button
-                type="button"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    draft.baseProfile.professional.skills.splice(index, 1);
-                  })
-                }
-              >
-                Remove skill {index + 1}
-              </button>
-            </article>
-          ))}
-        </div>
+                >
+                  Remove skill {index + 1}
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       {vaultClient !== undefined ? (
@@ -502,7 +580,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
       ) : null}
 
       <section className="profile-section">
-        <div className="section-heading">
+        <div className="fillio-section-heading">
           <div>
             <h2>Application variants</h2>
             <p className="muted">
@@ -511,6 +589,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             </p>
           </div>
           <button
+            className="fillio-button"
             type="button"
             onClick={() =>
               changeProfile((draft) => {
@@ -550,58 +629,66 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           </label>
         ) : null}
 
-        <div className="record-list">
-          {profile.variants.map((variant, index) => (
-            <article className="record-card" key={variant.id}>
-              <div className="form-grid">
-                <label>
-                  Variant name {index + 1}
-                  <input
-                    value={variant.name}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) item.name = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Variant headline {index + 1}
-                  <input
-                    value={variant.headlineOverride ?? ''}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) {
-                          item.headlineOverride = event.target.value;
-                        }
-                      })
-                    }
-                  />
-                </label>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    const removed = draft.variants[index];
-                    draft.variants.splice(index, 1);
-                    if (
-                      removed !== undefined &&
-                      draft.preferences.defaultVariantId === removed.id
-                    ) {
-                      draft.preferences.defaultVariantId =
-                        draft.variants[0]?.id ?? null;
-                    }
-                  })
-                }
-              >
-                Remove variant {index + 1}
-              </button>
-            </article>
-          ))}
-        </div>
+        {profile.variants.length === 0 ? (
+          <div className="fillio-empty-row">
+            No application variants added yet.
+          </div>
+        ) : (
+          <div className="record-list">
+            {profile.variants.map((variant, index) => (
+              <article className="record-card" key={variant.id}>
+                <div className="form-grid">
+                  <label>
+                    Variant name {index + 1}
+                    <input
+                      value={variant.name}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined)
+                            item.name = event.target.value;
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Variant headline {index + 1}
+                    <input
+                      value={variant.headlineOverride ?? ''}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined) {
+                            item.headlineOverride = event.target.value;
+                          }
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+                <button
+                  className="fillio-button"
+                  type="button"
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      const removed = draft.variants[index];
+                      draft.variants.splice(index, 1);
+                      if (
+                        removed !== undefined &&
+                        draft.preferences.defaultVariantId === removed.id
+                      ) {
+                        draft.preferences.defaultVariantId =
+                          draft.variants[0]?.id ?? null;
+                      }
+                    })
+                  }
+                >
+                  Remove variant {index + 1}
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );

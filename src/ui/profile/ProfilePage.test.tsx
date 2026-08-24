@@ -16,6 +16,41 @@ function createRepository(
 }
 
 describe('ProfilePage', () => {
+  it('shows a guided readiness summary for an empty profile', async () => {
+    const { repository } = createRepository(null);
+
+    render(<ProfilePage repository={repository} />);
+
+    expect(await screen.findByText('Profile readiness')).not.toBeNull();
+    expect(screen.getByText(/sections ready/i)).not.toBeNull();
+    expect(screen.getByText('Missing essentials')).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: /save profile/i }),
+    ).not.toBeNull();
+  });
+
+  it('shows compact empty states for profile modules', async () => {
+    const { repository } = createRepository(null);
+
+    render(<ProfilePage repository={repository} />);
+
+    expect(await screen.findByText('Experience')).not.toBeNull();
+    expect(screen.getByText('No experience added yet.')).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: /add experience/i }),
+    ).not.toBeNull();
+    expect(screen.getByText('No education added yet.')).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: /add education/i }),
+    ).not.toBeNull();
+    expect(screen.getByText('No skills added yet.')).not.toBeNull();
+    expect(screen.getByRole('button', { name: /add skill/i })).not.toBeNull();
+    expect(
+      screen.getByText('No application variants added yet.'),
+    ).not.toBeNull();
+    expect(screen.getByRole('button', { name: /add variant/i })).not.toBeNull();
+  });
+
   it('edits core profile fields and persists them', async () => {
     const { repository, save } = createRepository(null);
 
