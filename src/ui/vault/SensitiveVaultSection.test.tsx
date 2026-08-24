@@ -47,6 +47,17 @@ describe('SensitiveVaultSection', () => {
     vi.setSystemTime(new Date('2026-08-13T16:45:00.000Z'));
   });
 
+  it('shows only vault setup controls before the vault is configured', async () => {
+    render(<SensitiveVaultSection vaultClient={createVaultClient()} />);
+
+    expect(await screen.findByText('Sensitive vault')).toBeTruthy();
+    expect(screen.getByText(/stored encrypted on this device/i)).toBeTruthy();
+    expect(screen.getByLabelText(/new vault passphrase/i)).toBeTruthy();
+    expect(screen.getByLabelText(/confirm vault passphrase/i)).toBeTruthy();
+    expect(screen.queryByLabelText(/national id/i)).toBeNull();
+    expect(screen.queryByLabelText(/expected salary/i)).toBeNull();
+  });
+
   it('requires matching passphrases before opt-in setup', async () => {
     const client = createVaultClient();
 
@@ -60,9 +71,13 @@ describe('SensitiveVaultSection', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Set up vault' }));
 
-    expect((await screen.findByRole('alert')).textContent).toBe(
-      'Passphrases do not match.',
-    );
+    const error = await screen.findByRole('alert');
+    expect(error.textContent).toBe('Passphrases do not match.');
+    expect(
+      screen.getByLabelText('Confirm vault passphrase').getAttribute(
+        'aria-invalid',
+      ),
+    ).toBe('true');
     expect(client.setup).not.toHaveBeenCalled();
   });
 
@@ -73,13 +88,7 @@ describe('SensitiveVaultSection', () => {
       <SensitiveVaultSection vaultClient={client} />,
     );
 
-    fireEvent.change(await screen.findByLabelText('Birth date'), {
-      target: { value: '1999-04-05' },
-    });
-    fireEvent.change(screen.getByLabelText('National ID'), {
-      target: { value: '3174000000000002' },
-    });
-    fireEvent.change(screen.getByLabelText('New vault passphrase'), {
+    fireEvent.change(await screen.findByLabelText('New vault passphrase'), {
       target: { value: 'local-passphrase' },
     });
     fireEvent.change(screen.getByLabelText('Confirm vault passphrase'), {
@@ -89,12 +98,44 @@ describe('SensitiveVaultSection', () => {
 
     await waitFor(() => expect(client.setup).toHaveBeenCalledTimes(1));
     const setupProfile = vi.mocked(client.setup).mock.calls[0]?.[0];
-    expect(setupProfile?.personal.birthDate).toBe('1999-04-05');
-    expect(setupProfile?.identity.nationalId).toBe('3174000000000002');
+    expect(setupProfile).toEqual(createEmptySensitiveProfile());
     expect(container.outerHTML).not.toContain('local-passphrase');
+    expect(await screen.findByLabelText('Birth date')).toBeTruthy();
     expect((await screen.findByRole('status')).textContent).toBe(
       'Sensitive vault is unlocked.',
     );
+  });
+
+  it('shows only an unlock action while a configured vault is locked', async () => {
+    const client = createVaultClient();
+    vi.mocked(client.status).mockResolvedValueOnce({
+      ok: true,
+      status: { configured: true, unlocked: false, expiresAt: null },
+    });
+
+    render(<SensitiveVaultSection vaultClient={client} />);
+
+    expect(await screen.findByLabelText(/vault passphrase/i)).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: /unlock vault/i }),
+    ).toBeTruthy();
+    expect(screen.queryByLabelText(/national id/i)).toBeNull();
+  });
+
+  it('shows the sensitive editor only after a configured vault is unlocked', async () => {
+    const client = createVaultClient();
+    vi.mocked(client.status).mockResolvedValueOnce({
+      ok: true,
+      status: { configured: true, unlocked: true, expiresAt: 1786639500000 },
+    });
+
+    render(<SensitiveVaultSection vaultClient={client} />);
+
+    expect(await screen.findByLabelText(/national id/i)).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: /save sensitive data/i }),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: /lock vault/i })).toBeTruthy();
   });
 
   it('unlocks an existing vault, saves edits, and locks explicitly', async () => {

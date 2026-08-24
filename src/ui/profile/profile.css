@@ -133,7 +133,6 @@ select {
   font-size: 13px;
 }
 
-/* Vault markup is migrated in Task 3; retain its current profile-page contract. */
 .section-heading {
   display: flex;
   align-items: flex-start;
@@ -262,6 +261,41 @@ select {
 .default-variant {
   max-width: 360px;
   margin-top: var(--fillio-space-5);
+}
+
+.vault-section {
+  display: grid;
+  gap: var(--fillio-space-4);
+}
+
+.vault-section > * {
+  margin-bottom: 0;
+}
+
+.vault-section .section-heading h2,
+.vault-section .section-heading .muted {
+  margin-bottom: 0;
+}
+
+.vault-section .section-heading .muted {
+  max-width: 60ch;
+  margin-top: var(--fillio-space-2);
+}
+
+.vault-section .fillio-status {
+  margin: 0;
+}
+
+.vault-section .form-grid {
+  margin-top: 0;
+}
+
+.vault-actions {
+  margin-top: 0;
+}
+
+.vault-unlock-field {
+  margin-top: 0;
 }
 
 @media (max-width: 720px) {

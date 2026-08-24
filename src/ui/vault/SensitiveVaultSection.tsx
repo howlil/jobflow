@@ -168,26 +168,36 @@ export function SensitiveVaultSection({
     setMessage(null);
   }
 
+  const passphraseMismatch = error === 'Passphrases do not match.';
+
   return (
-    <section className="profile-section">
-      <div className="section-heading">
+    <section className="profile-section vault-section">
+      <div className="section-heading fillio-section-heading">
         <div>
           <h2>Sensitive vault</h2>
           <p className="muted">
-            Encrypted local data for fields that require explicit disclosure.
+            Sensitive details are stored encrypted on this device and require
+            explicit approval before Fillio can use them on a site.
           </p>
         </div>
-        <strong>
+        <strong className="fillio-chip fillio-chip-strong">
           {vaultStatus.configured ? 'Vault set up' : 'Vault not set up'}
         </strong>
       </div>
 
-      {error !== null ? <p role="alert">{error}</p> : null}
-      {message !== null ? <p role="status">{message}</p> : null}
+      {error !== null ? (
+        <p className="fillio-status fillio-status-danger" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {message !== null ? (
+        <p className="fillio-status fillio-status-success" role="status">
+          {message}
+        </p>
+      ) : null}
 
       {!vaultStatus.configured ? (
         <>
-          <SensitiveProfileFields profile={profile} onChange={changeProfile} />
           <div className="form-grid">
             <label>
               New vault passphrase
@@ -202,30 +212,51 @@ export function SensitiveVaultSection({
               <input
                 type="password"
                 value={confirmPassphrase}
+                aria-invalid={passphraseMismatch}
                 onChange={(event) => setConfirmPassphrase(event.target.value)}
               />
             </label>
           </div>
-          <button type="button" onClick={() => void setupVault()}>
+          <button
+            className="fillio-button fillio-button-primary"
+            type="button"
+            onClick={() => void setupVault()}
+          >
             Set up vault
           </button>
         </>
       ) : vaultStatus.unlocked ? (
         <>
           <SensitiveProfileFields profile={profile} onChange={changeProfile} />
-          <div className="button-row">
-            <button type="button" onClick={() => void saveVault()}>
+          <div className="button-row vault-actions">
+            <button
+              className="fillio-button fillio-button-primary"
+              type="button"
+              onClick={() => void saveVault()}
+            >
               Save sensitive data
             </button>
-            <button type="button" onClick={() => void lockVault()}>
+            <button
+              className="fillio-button fillio-button-secondary"
+              type="button"
+              onClick={() => void lockVault()}
+            >
               Lock vault
             </button>
             {confirmReset ? (
-              <button type="button" onClick={() => void resetVault()}>
+              <button
+                className="fillio-button fillio-button-danger"
+                type="button"
+                onClick={() => void resetVault()}
+              >
                 Delete encrypted vault
               </button>
             ) : (
-              <button type="button" onClick={() => setConfirmReset(true)}>
+              <button
+                className="fillio-button"
+                type="button"
+                onClick={() => setConfirmReset(true)}
+              >
                 Reset vault
               </button>
             )}
@@ -233,7 +264,7 @@ export function SensitiveVaultSection({
         </>
       ) : (
         <>
-          <label className="default-variant">
+          <label className="default-variant vault-unlock-field">
             Vault passphrase
             <input
               type="password"
@@ -241,7 +272,11 @@ export function SensitiveVaultSection({
               onChange={(event) => setPassphrase(event.target.value)}
             />
           </label>
-          <button type="button" onClick={() => void unlockVault()}>
+          <button
+            className="fillio-button fillio-button-primary"
+            type="button"
+            onClick={() => void unlockVault()}
+          >
             Unlock vault
           </button>
         </>
