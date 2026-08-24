@@ -578,7 +578,8 @@ Expected: all pass.
 
 **Interfaces:**
 - Produces a browser acceptance script that launches Chromium with `.output/chrome-mv3`.
-- Produces screenshots under `.agent/design-audits/iteration-6-verification/`.
+- Produces disposable runtime screenshots under ignored `test-results/iteration-6-design-polish/`.
+- Keeps reviewed screenshot evidence committed under `.agent/design-audits/iteration-6-verification/`.
 - Does not submit forms, click Next, upload files, or fill sensitive values without explicit test action.
 
 - [ ] **Step 1: Create RED acceptance script**
@@ -623,7 +624,7 @@ rtk pnpm build
 rtk pnpm test:e2e
 ```
 
-Expected: all E2E scripts pass and screenshots are saved.
+Expected: all E2E scripts pass and disposable screenshots are saved outside tracked evidence.
 
 ---
 
