@@ -110,16 +110,18 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByLabel('First name').fill('Vault');
   await page.getByLabel('Primary email').fill('vault@example.com');
+  await expect(page.getByText('Vault not set up')).toBeVisible();
+  await expect(page.getByLabel('Birth date')).toHaveCount(0);
+  await page.getByLabel('New vault passphrase').fill('local-passphrase');
+  await page.getByLabel('Confirm vault passphrase').fill('local-passphrase');
+  await page.getByRole('button', { name: 'Set up vault' }).click();
+  await expect(page.getByText('Sensitive vault is unlocked.')).toBeVisible();
   await page.getByLabel('Birth date').fill('2001-02-03');
   await page.getByLabel('National ID').fill('3174000000000001');
   await page.getByLabel('Expected salary', { exact: true }).fill('15000000');
   await page.getByLabel('Expected salary currency').fill('IDR');
-  await page.getByLabel('New vault passphrase').fill('local-passphrase');
-  await page.getByLabel('Confirm vault passphrase').fill('local-passphrase');
-  await page.getByRole('button', { name: 'Set up vault' }).click();
-  await expect(page.getByRole('status')).toHaveText(
-    'Sensitive vault is unlocked.',
-  );
+  await page.getByRole('button', { name: 'Save sensitive data' }).click();
+  await expect(page.getByText('Sensitive data saved.')).toBeVisible();
   await page.getByRole('button', { name: 'Save profile' }).click();
   await expect(page.getByText('Profile saved.')).toBeVisible();
 
