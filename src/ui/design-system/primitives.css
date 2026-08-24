@@ -36,7 +36,7 @@
 }
 
 .fillio-button-primary:hover:not(:disabled) {
-  background: #30343d;
+  background: var(--fillio-color-text-hover);
 }
 
 .fillio-button-secondary {
@@ -50,7 +50,7 @@
 }
 
 .fillio-button-danger:hover:not(:disabled) {
-  background: #8f1d13;
+  background: var(--fillio-color-danger-hover);
 }
 
 .fillio-chip,

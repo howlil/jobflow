@@ -9,8 +9,8 @@ buttons, chips, status messages, section headings, and empty rows.
 Use the `--fillio-*` custom properties instead of repeating shared values:
 
 - Colors: `bg`, `surface`, `surface-subtle`, `text`, `muted`, `border`,
-  `border-strong`, `focus`, `danger`, `danger-bg`, `success`, `success-bg`,
-  `warning`, and `warning-bg`
+  `border-strong`, `focus`, `text-hover`, `danger`, `danger-bg`,
+  `danger-hover`, `success`, `success-bg`, `warning`, and `warning-bg`
 - Radius: `radius-sm`, `radius-md`, and `radius-lg`
 - Shadow: `shadow-panel`
 - Spacing: `space-1` through `space-8`

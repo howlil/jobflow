@@ -3,12 +3,14 @@
   --fillio-color-surface: #ffffff;
   --fillio-color-surface-subtle: #f1f3f5;
   --fillio-color-text: #111318;
+  --fillio-color-text-hover: #30343d;
   --fillio-color-muted: #5f6673;
   --fillio-color-border: #d9dde3;
   --fillio-color-border-strong: #b8bec8;
   --fillio-color-focus: #2563eb;
   --fillio-color-danger: #b42318;
   --fillio-color-danger-bg: #fff1f0;
+  --fillio-color-danger-hover: #8f1d13;
   --fillio-color-success: #027a48;
   --fillio-color-success-bg: #ecfdf3;
   --fillio-color-warning: #b54708;
