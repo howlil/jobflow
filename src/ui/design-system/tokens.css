@@ -1,0 +1,28 @@
+:root {
+  --fillio-color-bg: #f6f7f8;
+  --fillio-color-surface: #ffffff;
+  --fillio-color-surface-subtle: #f1f3f5;
+  --fillio-color-text: #111318;
+  --fillio-color-muted: #5f6673;
+  --fillio-color-border: #d9dde3;
+  --fillio-color-border-strong: #b8bec8;
+  --fillio-color-focus: #2563eb;
+  --fillio-color-danger: #b42318;
+  --fillio-color-danger-bg: #fff1f0;
+  --fillio-color-success: #027a48;
+  --fillio-color-success-bg: #ecfdf3;
+  --fillio-color-warning: #b54708;
+  --fillio-color-warning-bg: #fffaeb;
+  --fillio-radius-sm: 6px;
+  --fillio-radius-md: 8px;
+  --fillio-radius-lg: 10px;
+  --fillio-shadow-panel: 0 16px 40px rgba(17, 24, 39, 0.12);
+  --fillio-space-1: 4px;
+  --fillio-space-2: 8px;
+  --fillio-space-3: 12px;
+  --fillio-space-4: 16px;
+  --fillio-space-5: 20px;
+  --fillio-space-6: 24px;
+  --fillio-space-7: 32px;
+  --fillio-space-8: 40px;
+}
