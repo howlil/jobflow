@@ -37,13 +37,14 @@ function getPrimaryActionLabel(
   profileComplete: boolean,
   pageSummary: PageAnalysisSummary | null | undefined,
 ): string {
-  if (!profileComplete) return 'Open profile settings';
+  if (!profileComplete) return 'Complete profile';
   if (pageSummary === null || pageSummary === undefined) {
     return 'Open profile settings';
   }
-  if (pageSummary.ready > 0) return 'Fill safe fields';
-  if (pageSummary.needsReview > 0) return 'Review fields';
-  if (pageSummary.sensitive > 0) return 'Open vault settings';
+  if (pageSummary.ready > 0 || pageSummary.needsReview > 0) {
+    return 'Prepare fields in settings';
+  }
+  if (pageSummary.sensitive > 0) return 'Manage vault in settings';
   return 'Open profile settings';
 }
 

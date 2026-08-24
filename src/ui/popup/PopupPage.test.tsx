@@ -14,6 +14,45 @@ function createRepository(
   };
 }
 
+function createCompleteProfile() {
+  const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
+  profile.baseProfile.personal.legalName.first = 'Ulil';
+  profile.baseProfile.personal.legalName.last = 'Abshar';
+  profile.baseProfile.contact.whatsapp = '+628123456789';
+  profile.baseProfile.links.github = 'https://github.com/ulil';
+  profile.baseProfile.professional.experiences.push({
+    id: 'experience-1',
+    company: 'Fillio',
+    title: 'Engineer',
+    employmentType: '',
+    location: '',
+    startDate: '',
+    endDate: '',
+    current: false,
+    description: '',
+    achievements: [],
+  });
+  profile.baseProfile.professional.education.push({
+    id: 'education-1',
+    institution: 'Fillio University',
+    degree: '',
+    fieldOfStudy: '',
+    location: '',
+    startDate: '',
+    endDate: '',
+    gpa: null,
+    maxGpa: null,
+    description: '',
+  });
+  profile.baseProfile.professional.skills.push({
+    id: 'skill-1',
+    name: 'TypeScript',
+    level: '',
+    yearsExperience: null,
+  });
+  return profile;
+}
+
 describe('PopupPage', () => {
   it('shows empty readiness and opens profile settings', async () => {
     const openOptions = vi.fn().mockResolvedValue(undefined);
@@ -31,7 +70,7 @@ describe('PopupPage', () => {
     expect(screen.getByText('0 application variants')).toBeTruthy();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Open profile settings' }),
+      screen.getByRole('button', { name: 'Complete profile' }),
     );
 
     await waitFor(() => expect(openOptions).toHaveBeenCalledTimes(1));
@@ -39,7 +78,10 @@ describe('PopupPage', () => {
 
   it('guides people to open a job application form when none is detected', async () => {
     render(
-      <PopupPage repository={createRepository(null)} openOptions={vi.fn()} />,
+      <PopupPage
+        repository={createRepository(createCompleteProfile())}
+        openOptions={vi.fn()}
+      />,
     );
 
     expect(
@@ -111,4 +153,56 @@ describe('PopupPage', () => {
     expect(screen.getByText('1 sensitive')).toBeTruthy();
     expect(screen.getByText('3 unknown')).toBeTruthy();
   });
+
+  it.each([
+    {
+      name: 'safe fields',
+      pageSummary: {
+        ready: 2,
+        needsReview: 0,
+        sensitive: 0,
+        unknown: 0,
+        total: 2,
+      },
+      expectedLabel: 'Prepare fields in settings',
+    },
+    {
+      name: 'review fields',
+      pageSummary: {
+        ready: 0,
+        needsReview: 2,
+        sensitive: 0,
+        unknown: 0,
+        total: 2,
+      },
+      expectedLabel: 'Prepare fields in settings',
+    },
+    {
+      name: 'sensitive fields',
+      pageSummary: {
+        ready: 0,
+        needsReview: 0,
+        sensitive: 2,
+        unknown: 0,
+        total: 2,
+      },
+      expectedLabel: 'Manage vault in settings',
+    },
+  ])(
+    'uses a truthful settings CTA when $name are detected',
+    async ({ pageSummary, expectedLabel }) => {
+      render(
+        <PopupPage
+          repository={createRepository(createCompleteProfile())}
+          openOptions={vi.fn()}
+          pageSummary={pageSummary}
+        />,
+      );
+
+      expect(await screen.findByRole('button', { name: expectedLabel })).toBeTruthy();
+      expect(screen.queryByRole('button', { name: /fill safe fields/i })).toBeNull();
+      expect(screen.queryByRole('button', { name: /review fields/i })).toBeNull();
+      expect(screen.queryByRole('button', { name: /open vault settings/i })).toBeNull();
+    },
+  );
 });
