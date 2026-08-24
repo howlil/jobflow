@@ -47,19 +47,31 @@ export function FloatingPanel({
   const [passphrase, setPassphrase] = useState('');
   const fillLabel =
     summary.ready === 0
-      ? 'No ready fields'
+      ? 'No safe fields ready to fill yet'
       : `Fill ${summary.ready} ready ${summary.ready === 1 ? 'field' : 'fields'}`;
 
   return (
     <aside className="fillio-panel" aria-label="Fillio form assistant">
       <div className="fillio-panel__header">
         <strong>Fillio</strong>
-        <span>{summary.ready} ready</span>
       </div>
       <div className="fillio-panel__counts" aria-label="Form analysis summary">
-        <span>{summary.needsReview} needs review</span>
-        <span>{summary.sensitive} sensitive</span>
-        <span>{summary.unknown} unknown</span>
+        <span className="fillio-chip">
+          <span>Ready</span>
+          <strong>{summary.ready}</strong>
+        </span>
+        <span className="fillio-chip">
+          <span>Review</span>
+          <strong>{summary.needsReview}</strong>
+        </span>
+        <span className="fillio-chip">
+          <span>Sensitive</span>
+          <strong>{summary.sensitive}</strong>
+        </span>
+        <span className="fillio-chip">
+          <span>Unknown</span>
+          <strong>{summary.unknown}</strong>
+        </span>
       </div>
 
       {reviewItems.length > 0 && onRemember !== undefined ? (
@@ -79,6 +91,7 @@ export function FloatingPanel({
                 <div className="fillio-panel__review-actions">
                   {item.match.candidates.map((candidate) => (
                     <button
+                      className="fillio-panel__action--secondary"
                       type="button"
                       key={candidate.field}
                       aria-label={`Use ${candidate.field} for ${label}`}
@@ -88,6 +101,7 @@ export function FloatingPanel({
                     </button>
                   ))}
                   <button
+                    className="fillio-panel__action--secondary"
                     type="button"
                     aria-label={`Ignore ${label}`}
                     onClick={() => onRemember(item.context, 'ignore')}
@@ -102,27 +116,37 @@ export function FloatingPanel({
       ) : null}
 
       {sensitiveItems.length > 0 ? (
-        <div
-          className="fillio-panel__reviews"
+        <section
+          className="fillio-panel__sensitive"
           aria-label="Sensitive fields requiring approval"
         >
-          {sensitiveItems.map((item) => (
-            <div
-              className="fillio-panel__review"
-              key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
-            >
-              <strong>{fieldLabel(item.context)}</strong>
-            </div>
-          ))}
+          <h2 className="fillio-panel__section-heading">
+            Sensitive fields detected
+          </h2>
+          <ul className="fillio-panel__sensitive-list">
+            {sensitiveItems.map((item) => (
+              <li
+                key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+              >
+                {fieldLabel(item.context)}
+              </li>
+            ))}
+          </ul>
           {sensitiveError !== null ? (
-            <p role="alert">{sensitiveError}</p>
+            <p className="fillio-panel__sensitive-error" role="alert">
+              {sensitiveError}
+            </p>
           ) : null}
           {vaultStatus === 'not-configured' ? (
-            <button type="button" onClick={onOpenOptions}>
-              Open vault settings
+            <button
+              className="fillio-panel__action fillio-panel__action--primary"
+              type="button"
+              onClick={onOpenOptions}
+            >
+              Set up vault
             </button>
           ) : vaultStatus === 'locked' ? (
-            <>
+            <div className="fillio-panel__unlock">
               <label>
                 Vault passphrase
                 <input
@@ -132,18 +156,23 @@ export function FloatingPanel({
                 />
               </label>
               <button
+                className="fillio-panel__action fillio-panel__action--primary"
                 type="button"
                 onClick={() => onUnlockSensitive?.(passphrase)}
               >
                 Unlock vault
               </button>
-            </>
+            </div>
           ) : vaultStatus === 'unlocked' ? (
-            <button type="button" onClick={onFillSensitive}>
+            <button
+              className="fillio-panel__action fillio-panel__action--primary"
+              type="button"
+              onClick={onFillSensitive}
+            >
               Fill sensitive fields on {siteHost}
             </button>
           ) : null}
-        </div>
+        </section>
       ) : null}
 
       <button

@@ -5,12 +5,13 @@ import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-p
 import type { FieldContext } from '../../domain/forms/field-context';
 import { FloatingPanel } from './FloatingPanel';
 
-function sensitiveItem(): FillAnalysis {
+function sensitiveItem(label = 'NIK'): FillAnalysis {
+  const fieldFingerprint = label.toLowerCase().replaceAll(' ', '-');
   const context: FieldContext = {
     controlKind: 'input',
     inputType: 'text',
-    label: 'NIK',
-    name: 'nik',
+    label,
+    name: fieldFingerprint,
     id: '',
     placeholder: '',
     ariaLabel: '',
@@ -18,7 +19,7 @@ function sensitiveItem(): FillAnalysis {
     sectionText: '',
     origin: 'https://jobs.example.test',
     formFingerprint: 'form',
-    fieldFingerprint: 'nik',
+    fieldFingerprint,
   };
   return {
     context,
@@ -32,6 +33,28 @@ function sensitiveItem(): FillAnalysis {
 }
 
 describe('FloatingPanel sensitive disclosure', () => {
+  it('groups sensitive field labels without exposing values', () => {
+    render(
+      <FloatingPanel
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 2,
+          unknown: 0,
+          total: 2,
+        }}
+        sensitiveItems={[sensitiveItem('Date of birth'), sensitiveItem('NIK')]}
+        vaultStatus="locked"
+        onFill={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Sensitive fields detected')).toBeTruthy();
+    expect(screen.getByText('Date of birth')).toBeTruthy();
+    expect(screen.getByText('NIK')).toBeTruthy();
+    expect(screen.queryByText(/123456/)).toBeNull();
+  });
+
   it('offers settings when sensitive fields are present but no vault exists', () => {
     const openOptions = vi.fn();
 
@@ -54,7 +77,7 @@ describe('FloatingPanel sensitive disclosure', () => {
 
     expect(screen.getByText('NIK')).toBeTruthy();
     fireEvent.click(
-      screen.getByRole('button', { name: 'Open vault settings' }),
+      screen.getByRole('button', { name: 'Set up vault' }),
     );
     expect(openOptions).toHaveBeenCalledTimes(1);
   });

@@ -20,10 +20,13 @@ describe('FloatingPanel', () => {
       />,
     );
 
-    expect(screen.getByText('3 ready')).toBeTruthy();
-    expect(screen.getByText('1 needs review')).toBeTruthy();
-    expect(screen.getByText('1 sensitive')).toBeTruthy();
-    expect(screen.getByText('2 unknown')).toBeTruthy();
+    expect(screen.getByText('3')).toBeTruthy();
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    expect(screen.getByText('2')).toBeTruthy();
+    expect(screen.getByText('Ready')).toBeTruthy();
+    expect(screen.getByText('Review')).toBeTruthy();
+    expect(screen.getByText('Sensitive')).toBeTruthy();
+    expect(screen.getByText('Unknown')).toBeTruthy();
     expect(fill).not.toHaveBeenCalled();
 
     fireEvent.click(
@@ -46,7 +49,9 @@ describe('FloatingPanel', () => {
       />,
     );
 
-    const button = screen.getByRole('button', { name: 'No ready fields' });
+    const button = screen.getByRole('button', {
+      name: 'No safe fields ready to fill yet',
+    });
     expect((button as HTMLButtonElement).disabled).toBe(true);
   });
 });
