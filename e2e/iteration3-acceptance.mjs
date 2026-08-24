@@ -34,6 +34,15 @@ const fixtureUrl = `http://127.0.0.1:${address.port}/apply`;
 const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i3-'));
 let context;
 
+async function expectReviewCount(page, count) {
+  const reviewChip = page
+    .getByLabel('Form analysis summary')
+    .locator('.fillio-chip')
+    .filter({ hasText: 'Review' });
+
+  await expect(reviewChip).toHaveText(new RegExp(`^Review\\s*${count}$`));
+}
+
 try {
   context = await chromium.launchPersistentContext(dataDir, {
     channel: 'chromium',
@@ -56,7 +65,7 @@ try {
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
 
   await page.goto(fixtureUrl);
-  await expect(page.getByText('1 needs review')).toBeVisible();
+  await expectReviewCount(page, 1);
   await page
     .getByRole('button', { name: 'Use personal.legalName.first for Name' })
     .click();
@@ -90,7 +99,7 @@ try {
   await expect(
     page.getByRole('button', { name: 'Fill 3 ready fields' }),
   ).toBeVisible();
-  await expect(page.getByText('0 needs review')).toBeVisible();
+  await expectReviewCount(page, 0);
   await expect(page.getByLabel('Name', { exact: true })).toHaveValue('');
 
   await page.evaluate(() => {
@@ -99,7 +108,7 @@ try {
     form.id = 'different-application';
     form.setAttribute('action', '/different-apply');
   });
-  await expect(page.getByText('1 needs review')).toBeVisible();
+  await expectReviewCount(page, 1);
   await expect(
     page.getByRole('button', { name: 'Fill 2 ready fields' }),
   ).toBeVisible();
