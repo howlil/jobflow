@@ -4,7 +4,7 @@ This file is the single current-state tracker. Do not create permanent iteration
 
 ## Project status
 
-Phase: Iteration 5 PR is open and CI is green; merge, fresh master verification, and release tag pending.
+Phase: Iteration 5 merged and verified on `master`; release tag pending.
 
 Repository state: the Fillio Chromium extension has a verified local-first profile foundation, generic form analysis and explicit safe autofill, dynamic/multi-step re-analysis, scoped user correction memory, and a verified encrypted-at-rest Sensitive Data Vault. Vault data has a versioned envelope, authenticated local encryption, validated decryption, encrypted browser persistence, a generic memory-only inactivity session, typed runtime messages/client, and a background-owned vault broker. Supported sensitive form fields are classified into a separate fail-closed plan bucket and surfaced in page summaries without becoming normal Ready fields. The options/profile page exposes opt-in vault setup, unlock, edit/save, explicit lock, and destructive reset controls through the runtime client. The in-page panel discloses sensitive fields, supports unlock without fill, and requires a separate site-specific approval before requesting only the current sensitive values from the background broker. MVP hardening now includes an expanded career-form corpus, reusable manifest verification, README/user documentation, normalized formatting baseline, full local verification, and a packaged `0.1.0` Chromium ZIP.
 
@@ -160,15 +160,16 @@ Current verification evidence:
 - Repo-wide Prettier check still has pre-existing Windows line-ending/style drift outside the current task; focused formatting was applied to touched files.
 - Manifest permission surface remains unchanged from Iteration 3.
 
-Remaining repository integration before branch completion:
+Repository integration status:
 
-- Squash merge and fresh `master` CI.
+- PR #5 was squash merged to `master` as `9913a4d`.
+- Fresh `master` verification passed locally.
 
 Do not merge this iteration while any remaining item above is incomplete.
 
 ## Iteration 5 — MVP hardening and release
 
-Status: PR open with green CI; merge, fresh master verification, and release tag pending.
+Status: merged and verified on `master`; release tag pending.
 
 Delivered locally:
 
@@ -198,10 +199,11 @@ Repository integration evidence:
 
 - PR #5 opened against `master`: https://github.com/howlil/fillio/pull/5
 - GitHub Actions `verify` check passed for the PR branch.
+- PR #5 squash merged to `master` as `9913a4d`.
+- Fresh `master` verification passed locally after merge.
 
 Remaining repository/release integration:
 
-- Squash merge and verify fresh `master`.
 - Create first `0.x` release tag only from verified `master`.
 
 ## Iteration discipline
