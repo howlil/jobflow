@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const extensionDir = resolve('.output/chrome-mv3');
-const screenshotsDir = resolve('.agent/design-audits/iteration-6-verification');
+const screenshotsDir = resolve('test-results/iteration-6-design-polish');
 const manifest = JSON.parse(
   await readFile(join(extensionDir, 'manifest.json'), 'utf8'),
 );

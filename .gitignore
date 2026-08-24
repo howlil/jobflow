@@ -4,6 +4,7 @@ node_modules/
 .output/
 .wxt/
 coverage/
+test-results/
 *.zip
 web-ext.config.ts
 .DS_Store
