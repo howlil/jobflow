@@ -72,6 +72,7 @@ describe('ProfilePage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save profile' }));
 
     await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+    expect(screen.getByRole('status').textContent).toBe('Profile saved.');
     const saved = save.mock.calls[0]?.[0];
 
     expect(saved?.baseProfile.personal.legalName.first).toBe('Ulil');

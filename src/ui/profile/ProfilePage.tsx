@@ -163,7 +163,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           </p>
         </div>
         <div className="profile-save-action">
-          <p className="profile-save-state" aria-live="polite">
+          <p className="profile-save-state" role="status" aria-live="polite">
             {saveStateText}
           </p>
           <button
