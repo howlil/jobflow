@@ -34,3 +34,16 @@ Status: DONE_WITH_CONCERNS
 ## Concerns
 
 The mandated repository-wide `format:check` remains blocked by pre-existing formatting drift in the three `.superpowers` task/progress documents. Those files are outside the requested ownership scope and were intentionally left unchanged.
+
+## Format-check fix
+
+Status: FIXED
+
+- Added `.superpowers/` to `.prettierignore` so SDD scratch artifacts are excluded from repository formatting checks.
+- `rtk pnpm typecheck`: PASS.
+- `rtk pnpm lint`: PASS.
+- `rtk pnpm format:check`: PASS.
+- `rtk git diff --check`: PASS.
+- Fix commit: recorded in the follow-up commit created after verification.
+
+Remaining concerns: none for this task.
