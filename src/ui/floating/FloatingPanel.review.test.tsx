@@ -20,7 +20,7 @@ it('lets the user remember or ignore a Review field', () => {
   };
   render(
     <FloatingPanel
-      summary={{ ready: 0, needsReview: 1, unknown: 0, total: 1 }}
+      summary={{ ready: 0, needsReview: 1, sensitive: 0, unknown: 0, total: 1 }}
       reviewItems={[
         {
           context,

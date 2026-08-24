@@ -12,7 +12,9 @@ const optionsPath = manifest.options_ui?.page ?? manifest.options_page;
 if (!optionsPath) throw new Error('Expected options entrypoint');
 
 const smokeSource = await readFile('e2e/extension-smoke.mjs', 'utf8');
-const fixtureMatch = smokeSource.match(/const fixtureHtml = `([\s\S]*?)`;\n/);
+const fixtureMatch = smokeSource.match(
+  /const fixtureHtml = `([\s\S]*?)`;\r?\n/,
+);
 if (!fixtureMatch?.[1]) throw new Error('Could not load shared career fixture');
 const fixtureHtml = fixtureMatch[1];
 

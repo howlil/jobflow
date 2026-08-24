@@ -82,6 +82,7 @@ export function PopupPage({
           <div className="page-summary" aria-label="Current page form analysis">
             <span>{pageSummary.ready} ready</span>
             <span>{pageSummary.needsReview} needs review</span>
+            <span>{pageSummary.sensitive} sensitive</span>
             <span>{pageSummary.unknown} unknown</span>
           </div>
         )}

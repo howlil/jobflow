@@ -4,9 +4,9 @@ This file is the single current-state tracker. Do not create permanent iteration
 
 ## Project status
 
-Phase: Iteration 3 complete; Iteration 4 ready.
+Phase: Iteration 5 PR is open and CI is green; merge, fresh master verification, and release tag pending.
 
-Repository state: the Fillio Chromium extension has a verified local-first profile foundation, generic form analysis and explicit safe autofill, plus dynamic/multi-step re-analysis and scoped user correction memory. It can detect representative career-form controls, map supported factual fields deterministically, expose Ready / Needs review / Unknown results, remember an explicit mapping or ignore decision for the exact site/form/field, re-analyze relevant DOM changes without filling automatically, fill only Ready values after an explicit user action, and surface current-page analysis through the toolbar popup.
+Repository state: the Fillio Chromium extension has a verified local-first profile foundation, generic form analysis and explicit safe autofill, dynamic/multi-step re-analysis, scoped user correction memory, and a verified encrypted-at-rest Sensitive Data Vault. Vault data has a versioned envelope, authenticated local encryption, validated decryption, encrypted browser persistence, a generic memory-only inactivity session, typed runtime messages/client, and a background-owned vault broker. Supported sensitive form fields are classified into a separate fail-closed plan bucket and surfaced in page summaries without becoming normal Ready fields. The options/profile page exposes opt-in vault setup, unlock, edit/save, explicit lock, and destructive reset controls through the runtime client. The in-page panel discloses sensitive fields, supports unlock without fill, and requires a separate site-specific approval before requesting only the current sensitive values from the background broker. MVP hardening now includes an expanded career-form corpus, reusable manifest verification, README/user documentation, normalized formatting baseline, full local verification, and a packaged `0.1.0` Chromium ZIP.
 
 ## Decisions locked
 
@@ -18,9 +18,12 @@ Repository state: the Fillio Chromium extension has a verified local-first profi
 - Floating in-page action + toolbar popup/detail UI.
 - Manual profile creation now; future CV import writes into the same canonical schema.
 - Complete canonical profile schema with progressive UI disclosure.
-- Sensitive Data Vault is opt-in, passphrase-protected, encrypted locally; implementation begins in Iteration 4.
-- Vault auto-lock target: 30 minutes of Fillio inactivity.
-- Sensitive disclosure requires explicit approval for the current site/fill operation.
+- Sensitive Data Vault is opt-in, passphrase-protected, encrypted locally.
+- Vault crypto baseline: PBKDF2-HMAC-SHA-256 with 600,000 iterations, random 16-byte salt, AES-256-GCM, fresh random 12-byte IV per encryption, 128-bit tag, and stable version AAD.
+- Vault key material is non-extractable and intended to live only in the background in-memory unlock session once runtime wiring is introduced.
+- Vault auto-lock target: 30 minutes of Fillio vault inactivity; browser service-worker suspension may lock sooner.
+- Sensitive disclosure requires explicit approval for the current site/fill operation; unlock alone is never fill approval.
+- Government-ID and other sensitive form fields remain fail-closed/manual until the dedicated sensitive disclosure path is implemented and verified.
 - One base profile + lightweight application variants.
 - Variant recommendation uses deterministic page/job keyword scoring when page-level recommendation work is introduced.
 - Field confidence: Ready / Needs review / Unknown.
@@ -124,32 +127,82 @@ Final Iteration 3 branch verification: 57 unit/UI tests plus typecheck, lint, fo
 
 ## Iteration 4 — Sensitive Data Vault
 
-Status: ready.
+Status: completed.
 
-Expected scope:
+Completed foundation:
 
-- opt-in vault setup
-- PBKDF2/AES-GCM envelope
-- unlock session
-- 30-minute Fillio-inactivity auto-lock
-- sensitive field classification
-- per-site fill disclosure summary/approval
-- reset flow with destructive confirmation
-- security-focused tests
+1. Strict versioned encrypted vault envelope with no plaintext profile/passphrase fields.
+2. Complete empty `SensitiveProfile` factory validated against the existing domain schema.
+3. PBKDF2-HMAC-SHA-256 key derivation at 600,000 iterations and non-extractable AES-256-GCM key material.
+4. AES-GCM authenticated encryption with stable version AAD, random 16-byte salt, and fresh random 12-byte IV.
+5. Sensitive profile serialization/deserialization is schema-validated before encryption and after authenticated decryption.
+6. Wrong passphrase and ciphertext tampering fail closed through the vault unlock error contract.
+7. Re-encryption preserves KDF salt, rotates IV, and updates metadata.
+8. `VaultRepository` port plus `ChromeVaultRepository` storing only the validated encrypted envelope under `fillio.vault`.
+9. Generic memory-only `VaultSession` with explicit lock, explicit activity refresh, and 30-minute idle expiry.
+10. Security regression tests verify no representative plaintext/passphrase is present in the envelope, independent setup salt/IV randomness, authenticated tamper rejection, invalid decrypted-profile rejection, correct/wrong passphrase behavior, and encrypted storage load/save/delete.
+11. Typed vault runtime messages and `ChromeVaultClient` for status/setup/unlock/lock/load-profile/save-profile/read-fields/reset.
+12. Background runtime broker owns `VaultSession<CryptoKey>`, persists only encrypted envelopes, returns fail-closed errors for invalid/locked/unconfigured states, and does not expose passphrase/key material in status responses.
+13. Sensitive aliases for high-frequency scalar vault values classify as Sensitive rather than Unknown.
+14. Sensitive matches are excluded from normal Ready fill instructions even when the normal profile has values.
+15. Correction memory cannot override sensitive/file fail-closed guards.
+16. Page and popup/floating summaries include a Sensitive count while preserving Ready / Needs review / Unknown semantics.
+17. Vault options UI supports passphrase-confirmed setup, locked/unlocked states, scalar sensitive profile editing, save through re-encryption, explicit lock, and two-step destructive reset.
+18. Floating panel shows sensitive field labels without values, opens vault settings when absent, unlocks without filling, shows generic unlock errors, and fills sensitive fields only after a separate current-site approval.
+19. Sensitive fill requests resolve only the detected field paths and skip missing/empty vault values.
+20. Chromium security acceptance verifies encrypted storage contains no passphrase/plaintext sensitive values, normal Fill skips sensitive controls, wrong passphrase fails, unlock does not fill, explicit site approval fills only configured sensitive values, submit count remains zero, and reset removes the encrypted vault.
+
+Current verification evidence:
+
+- `pnpm install --frozen-lockfile` passes.
+- 26 test files / 97 tests pass.
+- Typecheck, lint, production build, legacy Chromium E2E journeys, Iteration 4 vault E2E, extension packaging, and generated-manifest invariants pass locally.
+- Repo-wide Prettier check still has pre-existing Windows line-ending/style drift outside the current task; focused formatting was applied to touched files.
+- Manifest permission surface remains unchanged from Iteration 3.
+
+Remaining repository integration before branch completion:
+
+- Squash merge and fresh `master` CI.
+
+Do not merge this iteration while any remaining item above is incomplete.
 
 ## Iteration 5 — MVP hardening and release
 
-Status: queued.
+Status: PR open with green CI; merge, fresh master verification, and release tag pending.
 
-Expected scope:
+Delivered locally:
 
-- test corpus expansion across representative local/global career form patterns
-- permission review
-- performance profiling of scanning/mutation behavior
-- accessibility pass
-- packaging and release workflow
-- README/user documentation
-- first `0.x` tagged release
+1. Expanded representative local/global career-form matcher corpus.
+2. Sensitive/file fail-closed coverage in the expanded corpus.
+3. Reusable `pnpm verify:manifest` script for generated-manifest invariants.
+4. CI manifest verification now uses the shared script.
+5. README with local setup, prototype loading, verification, privacy/security behavior, and release constraints.
+6. Repository-wide Prettier baseline normalized; `pnpm format:check` now passes.
+7. Extension permission surface remains `storage` only with no `host_permissions`.
+8. Local package artifact builds as `.output/fillio-0.1.0-chrome.zip`.
+
+Final local verification evidence:
+
+- `pnpm install --frozen-lockfile`
+- `pnpm test`: 27 files / 118 tests
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm format:check`
+- `pnpm build`
+- `pnpm verify:manifest`
+- `pnpm test:e2e`
+- `pnpm zip`
+- `git diff --check`
+
+Repository integration evidence:
+
+- PR #5 opened against `master`: https://github.com/howlil/fillio/pull/5
+- GitHub Actions `verify` check passed for the PR branch.
+
+Remaining repository/release integration:
+
+- Squash merge and verify fresh `master`.
+- Create first `0.x` release tag only from verified `master`.
 
 ## Iteration discipline
 

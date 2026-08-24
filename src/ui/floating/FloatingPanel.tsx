@@ -1,13 +1,24 @@
+import { useState } from 'react';
+
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
 import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
 
+export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
+
 type FloatingPanelProps = {
   summary: PageAnalysisSummary;
   reviewItems?: FillAnalysis[];
+  sensitiveItems?: FillAnalysis[];
+  vaultStatus?: SensitiveVaultStatus;
+  sensitiveError?: string | null;
+  siteHost?: string;
   onFill: () => void;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
+  onOpenOptions?: () => void;
+  onUnlockSensitive?: (passphrase: string) => void;
+  onFillSensitive?: () => void;
 };
 
 function fieldLabel(context: FieldContext): string {
@@ -23,9 +34,17 @@ function fieldLabel(context: FieldContext): string {
 export function FloatingPanel({
   summary,
   reviewItems = [],
+  sensitiveItems = [],
+  vaultStatus,
+  sensitiveError = null,
+  siteHost = 'this site',
   onFill,
   onRemember,
+  onOpenOptions,
+  onUnlockSensitive,
+  onFillSensitive,
 }: FloatingPanelProps) {
+  const [passphrase, setPassphrase] = useState('');
   const fillLabel =
     summary.ready === 0
       ? 'No ready fields'
@@ -39,6 +58,7 @@ export function FloatingPanel({
       </div>
       <div className="fillio-panel__counts" aria-label="Form analysis summary">
         <span>{summary.needsReview} needs review</span>
+        <span>{summary.sensitive} sensitive</span>
         <span>{summary.unknown} unknown</span>
       </div>
 
@@ -78,6 +98,51 @@ export function FloatingPanel({
               </div>
             );
           })}
+        </div>
+      ) : null}
+
+      {sensitiveItems.length > 0 ? (
+        <div
+          className="fillio-panel__reviews"
+          aria-label="Sensitive fields requiring approval"
+        >
+          {sensitiveItems.map((item) => (
+            <div
+              className="fillio-panel__review"
+              key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+            >
+              <strong>{fieldLabel(item.context)}</strong>
+            </div>
+          ))}
+          {sensitiveError !== null ? (
+            <p role="alert">{sensitiveError}</p>
+          ) : null}
+          {vaultStatus === 'not-configured' ? (
+            <button type="button" onClick={onOpenOptions}>
+              Open vault settings
+            </button>
+          ) : vaultStatus === 'locked' ? (
+            <>
+              <label>
+                Vault passphrase
+                <input
+                  type="password"
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => onUnlockSensitive?.(passphrase)}
+              >
+                Unlock vault
+              </button>
+            </>
+          ) : vaultStatus === 'unlocked' ? (
+            <button type="button" onClick={onFillSensitive}>
+              Fill sensitive fields on {siteHost}
+            </button>
+          ) : null}
         </div>
       ) : null}
 

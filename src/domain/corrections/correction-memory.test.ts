@@ -82,7 +82,12 @@ describe('correction memory', () => {
       matchFieldWithCorrections(field({ label: 'Date of birth' }), [
         correction(),
       ]),
-    ).toEqual({ status: 'unknown', reason: 'sensitive-field' });
+    ).toEqual({
+      status: 'sensitive',
+      field: 'personal.birthDate',
+      reason: 'exact-sensitive-alias',
+      sensitivity: 'sensitive',
+    });
 
     expect(
       matchFieldWithCorrections(

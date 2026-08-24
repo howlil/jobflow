@@ -201,7 +201,13 @@ try {
       type: 'fillio:get-page-analysis',
     });
   });
-  expect(summary).toEqual({ ready: 7, needsReview: 1, unknown: 3, total: 11 });
+  expect(summary).toEqual({
+    ready: 7,
+    needsReview: 1,
+    sensitive: 1,
+    unknown: 2,
+    total: 11,
+  });
 
   await page.getByRole('button', { name: 'Fill 7 ready fields' }).click();
 
