@@ -4,9 +4,9 @@ This file is the single current-state tracker. Do not create permanent iteration
 
 ## Project status
 
-Phase: Iteration 5 merged and verified on `master`; release tag pending.
+Phase: Iteration 6 design-system and UX polish locally verified; repository integration pending.
 
-Repository state: the Fillio Chromium extension has a verified local-first profile foundation, generic form analysis and explicit safe autofill, dynamic/multi-step re-analysis, scoped user correction memory, and a verified encrypted-at-rest Sensitive Data Vault. Vault data has a versioned envelope, authenticated local encryption, validated decryption, encrypted browser persistence, a generic memory-only inactivity session, typed runtime messages/client, and a background-owned vault broker. Supported sensitive form fields are classified into a separate fail-closed plan bucket and surfaced in page summaries without becoming normal Ready fields. The options/profile page exposes opt-in vault setup, unlock, edit/save, explicit lock, and destructive reset controls through the runtime client. The in-page panel discloses sensitive fields, supports unlock without fill, and requires a separate site-specific approval before requesting only the current sensitive values from the background broker. MVP hardening now includes an expanded career-form corpus, reusable manifest verification, README/user documentation, normalized formatting baseline, full local verification, and a packaged `0.1.0` Chromium ZIP.
+Repository state: the Fillio Chromium extension has a verified local-first profile foundation, generic form analysis and explicit safe autofill, dynamic/multi-step re-analysis, scoped user correction memory, and a verified encrypted-at-rest Sensitive Data Vault. Vault data has a versioned envelope, authenticated local encryption, validated decryption, encrypted browser persistence, a generic memory-only inactivity session, typed runtime messages/client, and a background-owned vault broker. Supported sensitive form fields are classified into a separate fail-closed plan bucket and surfaced in page summaries without becoming normal Ready fields. The options/profile page exposes a guided profile workbench with readiness and missing-essentials guidance, opt-in progressive vault setup/unlock/edit/save/lock/reset controls, and tokenized design-system primitives. The in-page panel discloses sensitive fields, supports unlock without fill, uses status chips and grouped sensitive labels, and requires a separate site-specific approval before requesting only the current sensitive values from the background broker. The popup now behaves as a compact command center with truthful settings-navigation CTAs. MVP hardening includes an expanded career-form corpus, reusable manifest verification, README/user documentation, normalized formatting baseline, full local verification, and a packaged `0.1.0` Chromium ZIP.
 
 ## Decisions locked
 
@@ -204,6 +204,45 @@ Repository integration evidence:
 
 Remaining repository/release integration:
 
+- Create first `0.x` release tag only from verified `master`.
+
+## Iteration 6 — Design system and UX polish
+
+Status: locally verified; repository integration pending.
+
+Delivered:
+
+1. Shared design tokens and reusable primitives for buttons, chips, statuses, section headings, empty rows, focus states, and disabled states.
+2. Guided profile workbench with readiness summary, missing essentials, clearer save feedback, compact empty modules, and mobile-safe layout.
+3. Progressive Sensitive Vault UI: not-set-up setup-only state, locked unlock-only state, unlocked editor state, inline `role="alert"` error feedback, and preserved two-step reset.
+4. Professional floating panel with Ready / Review / Sensitive / Unknown chips, value-free sensitive grouping, truthful vault-state CTAs, and fail-closed no-ready copy.
+5. Compact popup command center with readiness, missing essentials, current-page guidance, variants summary, and truthful settings-navigation CTAs.
+6. Iteration 6 visual runtime acceptance covering desktop and mobile options/floating screenshots, required visible copy, no sensitive fill, and zero submissions.
+7. E2E compatibility updates preserving Iteration 3 dynamic/correction safety and Iteration 4 vault security acceptance under the new UI copy/progressive vault flow.
+
+Final local verification evidence:
+
+- `pnpm install --frozen-lockfile`
+- `pnpm test`: 27 files / 129 tests
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm format:check`
+- `pnpm build`
+- `pnpm verify:manifest`
+- `pnpm test:e2e`: legacy smoke, Iteration 3 acceptance, Iteration 4 vault acceptance, and Iteration 6 design acceptance
+- `pnpm zip`: produced `.output/fillio-0.1.0-chrome.zip`
+- `git diff --check`
+
+Visual verification evidence:
+
+- `.agent/design-audits/iteration-6-verification/options-desktop.png`
+- `.agent/design-audits/iteration-6-verification/options-mobile.png`
+- `.agent/design-audits/iteration-6-verification/floating-panel-desktop.png`
+- `.agent/design-audits/iteration-6-verification/floating-panel-mobile.png`
+
+Remaining repository integration:
+
+- Open PR, observe CI, squash merge, and verify fresh `master`.
 - Create first `0.x` release tag only from verified `master`.
 
 ## Iteration discipline

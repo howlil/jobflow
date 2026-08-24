@@ -74,9 +74,9 @@ describe('SensitiveVaultSection', () => {
     const error = await screen.findByRole('alert');
     expect(error.textContent).toBe('Passphrases do not match.');
     expect(
-      screen.getByLabelText('Confirm vault passphrase').getAttribute(
-        'aria-invalid',
-      ),
+      screen
+        .getByLabelText('Confirm vault passphrase')
+        .getAttribute('aria-invalid'),
     ).toBe('true');
     expect(client.setup).not.toHaveBeenCalled();
   });
@@ -116,9 +116,7 @@ describe('SensitiveVaultSection', () => {
     render(<SensitiveVaultSection vaultClient={client} />);
 
     expect(await screen.findByLabelText(/vault passphrase/i)).toBeTruthy();
-    expect(
-      screen.getByRole('button', { name: /unlock vault/i }),
-    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: /unlock vault/i })).toBeTruthy();
     expect(screen.queryByLabelText(/national id/i)).toBeNull();
   });
 

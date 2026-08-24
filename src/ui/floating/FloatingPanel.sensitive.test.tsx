@@ -76,9 +76,7 @@ describe('FloatingPanel sensitive disclosure', () => {
     );
 
     expect(screen.getByText('NIK')).toBeTruthy();
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Set up vault' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Set up vault' }));
     expect(openOptions).toHaveBeenCalledTimes(1);
   });
 

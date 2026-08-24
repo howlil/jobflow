@@ -69,9 +69,7 @@ describe('PopupPage', () => {
     ).toBeTruthy();
     expect(screen.getByText('0 application variants')).toBeTruthy();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Complete profile' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Complete profile' }));
 
     await waitFor(() => expect(openOptions).toHaveBeenCalledTimes(1));
   });
@@ -199,10 +197,18 @@ describe('PopupPage', () => {
         />,
       );
 
-      expect(await screen.findByRole('button', { name: expectedLabel })).toBeTruthy();
-      expect(screen.queryByRole('button', { name: /fill safe fields/i })).toBeNull();
-      expect(screen.queryByRole('button', { name: /review fields/i })).toBeNull();
-      expect(screen.queryByRole('button', { name: /open vault settings/i })).toBeNull();
+      expect(
+        await screen.findByRole('button', { name: expectedLabel }),
+      ).toBeTruthy();
+      expect(
+        screen.queryByRole('button', { name: /fill safe fields/i }),
+      ).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: /review fields/i }),
+      ).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: /open vault settings/i }),
+      ).toBeNull();
     },
   );
 });

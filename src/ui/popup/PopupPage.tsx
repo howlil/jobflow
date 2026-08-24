@@ -25,9 +25,9 @@ const ESSENTIAL_LABELS = {
 function getMissingEssentials(
   sections: ReturnType<typeof calculateProfileReadiness>['sections'],
 ): string[] {
-  return (Object.entries(sections) as Array<
-    [keyof typeof ESSENTIAL_LABELS, boolean]
-  >)
+  return (
+    Object.entries(sections) as Array<[keyof typeof ESSENTIAL_LABELS, boolean]>
+  )
     .filter(([, complete]) => !complete)
     .slice(0, 3)
     .map(([section]) => ESSENTIAL_LABELS[section]);
@@ -111,7 +111,9 @@ export function PopupPage({
           <p className="popup-eyebrow">Fillio</p>
           <h1>Ready to apply</h1>
         </div>
-        <strong className="popup-readiness">{readiness.percentage}% ready</strong>
+        <strong className="popup-readiness">
+          {readiness.percentage}% ready
+        </strong>
         <p className="popup-muted popup-header__summary">
           {readiness.completed} of {readiness.total} profile sections ready
         </p>
@@ -140,8 +142,7 @@ export function PopupPage({
         </div>
         {pageSummary === null || pageSummary === undefined ? (
           <p className="popup-muted popup-empty">
-            Open a job application form to see safe fields Fillio can help
-            with.
+            Open a job application form to see safe fields Fillio can help with.
           </p>
         ) : (
           <div className="page-summary" aria-label="Current page form analysis">
@@ -149,7 +150,9 @@ export function PopupPage({
             <span className="fillio-chip">
               {pageSummary.needsReview} needs review
             </span>
-            <span className="fillio-chip">{pageSummary.sensitive} sensitive</span>
+            <span className="fillio-chip">
+              {pageSummary.sensitive} sensitive
+            </span>
             <span className="fillio-chip">{pageSummary.unknown} unknown</span>
           </div>
         )}
