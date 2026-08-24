@@ -2,6 +2,7 @@
   "name": "fillio",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.21.0",
   "type": "module",
   "description": "Local-first career form autofill browser extension",
   "engines": {
@@ -16,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/iteration3-acceptance.mjs",
+    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/iteration3-acceptance.mjs && node e2e/iteration4-vault.mjs",
+    "verify:manifest": "node scripts/verify-manifest.mjs",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

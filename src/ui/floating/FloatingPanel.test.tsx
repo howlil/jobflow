@@ -9,13 +9,20 @@ describe('FloatingPanel', () => {
 
     render(
       <FloatingPanel
-        summary={{ ready: 3, needsReview: 1, unknown: 2, total: 6 }}
+        summary={{
+          ready: 3,
+          needsReview: 1,
+          sensitive: 1,
+          unknown: 2,
+          total: 7,
+        }}
         onFill={fill}
       />,
     );
 
     expect(screen.getByText('3 ready')).toBeTruthy();
     expect(screen.getByText('1 needs review')).toBeTruthy();
+    expect(screen.getByText('1 sensitive')).toBeTruthy();
     expect(screen.getByText('2 unknown')).toBeTruthy();
     expect(fill).not.toHaveBeenCalled();
 
@@ -28,7 +35,13 @@ describe('FloatingPanel', () => {
   it('disables fill when no fields are ready', () => {
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 2, unknown: 1, total: 3 }}
+        summary={{
+          ready: 0,
+          needsReview: 2,
+          sensitive: 1,
+          unknown: 1,
+          total: 4,
+        }}
         onFill={vi.fn()}
       />,
     );

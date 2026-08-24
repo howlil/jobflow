@@ -71,7 +71,13 @@ describe('PopupPage', () => {
       <PopupPage
         repository={createRepository(null)}
         openOptions={vi.fn()}
-        pageSummary={{ ready: 2, needsReview: 1, unknown: 3, total: 6 }}
+        pageSummary={{
+          ready: 2,
+          needsReview: 1,
+          sensitive: 1,
+          unknown: 3,
+          total: 7,
+        }}
       />,
     );
 
@@ -80,6 +86,7 @@ describe('PopupPage', () => {
     ).toBeTruthy();
     expect(screen.getByText('2 ready')).toBeTruthy();
     expect(screen.getByText('1 needs review')).toBeTruthy();
+    expect(screen.getByText('1 sensitive')).toBeTruthy();
     expect(screen.getByText('3 unknown')).toBeTruthy();
   });
 });

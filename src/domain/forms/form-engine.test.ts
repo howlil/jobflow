@@ -104,12 +104,30 @@ describe('form intelligence core', () => {
     }
   });
 
-  it('fails closed for sensitive and file fields in iteration 2', () => {
+  it('classifies sensitive fields separately from normal ready fields', () => {
     expect(matchField(field({ label: 'Date of birth' }))).toEqual({
-      status: 'unknown',
-      reason: 'sensitive-field',
+      status: 'sensitive',
+      field: 'personal.birthDate',
+      reason: 'exact-sensitive-alias',
+      sensitivity: 'sensitive',
     });
 
+    expect(matchField(field({ label: 'NIK' }))).toEqual({
+      status: 'sensitive',
+      field: 'identity.nationalId',
+      reason: 'exact-sensitive-alias',
+      sensitivity: 'sensitive',
+    });
+
+    expect(matchField(field({ label: 'Expected salary' }))).toEqual({
+      status: 'sensitive',
+      field: 'compensation.expected.amount',
+      reason: 'exact-sensitive-alias',
+      sensitivity: 'sensitive',
+    });
+  });
+
+  it('fails closed for file fields', () => {
     expect(
       matchField(
         field({ controlKind: 'file', inputType: 'file', label: 'CV' }),
@@ -123,7 +141,7 @@ describe('form intelligence core', () => {
     ).toEqual({ status: 'unknown', reason: 'no-match' });
   });
 
-  it('prepares an explicit fill plan without authorizing review, unknown, or missing values', () => {
+  it('prepares an explicit fill plan without authorizing review, sensitive, unknown, or missing values', () => {
     const stored = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
     const profile = stored.baseProfile;
     profile.personal.legalName.first = 'Ulil';
@@ -157,6 +175,7 @@ describe('form intelligence core', () => {
         label: 'Available from',
       }),
       field({ fieldFingerprint: 'ambiguous', label: 'Name' }),
+      field({ fieldFingerprint: 'birth-date', label: 'Date of birth' }),
       field({ fieldFingerprint: 'unknown', label: 'Favorite color' }),
       field({ fieldFingerprint: 'missing', label: 'GitHub URL' }),
     ];
@@ -188,6 +207,9 @@ describe('form intelligence core', () => {
       }),
     ]);
     expect(plan.needsReview).toHaveLength(1);
+    expect(plan.sensitive.map((item) => item.context.fieldFingerprint)).toEqual(
+      ['birth-date'],
+    );
     expect(plan.unknown.map((item) => item.context.fieldFingerprint)).toEqual(
       expect.arrayContaining(['unknown', 'missing']),
     );

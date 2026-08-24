@@ -28,6 +28,7 @@ export function isPageAnalysisSummary(
   return (
     typeof candidate.ready === 'number' &&
     typeof candidate.needsReview === 'number' &&
+    typeof candidate.sensitive === 'number' &&
     typeof candidate.unknown === 'number' &&
     typeof candidate.total === 'number'
   );

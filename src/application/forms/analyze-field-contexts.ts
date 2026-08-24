@@ -10,6 +10,7 @@ import {
 export type PageAnalysisSummary = {
   ready: number;
   needsReview: number;
+  sensitive: number;
   unknown: number;
   total: number;
 };
@@ -35,6 +36,7 @@ export function analyzeFieldContexts(
     summary: {
       ready: plan.ready.length,
       needsReview: plan.needsReview.length,
+      sensitive: plan.sensitive.length,
       unknown: plan.unknown.length,
       total: fields.length,
     },

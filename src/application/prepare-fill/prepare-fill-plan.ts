@@ -1,13 +1,14 @@
 import type { FieldContext } from '../../domain/forms/field-context';
 import type { CorrectionAwareMatchResult } from '../../domain/matching/match-field-with-corrections';
 import type { CanonicalField } from '../../domain/matching/match-field';
+import type { SensitiveCanonicalField } from '../../domain/matching/sensitive-fields';
 import type { BaseProfile } from '../../domain/profile/profile-schema';
 
 export type FillValue = string | boolean | string[];
 
 export type FillInstruction = {
   fieldFingerprint: string;
-  field: CanonicalField;
+  field: CanonicalField | SensitiveCanonicalField;
   value: FillValue;
   controlKind: FieldContext['controlKind'];
 };
@@ -20,6 +21,7 @@ export type FillAnalysis = {
 export type FillPlan = {
   ready: FillInstruction[];
   needsReview: FillAnalysis[];
+  sensitive: FillAnalysis[];
   unknown: FillAnalysis[];
 };
 
@@ -87,6 +89,7 @@ export function prepareFillPlan(
   const plan: FillPlan = {
     ready: [],
     needsReview: [],
+    sensitive: [],
     unknown: [],
   };
 
@@ -98,6 +101,11 @@ export function prepareFillPlan(
 
     if (item.match.status === 'unknown') {
       plan.unknown.push(item);
+      continue;
+    }
+
+    if (item.match.status === 'sensitive') {
+      plan.sensitive.push(item);
       continue;
     }
 

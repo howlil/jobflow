@@ -158,6 +158,13 @@ button:hover {
   justify-self: start;
 }
 
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 .default-variant {
   max-width: 360px;
   margin-top: 18px;

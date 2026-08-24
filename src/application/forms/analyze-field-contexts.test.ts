@@ -41,6 +41,7 @@ describe('analyzeFieldContexts', () => {
         field('First name', 'first'),
         { ...field('Email', 'email'), inputType: 'email' },
         field('Name', 'review'),
+        field('Date of birth', 'birth-date'),
         field('Favorite color', 'unknown'),
         field('GitHub URL', 'missing'),
       ],
@@ -49,12 +50,14 @@ describe('analyzeFieldContexts', () => {
 
     expect(result.plan.ready).toHaveLength(2);
     expect(result.plan.needsReview).toHaveLength(1);
+    expect(result.plan.sensitive).toHaveLength(1);
     expect(result.plan.unknown).toHaveLength(2);
     expect(result.summary).toEqual({
       ready: 2,
       needsReview: 1,
+      sensitive: 1,
       unknown: 2,
-      total: 5,
+      total: 6,
     });
   });
 });

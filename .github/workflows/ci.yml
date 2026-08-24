@@ -14,47 +14,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 11.21.0
+          run_install: false
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: npm
+          cache: pnpm
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: Test
-        run: npm test
+        run: pnpm test
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm typecheck
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
       - name: Format check
-        run: npm run format:check
+        run: pnpm format:check
       - name: Build
-        run: npm run build
+        run: pnpm build
       - name: Verify generated extension
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const manifest = JSON.parse(fs.readFileSync('.output/chrome-mv3/manifest.json', 'utf8'));
-          if (manifest.manifest_version !== 3) throw new Error(`Expected MV3, received ${manifest.manifest_version}`);
-          const permissions = [...(manifest.permissions ?? [])].sort();
-          if (JSON.stringify(permissions) !== JSON.stringify(['storage'])) {
-            throw new Error(`Unexpected permissions: ${JSON.stringify(permissions)}`);
-          }
-          const hostPermissions = [...(manifest.host_permissions ?? [])].sort();
-          if (hostPermissions.length !== 0) {
-            throw new Error(`Unexpected host_permissions: ${JSON.stringify(hostPermissions)}`);
-          }
-          const matches = [...new Set((manifest.content_scripts ?? []).flatMap((script) => script.matches ?? []))].sort();
-          const expectedMatches = ['http://*/*', 'https://*/*'].sort();
-          if (JSON.stringify(matches) !== JSON.stringify(expectedMatches)) {
-            throw new Error(`Unexpected content-script matches: ${JSON.stringify(matches)}`);
-          }
-          if (!manifest.action?.default_popup) throw new Error('Popup entrypoint missing from manifest');
-          if (!manifest.options_ui?.page && !manifest.options_page) throw new Error('Options entrypoint missing from manifest');
-          NODE
+        run: pnpm verify:manifest
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
       - name: Browser extension smoke test
-        run: npm run test:e2e
+        run: pnpm test:e2e
       - name: Package extension
-        run: npm run zip
+        run: pnpm zip

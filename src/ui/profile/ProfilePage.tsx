@@ -6,10 +6,15 @@ import type {
   BaseProfile,
   StoredProfileEnvelope,
 } from '../../domain/profile/profile-schema';
+import {
+  SensitiveVaultSection,
+  type VaultClient,
+} from '../vault/SensitiveVaultSection';
 import './profile.css';
 
 type ProfilePageProps = {
   repository: ProfileRepository;
+  vaultClient?: VaultClient;
 };
 
 type ContactItem = BaseProfile['contact']['emails'][number];
@@ -47,7 +52,7 @@ function updatePrimaryContact(
   );
 }
 
-export function ProfilePage({ repository }: ProfilePageProps) {
+export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(
@@ -491,6 +496,10 @@ export function ProfilePage({ repository }: ProfilePageProps) {
           ))}
         </div>
       </section>
+
+      {vaultClient !== undefined ? (
+        <SensitiveVaultSection vaultClient={vaultClient} />
+      ) : null}
 
       <section className="profile-section">
         <div className="section-heading">

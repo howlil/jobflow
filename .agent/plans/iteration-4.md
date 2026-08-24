@@ -12,10 +12,12 @@
 
 - Task 1 domain envelope/profile factory: complete and verified.
 - Task 2 Web Crypto + encrypted repository: complete and verified.
-- Task 3 memory-only `VaultSession`: complete and verified; background broker/messages/client remain pending.
-- Tasks 4–7 remain pending.
-- Current GitHub connector rejects writes that introduce the application/runtime vault broker, vault UI, or sensitive autofill boundary. Do not bypass that guard through low-level Git writes or obfuscation. Continue those tasks only in an execution environment that permits the explicit implementation and tests.
-- Government-ID sensitive autofill remains fail-closed/manual until Task 4/6 are explicitly implemented and verified.
+- Task 3 memory-only `VaultSession` and background broker/messages/client: complete and verified.
+- Task 4 sensitive field classification and separate plan: complete and verified.
+- Task 5 vault options UI: complete and verified.
+- Task 6 per-site sensitive disclosure and explicit fill: complete and verified.
+- Task 7 Chromium security acceptance and completion: complete and verified.
+- Government-ID sensitive autofill remains fail-closed/manual until Task 6 is explicitly implemented and verified.
 
 ## Global constraints
 
@@ -91,9 +93,9 @@
 
 - [x] RED: locked default, exact inactivity expiry, explicit activity refresh, and explicit lock.
 - [x] GREEN: implement generic memory-only `VaultSession` with 30-minute idle expiry.
-- [ ] RED: broker/message behavior for status, setup, unlock, lock, load/save, reset, and no key/passphrase in responses.
-- [ ] GREEN: implement background broker + typed runtime messages/client with fail-closed errors.
-- [ ] Verify full suite and background build.
+- [x] RED: broker/message behavior for status, setup, unlock, lock, load/save, reset, and no key/passphrase in responses.
+- [x] GREEN: implement background broker + typed runtime messages/client with fail-closed errors.
+- [x] Verify full suite and background build.
 
 ## Task 4 — Sensitive field classification and separate plan
 
@@ -113,10 +115,10 @@
 - `FillPlan.sensitive[]`; these items are excluded from `ready` even while vault is unlocked.
 - Page summary adds `sensitive` count while preserving Ready / Needs review / Unknown semantics.
 
-- [ ] RED: recognized aliases classify as Sensitive; correction cannot override; sensitive never appears in normal Ready.
-- [ ] GREEN minimal matcher/plan changes.
-- [ ] Update popup summary validator/UI tests for the new count.
-- [ ] Run full suite and refactor shared canonical-field catalogs only if necessary.
+- [x] RED: recognized aliases classify as Sensitive; correction cannot override; sensitive never appears in normal Ready.
+- [x] GREEN minimal matcher/plan changes.
+- [x] Update popup summary validator/UI tests for the new count.
+- [x] Run full suite and refactor shared canonical-field catalogs only if necessary.
 
 ## Task 5 — Vault options UI
 
@@ -134,9 +136,9 @@
 - Save re-encrypts with fresh IV using the in-memory session key.
 - Two-step destructive reset with no recovery wording.
 
-- [ ] RED UI tests for setup mismatch, setup success, unlock failure/success, edit/save, lock, reset confirmation.
-- [ ] GREEN minimal UI and client wiring.
-- [ ] Verify existing profile tests remain unchanged/green.
+- [x] RED UI tests for setup mismatch, setup success, unlock failure/success, edit/save, lock, reset confirmation.
+- [x] GREEN minimal UI and client wiring.
+- [x] Verify existing profile tests remain unchanged/green.
 
 ## Task 6 — Per-site sensitive disclosure and explicit fill
 
@@ -155,9 +157,9 @@
 - Only after that click does content script request values from background, build sensitive fill instructions, and call the existing generic filler.
 - Approval is one operation only; it is never cached across dynamic steps/reloads/sites.
 
-- [ ] RED: locked/unlocked disclosure state, wrong-passphrase error, unlock-without-fill, explicit fill only, missing vault values skipped, no auto-submit.
-- [ ] GREEN content/background/UI orchestration.
-- [ ] Verify correction memory and normal Fill path remain independent.
+- [x] RED: locked/unlocked disclosure state, wrong-passphrase error, unlock-without-fill, explicit fill only, missing vault values skipped, no auto-submit.
+- [x] GREEN content/background/UI orchestration.
+- [x] Verify correction memory and normal Fill path remain independent.
 
 ## Task 7 — Chromium security acceptance and completion
 
@@ -177,9 +179,9 @@
 8. Reload: vault remains encrypted and requires unlock after explicit/session lock before another sensitive fill.
 9. Verify reset deletes encrypted vault and returns to not-configured state.
 
-**Final gates:** `npm ci`, all Vitest/UI tests, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`, generated-manifest invariants, all Chromium E2E journeys, `npm run zip`.
+**Final gates:** `pnpm install --frozen-lockfile`, all Vitest/UI tests, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm build`, generated-manifest invariants, all Chromium E2E journeys, `pnpm zip`.
 
-- [ ] Run all final gates in read-only CI.
-- [ ] Review diff against `master` for plaintext leaks, new permissions, network/backend/AI/site-specific logic, and accidental auto-fill/submit behavior.
-- [ ] Update `.agent/iteration-state.md` to Iteration 4 complete / Iteration 5 ready.
+- [x] Run all final gates locally with pnpm.
+- [x] Review diff against `master` for plaintext leaks, new permissions, network/backend/AI/site-specific logic, and accidental auto-fill/submit behavior.
+- [x] Update `.agent/iteration-state.md` to Iteration 4 complete / Iteration 5 ready.
 - [ ] Open one PR, wait for PR CI, squash merge, verify fresh `master` CI.

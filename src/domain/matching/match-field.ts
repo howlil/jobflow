@@ -1,5 +1,9 @@
 import type { FieldContext } from '../forms/field-context';
 import { normalizeFieldText } from './normalize-field-text';
+import {
+  findSensitiveFieldMatch,
+  type SensitiveCanonicalField,
+} from './sensitive-fields';
 
 export type CanonicalField =
   | 'personal.legalName.first'
@@ -41,7 +45,13 @@ export type MatchResult =
     }
   | {
       status: 'unknown';
-      reason: 'file-input' | 'sensitive-field' | 'no-match';
+      reason: 'file-input' | 'no-match';
+    }
+  | {
+      status: 'sensitive';
+      field: SensitiveCanonicalField;
+      reason: 'exact-sensitive-alias';
+      sensitivity: 'sensitive';
     };
 
 type AliasDefinition = {
@@ -68,7 +78,13 @@ const ALIASES: AliasDefinition[] = [
   },
   {
     field: 'contact.email.primary',
-    aliases: ['email', 'email address', 'e mail', 'alamat email'],
+    aliases: [
+      'email',
+      'email address',
+      'e-mail address',
+      'e mail',
+      'alamat email',
+    ],
   },
   {
     field: 'contact.phone.primary',
@@ -158,25 +174,6 @@ const ALIASES: AliasDefinition[] = [
   },
 ];
 
-const SENSITIVE_ALIASES = [
-  'date of birth',
-  'birth date',
-  'dob',
-  'tanggal lahir',
-  'nik',
-  'national id',
-  'national identity number',
-  'passport',
-  'passport number',
-  'tax id',
-  'npwp',
-  'current salary',
-  'expected salary',
-  'compensation',
-  'marital status',
-  'gender',
-];
-
 const MATCHER_CONFIG = {
   reviewScore: 0.55,
   readyScore: 0.82,
@@ -187,7 +184,6 @@ const NORMALIZED_ALIASES = ALIASES.map((definition) => ({
   field: definition.field,
   aliases: definition.aliases.map(normalizeFieldText),
 }));
-const NORMALIZED_SENSITIVE = SENSITIVE_ALIASES.map(normalizeFieldText);
 
 function signals(context: FieldContext): string[] {
   return [
@@ -199,18 +195,6 @@ function signals(context: FieldContext): string[] {
   ]
     .map(normalizeFieldText)
     .filter(Boolean);
-}
-
-function containsSensitiveSignal(values: string[]): boolean {
-  return values.some((value) =>
-    NORMALIZED_SENSITIVE.some(
-      (alias) =>
-        value === alias ||
-        value.includes(` ${alias} `) ||
-        value.startsWith(`${alias} `) ||
-        value.endsWith(` ${alias}`),
-    ),
-  );
 }
 
 function tokenScore(signal: string, alias: string): number {
@@ -258,8 +242,14 @@ export function matchField(context: FieldContext): MatchResult {
   }
 
   const normalizedSignals = signals(context);
-  if (containsSensitiveSignal(normalizedSignals)) {
-    return { status: 'unknown', reason: 'sensitive-field' };
+  const sensitive = findSensitiveFieldMatch(normalizedSignals);
+  if (sensitive !== null) {
+    return {
+      status: 'sensitive',
+      field: sensitive,
+      reason: 'exact-sensitive-alias',
+      sensitivity: 'sensitive',
+    };
   }
 
   const exact = exactAlias(normalizedSignals);

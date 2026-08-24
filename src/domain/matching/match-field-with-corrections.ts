@@ -25,8 +25,8 @@ export function matchFieldWithCorrections(
 ): CorrectionAwareMatchResult {
   const base = matchField(context);
   if (
-    base.status === 'unknown' &&
-    (base.reason === 'sensitive-field' || base.reason === 'file-input')
+    base.status === 'sensitive' ||
+    (base.status === 'unknown' && base.reason === 'file-input')
   ) {
     return base;
   }
