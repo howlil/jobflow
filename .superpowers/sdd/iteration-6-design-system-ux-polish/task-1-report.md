@@ -44,6 +44,6 @@ Status: FIXED
 - `rtk pnpm lint`: PASS.
 - `rtk pnpm format:check`: PASS.
 - `rtk git diff --check`: PASS.
-- Fix commit: recorded in the follow-up commit created after verification.
+- Fix commit: `5e0f8e9` (`chore: ignore SDD scratch files in Prettier`).
 
 Remaining concerns: none for this task.
