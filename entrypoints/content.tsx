@@ -36,14 +36,17 @@ import {
   type VariantRecommendation,
 } from '../src/domain/variants/recommend-variant';
 import { resolveApplicationProfile } from '../src/domain/variants/resolve-profile';
+import { attachFileToField } from '../src/infrastructure/dom/attach-file-control';
 import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
 import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
 import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
+import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
 import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
 import { ChromeProfileRepository } from '../src/infrastructure/storage/chrome-profile-repository';
 import {
   FloatingPanel,
+  type DocumentAttachStatus,
   type SensitiveVaultStatus,
 } from '../src/ui/floating/FloatingPanel';
 import { FLOATING_STYLES } from '../src/ui/floating/floating-styles';
@@ -69,7 +72,7 @@ function documentSummary(
 ): RecommendedDocumentSummary | null {
   return document === null || document === undefined
     ? null
-    : { label: document.label, fileName: document.fileName };
+    : { id: document.id, label: document.label, fileName: document.fileName };
 }
 
 function documentForIntent(
@@ -79,8 +82,7 @@ function documentForIntent(
 ): DocumentMetadata | null {
   if (intent === 'resume') return recommended.resume;
   if (intent === 'cover_letter') return recommended.coverLetter;
-  if (intent === 'transcript')
-    return baseProfile.documents.transcripts[0] ?? null;
+  if (intent === 'transcript') return baseProfile.documents.transcripts[0] ?? null;
   if (intent === 'certificate') {
     return baseProfile.documents.certificates[0] ?? null;
   }
@@ -163,6 +165,7 @@ export default defineContentScript({
 
       const correctionRepository = new ChromeCorrectionRepository();
       const vaultClient = new ChromeVaultClient();
+      const documentClient = new ChromeDocumentClient();
       let corrections = await correctionRepository.listForOrigin(
         location.origin,
       );
@@ -182,25 +185,28 @@ export default defineContentScript({
 
       const renderPanel = () => {
         if (reactRoot === null) return;
-        if (
-          currentAnalysis === null ||
-          currentAnalysis.summary.ready +
-            currentAnalysis.summary.needsReview +
-            currentAnalysis.summary.sensitive ===
-            0
-        ) {
+        if (currentAnalysis === null || currentAnalysis.summary.total === 0) {
           reactRoot.render(null);
           return;
         }
+
+        const variantName =
+          currentActiveVariantId === null
+            ? null
+            : (currentVariantOptions.find(
+                (variant) => variant.id === currentActiveVariantId,
+              )?.name ?? null);
 
         reactRoot.render(
           <FloatingPanel
             summary={currentAnalysis.summary}
             reviewItems={currentAnalysis.plan.needsReview}
             sensitiveItems={currentAnalysis.plan.sensitive}
+            documentFields={currentDocumentFields}
             vaultStatus={currentVaultStatus}
             sensitiveError={sensitiveError}
             siteHost={location.host}
+            variantName={variantName}
             onFill={() => {
               if (currentAnalysis === null) return;
               applyFillInstructions(
@@ -220,6 +226,21 @@ export default defineContentScript({
             }}
             onRemember={(context, target) => {
               void rememberCorrection(context, target);
+            }}
+            onAttachDocument={async (
+              fieldFingerprint,
+              documentId,
+            ): Promise<DocumentAttachStatus> => {
+              const file = await documentClient.getFile(documentId);
+              if (file === null) return 'missing';
+              const result = attachFileToField(
+                document,
+                location.origin,
+                fieldFingerprint,
+                file,
+              );
+              if (result.status === 'attached') return 'attached';
+              return result.status === 'not-found' ? 'missing' : 'unsupported';
             }}
           />,
         );
@@ -263,6 +284,7 @@ export default defineContentScript({
         currentDocumentFields = fileFields.map((field, index) => {
           const classification = classifyDocumentFieldIntent(field);
           return {
+            fieldFingerprint: field.fieldFingerprint,
             fieldLabel: documentFieldLabel(field, index),
             intent: classification.intent,
             evidence: classification.evidence,
