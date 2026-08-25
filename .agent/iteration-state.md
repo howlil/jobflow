@@ -4,8 +4,10 @@ This file is the single current-state tracker for Fillio.
 
 ## Current phase
 
-- Iteration 14 is integrated on `master` at `7aa8c613559326f63776c48fe75df198b3c083a5`.
-- Iteration 15 surface refactor is implemented on `feat/iteration-15-surface-refactor` and is awaiting fast-gate verification/merge.
+- Iteration 15 is integrated on `master` at `9bb2080687ddb345f14805942758b8b74e834f68`.
+- Post-Iteration-15 workspace/navigation refinements are integrated on `master` at `e7ab8d5b26442bdeee5fdb1942157e6e8e40ea7d`.
+- No Iteration 16 is open. The next product iteration must start from a concrete user, compatibility, reliability, or release-readiness problem rather than speculative scope.
+- Browser E2E remains outstanding before release readiness can be claimed.
 - Chrome Web Store publishing and a tagged release remain explicit future release actions.
 
 ## Locked product boundaries
@@ -22,12 +24,12 @@ This file is the single current-state tracker for Fillio.
 - No career/profile/form-data telemetry.
 - Persisted schemas remain versioned and validated.
 
-## Integrated product state through Iteration 14
+## Integrated product state through Iteration 15
 
 Delivered:
 
 - canonical versioned career profile and application variants
-- local profile persistence and responsive profile workspace
+- local profile persistence and responsive career workspace
 - deterministic generic form analysis and safe autofill
 - Ready / Review / Unknown / Sensitive planning
 - correction memory and dynamic-form re-analysis
@@ -38,11 +40,18 @@ Delivered:
 - document binaries stored locally in extension-owned IndexedDB
 - explicit user-triggered native file attachment
 - local backup/recovery and compatibility evidence tooling
-- compact injected application assistant
+- career workspace opened as a normal browser tab
+- compact right-edge launcher with fixed right slide panel on application pages
+- compact monochrome utility-first visual system
+- non-linear workspace section navigation with a desktop left rail and mobile section selector
+- profile state preserved across workspace section changes
+- explicit workspace opening through the extension background runtime
 
 ## Iteration 15 — Surface refactor
 
-Target state:
+Status: completed and integrated.
+
+Integrated behavior:
 
 - career workspace opens as a normal full browser tab rather than a constrained embedded options dialog
 - collapsed assistant is docked to the right viewport edge
@@ -51,9 +60,7 @@ Target state:
 - visual system is compact, monochrome, utility-first, and uses fewer pills/cards
 - existing fill, document, correction, and sensitive-data safety boundaries remain unchanged
 
-## Verification policy for Iteration 15
-
-Browser E2E is explicitly deferred/non-blocking for this development merge. Merge requires:
+Fast deterministic merge gates were observed as passed for the Iteration 15 merge:
 
 ```text
 pnpm install --frozen-lockfile
@@ -66,8 +73,45 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Browser E2E remains in the repository and is still required before release readiness is claimed.
+Browser E2E was explicitly deferred/non-blocking for the development merge and remains required before release readiness is claimed.
+
+## Post-Iteration-15 refinement
+
+Status: integrated on `master`.
+
+The workspace was refined without opening a new product iteration:
+
+- continuous-page anchor navigation was replaced with non-linear section navigation
+- desktop uses a sticky left navigation rail
+- mobile uses a compact section selector
+- one workspace category is visible at a time without wizard semantics
+- unsaved profile state remains mounted across category changes
+- document, correction, and backup surfaces render only in their relevant workspace sections
+- popup/content-script workspace actions open the workspace through the background runtime
+- visual acceptance/E2E fixtures were adjusted to the current surface model
+
+These changes are refinements of the Iteration 15 surface model, not evidence of a separate Iteration 16.
+
+## Release-readiness gap
+
+Do not describe the product as release-ready until current browser E2E is run successfully against the integrated `master` behavior and any failures are resolved.
+
+Release-readiness evidence should include at minimum:
+
+```text
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm verify:compatibility
+pnpm build
+pnpm verify:manifest
+pnpm test:e2e
+pnpm zip
+```
+
+A tagged release or Chrome Web Store publishing remains a separate explicit action after verification.
 
 ## Next-state rule
 
-Finish Iteration 15 verification and integration before adding another visual surface. After integration, prioritize real application use and recorded compatibility failures over speculative features. Do not add automatic submission, automatic attachment, backend sync, AI, or ATS-specific adapters without new evidence and an explicit scope decision.
+Prioritize real application use, browser E2E, recorded compatibility failures, and trusted-beta feedback before adding another feature iteration. Open Iteration 16 only when there is a concrete problem and explicit acceptance criteria. Do not add automatic submission, automatic attachment, backend sync, AI, or ATS-specific adapters without new evidence and an explicit scope decision.
