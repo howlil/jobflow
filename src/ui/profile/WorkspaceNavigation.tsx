@@ -7,7 +7,7 @@ const items = [
   { label: 'Documents', targetId: 'cv-import' },
   { label: 'Preferences', heading: 'Job preferences' },
   { label: 'Variants', heading: 'Application variants' },
-  { label: 'Sensitive', heading: 'Sensitive data vault' },
+  { label: 'Sensitive', heading: 'Sensitive vault' },
   { label: 'Corrections', targetId: 'corrections' },
   { label: 'Backup', targetId: 'backup-recovery' },
 ] as const;
