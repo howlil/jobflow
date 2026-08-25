@@ -5,12 +5,14 @@ import type { ProfileRepository } from '../../application/profile/profile-reposi
 import { calculateProfileReadiness } from '../../application/profile/profile-readiness';
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import type { StoredProfileEnvelope } from '../../domain/profile/profile-schema';
+import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import './popup.css';
 
 type PopupPageProps = {
   repository: ProfileRepository;
   openOptions: () => void | Promise<void>;
   pageSummary?: PageAnalysisSummary | null;
+  variantRecommendation?: VariantRecommendation | null;
 };
 
 const ESSENTIAL_LABELS = {
@@ -52,6 +54,7 @@ export function PopupPage({
   repository,
   openOptions,
   pageSummary,
+  variantRecommendation,
 }: PopupPageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -103,6 +106,13 @@ export function PopupPage({
     readiness.completed === readiness.total,
     pageSummary,
   );
+  const recommendedVariant =
+    variantRecommendation?.variantId === null ||
+    variantRecommendation?.variantId === undefined
+      ? null
+      : (profile.variants.find(
+          (variant) => variant.id === variantRecommendation.variantId,
+        ) ?? null);
 
   return (
     <main className="popup-page">
@@ -166,6 +176,19 @@ export function PopupPage({
             {variantCount === 1 ? 'variant' : 'variants'}
           </strong>
         </div>
+        {recommendedVariant !== null ? (
+          <div className="popup-empty">
+            <span className="fillio-chip fillio-chip-strong">Recommended</span>
+            <p>
+              <strong>{recommendedVariant.name || 'Untitled variant'}</strong>
+            </p>
+            <p className="popup-muted">
+              {variantRecommendation?.evidence.length
+                ? `Matched page signals: ${variantRecommendation.evidence.join(', ')}`
+                : 'Using your default application profile because this page has no strong matching signal.'}
+            </p>
+          </div>
+        ) : null}
         {profile.variants.length > 0 ? (
           <ul className="variant-list">
             {profile.variants.map((variant) => (
