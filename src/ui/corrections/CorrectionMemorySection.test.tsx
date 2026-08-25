@@ -80,7 +80,9 @@ describe('CorrectionMemorySection', () => {
     const repo = repository([correction()]);
     render(<CorrectionMemorySection repository={repo} />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Delete mapping' }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Delete mapping' }),
+    );
 
     await waitFor(() => expect(repo.remove).toHaveBeenCalledTimes(1));
     expect(screen.queryByText('links.github')).toBeNull();
@@ -89,7 +91,10 @@ describe('CorrectionMemorySection', () => {
   it('resets a site without deleting mappings from other origins', async () => {
     const repo = repository([
       correction(),
-      correction({ origin: 'https://other.example.test', fieldFingerprint: 'b' }),
+      correction({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'b',
+      }),
     ]);
     render(<CorrectionMemorySection repository={repo} />);
 
@@ -110,7 +115,9 @@ describe('CorrectionMemorySection', () => {
     const repo = repository([correction()]);
     render(<CorrectionMemorySection repository={repo} />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Reset all learned mappings' }));
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Reset all learned mappings' }),
+    );
     expect(repo.clear).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm reset all' }));

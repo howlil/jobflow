@@ -82,7 +82,10 @@ export function CorrectionMemorySection({
   }
 
   return (
-    <section className="profile-section" aria-labelledby="correction-memory-title">
+    <section
+      className="profile-section"
+      aria-labelledby="correction-memory-title"
+    >
       <div className="fillio-section-heading">
         <div>
           <p className="eyebrow">Autofill memory</p>

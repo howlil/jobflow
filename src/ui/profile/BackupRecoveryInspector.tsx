@@ -45,7 +45,10 @@ export function BackupRecoveryInspector({
   }
 
   return (
-    <section className="profile-section" aria-labelledby="backup-inspector-title">
+    <section
+      className="profile-section"
+      aria-labelledby="backup-inspector-title"
+    >
       <div className="fillio-section-heading">
         <div>
           <p className="eyebrow">Recovery</p>
@@ -73,7 +76,8 @@ export function BackupRecoveryInspector({
         <div className="record-card">
           <strong>Validated backup</strong>
           <p className="muted">
-            Exported {new Date(backup.exportedAt).toLocaleDateString('en-GB', {
+            Exported{' '}
+            {new Date(backup.exportedAt).toLocaleDateString('en-GB', {
               day: '2-digit',
               month: 'short',
               year: 'numeric',

@@ -29,7 +29,9 @@ describe('BackupRecoveryInspector', () => {
       target: { files: [uploadFile('{bad-json')] },
     });
 
-    expect(await screen.findByText('This file is not valid JSON.')).toBeTruthy();
+    expect(
+      await screen.findByText('This file is not valid JSON.'),
+    ).toBeTruthy();
     expect(repo.save).not.toHaveBeenCalled();
   });
 

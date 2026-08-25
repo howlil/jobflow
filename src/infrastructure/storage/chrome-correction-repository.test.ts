@@ -71,7 +71,10 @@ describe('ChromeCorrectionRepository', () => {
     const repository = new ChromeCorrectionRepository();
     await repository.upsert(entry());
     await repository.upsert(
-      entry({ origin: 'https://other.example.test', fieldFingerprint: 'field-b' }),
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
     );
 
     await expect(repository.listAll()).resolves.toHaveLength(2);
@@ -97,12 +100,18 @@ describe('ChromeCorrectionRepository', () => {
     const repository = new ChromeCorrectionRepository();
     await repository.upsert(entry());
     await repository.upsert(
-      entry({ origin: 'https://other.example.test', fieldFingerprint: 'field-b' }),
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
     );
 
     await repository.removeForOrigin('https://jobs.example.test');
     await expect(repository.listAll()).resolves.toEqual([
-      entry({ origin: 'https://other.example.test', fieldFingerprint: 'field-b' }),
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
     ]);
 
     await repository.clear();

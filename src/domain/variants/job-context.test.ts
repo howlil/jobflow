@@ -14,7 +14,12 @@ describe('extractJobContext', () => {
 
     expect(result.seniority).toBe('senior');
     expect(result.domains).toEqual(
-      expect.arrayContaining(['backend', 'payments', 'platform', 'distributed']),
+      expect.arrayContaining([
+        'backend',
+        'payments',
+        'platform',
+        'distributed',
+      ]),
     );
     expect(result.skills).toEqual(['go', 'kafka', 'postgresql']);
     expect(result.tokens).toContain('engineer');

@@ -241,7 +241,9 @@ describe('PopupPage', () => {
     expect(screen.getAllByText('Cover letter')).toHaveLength(2);
     expect(screen.getByText(/backend cover/i)).toBeTruthy();
     expect(screen.getByText('Supporting attachment')).toBeTruthy();
-    expect(screen.getAllByText(/unknown document type/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/unknown document type/i).length,
+    ).toBeGreaterThan(0);
   });
 
   it.each([

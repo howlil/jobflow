@@ -25,13 +25,20 @@ const raw = await readFile(
 );
 const evidence = JSON.parse(raw);
 
-assert.equal(evidence.schemaVersion, 1, 'Unsupported compatibility evidence schema');
+assert.equal(
+  evidence.schemaVersion,
+  1,
+  'Unsupported compatibility evidence schema',
+);
 assert.ok(Array.isArray(evidence.families), 'families must be an array');
 
 const byId = new Map();
 for (const family of evidence.families) {
   assert.equal(typeof family.id, 'string', 'family id must be a string');
-  assert.ok(!byId.has(family.id), `Duplicate compatibility family: ${family.id}`);
+  assert.ok(
+    !byId.has(family.id),
+    `Duplicate compatibility family: ${family.id}`,
+  );
   assert.ok(
     VALID_FIXTURE_STATUS.has(family.fixtureStatus),
     `Invalid fixture status for ${family.id}`,
