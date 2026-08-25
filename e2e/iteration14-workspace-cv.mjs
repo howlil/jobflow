@@ -1,4 +1,5 @@
 import { chromium, expect } from '@playwright/test';
+import { Buffer } from 'node:buffer';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -120,9 +121,7 @@ try {
 
   const attachedName = await page
     .locator('#resume')
-    .evaluate((input) =>
-      input instanceof HTMLInputElement ? (input.files?.[0]?.name ?? '') : '',
-    );
+    .evaluate((input) => input.files?.[0]?.name ?? '');
   expect(attachedName).toBe('backend-cv.txt');
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
 } finally {
