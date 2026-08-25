@@ -57,6 +57,11 @@ describe('FloatingPanel sensitive disclosure', () => {
     expect(screen.queryByText('Date of birth')).toBeNull();
     openSensitive();
     expect(screen.getByText('Sensitive fields detected')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Review the detected fields first. Unlocking the vault does not fill anything until you approve this site.',
+      ),
+    ).toBeTruthy();
     expect(screen.getByText('Date of birth')).toBeTruthy();
     expect(screen.getByText('NIK')).toBeTruthy();
     expect(screen.queryByText(/123456/)).toBeNull();

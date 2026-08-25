@@ -1,4 +1,13 @@
 import { useEffect, useState } from 'react';
+import {
+  ArrowRight,
+  Download,
+  Plus,
+  Save,
+  ShieldCheck,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 
 import {
   createProfileBackup,
@@ -16,11 +25,14 @@ import {
   SensitiveVaultSection,
   type VaultClient,
 } from '../vault/SensitiveVaultSection';
+import type { WorkspaceSection } from './workspace-sections';
 import './profile.css';
 
 type ProfilePageProps = {
   repository: ProfileRepository;
   vaultClient?: VaultClient;
+  activeSection?: WorkspaceSection;
+  onSectionChange?: (section: WorkspaceSection) => void;
 };
 
 type ContactItem = BaseProfile['contact']['emails'][number];
@@ -67,7 +79,12 @@ function parseNullableNumber(value: string): number | null {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
-export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
+export function ProfilePage({
+  repository,
+  vaultClient,
+  activeSection = 'personal',
+  onSectionChange,
+}: ProfilePageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(
@@ -193,6 +210,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             onClick={() => void saveProfile()}
             disabled={saveState === 'saving'}
           >
+            <Save aria-hidden="true" size={16} />
             {saveState === 'saving' ? 'Saving...' : 'Save profile'}
           </button>
         </div>
@@ -203,6 +221,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
       <section
         className="profile-readiness"
         aria-labelledby="profile-readiness-title"
+        hidden={activeSection !== 'overview'}
       >
         <div className="fillio-section-heading">
           <div>
@@ -210,6 +229,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             <h2 id="profile-readiness-title">
               {readiness.completed} of {readiness.total} sections ready
             </h2>
+            <p className="profile-readiness-intro">
+              Start with name, email, and phone so Fillio can safely handle the
+              common required fields.
+            </p>
           </div>
           <span className="fillio-chip fillio-chip-strong">
             {readiness.percentage}% complete
@@ -227,9 +250,33 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             <p className="muted">Your core contact details are ready.</p>
           )}
         </div>
+        <div className="profile-readiness-actions">
+          <button
+            className="fillio-button fillio-button-primary"
+            type="button"
+            onClick={() => onSectionChange?.('personal')}
+          >
+            <ArrowRight aria-hidden="true" size={16} />
+            Start with personal data
+          </button>
+          {vaultClient !== undefined ? (
+            <button
+              className="fillio-button fillio-button-secondary"
+              type="button"
+              onClick={() => onSectionChange?.('sensitive')}
+            >
+              <ShieldCheck aria-hidden="true" size={16} />
+              Set sensitive data later
+            </button>
+          ) : null}
+        </div>
       </section>
 
-      <section className="profile-section">
+      <section
+        className="profile-section"
+        id="basic-info"
+        hidden={activeSection !== 'personal'}
+      >
         <h2>Basic information</h2>
         <div className="form-grid">
           <label>
@@ -304,7 +351,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         </label>
       </section>
 
-      <section className="profile-section">
+      <section className="profile-section" hidden={activeSection !== 'contact'}>
         <h2>Contact</h2>
         <div className="form-grid">
           <label>
@@ -407,7 +454,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         </div>
       </section>
 
-      <section className="profile-section">
+      <section className="profile-section" hidden={activeSection !== 'links'}>
         <h2>Links</h2>
         <div className="form-grid">
           <label>
@@ -446,7 +493,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         </div>
       </section>
 
-      <section className="profile-section">
+      <section
+        className="profile-section"
+        hidden={activeSection !== 'experience'}
+      >
         <div className="fillio-section-heading">
           <h2>Experience</h2>
           <button
@@ -469,6 +519,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               })
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add experience
           </button>
         </div>
@@ -561,6 +612,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     })
                   }
                 >
+                  <Trash2 aria-hidden="true" size={16} />
                   Remove experience {index + 1}
                 </button>
               </article>
@@ -569,7 +621,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         )}
       </section>
 
-      <section className="profile-section">
+      <section
+        className="profile-section"
+        hidden={activeSection !== 'education'}
+      >
         <div className="fillio-section-heading">
           <h2>Education</h2>
           <button
@@ -592,6 +647,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               })
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add education
           </button>
         </div>
@@ -684,6 +740,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     })
                   }
                 >
+                  <Trash2 aria-hidden="true" size={16} />
                   Remove education {index + 1}
                 </button>
               </article>
@@ -692,7 +749,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         )}
       </section>
 
-      <section className="profile-section">
+      <section className="profile-section" hidden={activeSection !== 'skills'}>
         <div className="fillio-section-heading">
           <h2>Skills</h2>
           <button
@@ -709,6 +766,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               })
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add skill
           </button>
         </div>
@@ -774,6 +832,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     })
                   }
                 >
+                  <Trash2 aria-hidden="true" size={16} />
                   Remove skill {index + 1}
                 </button>
               </article>
@@ -782,7 +841,11 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         )}
       </section>
 
-      <details className="profile-section">
+      <details
+        className="profile-section"
+        open
+        hidden={activeSection !== 'preferences'}
+      >
         <summary>Job preferences</summary>
         <div className="form-grid">
           <label>
@@ -864,7 +927,11 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         </div>
       </details>
 
-      <details className="profile-section">
+      <details
+        className="profile-section"
+        open
+        hidden={activeSection !== 'skills'}
+      >
         <summary>Languages, certifications, and projects</summary>
         <div className="fillio-section-heading">
           <h3>Languages</h3>
@@ -881,6 +948,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               )
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add language
           </button>
         </div>
@@ -924,6 +992,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 )
               }
             >
+              <Trash2 aria-hidden="true" size={16} />
               Remove
             </button>
           </article>
@@ -948,6 +1017,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               )
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add certification
           </button>
         </div>
@@ -1006,6 +1076,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 )
               }
             >
+              <Trash2 aria-hidden="true" size={16} />
               Remove
             </button>
           </article>
@@ -1031,6 +1102,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               )
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add project
           </button>
         </div>
@@ -1113,13 +1185,18 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 )
               }
             >
+              <Trash2 aria-hidden="true" size={16} />
               Remove
             </button>
           </article>
         ))}
       </details>
 
-      <details className="profile-section">
+      <details
+        className="profile-section"
+        open
+        hidden={activeSection !== 'documents'}
+      >
         <summary>Documents and reusable answers</summary>
         <div className="fillio-section-heading">
           <div>
@@ -1143,6 +1220,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               )
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add resume
           </button>
         </div>
@@ -1184,6 +1262,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 )
               }
             >
+              <Trash2 aria-hidden="true" size={16} />
               Remove resume
             </button>
           </article>
@@ -1206,6 +1285,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               )
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add answer
           </button>
         </div>
@@ -1257,17 +1337,21 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 )
               }
             >
+              <Trash2 aria-hidden="true" size={16} />
               Remove answer
             </button>
           </article>
         ))}
       </details>
 
-      {vaultClient !== undefined ? (
+      {vaultClient !== undefined && activeSection === 'sensitive' ? (
         <SensitiveVaultSection vaultClient={vaultClient} />
       ) : null}
 
-      <section className="profile-section">
+      <section
+        className="profile-section"
+        hidden={activeSection !== 'variants'}
+      >
         <div className="fillio-section-heading">
           <div>
             <h2>Application variants</h2>
@@ -1287,6 +1371,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               })
             }
           >
+            <Plus aria-hidden="true" size={16} />
             Add variant
           </button>
         </div>
@@ -1399,6 +1484,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     })
                   }
                 >
+                  <Trash2 aria-hidden="true" size={16} />
                   Remove variant {index + 1}
                 </button>
               </article>
@@ -1407,7 +1493,11 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         )}
       </section>
 
-      <details className="profile-section">
+      <details
+        className="profile-section"
+        open
+        hidden={activeSection !== 'backup'}
+      >
         <summary>Backup and recovery</summary>
         <p className="muted">
           Export contains the normal versioned profile and variants. Sensitive
@@ -1419,9 +1509,11 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             type="button"
             onClick={exportProfile}
           >
+            <Download aria-hidden="true" size={16} />
             Export profile backup
           </button>
           <label className="fillio-button">
+            <Upload aria-hidden="true" size={16} />
             Import profile backup
             <input
               type="file"

@@ -7,6 +7,7 @@ import {
   SET_PAGE_VARIANT,
   type PageContextResponse,
 } from '../../src/application/forms/page-messages';
+import { OPEN_WORKSPACE } from '../../src/application/workspace/workspace-messages';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { PopupPage } from '../../src/ui/popup/PopupPage';
 
@@ -75,7 +76,7 @@ export default function App() {
   return (
     <PopupPage
       repository={repository}
-      openOptions={() => browser.runtime.openOptionsPage()}
+      openOptions={() => browser.runtime.sendMessage({ type: OPEN_WORKSPACE })}
       pageSummary={pageContext.analysis}
       variantRecommendation={pageContext.variantRecommendation}
       activeVariantId={pageContext.activeVariantId}

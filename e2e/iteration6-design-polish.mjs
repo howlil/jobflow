@@ -73,9 +73,10 @@ async function getExtensionId(context) {
   return extensionId;
 }
 
-async function capture(page, name, viewport) {
+async function capture(page, name, viewport, fullPage = true) {
   await page.setViewportSize(viewport);
-  await page.screenshot({ path: join(screenshotsDir, name), fullPage: true });
+  await page.waitForTimeout(220);
+  await page.screenshot({ path: join(screenshotsDir, name), fullPage });
 }
 
 const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i6-'));
@@ -98,12 +99,23 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await expect(page.getByText('Profile readiness')).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Import from CV' }),
+    page.getByRole('heading', { name: 'Career profile' }),
   ).toBeVisible();
-  await expect(page.getByText('Career data workspace')).toBeVisible();
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
   await capture(page, 'options-tablet.png', { width: 1024, height: 900 });
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
+  await expect(page.getByLabel('First name')).toBeVisible();
+  await capture(page, 'options-personal-desktop.png', {
+    width: 1440,
+    height: 1000,
+  });
+  await capture(page, 'options-personal-mobile.png', {
+    width: 390,
+    height: 844,
+  });
 
   await page.goto(fixture.url);
   const host = page.locator('fillio-form-assistant');
@@ -111,26 +123,59 @@ try {
   const launcher = page.getByRole('button', { name: 'Open Fillio' });
   await expect(launcher).toBeVisible();
   await expect(page.getByText('Sensitive fields detected')).toHaveCount(0);
-  await capture(page, 'floating-launcher-desktop.png', {
-    width: 1440,
-    height: 1000,
-  });
+  await capture(
+    page,
+    'floating-launcher-desktop.png',
+    {
+      width: 1440,
+      height: 1000,
+    },
+    false,
+  );
 
   await launcher.click();
-  await expect(page.getByText('Sensitive')).toBeVisible();
-  await page.getByRole('button', { name: /Sensitive data/i }).click();
-  await expect(page.getByText('Sensitive fields detected')).toBeVisible();
-  await expect(page.getByText('Date of birth')).toBeVisible();
-  await expect(page.getByText('National ID')).toBeVisible();
-  await capture(page, 'floating-panel-desktop.png', {
-    width: 1440,
-    height: 1000,
+  const workspacePagePromise = context.waitForEvent('page');
+  await page.getByRole('button', { name: 'Open profile workspace' }).click();
+  const workspacePage = await workspacePagePromise;
+  await workspacePage.waitForLoadState('domcontentloaded');
+  await expect(
+    workspacePage.getByRole('heading', { name: 'Career profile' }),
+  ).toBeVisible();
+  await workspacePage.close();
+
+  const sensitiveFieldsButton = page.getByRole('button', {
+    name: /Sensitive fields/i,
   });
+  await expect(sensitiveFieldsButton).toBeVisible();
+  await sensitiveFieldsButton.click();
+  const sensitiveRegion = page.getByLabel(
+    'Sensitive fields requiring approval',
+  );
+  await expect(page.getByText('Sensitive fields detected')).toBeVisible();
+  await expect(
+    sensitiveRegion.getByText(/unlocking the vault does not fill anything/i),
+  ).toBeVisible();
+  await expect(sensitiveRegion.getByText('Date of birth')).toBeVisible();
+  await expect(sensitiveRegion.getByText('National ID')).toBeVisible();
+  await capture(
+    page,
+    'floating-panel-desktop.png',
+    {
+      width: 1440,
+      height: 1000,
+    },
+    false,
+  );
 
   await page.getByRole('button', { name: 'Close Fillio' }).first().click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Open Fillio' }).click();
-  await capture(page, 'floating-panel-mobile.png', { width: 390, height: 844 });
+  await capture(
+    page,
+    'floating-panel-mobile.png',
+    { width: 390, height: 844 },
+    false,
+  );
 
   expect(await page.getByLabel('Date of birth').inputValue()).toBe('');
   expect(await page.getByLabel('National ID').inputValue()).toBe('');

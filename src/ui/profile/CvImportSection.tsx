@@ -14,6 +14,7 @@ import type {
   DocumentMetadata,
   StoredProfileEnvelope,
 } from '../../domain/profile/profile-schema';
+import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import {
   extractCvText,
   isSupportedCvFile,
@@ -58,7 +59,7 @@ export function CvImportSection({
   useEffect(() => {
     let active = true;
     void profileRepository.load().then((stored) => {
-      if (active) setProfile(stored);
+      if (active) setProfile(stored ?? createEmptyStoredProfile());
     });
     return () => {
       active = false;
@@ -84,16 +85,16 @@ export function CvImportSection({
       setError('Use a PDF, DOCX, or TXT CV.');
       return;
     }
-    if (profile === null) {
-      setError('Your profile is not ready yet.');
-      return;
-    }
-
     setBusy(true);
     try {
+      const sourceProfile =
+        profile ??
+        (await profileRepository.load()) ??
+        createEmptyStoredProfile();
+      if (profile === null) setProfile(sourceProfile);
       const extraction = await extractCvText(nextFile);
       const nextDraft = parseCvText(extraction.text);
-      const nextPreview = createCvImportPreview(profile, nextDraft);
+      const nextPreview = createCvImportPreview(sourceProfile, nextDraft);
       setDraft(nextDraft);
       setPreview(nextPreview);
       setSelected(initialSelection(nextPreview));

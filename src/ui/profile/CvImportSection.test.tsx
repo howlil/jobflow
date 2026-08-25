@@ -44,6 +44,27 @@ describe('CvImportSection', () => {
     });
   });
 
+  it('starts from an empty profile when storage has not been initialized', async () => {
+    const { profileRepository, documentRepository } = createRepositories();
+    vi.mocked(profileRepository.load).mockResolvedValue(null);
+
+    render(
+      <CvImportSection
+        profileRepository={profileRepository}
+        documentRepository={documentRepository}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('Choose CV'), {
+      target: {
+        files: [new File([cvText], 'backend.txt', { type: 'text/plain' })],
+      },
+    });
+
+    expect(await screen.findByText('Maya Putri')).toBeTruthy();
+    expect(screen.queryByText('Your profile is not ready yet.')).toBeNull();
+  });
+
   it('extracts locally but waits for explicit reviewed import', async () => {
     const { profileRepository, documentRepository } = createRepositories();
     render(

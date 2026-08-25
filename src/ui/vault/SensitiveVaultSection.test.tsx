@@ -51,7 +51,9 @@ describe('SensitiveVaultSection', () => {
     render(<SensitiveVaultSection vaultClient={createVaultClient()} />);
 
     expect(await screen.findByText('Sensitive vault')).toBeTruthy();
-    expect(screen.getByText(/stored encrypted on this device/i)).toBeTruthy();
+    expect(
+      screen.getByText(/add salary, identity, and other private answers/i),
+    ).toBeTruthy();
     expect(screen.getByLabelText(/new vault passphrase/i)).toBeTruthy();
     expect(screen.getByLabelText(/confirm vault passphrase/i)).toBeTruthy();
     expect(screen.queryByLabelText(/national id/i)).toBeNull();

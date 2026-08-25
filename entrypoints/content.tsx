@@ -18,6 +18,7 @@ import {
 } from '../src/application/forms/page-messages';
 import { createSensitiveFillInstructions } from '../src/application/vault/sensitive-values';
 import type { SensitiveFieldPath } from '../src/application/vault/vault-messages';
+import { OPEN_WORKSPACE } from '../src/application/workspace/workspace-messages';
 import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
 import {
   classifyDocumentFieldIntent,
@@ -217,7 +218,7 @@ export default defineContentScript({
               );
             }}
             onOpenOptions={() => {
-              void browser.runtime.openOptionsPage();
+              void browser.runtime.sendMessage({ type: OPEN_WORKSPACE });
             }}
             onUnlockSensitive={(passphrase) => {
               void unlockSensitive(passphrase);
@@ -362,9 +363,9 @@ export default defineContentScript({
         isolateEvents: true,
         onMount(container, _shadow, shadowHost) {
           shadowHost.style.position = 'fixed';
-          shadowHost.style.right = '20px';
-          shadowHost.style.bottom = '20px';
+          shadowHost.style.inset = '0';
           shadowHost.style.zIndex = '2147483647';
+          shadowHost.style.pointerEvents = 'none';
 
           const mountPoint = document.createElement('div');
           container.append(mountPoint);

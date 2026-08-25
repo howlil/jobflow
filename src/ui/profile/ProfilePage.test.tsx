@@ -19,32 +19,73 @@ describe('ProfilePage', () => {
   it('shows a guided readiness summary for an empty profile', async () => {
     const { repository } = createRepository(null);
 
-    render(<ProfilePage repository={repository} />);
+    render(<ProfilePage repository={repository} activeSection="overview" />);
 
     expect(await screen.findByText('Profile readiness')).not.toBeNull();
     expect(screen.getByText(/sections ready/i)).not.toBeNull();
+    expect(
+      screen.getByText(
+        'Start with name, email, and phone so Fillio can safely handle the common required fields.',
+      ),
+    ).not.toBeNull();
     expect(screen.getByText('Missing essentials')).not.toBeNull();
     expect(
+      screen.getByRole('button', { name: 'Start with personal data' }),
+    ).not.toBeNull();
+    expect(screen.getByLabelText('First name').closest('section')?.hidden).toBe(
+      true,
+    );
+    expect(
       screen.getByRole('button', { name: /save profile/i }),
+    ).not.toBeNull();
+  });
+
+  it('shows only the selected form category', async () => {
+    const { repository } = createRepository(null);
+    const { rerender } = render(
+      <ProfilePage repository={repository} activeSection="personal" />,
+    );
+
+    expect(await screen.findByLabelText('First name')).not.toBeNull();
+    expect(
+      screen
+        .getByRole('button', { name: 'Add experience', hidden: true })
+        .closest('section')?.hidden,
+    ).toBe(true);
+
+    rerender(
+      <ProfilePage repository={repository} activeSection="experience" />,
+    );
+
+    expect(screen.getByLabelText('First name').closest('section')?.hidden).toBe(
+      true,
+    );
+    expect(
+      screen.getByRole('button', { name: 'Add experience' }),
     ).not.toBeNull();
   });
 
   it('shows compact empty states for core profile modules', async () => {
     const { repository } = createRepository(null);
 
-    render(<ProfilePage repository={repository} />);
+    const { rerender } = render(
+      <ProfilePage repository={repository} activeSection="experience" />,
+    );
 
     expect(await screen.findByText('Experience')).not.toBeNull();
     expect(screen.getByText('No experience added yet.')).not.toBeNull();
     expect(
       screen.getByRole('button', { name: /add experience/i }),
     ).not.toBeNull();
+    rerender(<ProfilePage repository={repository} activeSection="education" />);
     expect(screen.getByText('No education added yet.')).not.toBeNull();
     expect(
       screen.getByRole('button', { name: /add education/i }),
     ).not.toBeNull();
+    rerender(<ProfilePage repository={repository} activeSection="skills" />);
     expect(screen.getByText('No skills added yet.')).not.toBeNull();
     expect(screen.getByRole('button', { name: /add skill/i })).not.toBeNull();
+    rerender(<ProfilePage repository={repository} activeSection="variants" />);
     expect(
       screen.getByText('No application variants added yet.'),
     ).not.toBeNull();
@@ -54,7 +95,7 @@ describe('ProfilePage', () => {
   it('edits core profile fields and persists them', async () => {
     const { repository, save } = createRepository(null);
 
-    render(<ProfilePage repository={repository} />);
+    const { rerender } = render(<ProfilePage repository={repository} />);
 
     fireEvent.change(await screen.findByLabelText('First name'), {
       target: { value: 'Ulil' },
@@ -62,9 +103,13 @@ describe('ProfilePage', () => {
     fireEvent.change(screen.getByLabelText('Last name'), {
       target: { value: 'Abshar' },
     });
+
+    rerender(<ProfilePage repository={repository} activeSection="contact" />);
     fireEvent.change(screen.getByLabelText('Primary email'), {
       target: { value: 'ulil@example.com' },
     });
+
+    rerender(<ProfilePage repository={repository} activeSection="links" />);
     fireEvent.change(screen.getByLabelText('LinkedIn'), {
       target: { value: 'https://linkedin.com/in/ulil' },
     });
@@ -88,9 +133,14 @@ describe('ProfilePage', () => {
   it('adds richer career records, preferences, documents, and a variant', async () => {
     const { repository, save } = createRepository(null);
 
-    render(<ProfilePage repository={repository} />);
+    const { rerender } = render(
+      <ProfilePage repository={repository} activeSection="personal" />,
+    );
     await screen.findByLabelText('First name');
 
+    rerender(
+      <ProfilePage repository={repository} activeSection="experience" />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Add experience' }));
     fireEvent.change(screen.getByLabelText('Company'), {
       target: { value: 'Example Co' },
@@ -102,6 +152,7 @@ describe('ProfilePage', () => {
       target: { value: 'Full-time' },
     });
 
+    rerender(<ProfilePage repository={repository} activeSection="education" />);
     fireEvent.click(screen.getByRole('button', { name: 'Add education' }));
     fireEvent.change(screen.getByLabelText('Institution'), {
       target: { value: 'Universitas Andalas' },
@@ -110,15 +161,20 @@ describe('ProfilePage', () => {
       target: { value: 'Bachelor' },
     });
 
+    rerender(<ProfilePage repository={repository} activeSection="skills" />);
     fireEvent.click(screen.getByRole('button', { name: 'Add skill' }));
     fireEvent.change(screen.getByLabelText('Skill'), {
       target: { value: 'TypeScript' },
     });
 
+    rerender(
+      <ProfilePage repository={repository} activeSection="preferences" />,
+    );
     fireEvent.change(screen.getByLabelText('Desired roles, comma separated'), {
       target: { value: 'Backend Engineer, Software Engineer' },
     });
 
+    rerender(<ProfilePage repository={repository} activeSection="documents" />);
     fireEvent.click(screen.getByRole('button', { name: 'Add resume' }));
     fireEvent.change(screen.getByLabelText('Label'), {
       target: { value: 'Backend resume' },
@@ -127,6 +183,7 @@ describe('ProfilePage', () => {
       target: { value: 'backend.pdf' },
     });
 
+    rerender(<ProfilePage repository={repository} activeSection="variants" />);
     fireEvent.click(screen.getByRole('button', { name: 'Add variant' }));
     fireEvent.change(screen.getByLabelText('Variant name'), {
       target: { value: 'Backend Engineer' },

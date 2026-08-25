@@ -19,6 +19,13 @@
     border-color 120ms ease,
     color 120ms ease,
     transform 120ms ease;
+  text-decoration: none;
+}
+
+.fillio-button svg,
+.fillio-icon-button svg,
+.fillio-chip svg {
+  flex: 0 0 auto;
 }
 
 .fillio-button:hover:not(:disabled) {

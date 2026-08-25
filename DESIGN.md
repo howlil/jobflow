@@ -8,7 +8,7 @@ This file is the visual source of truth for Fillio. External design references a
 2. **Editorial before dashboard.** Prefer typography, whitespace, separators, and clear grouping over card soup.
 3. **Monochrome by default.** Product actions use near-black, white, and warm neutrals. Semantic colors are reserved for warning, success, and danger states.
 4. **Compact controls, clear hierarchy.** Form controls are dense enough for long career profiles without becoming cramped.
-5. **One workspace, not a wizard.** Career data is edited on one continuous responsive page with sticky anchor navigation.
+5. **One workspace, not a wizard.** Career data uses non-linear section navigation with one focused category visible at a time. Users can switch categories freely without a forced sequence.
 6. **Use the correct surface.** Profile, CV, documents, variants, vault, corrections, and backup live in a normal browser tab. Job-page assistance stays on the current webpage.
 7. **Contextual extension UI.** On websites, Fillio defaults to a small launcher docked to the right viewport edge. Clicking it opens a fixed right slide panel over the page.
 8. **Motion is functional.** Short opacity/transform transitions only; respect `prefers-reduced-motion`.
@@ -135,12 +135,14 @@ Long text, addresses, summaries, and record descriptions span the useful content
 
 ### Workspace navigation
 
-Sticky horizontal anchor navigation below the Fillio top bar.
+Desktop uses a sticky left navigation rail beside the active category. Mobile uses a compact native section selector above the content. Only one category is rendered visibly at a time; switching categories does not imply completion and is not a wizard step.
 
 Sections:
 
 - Overview
 - Personal
+- Contact
+- Links
 - Experience
 - Education
 - Skills
@@ -151,7 +153,7 @@ Sections:
 - Corrections
 - Backup
 
-Navigation scrolls the existing one-page document; it is not a wizard or route switcher.
+Navigation changes the active workspace category. Profile state stays mounted so unsaved edits survive category changes.
 
 ### 2. Job-page assistant — fixed right slide panel
 

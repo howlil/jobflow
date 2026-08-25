@@ -94,6 +94,7 @@ try {
   const page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+  await page.getByRole('button', { name: 'Documents' }).click();
   await expect(
     page.getByRole('heading', { name: 'Import from CV' }),
   ).toBeVisible();
@@ -109,8 +110,14 @@ try {
   await expect(page.getByText(/Go, PostgreSQL, Redis/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Save CV locally' }).click();
-  await page.waitForLoadState('domcontentloaded');
-  await expect(page.getByText('backend-cv')).toBeVisible();
+  await expect(
+    page.getByText(
+      'backend-cv.txt is stored locally and can be attached from Fillio.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.locator('.document-row').getByText('backend-cv.txt'),
+  ).toBeVisible();
 
   await page.goto(fixture.url);
   await expect(page.locator('fillio-form-assistant')).toBeAttached();

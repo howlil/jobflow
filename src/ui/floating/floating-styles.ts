@@ -178,6 +178,10 @@ export const FLOATING_STYLES = `
   color: var(--fillio-text);
 }
 
+.fillio-panel svg {
+  flex: 0 0 auto;
+}
+
 .fillio-panel__body {
   display: grid;
 }
@@ -213,7 +217,11 @@ export const FLOATING_STYLES = `
 }
 
 .fillio-panel__fill {
+  display: inline-flex;
   min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin: 0 18px 18px;
   padding: 10px 14px;
   border: 1px solid #111111;
@@ -242,6 +250,9 @@ export const FLOATING_STYLES = `
 }
 
 .fillio-panel__section-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 14px 18px 8px;
 }
 
@@ -299,6 +310,13 @@ export const FLOATING_STYLES = `
   border-top: 0;
 }
 
+.fillio-panel__menu button > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
 .fillio-panel__menu button:hover,
 .fillio-panel__open-profile:hover,
 .fillio-panel__back:hover,
@@ -342,8 +360,11 @@ export const FLOATING_STYLES = `
 }
 
 .fillio-panel__back {
+  display: inline-flex;
   width: max-content;
   min-height: 34px;
+  align-items: center;
+  gap: 6px;
   margin-left: -8px;
   padding: 6px 8px;
   border: 0;
@@ -355,6 +376,13 @@ export const FLOATING_STYLES = `
 
 .fillio-panel__section-label {
   margin: 0;
+}
+
+.fillio-panel__helper {
+  margin: 6px 0 0;
+  color: var(--fillio-muted);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .fillio-panel__review {
@@ -376,7 +404,11 @@ export const FLOATING_STYLES = `
 
 .fillio-panel__action,
 .fillio-panel__action--secondary {
+  display: inline-flex;
   min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   border-radius: 7px;
   cursor: pointer;
 }
@@ -406,6 +438,9 @@ export const FLOATING_STYLES = `
 }
 
 .fillio-panel__sensitive-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   margin: 0;
   padding: 10px;
   border: 1px solid color-mix(in srgb, var(--fillio-danger) 28%, transparent);
@@ -455,7 +490,8 @@ export const FLOATING_STYLES = `
 
 @media (max-width: 560px) {
   .fillio-panel {
-    width: 100vw;
+    left: 0;
+    width: auto;
   }
 
   .fillio-launcher {

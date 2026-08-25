@@ -1,4 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  ExternalLink,
+  FileText,
+  HelpCircle,
+  LockKeyhole,
+  PanelRightClose,
+  ShieldCheck,
+} from 'lucide-react';
 
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
@@ -130,7 +141,7 @@ export function FloatingPanel({
               aria-label="Close Fillio"
               onClick={() => setIsOpen(false)}
             >
-              ×
+              <PanelRightClose aria-hidden="true" size={18} />
             </button>
           </header>
 
@@ -157,6 +168,7 @@ export function FloatingPanel({
                 disabled={summary.ready === 0}
                 onClick={onFill}
               >
+                <CheckCircle2 aria-hidden="true" size={16} />
                 {fillLabel}
               </button>
 
@@ -166,6 +178,7 @@ export function FloatingPanel({
                   aria-label="Detected document fields"
                 >
                   <div className="fillio-panel__section-heading">
+                    <FileText aria-hidden="true" size={14} />
                     <span>Documents</span>
                   </div>
                   {attachableDocuments.map((item) => (
@@ -202,7 +215,10 @@ export function FloatingPanel({
                   <div className="fillio-panel__menu">
                     {summary.needsReview > 0 ? (
                       <button type="button" onClick={() => setView('review')}>
-                        <span>Review ambiguous fields</span>
+                        <span>
+                          <HelpCircle aria-hidden="true" size={15} />
+                          Review ambiguous fields
+                        </span>
                         <strong>{summary.needsReview}</strong>
                       </button>
                     ) : null}
@@ -211,7 +227,10 @@ export function FloatingPanel({
                         type="button"
                         onClick={() => setView('sensitive')}
                       >
-                        <span>Sensitive fields</span>
+                        <span>
+                          <ShieldCheck aria-hidden="true" size={15} />
+                          Sensitive fields
+                        </span>
                         <strong>{summary.sensitive}</strong>
                       </button>
                     ) : null}
@@ -226,7 +245,7 @@ export function FloatingPanel({
                   onClick={onOpenOptions}
                 >
                   Open profile workspace
-                  <span aria-hidden="true">↗</span>
+                  <ExternalLink aria-hidden="true" size={15} />
                 </button>
               ) : null}
             </div>
@@ -242,7 +261,8 @@ export function FloatingPanel({
                 type="button"
                 onClick={() => setView('home')}
               >
-                ← Back
+                <ArrowLeft aria-hidden="true" size={15} />
+                Back
               </button>
               <div>
                 <p className="fillio-panel__section-label">Review</p>
@@ -296,11 +316,16 @@ export function FloatingPanel({
                 type="button"
                 onClick={() => setView('home')}
               >
-                ← Back
+                <ArrowLeft aria-hidden="true" size={15} />
+                Back
               </button>
               <div>
                 <p className="fillio-panel__section-label">Sensitive</p>
                 <h2>Sensitive fields detected</h2>
+                <p className="fillio-panel__helper">
+                  Review the detected fields first. Unlocking the vault does not
+                  fill anything until you approve this site.
+                </p>
               </div>
               <ul className="fillio-panel__sensitive-list">
                 {sensitiveItems.map((item) => (
@@ -313,6 +338,7 @@ export function FloatingPanel({
               </ul>
               {sensitiveError !== null ? (
                 <p className="fillio-panel__sensitive-error" role="alert">
+                  <AlertTriangle aria-hidden="true" size={15} />
                   {sensitiveError}
                 </p>
               ) : null}
@@ -322,6 +348,7 @@ export function FloatingPanel({
                   type="button"
                   onClick={onOpenOptions}
                 >
+                  <LockKeyhole aria-hidden="true" size={16} />
                   Set up vault
                 </button>
               ) : vaultStatus === 'locked' ? (
@@ -339,6 +366,7 @@ export function FloatingPanel({
                     type="button"
                     onClick={() => onUnlockSensitive?.(passphrase)}
                   >
+                    <LockKeyhole aria-hidden="true" size={16} />
                     Unlock vault
                   </button>
                 </div>
@@ -348,6 +376,7 @@ export function FloatingPanel({
                   type="button"
                   onClick={onFillSensitive}
                 >
+                  <ShieldCheck aria-hidden="true" size={16} />
                   Fill sensitive fields on {siteHost}
                 </button>
               ) : null}

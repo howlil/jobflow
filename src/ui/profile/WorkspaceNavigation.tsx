@@ -1,57 +1,85 @@
+import {
+  BriefcaseBusiness,
+  FileArchive,
+  FileText,
+  GraduationCap,
+  History,
+  Link,
+  LayoutDashboard,
+  ListChecks,
+  Mail,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from 'lucide-react';
+
+import type { WorkspaceSection } from './workspace-sections';
+
 const items = [
-  { label: 'Overview', heading: 'Career profile' },
-  { label: 'Personal', heading: 'Basic information' },
-  { label: 'Experience', heading: 'Experience' },
-  { label: 'Education', heading: 'Education' },
-  { label: 'Skills', heading: 'Skills' },
-  { label: 'Documents', targetId: 'cv-import' },
-  { label: 'Preferences', heading: 'Job preferences' },
-  { label: 'Variants', heading: 'Application variants' },
-  { label: 'Sensitive', heading: 'Sensitive vault' },
-  { label: 'Corrections', targetId: 'corrections' },
-  { label: 'Backup', targetId: 'backup-recovery' },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'personal', label: 'Personal', icon: UserRound },
+  { id: 'contact', label: 'Contact', icon: Mail },
+  { id: 'links', label: 'Links', icon: Link },
+  { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
+  { id: 'education', label: 'Education', icon: GraduationCap },
+  { id: 'skills', label: 'Skills', icon: Sparkles },
+  { id: 'documents', label: 'Documents', icon: FileText },
+  { id: 'preferences', label: 'Preferences', icon: MapPin },
+  { id: 'variants', label: 'Variants', icon: ListChecks },
+  { id: 'sensitive', label: 'Sensitive', icon: ShieldCheck },
+  { id: 'corrections', label: 'Corrections', icon: History },
+  { id: 'backup', label: 'Backup', icon: FileArchive },
 ] as const;
 
-function scrollToHeading(text: string): void {
-  const headings = Array.from(
-    document.querySelectorAll<HTMLElement>('h1, h2, h3'),
-  );
-  const heading = headings.find(
-    (candidate) => candidate.textContent?.trim() === text,
-  );
-  (heading?.closest('.profile-section') ?? heading)?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-  });
-}
+type WorkspaceNavigationProps = {
+  activeSection: WorkspaceSection;
+  onChange: (section: WorkspaceSection) => void;
+};
 
-export function WorkspaceNavigation() {
+export function WorkspaceNavigation({
+  activeSection,
+  onChange,
+}: WorkspaceNavigationProps) {
   return (
-    <div
+    <aside
       className="workspace-nav-wrap"
       aria-label="Career workspace navigation"
     >
+      <div className="workspace-nav-heading">
+        <strong>Profile setup</strong>
+        <span>Choose what to update</span>
+      </div>
+      <label className="workspace-nav-select">
+        Section
+        <select
+          value={activeSection}
+          onChange={(event) => onChange(event.target.value as WorkspaceSection)}
+        >
+          {items.map((item) => (
+            <option value={item.id} key={item.id}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <nav className="workspace-nav">
-        {items.map((item) => (
-          <button
-            className="fillio-nav-link"
-            type="button"
-            key={item.label}
-            onClick={() => {
-              if ('targetId' in item) {
-                document.getElementById(item.targetId)?.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              } else {
-                scrollToHeading(item.heading);
-              }
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              className="fillio-nav-link"
+              type="button"
+              key={item.id}
+              aria-current={activeSection === item.id ? 'page' : undefined}
+              onClick={() => onChange(item.id)}
+            >
+              <Icon aria-hidden="true" size={17} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
-    </div>
+    </aside>
   );
 }

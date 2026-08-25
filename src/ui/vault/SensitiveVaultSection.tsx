@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { KeyRound, Lock, Save, ShieldCheck, Trash2 } from 'lucide-react';
 
 import { createEmptySensitiveProfile } from '../../domain/profile/create-empty-sensitive-profile';
 import type { SensitiveProfile } from '../../domain/profile/profile-schema';
@@ -171,16 +172,17 @@ export function SensitiveVaultSection({
   const passphraseMismatch = error === 'Passphrases do not match.';
 
   return (
-    <section className="profile-section vault-section">
+    <section className="profile-section vault-section" id="sensitive-vault">
       <div className="section-heading fillio-section-heading">
         <div>
           <h2>Sensitive vault</h2>
           <p className="muted">
-            Sensitive details are stored encrypted on this device and require
-            explicit approval before Fillio can use them on a site.
+            Add salary, identity, and other private answers here only when a job
+            form asks for them. Fillio still asks before using them on a site.
           </p>
         </div>
         <strong className="fillio-chip fillio-chip-strong">
+          <ShieldCheck aria-hidden="true" size={14} />
           {vaultStatus.configured ? 'Vault set up' : 'Vault not set up'}
         </strong>
       </div>
@@ -222,6 +224,7 @@ export function SensitiveVaultSection({
             type="button"
             onClick={() => void setupVault()}
           >
+            <KeyRound aria-hidden="true" size={16} />
             Set up vault
           </button>
         </>
@@ -234,6 +237,7 @@ export function SensitiveVaultSection({
               type="button"
               onClick={() => void saveVault()}
             >
+              <Save aria-hidden="true" size={16} />
               Save sensitive data
             </button>
             <button
@@ -241,6 +245,7 @@ export function SensitiveVaultSection({
               type="button"
               onClick={() => void lockVault()}
             >
+              <Lock aria-hidden="true" size={16} />
               Lock vault
             </button>
             {confirmReset ? (
@@ -249,6 +254,7 @@ export function SensitiveVaultSection({
                 type="button"
                 onClick={() => void resetVault()}
               >
+                <Trash2 aria-hidden="true" size={16} />
                 Delete encrypted vault
               </button>
             ) : (
@@ -257,6 +263,7 @@ export function SensitiveVaultSection({
                 type="button"
                 onClick={() => setConfirmReset(true)}
               >
+                <Trash2 aria-hidden="true" size={16} />
                 Reset vault
               </button>
             )}
@@ -277,6 +284,7 @@ export function SensitiveVaultSection({
             type="button"
             onClick={() => void unlockVault()}
           >
+            <KeyRound aria-hidden="true" size={16} />
             Unlock vault
           </button>
         </>
