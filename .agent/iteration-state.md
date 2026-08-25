@@ -4,18 +4,16 @@ This file is the single current-state tracker for Fillio.
 
 ## Current phase
 
-Phase: product-maturity loop after the verified local-first MVP.
+Phase: Iterations 0-12 integrated on `master`; first tagged `0.1.0` release remains an explicit release action.
 
-Active branch: `feat/product-maturity-iterations-7-12`.
+Integration commit for the product-maturity loop: `7e4e5e65312f3a4580af84f3ad9a276679b61e34` (PR #6, squash merged after green required CI).
 
-Iterations 0-6 are integrated product foundation. The previous tracker text saying Iteration 6 still required repository integration was stale: its design-system, profile workbench, popup, floating-panel, visual acceptance, and supporting commits are already present in `master`.
-
-Iterations 6.1-12 are implemented on the active branch and are now in verification/integration. Remote CI may overlap with later slices, but a known failed required gate still blocks merge/release.
+The feature branch is no longer the source of truth. `master` is authoritative.
 
 ## Locked product boundaries
 
 - Chrome/Chromium desktop first.
-- Local-first; no account/backend/cloud sync in this roadmap.
+- Local-first; no account/backend/cloud sync in the current product.
 - Deterministic behavior before AI.
 - No automatic Apply, Submit, Next, file selection, or file upload.
 - Generic form engine first; ATS adapters require a reproducible generic-engine failure.
@@ -25,107 +23,145 @@ Iterations 6.1-12 are implemented on the active branch and are now in verificati
 - Persisted schemas remain versioned and validated.
 - Production behavior changes require tests and risk-appropriate verification.
 
-## Integrated foundation
+## Integrated iterations
 
-- Iteration 0: project operating system, architecture, security, git/release strategy, TDD policy.
-- Iteration 1: canonical profile, variants, local persistence, editor, popup readiness, manifest/smoke verification.
-- Iteration 2: generic extraction/matching/planning/filling, explicit fill only, isolated floating UI.
-- Iteration 3: dynamic forms, exact correction memory, stable fingerprints, no automatic fill/navigation/submission.
-- Iteration 4: encrypted Sensitive Data Vault, background-owned memory session, explicit disclosure approval.
-- Iteration 5: matcher corpus, reusable manifest verification, formatting baseline, documentation, packaging.
-- Iteration 6: shared UI primitives, guided workbench, progressive vault UX, popup/floating polish, visual acceptance.
+### Iteration 0 — Project operating system
+Status: completed.
 
-## Product-maturity implementation
+Delivered requirements, architecture, code patterns, security, git/release strategy, TDD policy, and project skills.
+
+### Iteration 1 — Profile vertical slice
+Status: completed.
+
+Delivered canonical versioned profile, variants, local persistence, editor, popup readiness, manifest verification, and Chromium smoke coverage.
+
+### Iteration 2 — Generic form analysis and safe autofill
+Status: completed.
+
+Delivered generic DOM extraction, deterministic matching, Ready/Review/Unknown/Sensitive planning, explicit filling, browser-compatible control events, isolated floating UI, and page summary messaging.
+
+### Iteration 3 — Dynamic forms and correction memory
+Status: completed.
+
+Delivered exact origin/form/field correction memory, stable fingerprints, debounced mutation re-analysis, review/ignore controls, and preserved zero automatic fill/navigation/submission.
+
+### Iteration 4 — Sensitive Data Vault
+Status: completed.
+
+Delivered authenticated encrypted-at-rest sensitive storage, background-owned memory session, inactivity lock, typed messaging, explicit site disclosure approval, and fail-closed security acceptance.
+
+### Iteration 5 — MVP hardening
+Status: completed.
+
+Delivered expanded matcher corpus, reusable manifest verification, normalized formatting baseline, user/security documentation, and reproducible Chromium packaging.
+
+### Iteration 6 — Design system and UX polish
+Status: completed.
+
+Delivered shared UI primitives, guided workbench, progressive vault UX, popup/floating polish, and desktop/mobile visual acceptance.
 
 ### Iteration 6.1 — Repository and release closure
-Status: implemented; verification/integration pending.
+Status: completed except external tag/release creation.
 
 Delivered:
-- tracker realigned with repository reality
-- tag-driven fail-closed release workflow
-- release reruns tests, typecheck, lint, formatting, build, manifest verification, Chromium E2E, and packaging
-- release ZIP receives SHA-256 checksum before immutable GitHub Release creation
-- no release is created from the feature branch
+- repository tracker realigned with actual state
+- tag-driven fail-closed GitHub Release workflow
+- release workflow reruns tests, typecheck, lint, formatting, build, manifest verification, Chromium E2E, and packaging
+- packaged ZIP receives SHA-256 checksum before GitHub Release creation
+- release publishing is not allowed to bypass verification
+
+Remaining explicit release action:
+- create `v0.1.0` from a verified `master` commit when the release is intended to be published
 
 ### Iteration 7 — Context-aware application variants
-Status: implemented; verification/integration pending.
+Status: completed.
 
 Delivered:
-- pure deterministic `recommendApplicationVariant`
-- local page signals from title, meta description, and bounded heading text
-- inspectable keyword evidence instead of fake probability
+- deterministic `recommendApplicationVariant`
+- bounded local page signals from title, meta description, and headings
+- inspectable keyword evidence rather than fake probability
 - stable default fallback/tie behavior
-- recommended variant drives resolved application profile
-- popup discloses recommendation and evidence
-- explicit per-page variant override re-analyzes the page
-- user can return to automatic recommendation
+- recommendation drives resolved application profile
+- popup recommendation disclosure
+- explicit per-page variant override with re-analysis
+- return-to-automatic recommendation control
 - no AI/network dependency
 
 ### Iteration 8 — Progressive profile completeness
-Status: implemented; verification/integration pending.
+Status: completed for the current product scope.
 
-Delivered in the existing canonical profile workbench:
+Delivered in the same canonical profile workbench:
 - richer basic/contact/professional fields
 - richer experience, education, and skill records
 - first-class job preferences
 - progressive languages, certifications, projects, reusable answers, and document metadata
 - richer application variant editing
-- one profile state/save model; no parallel editor/schema
+- one state/save model with no parallel profile schema/editor
 
 ### Iteration 9 — Document assistance
-Status: implemented for resume guidance; verification/integration pending.
+Status: completed for safe generic resume guidance.
 
 Delivered:
-- deterministic preferred-document selection from the active application variant
+- deterministic preferred-document selection from the active variant
 - resume metadata management and per-variant preferred resume
 - current-page file-input detection
-- popup recommends the configured resume only when file inputs exist
-- UI explicitly states that selection/upload remains manual
-- no file input is programmatically filled
+- popup resume guidance only when a file input is present
+- explicit manual-only file selection/upload UX
+- no programmatic file-input filling
 
-Cover-letter metadata exists in the canonical model but is not pulled into the current file-input guidance because generic file inputs do not reliably disclose document intent. Do not guess document type without stronger page evidence.
+Cover-letter metadata remains available in the canonical model but generic file inputs do not reliably identify document intent. Fillio intentionally does not guess a document type without stronger evidence.
 
 ### Iteration 10 — Real-world compatibility evidence
-Status: implemented; verification/integration pending.
+Status: completed for the maintained generic-engine corpus.
 
 Delivered:
-- expanded maintained matcher corpus with native, Indonesian/English, and ATS-shaped contexts resembling common application systems
+- expanded native, Indonesian/English, and ATS-shaped matcher corpus
+- representative patterns resembling common ATS structures without vendor-specific production branches
 - sensitive/file fail-closed regression coverage
 - ambiguous subjective-question coverage
 - compatibility evidence model in `docs/compatibility.md`
-- explicit ATS adapter gate: reproduce generic failure first; fix generic layer before adding vendor code
+- explicit adapter gate requiring a reproducible generic-engine failure first
 
 ### Iteration 11 — Local portability and recovery
-Status: implemented; verification/integration pending.
+Status: completed for normal profile backup.
 
 Delivered:
 - versioned `fillio-profile-backup` format
-- normal profile/variants/preferences round-trip through the same persisted-schema parser/migrations
+- profile/variants/preferences round-trip through the same persisted-schema parser/migrations
 - malformed/unsupported backup rejection
-- profile workbench export/import UI
+- workbench export/import UI
 - Sensitive Data Vault values are never exported as plaintext
 
 ### Iteration 12 — External beta readiness
-Status: implemented as readiness infrastructure; external distribution pending.
+Status: readiness infrastructure completed; actual external distribution is a release/operations decision.
 
 Delivered:
 - privacy disclosure matching actual local data flow
-- compatibility/support evidence document
+- compatibility evidence document
 - Chrome Web Store unlisted/test beta checklist
 - permission/product-truth gates
-- GitHub Release ZIP + checksum workflow
-- explicit progression: verified master -> tag -> GitHub release -> trusted testers -> unlisted/test store -> public only after evidence
+- fail-closed GitHub Release ZIP + checksum workflow
+- explicit progression: verified master -> immutable tag -> GitHub Release -> trusted testers -> unlisted/test store -> public listing only after evidence
 - no store-publishing automation before credentials/tester cadence justify it
 
-## Current verification evidence
+## Verification evidence
 
-Known CI history on this branch:
+Product-maturity branch final required CI passed before squash merge:
 
-- first runtime pass exposed one stale profile UI test label; fixed
-- next pass reached 146/146 unit tests green and then exposed two TypeScript key-narrowing errors; fixed
-- later commits add per-page variant override, file-input resume guidance, and corresponding popup acceptance tests; final CI is still the source of truth for merge readiness
+- dependency install from frozen lockfile
+- 30 Vitest files / 148 tests passed
+- TypeScript typecheck passed
+- ESLint passed with zero warnings
+- Prettier check passed
+- production extension build passed
+- generated manifest invariants passed
+- Playwright Chromium installation passed
+- complete `pnpm test:e2e` passed after narrowing one stale Iteration 6 text locator to the semantic `Sensitive vault` heading
+- extension package creation passed
 
-## Required final gates
+The E2E locator correction changed test specificity only; no production behavior was weakened to satisfy the test.
+
+## Required gates for future runtime changes
 
 ```text
 pnpm install --frozen-lockfile
@@ -140,8 +176,8 @@ pnpm zip
 git diff --check
 ```
 
-A pending remote run does not block beginning another independent slice. A known failed required gate must be fixed before merge. Security/privacy/schema/permission changes receive the stricter verification path.
+Security/privacy/schema/permission changes receive the stricter verification path. A known failed required gate blocks merge/release.
 
-## Definition of done
+## Current next-state rule
 
-The product-maturity loop is complete only when the branch is coherent, required CI gates are green, PR review/integration is clean, `.agent` matches repository reality, package/release behavior is reproducible, and no capability weakens Fillio's local-first, explicit-action, fail-closed model.
+Do not add AI, backend sync, automatic submission, automatic file upload, or ATS-specific adapters merely because Iterations 0-12 are complete. The next product iteration should be driven by evidence from actual use, compatibility failures, or external beta feedback.
