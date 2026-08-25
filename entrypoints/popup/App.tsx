@@ -26,7 +26,9 @@ async function getActiveTabId(): Promise<number | null> {
   return tab?.id ?? null;
 }
 
-async function readPageContext(tabId: number): Promise<PageContextResponse | null> {
+async function readPageContext(
+  tabId: number,
+): Promise<PageContextResponse | null> {
   const response: unknown = await browser.tabs.sendMessage(tabId, {
     type: GET_PAGE_CONTEXT,
   });

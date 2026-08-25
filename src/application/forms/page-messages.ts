@@ -87,7 +87,9 @@ export function isPageAnalysisSummary(
   );
 }
 
-function isVariantRecommendation(value: unknown): value is VariantRecommendation {
+function isVariantRecommendation(
+  value: unknown,
+): value is VariantRecommendation {
   if (typeof value !== 'object' || value === null) return false;
   const candidate = value as Record<string, unknown>;
   return (
@@ -115,7 +117,9 @@ function isRecommendedDocumentSummary(
   );
 }
 
-export function isPageContextResponse(value: unknown): value is PageContextResponse {
+export function isPageContextResponse(
+  value: unknown,
+): value is PageContextResponse {
   if (typeof value !== 'object' || value === null) return false;
   const candidate = value as Record<string, unknown>;
   const analysis = candidate.analysis;

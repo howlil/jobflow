@@ -186,9 +186,8 @@ describe('PopupPage', () => {
       />,
     );
 
-    const selector = await screen.findByLabelText<HTMLSelectElement>(
-      'Use for this page',
-    );
+    const selector =
+      await screen.findByLabelText<HTMLSelectElement>('Use for this page');
     fireEvent.change(selector, { target: { value: 'devops' } });
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith('devops'));
 

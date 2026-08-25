@@ -54,10 +54,9 @@ export function recommendApplicationVariant(
   const best = scored[0];
   if (best === undefined || best.score === 0) {
     return {
-      variantId:
-        variants.some((variant) => variant.id === defaultVariantId)
-          ? defaultVariantId
-          : variants[0]?.id ?? null,
+      variantId: variants.some((variant) => variant.id === defaultVariantId)
+        ? defaultVariantId
+        : (variants[0]?.id ?? null),
       score: 0,
       evidence: [],
     };

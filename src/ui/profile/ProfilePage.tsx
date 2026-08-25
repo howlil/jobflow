@@ -386,7 +386,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.contact.address.country}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.contact.address.country = event.target.value;
+                  draft.baseProfile.contact.address.country =
+                    event.target.value;
                 })
               }
             />
@@ -726,7 +727,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                         changeProfile((draft) => {
                           const item =
                             draft.baseProfile.professional.skills[index];
-                          if (item !== undefined) item.name = event.target.value;
+                          if (item !== undefined)
+                            item.name = event.target.value;
                         })
                       }
                     />
@@ -949,67 +951,65 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             Add certification
           </button>
         </div>
-        {baseProfile.professional.certifications.map(
-          (certification, index) => (
-            <article className="record-card" key={certification.id}>
-              <div className="form-grid">
-                <label>
-                  Certification
-                  <input
-                    value={certification.name}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.certifications[index];
-                        if (item !== undefined) item.name = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Issuer
-                  <input
-                    value={certification.issuer}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.certifications[index];
-                        if (item !== undefined) item.issuer = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Credential URL
-                  <input
-                    value={certification.url}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.certifications[index];
-                        if (item !== undefined) item.url = event.target.value;
-                      })
-                    }
-                  />
-                </label>
-              </div>
-              <button
-                className="fillio-button"
-                type="button"
-                onClick={() =>
-                  changeProfile((draft) =>
-                    draft.baseProfile.professional.certifications.splice(
-                      index,
-                      1,
-                    ),
-                  )
-                }
-              >
-                Remove
-              </button>
-            </article>
-          ),
-        )}
+        {baseProfile.professional.certifications.map((certification, index) => (
+          <article className="record-card" key={certification.id}>
+            <div className="form-grid">
+              <label>
+                Certification
+                <input
+                  value={certification.name}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.certifications[index];
+                      if (item !== undefined) item.name = event.target.value;
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Issuer
+                <input
+                  value={certification.issuer}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.certifications[index];
+                      if (item !== undefined) item.issuer = event.target.value;
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Credential URL
+                <input
+                  value={certification.url}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.certifications[index];
+                      if (item !== undefined) item.url = event.target.value;
+                    })
+                  }
+                />
+              </label>
+            </div>
+            <button
+              className="fillio-button"
+              type="button"
+              onClick={() =>
+                changeProfile((draft) =>
+                  draft.baseProfile.professional.certifications.splice(
+                    index,
+                    1,
+                  ),
+                )
+              }
+            >
+              Remove
+            </button>
+          </article>
+        ))}
 
         <div className="fillio-section-heading">
           <h3>Projects</h3>
@@ -1097,8 +1097,7 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 value={project.description}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item =
-                      draft.baseProfile.professional.projects[index];
+                    const item = draft.baseProfile.professional.projects[index];
                     if (item !== undefined)
                       item.description = event.target.value;
                   })
@@ -1370,17 +1369,14 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                         changeProfile((draft) => {
                           const item = draft.variants[index];
                           if (item !== undefined)
-                            item.preferredResumeId =
-                              event.target.value || null;
+                            item.preferredResumeId = event.target.value || null;
                         })
                       }
                     >
                       <option value="">Use first configured resume</option>
                       {baseProfile.documents.resumes.map((resume) => (
                         <option value={resume.id} key={resume.id}>
-                          {resume.label ||
-                            resume.fileName ||
-                            'Untitled resume'}
+                          {resume.label || resume.fileName || 'Untitled resume'}
                         </option>
                       ))}
                     </select>
@@ -1418,7 +1414,11 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           vault values are not exported as plaintext.
         </p>
         <div className="fillio-section-heading">
-          <button className="fillio-button" type="button" onClick={exportProfile}>
+          <button
+            className="fillio-button"
+            type="button"
+            onClick={exportProfile}
+          >
             Export profile backup
           </button>
           <label className="fillio-button">

@@ -71,13 +71,16 @@ describe('representative career form corpus', () => {
       { label: 'Kode Pos', name: 'postal_code' },
       'contact.address.postalCode',
     ],
-  ])('recognizes %s without an ATS adapter', (_name, context, expectedField) => {
-    expect(matchField(field(context))).toMatchObject({
-      status: 'ready',
-      field: expectedField,
-      sensitivity: 'normal',
-    });
-  });
+  ])(
+    'recognizes %s without an ATS adapter',
+    (_name, context, expectedField) => {
+      expect(matchField(field(context))).toMatchObject({
+        status: 'ready',
+        field: expectedField,
+        sensitivity: 'normal',
+      });
+    },
+  );
 
   it.each([
     ['Tanggal lahir', 'personal.birthDate'],

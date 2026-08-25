@@ -4,7 +4,11 @@ import type { ApplicationVariant } from '../profile/profile-schema';
 import { recommendApplicationVariant } from './recommend-variant';
 
 const variants: ApplicationVariant[] = [
-  { id: 'backend', name: 'Backend Engineer', targetRoles: ['Backend Engineer'] },
+  {
+    id: 'backend',
+    name: 'Backend Engineer',
+    targetRoles: ['Backend Engineer'],
+  },
   { id: 'devops', name: 'DevOps Engineer', targetRoles: ['DevOps Engineer'] },
 ];
 
@@ -32,10 +36,12 @@ describe('recommendApplicationVariant', () => {
   });
 
   it('returns null when no variants exist', () => {
-    expect(recommendApplicationVariant([], ['Backend Engineer'], null)).toEqual({
-      variantId: null,
-      score: 0,
-      evidence: [],
-    });
+    expect(recommendApplicationVariant([], ['Backend Engineer'], null)).toEqual(
+      {
+        variantId: null,
+        score: 0,
+        evidence: [],
+      },
+    );
   });
 });
