@@ -73,7 +73,7 @@
   height: 4px;
   border-radius: 50%;
   background: var(--fillio-color-warning);
-  content: "";
+  content: '';
 }
 
 .profile-section {
