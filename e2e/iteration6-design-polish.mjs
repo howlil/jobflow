@@ -105,7 +105,9 @@ try {
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await expect(page.getByText('Profile readiness')).toBeVisible();
-  await expect(page.getByText('Sensitive vault')).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Sensitive vault' }),
+  ).toBeVisible();
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });
 

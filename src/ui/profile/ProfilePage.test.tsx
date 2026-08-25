@@ -29,7 +29,7 @@ describe('ProfilePage', () => {
     ).not.toBeNull();
   });
 
-  it('shows compact empty states for profile modules', async () => {
+  it('shows compact empty states for core profile modules', async () => {
     const { repository } = createRepository(null);
 
     render(<ProfilePage repository={repository} />);
@@ -85,38 +85,56 @@ describe('ProfilePage', () => {
     );
   });
 
-  it('adds career records and a lightweight application variant', async () => {
+  it('adds richer career records, preferences, documents, and a variant', async () => {
     const { repository, save } = createRepository(null);
 
     render(<ProfilePage repository={repository} />);
     await screen.findByLabelText('First name');
 
     fireEvent.click(screen.getByRole('button', { name: 'Add experience' }));
-    fireEvent.change(screen.getByLabelText('Company 1'), {
+    fireEvent.change(screen.getByLabelText('Company'), {
       target: { value: 'Example Co' },
     });
-    fireEvent.change(screen.getByLabelText('Job title 1'), {
+    fireEvent.change(screen.getByLabelText('Job title'), {
       target: { value: 'Software Engineer' },
+    });
+    fireEvent.change(screen.getByLabelText('Employment type'), {
+      target: { value: 'Full-time' },
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Add education' }));
-    fireEvent.change(screen.getByLabelText('Institution 1'), {
+    fireEvent.change(screen.getByLabelText('Institution'), {
       target: { value: 'Universitas Andalas' },
     });
-    fireEvent.change(screen.getByLabelText('Degree 1'), {
+    fireEvent.change(screen.getByLabelText('Degree'), {
       target: { value: 'Bachelor' },
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Add skill' }));
-    fireEvent.change(screen.getByLabelText('Skill 1'), {
+    fireEvent.change(screen.getByLabelText('Skill'), {
       target: { value: 'TypeScript' },
     });
 
+    fireEvent.change(screen.getByLabelText('Desired roles, comma separated'), {
+      target: { value: 'Backend Engineer, Software Engineer' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add resume' }));
+    fireEvent.change(screen.getByLabelText('Label'), {
+      target: { value: 'Backend resume' },
+    });
+    fireEvent.change(screen.getByLabelText('File name'), {
+      target: { value: 'backend.pdf' },
+    });
+
     fireEvent.click(screen.getByRole('button', { name: 'Add variant' }));
-    fireEvent.change(screen.getByLabelText('Variant name 1'), {
+    fireEvent.change(screen.getByLabelText('Variant name'), {
       target: { value: 'Backend Engineer' },
     });
-    fireEvent.change(screen.getByLabelText('Variant headline 1'), {
+    fireEvent.change(screen.getByLabelText('Target roles, comma separated'), {
+      target: { value: 'Backend Engineer' },
+    });
+    fireEvent.change(screen.getByLabelText('Variant headline'), {
       target: { value: 'Backend Software Engineer' },
     });
 
@@ -125,12 +143,25 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
     const saved = save.mock.calls[0]?.[0];
 
-    expect(saved?.baseProfile.professional.experiences).toHaveLength(1);
+    expect(saved?.baseProfile.professional.experiences[0]).toMatchObject({
+      company: 'Example Co',
+      title: 'Software Engineer',
+      employmentType: 'Full-time',
+    });
     expect(saved?.baseProfile.professional.education).toHaveLength(1);
     expect(saved?.baseProfile.professional.skills).toHaveLength(1);
+    expect(saved?.baseProfile.jobPreferences.desiredRoles).toEqual([
+      'Backend Engineer',
+      'Software Engineer',
+    ]);
+    expect(saved?.baseProfile.documents.resumes[0]).toMatchObject({
+      label: 'Backend resume',
+      fileName: 'backend.pdf',
+    });
     expect(saved?.variants).toHaveLength(1);
     expect(saved?.variants[0]).toMatchObject({
       name: 'Backend Engineer',
+      targetRoles: ['Backend Engineer'],
       headlineOverride: 'Backend Software Engineer',
     });
     expect(saved?.preferences.defaultVariantId).toBe(saved?.variants[0]?.id);

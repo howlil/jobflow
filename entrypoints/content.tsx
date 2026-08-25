@@ -8,14 +8,25 @@ import {
   type PageAnalysis,
   type PageAnalysisSummary,
 } from '../src/application/forms/analyze-field-contexts';
-import { isGetPageAnalysisMessage } from '../src/application/forms/page-messages';
+import {
+  isGetPageAnalysisMessage,
+  isGetPageContextMessage,
+  isSetPageVariantMessage,
+  type PageVariantOption,
+  type RecommendedDocumentSummary,
+} from '../src/application/forms/page-messages';
 import { createSensitiveFillInstructions } from '../src/application/vault/sensitive-values';
 import type { SensitiveFieldPath } from '../src/application/vault/vault-messages';
 import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
+import { recommendDocumentsForVariant } from '../src/domain/documents/recommend-document';
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
 import { createEmptyStoredProfile } from '../src/domain/profile/create-empty-profile';
 import { resolveApplicationProfile } from '../src/domain/variants/resolve-profile';
+import {
+  recommendApplicationVariant,
+  type VariantRecommendation,
+} from '../src/domain/variants/recommend-variant';
 import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
 import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
 import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
@@ -28,6 +39,22 @@ import {
 } from '../src/ui/floating/FloatingPanel';
 import { FLOATING_STYLES } from '../src/ui/floating/floating-styles';
 
+function collectPageSignals(document: Document): string[] {
+  const metaDescription = document.querySelector<HTMLMetaElement>(
+    'meta[name="description"]',
+  )?.content;
+  const headings = [
+    ...document.querySelectorAll<HTMLElement>('h1, h2, [role="heading"]'),
+  ]
+    .slice(0, 12)
+    .map((heading) => heading.textContent?.trim() ?? '')
+    .filter((value) => value.length > 0);
+
+  return [document.title, metaDescription ?? '', ...headings].filter(
+    (value) => value.length > 0,
+  );
+}
+
 export default defineContentScript({
   matches: ['http://*/*', 'https://*/*'],
   runAt: 'document_idle',
@@ -36,14 +63,43 @@ export default defineContentScript({
   async main(ctx) {
     let currentSummary: PageAnalysisSummary | null = null;
     let currentAnalysis: PageAnalysis | null = null;
+    let currentVariantRecommendation: VariantRecommendation | null = null;
+    let currentActiveVariantId: string | null = null;
+    let currentVariantOptions: PageVariantOption[] = [];
+    let currentFileInputCount = 0;
+    let currentRecommendedResume: RecommendedDocumentSummary | null = null;
     let currentFieldSet = '';
     let currentVaultStatus: SensitiveVaultStatus = 'not-configured';
     let sensitiveError: string | null = null;
     let reactRoot: Root | null = null;
+    let pageVariantOverrideId: string | null = null;
+    let knownVariantIds = new Set<string>();
+    let forceAnalyzePage: (() => void) | null = null;
 
     const messageListener = (message: unknown) => {
       if (isGetPageAnalysisMessage(message)) {
         return Promise.resolve(currentSummary);
+      }
+      if (isGetPageContextMessage(message)) {
+        return Promise.resolve({
+          analysis: currentSummary,
+          variantRecommendation: currentVariantRecommendation,
+          activeVariantId: currentActiveVariantId,
+          variantOptions: currentVariantOptions,
+          fileInputCount: currentFileInputCount,
+          recommendedResume: currentRecommendedResume,
+        });
+      }
+      if (isSetPageVariantMessage(message)) {
+        if (
+          message.variantId !== null &&
+          !knownVariantIds.has(message.variantId)
+        ) {
+          return Promise.resolve({ ok: false });
+        }
+        pageVariantOverrideId = message.variantId;
+        forceAnalyzePage?.();
+        return Promise.resolve({ ok: true });
       }
       return undefined;
     };
@@ -55,16 +111,12 @@ export default defineContentScript({
     try {
       const stored = await new ChromeProfileRepository().load();
       const envelope = stored ?? createEmptyStoredProfile();
-      const selectedVariant =
-        envelope.preferences.defaultVariantId === null
-          ? undefined
-          : envelope.variants.find(
-              (variant) => variant.id === envelope.preferences.defaultVariantId,
-            );
-      const profile = resolveApplicationProfile(
-        envelope.baseProfile,
-        selectedVariant,
-      );
+      knownVariantIds = new Set(envelope.variants.map((variant) => variant.id));
+      currentVariantOptions = envelope.variants.map((variant) => ({
+        id: variant.id,
+        name: variant.name || 'Untitled variant',
+      }));
+
       const correctionRepository = new ChromeCorrectionRepository();
       const vaultClient = new ChromeVaultClient();
       let corrections = await correctionRepository.listForOrigin(
@@ -135,10 +187,43 @@ export default defineContentScript({
         if (!force && nextFieldSet === currentFieldSet) return;
 
         currentFieldSet = nextFieldSet;
+        currentVariantRecommendation = recommendApplicationVariant(
+          envelope.variants,
+          collectPageSignals(document),
+          envelope.preferences.defaultVariantId,
+        );
+        currentActiveVariantId =
+          pageVariantOverrideId ?? currentVariantRecommendation.variantId;
+        const selectedVariant =
+          currentActiveVariantId === null
+            ? undefined
+            : envelope.variants.find(
+                (variant) => variant.id === currentActiveVariantId,
+              );
+        const profile = resolveApplicationProfile(
+          envelope.baseProfile,
+          selectedVariant,
+        );
+        const documents = recommendDocumentsForVariant(
+          envelope.baseProfile,
+          selectedVariant,
+        );
+
+        currentFileInputCount = fields.filter(
+          (field) => field.controlKind === 'file',
+        ).length;
+        currentRecommendedResume =
+          currentFileInputCount > 0 && documents.resume !== null
+            ? {
+                label: documents.resume.label,
+                fileName: documents.resume.fileName,
+              }
+            : null;
         currentAnalysis = analyzeFieldContexts(fields, profile, corrections);
         currentSummary = currentAnalysis.summary;
         renderPanel();
       };
+      forceAnalyzePage = () => analyzePage(true);
 
       const rememberCorrection = async (
         context: FieldContext,
@@ -226,6 +311,12 @@ export default defineContentScript({
     } catch {
       currentSummary = null;
       currentAnalysis = null;
+      currentVariantRecommendation = null;
+      currentActiveVariantId = null;
+      currentVariantOptions = [];
+      currentFileInputCount = 0;
+      currentRecommendedResume = null;
+      forceAnalyzePage = null;
     }
   },
 });

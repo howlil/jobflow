@@ -41,6 +41,48 @@ describe('representative career form corpus', () => {
   });
 
   it.each([
+    [
+      'Greenhouse-like first name',
+      { label: 'First Name', name: 'job_application[first_name]' },
+      'personal.legalName.first',
+    ],
+    [
+      'Lever-like email',
+      { label: 'Email', name: 'email', placeholder: 'you@example.com' },
+      'contact.email.primary',
+    ],
+    [
+      'Workday-like phone',
+      { ariaLabel: 'Phone Number', id: 'phone-number' },
+      'contact.phone.primary',
+    ],
+    [
+      'Ashby-like LinkedIn',
+      { label: 'LinkedIn Profile', name: 'linkedinUrl' },
+      'links.linkedin',
+    ],
+    [
+      'SmartRecruiters-like city',
+      { label: 'City', name: 'candidate.address.city' },
+      'contact.address.city',
+    ],
+    [
+      'Indonesian custom postal code',
+      { label: 'Kode Pos', name: 'postal_code' },
+      'contact.address.postalCode',
+    ],
+  ])(
+    'recognizes %s without an ATS adapter',
+    (_name, context, expectedField) => {
+      expect(matchField(field(context))).toMatchObject({
+        status: 'ready',
+        field: expectedField,
+        sensitivity: 'normal',
+      });
+    },
+  );
+
+  it.each([
     ['Tanggal lahir', 'personal.birthDate'],
     ['Tempat lahir', 'personal.birthPlace'],
     ['Jenis kelamin', 'personal.gender'],
@@ -58,6 +100,15 @@ describe('representative career form corpus', () => {
     });
   });
 
+  it.each([
+    { label: 'National ID', name: 'government_id' },
+    { label: 'Expected salary', name: 'salaryExpectation' },
+    { ariaLabel: 'Date of Birth', name: 'birthDate' },
+  ])('keeps ATS-shaped sensitive contexts out of normal Ready', (context) => {
+    const result = matchField(field(context));
+    expect(result.status).not.toBe('ready');
+  });
+
   it.each(['Resume', 'Upload CV', 'Portfolio file'])(
     'keeps file-like controls fail-closed for %s',
     (label) => {
@@ -66,4 +117,15 @@ describe('representative career form corpus', () => {
       ).toEqual({ status: 'unknown', reason: 'file-input' });
     },
   );
+
+  it('keeps unsupported ambiguous questions out of Ready', () => {
+    expect(
+      matchField(
+        field({
+          label: 'Why do you want to join our company?',
+          controlKind: 'textarea',
+        }),
+      ).status,
+    ).not.toBe('ready');
+  });
 });

@@ -152,6 +152,72 @@ describe('PopupPage', () => {
     expect(screen.getByText('3 unknown')).toBeTruthy();
   });
 
+  it('allows an explicit per-page variant override and reset to automatic', async () => {
+    const profile = createCompleteProfile();
+    profile.variants.push(
+      {
+        id: 'backend',
+        name: 'Backend Engineer',
+        targetRoles: ['Backend Engineer'],
+      },
+      {
+        id: 'devops',
+        name: 'DevOps Engineer',
+        targetRoles: ['DevOps Engineer'],
+      },
+    );
+    const onSelectVariant = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <PopupPage
+        repository={createRepository(profile)}
+        openOptions={vi.fn()}
+        variantRecommendation={{
+          variantId: 'backend',
+          score: 1,
+          evidence: ['backend', 'engineer'],
+        }}
+        activeVariantId="backend"
+        variantOptions={[
+          { id: 'backend', name: 'Backend Engineer' },
+          { id: 'devops', name: 'DevOps Engineer' },
+        ]}
+        onSelectVariant={onSelectVariant}
+      />,
+    );
+
+    const selector =
+      await screen.findByLabelText<HTMLSelectElement>('Use for this page');
+    fireEvent.change(selector, { target: { value: 'devops' } });
+    await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith('devops'));
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Use automatic recommendation' }),
+    );
+    await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith(null));
+  });
+
+  it('shows manual-only resume guidance when a file input is detected', async () => {
+    render(
+      <PopupPage
+        repository={createRepository(createCompleteProfile())}
+        openOptions={vi.fn()}
+        fileInputCount={1}
+        recommendedResume={{
+          label: 'Backend resume',
+          fileName: 'backend.pdf',
+        }}
+      />,
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Document upload' }),
+    ).toBeTruthy();
+    expect(screen.getByText(/will not choose or upload a file/i)).toBeTruthy();
+    expect(screen.getByText(/backend resume/i)).toBeTruthy();
+    expect(screen.getByText(/backend\.pdf/i)).toBeTruthy();
+  });
+
   it.each([
     {
       name: 'safe fields',

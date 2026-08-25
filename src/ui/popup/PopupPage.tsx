@@ -1,16 +1,27 @@
 import { useEffect, useState } from 'react';
 
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
+import type {
+  PageVariantOption,
+  RecommendedDocumentSummary,
+} from '../../application/forms/page-messages';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
 import { calculateProfileReadiness } from '../../application/profile/profile-readiness';
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import type { StoredProfileEnvelope } from '../../domain/profile/profile-schema';
+import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import './popup.css';
 
 type PopupPageProps = {
   repository: ProfileRepository;
   openOptions: () => void | Promise<void>;
   pageSummary?: PageAnalysisSummary | null;
+  variantRecommendation?: VariantRecommendation | null;
+  activeVariantId?: string | null;
+  variantOptions?: PageVariantOption[];
+  fileInputCount?: number;
+  recommendedResume?: RecommendedDocumentSummary | null;
+  onSelectVariant?: (variantId: string | null) => void | Promise<void>;
 };
 
 const ESSENTIAL_LABELS = {
@@ -52,6 +63,12 @@ export function PopupPage({
   repository,
   openOptions,
   pageSummary,
+  variantRecommendation,
+  activeVariantId,
+  variantOptions = [],
+  fileInputCount = 0,
+  recommendedResume,
+  onSelectVariant,
 }: PopupPageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -103,6 +120,13 @@ export function PopupPage({
     readiness.completed === readiness.total,
     pageSummary,
   );
+  const recommendedVariant =
+    variantRecommendation?.variantId === null ||
+    variantRecommendation?.variantId === undefined
+      ? null
+      : (profile.variants.find(
+          (variant) => variant.id === variantRecommendation.variantId,
+        ) ?? null);
 
   return (
     <main className="popup-page">
@@ -166,6 +190,49 @@ export function PopupPage({
             {variantCount === 1 ? 'variant' : 'variants'}
           </strong>
         </div>
+        {recommendedVariant !== null ? (
+          <div className="popup-empty">
+            <span className="fillio-chip fillio-chip-strong">Recommended</span>
+            <p>
+              <strong>{recommendedVariant.name || 'Untitled variant'}</strong>
+            </p>
+            <p className="popup-muted">
+              {variantRecommendation?.evidence.length
+                ? `Matched page signals: ${variantRecommendation.evidence.join(', ')}`
+                : 'Using your default application profile because this page has no strong matching signal.'}
+            </p>
+          </div>
+        ) : null}
+
+        {variantOptions.length > 0 && onSelectVariant !== undefined ? (
+          <label>
+            Use for this page
+            <select
+              value={activeVariantId ?? ''}
+              onChange={(event) =>
+                void onSelectVariant(event.target.value || null)
+              }
+            >
+              <option value="">No application variant</option>
+              {variantOptions.map((variant) => (
+                <option value={variant.id} key={variant.id}>
+                  {variant.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
+        {recommendedVariant !== null && onSelectVariant !== undefined ? (
+          <button
+            className="fillio-button"
+            type="button"
+            onClick={() => void onSelectVariant(null)}
+          >
+            Use automatic recommendation
+          </button>
+        ) : null}
+
         {profile.variants.length > 0 ? (
           <ul className="variant-list">
             {profile.variants.map((variant) => (
@@ -178,6 +245,35 @@ export function PopupPage({
           </p>
         )}
       </section>
+
+      {fileInputCount > 0 ? (
+        <section className="popup-card">
+          <div className="popup-section-heading">
+            <h2>Document upload</h2>
+            <span className="fillio-chip">Manual</span>
+          </div>
+          <p className="popup-muted">
+            {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
+            detected. Fillio will not choose or upload a file for you.
+          </p>
+          {recommendedResume !== null && recommendedResume !== undefined ? (
+            <p>
+              Recommended resume:{' '}
+              <strong>
+                {recommendedResume.label || recommendedResume.fileName}
+              </strong>
+              {recommendedResume.fileName
+                ? ` — ${recommendedResume.fileName}`
+                : ''}
+            </p>
+          ) : (
+            <p className="popup-muted">
+              Configure resume metadata in profile settings for a deterministic
+              recommendation.
+            </p>
+          )}
+        </section>
+      ) : null}
 
       <button
         className="fillio-button fillio-button-primary popup-primary"

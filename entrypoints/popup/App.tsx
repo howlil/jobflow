@@ -1,38 +1,54 @@
 import { useEffect, useState } from 'react';
 import { browser } from 'wxt/browser';
 
-import type { PageAnalysisSummary } from '../../src/application/forms/analyze-field-contexts';
 import {
-  GET_PAGE_ANALYSIS,
-  isPageAnalysisSummary,
+  GET_PAGE_CONTEXT,
+  isPageContextResponse,
+  SET_PAGE_VARIANT,
+  type PageContextResponse,
 } from '../../src/application/forms/page-messages';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { PopupPage } from '../../src/ui/popup/PopupPage';
 
 const repository = new ChromeProfileRepository();
 
+const EMPTY_PAGE_CONTEXT: PageContextResponse = {
+  analysis: null,
+  variantRecommendation: null,
+  activeVariantId: null,
+  variantOptions: [],
+  fileInputCount: 0,
+  recommendedResume: null,
+};
+
+async function getActiveTabId(): Promise<number | null> {
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  return tab?.id ?? null;
+}
+
+async function readPageContext(
+  tabId: number,
+): Promise<PageContextResponse | null> {
+  const response: unknown = await browser.tabs.sendMessage(tabId, {
+    type: GET_PAGE_CONTEXT,
+  });
+  return isPageContextResponse(response) ? response : null;
+}
+
 export default function App() {
-  const [pageSummary, setPageSummary] = useState<PageAnalysisSummary | null>(
-    null,
-  );
+  const [pageContext, setPageContext] =
+    useState<PageContextResponse>(EMPTY_PAGE_CONTEXT);
 
   useEffect(() => {
     let active = true;
 
-    void browser.tabs
-      .query({ active: true, currentWindow: true })
-      .then(async ([tab]) => {
-        if (tab?.id === undefined) return null;
-        const response: unknown = await browser.tabs.sendMessage(tab.id, {
-          type: GET_PAGE_ANALYSIS,
-        });
-        return isPageAnalysisSummary(response) ? response : null;
-      })
-      .then((summary) => {
-        if (active) setPageSummary(summary);
+    void getActiveTabId()
+      .then(async (tabId) => (tabId === null ? null : readPageContext(tabId)))
+      .then((context) => {
+        if (active && context !== null) setPageContext(context);
       })
       .catch(() => {
-        if (active) setPageSummary(null);
+        if (active) setPageContext(EMPTY_PAGE_CONTEXT);
       });
 
     return () => {
@@ -40,11 +56,32 @@ export default function App() {
     };
   }, []);
 
+  async function selectPageVariant(variantId: string | null) {
+    try {
+      const tabId = await getActiveTabId();
+      if (tabId === null) return;
+      await browser.tabs.sendMessage(tabId, {
+        type: SET_PAGE_VARIANT,
+        variantId,
+      });
+      const context = await readPageContext(tabId);
+      if (context !== null) setPageContext(context);
+    } catch {
+      // Keep the last truthful page context if the tab becomes unavailable.
+    }
+  }
+
   return (
     <PopupPage
       repository={repository}
       openOptions={() => browser.runtime.openOptionsPage()}
-      pageSummary={pageSummary}
+      pageSummary={pageContext.analysis}
+      variantRecommendation={pageContext.variantRecommendation}
+      activeVariantId={pageContext.activeVariantId}
+      variantOptions={pageContext.variantOptions}
+      fileInputCount={pageContext.fileInputCount}
+      recommendedResume={pageContext.recommendedResume}
+      onSelectVariant={selectPageVariant}
     />
   );
 }
