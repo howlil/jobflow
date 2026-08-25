@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type {
@@ -83,7 +83,7 @@ function getPrimaryActionLabel(
   return 'Open profile settings';
 }
 
-function PopupShell({ children }: { children: React.ReactNode }) {
+function PopupShell({ children }: { children: ReactNode }) {
   return (
     <main className="grid w-[340px] gap-3 bg-app-bg p-4 text-app-ink">
       {children}
