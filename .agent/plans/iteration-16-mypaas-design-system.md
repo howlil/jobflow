@@ -1,70 +1,68 @@
 # Iteration 16 — MyPaas design-system convergence
 
-## Problem
-
-The current Fillio workspace is functionally correct but visually under-uses wide screens, over-isolates the navigation rail, and does not yet have a consistent primitive grammar across surfaces. The user supplied the MyPaas frontend as the design reference and asked that Fillio adopt its product UI language, especially for the career-profile workspace.
-
 ## Goal
 
-Adopt the transferable MyPaas design system without introducing a high-risk framework rewrite.
+Refactor Fillio's options/career-profile workspace into a reusable React composition and migrate the workspace styling to Tailwind using the production UI grammar extracted from `howlil/MyPaas`.
 
-## Design source
+## Concrete problem
 
-Reference repository: `howlil/MyPaas`, especially:
+- the workspace under-uses wide screens
+- the navigation rail reads as a detached card instead of application chrome
+- options/profile markup and styling are coupled to several large CSS layers
+- the same surface grammar is repeated instead of expressed through reusable React composition and one canonical styling system
 
-- neutral application tokens from `frontend/src/app.css`
-- dense 36–40px controls and restrained button variants
-- flat 1px bordered surfaces with 6–8px radii
-- shadow reserved for overlays rather than normal product chrome
-- wide page-shell sizing with responsive horizontal gutters
-- muted typography hierarchy and semantic color only for real status meaning
+## Architecture decision
 
-## Decisions
+Keep React + WXT. `options.html` remains only the browser-extension mount document; application UI is React.
 
-### Keep React/WXT for this iteration
+Do not migrate to Svelte in this iteration. A framework rewrite would touch WXT integration, tests, messaging UI, injected surfaces, and component contracts without solving a measured runtime problem.
 
-Do not migrate Fillio from React to Svelte merely because MyPaas uses Svelte.
+## Styling decision
 
-Reasons:
+Tailwind is the canonical options/profile styling system for this iteration.
 
-- Fillio already has React/WXT entrypoints, tests, messaging UI, and component contracts.
-- A framework rewrite would touch most UI files while delivering almost no user-visible capability that cannot be delivered through tokens and primitives.
-- Bundle/runtime weight is not the current measured bottleneck.
-- WXT supports both frameworks, but changing framework is a migration project, not a visual refactor.
+MyPaas design rules being transferred:
 
-A Svelte migration requires separate evidence such as measured bundle/startup/runtime pressure or a maintainability problem that cannot be solved locally.
+- `#fafafa` application background
+- white primary surfaces and `#f7f7f7` muted surfaces
+- `#e5e5e5` neutral borders and `#d4d4d4` stronger borders
+- `#171717` primary ink with restrained muted text
+- 6–8px radii
+- flat surfaces; elevation reserved for overlays
+- dense 36–40px pointer controls while retaining 44px coarse-pointer targets
+- visible focus states
+- responsive wide shell with compact gutters
+- semantic colors only where state meaning requires them
 
-### Do not add Tailwind yet
+## Implementation
 
-MyPaas uses Tailwind, but the useful design rules are extracted into Fillio's existing CSS design-system layer first. Adding Tailwind now would require build-chain, dependency, lockfile, lint/format, and test changes while duplicating an existing token/primitive system.
+- configure Tailwind for React/WXT source paths
+- add MyPaas-derived theme values in `tailwind.config.ts`
+- use `src/ui/design-system/tailwind.css` as the options/profile design source of truth
+- introduce reusable React `WorkspaceFrame`
+- keep `WorkspaceNavigation` reusable and responsive using Tailwind utilities
+- compose options surfaces through React instead of repeated top-level HTML chrome
+- retire legacy `tokens.css`, `primitives.css`, `profile-compact.css`, and the temporary `mypaas-workspace.css`
+- reduce the old `profile.css` import to a compatibility shim while the large ProfilePage is split incrementally
+- preserve all profile, CV, vault, correction, backup, and application-variant behavior
 
-Tailwind may be reconsidered separately if utility-class composition becomes a demonstrated maintenance problem.
+## Scope boundary
 
-## Implemented slice
+Popup CSS and content-script Shadow-DOM styles are separate extension surfaces. Tailwind utilities do not automatically cross Shadow DOM boundaries, so they require their own verification slice rather than being silently coupled to this options/profile migration.
 
-- align Fillio neutral tokens with the MyPaas palette
-- widen the workspace page shell and make gutters responsive
-- convert the left navigation from a boxed card to integrated application chrome
-- use compact, restrained active navigation treatment
-- reduce heading/control scale to MyPaas-like production density
-- turn readiness and editable sections into consistent flat bordered surfaces
-- normalize fields, buttons, cards, dropzones, spacing, and focus behavior
-- keep mobile/coarse-pointer accessibility behavior
-- preserve all local-first, explicit-action, vault, document, and autofill safety boundaries
+## Safety invariants
 
-## Acceptance criteria
-
-- career-profile workspace uses the MyPaas visual grammar on desktop and mobile
-- wide-screen layout uses available width without creating a floating narrow island
-- navigation reads as application chrome, not a detached card
-- normal surfaces use 1px neutral borders and restrained 6–8px radii
-- normal product chrome does not use decorative shadows or gradients
-- controls remain keyboard-visible and coarse-pointer targets remain at least 44px
-- no behavior, storage schema, permissions, autofill logic, vault logic, or document logic changes
+- no auto-submit, auto-next, or auto-apply
+- no automatic file attachment
+- document attachment remains explicit
+- sensitive values remain behind vault unlock and explicit disclosure/fill approval
+- no browser permission changes
+- no storage-schema changes
+- no backend/network dependency added
 
 ## Verification
 
-Required before merge:
+Before merge:
 
 ```text
 pnpm install --frozen-lockfile
@@ -77,4 +75,4 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Browser visual/E2E validation should compare the options workspace at desktop and mobile sizes before the iteration is marked complete.
+Also perform browser visual/E2E validation on desktop and mobile. Do not claim completion while CI or browser verification is outstanding.
