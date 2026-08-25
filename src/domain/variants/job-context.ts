@@ -44,7 +44,7 @@ const SENIORITY_ALIASES: Array<[JobSeniority, string[]]> = [
 export function normalizeJobText(value: string): string {
   return value
     .toLocaleLowerCase('en-US')
-    .replace(/[^a-z0-9+#.]+/g, ' ')
+    .replace(/[^a-z0-9+#]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
