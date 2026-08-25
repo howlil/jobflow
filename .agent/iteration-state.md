@@ -7,9 +7,9 @@ This file is the single current-state tracker for Fillio.
 - Iteration 15 is integrated on `master` at `9bb2080687ddb345f14805942758b8b74e834f68`.
 - Post-Iteration-15 workspace/navigation refinements are integrated on `master` at `e7ab8d5b26442bdeee5fdb1942157e6e8e40ea7d`.
 - Iteration 16 — MyPaas design-system convergence is active on `feat/iteration-16-mypaas-design-system` through draft PR #10.
-- The active slice refactors the options/career-profile surface into reusable React composition and migrates its visual layer to Tailwind using the concrete design grammar extracted from `howlil/MyPaas`.
+- The active slice refactors the options/career-profile surface into reusable React composition and migrates document-level React surfaces to Tailwind using the concrete design grammar extracted from `howlil/MyPaas`.
 - React/WXT remains the UI runtime. Svelte migration is not part of Iteration 16.
-- Tailwind is now an explicit Iteration 16 implementation decision following the user's scope change; the previous CSS token/primitive workspace layer is being retired rather than maintained in parallel.
+- Tailwind is the canonical document-level styling system for options/profile and popup surfaces. The previous token/primitive/profile/popup CSS stack is retired rather than maintained in parallel.
 - CI and browser visual/E2E verification remain required before Iteration 16 is marked complete or merged.
 - Chrome Web Store publishing and a tagged release remain separate future release actions.
 
@@ -69,10 +69,11 @@ Implemented on the active branch so far:
 - responsive wide page shell and compact gutters
 - reusable React `WorkspaceFrame` for options application chrome
 - reusable responsive React `WorkspaceNavigation` with desktop rail and mobile selector
-- options workspace composed from React surfaces rather than repeated top-level HTML structure
-- Tailwind source-of-truth in `src/ui/design-system/tailwind.css` plus direct utility classes in reusable React shell/navigation components
-- legacy options/profile token, primitive, compact, and MyPaas-adaptation CSS layers retired to prevent two styling systems from drifting
-- existing ProfilePage behavior preserved while its compatibility CSS import is reduced to a no-op shim; further section extraction can happen incrementally without another visual system
+- `options.html` reduced to the browser-extension mount document; the workspace is composed in React
+- popup surface migrated from standalone CSS to React + Tailwind utilities using the same MyPaas-derived theme
+- Tailwind source of truth in `tailwind.config.ts` and `src/ui/design-system/tailwind.css`
+- legacy `tokens.css`, `primitives.css`, `profile-compact.css`, `popup.css`, and temporary MyPaas adaptation CSS removed
+- existing `ProfilePage` behavior preserved while its legacy stylesheet is reduced to a no-op compatibility shim; visual styling comes from Tailwind component rules
 - coarse-pointer 44px target preservation and visible keyboard focus behavior
 - no storage, permission, autofill, vault, messaging, document, or security behavior changes
 
@@ -80,13 +81,23 @@ Framework decision:
 
 - keep React/WXT
 - options HTML remains only the browser-extension mount document; the application surface is React
-- do not rewrite the component tree to Svelte for stylistic reasons
+- reusable composition is preferred over a framework rewrite
+- do not rewrite the component tree to Svelte without measured runtime, bundle, or maintenance evidence
 
 Styling decision:
 
-- Tailwind is the canonical styling system for the options/profile workspace in Iteration 16
-- do not maintain a second token/primitive CSS implementation for the same workspace
-- popup CSS and content-script Shadow-DOM injected styles are separate extension surfaces; migrate them only with surface-specific verification because global Tailwind utilities do not automatically cross Shadow DOM boundaries
+- Tailwind is canonical for document-level React surfaces in this iteration
+- do not recreate a parallel token/primitive CSS implementation
+- content-script assistant remains a special case because it is mounted inside Shadow DOM; document-level Tailwind output does not cross that boundary automatically. Its injected style bundle must remain isolated unless migrated through a Shadow-DOM-specific Tailwind delivery mechanism and verified independently.
+
+Verification evidence observed during the active engineering loop:
+
+- frozen-lockfile installation succeeds after Tailwind lockfile synchronization
+- 41 test files / 189 tests passed on the popup-Tailwind branch state
+- TypeScript passed on the same observed run
+- ESLint passed on the same observed run
+- the next observed blocker was formatting of the migrated popup file; Prettier was then applied automatically and the temporary formatting workflow removed
+- the latest post-format branch head still requires a complete CI run before build, manifest, browser smoke, or package success is claimed
 
 Required verification before completion:
 
@@ -101,7 +112,7 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Browser visual/E2E validation must also inspect the current options workspace on desktop and mobile before the iteration is marked complete.
+Browser visual/E2E validation must also inspect the current options workspace and popup on desktop/mobile where applicable before the iteration is marked complete.
 
 ## Release-readiness gap
 
