@@ -4,21 +4,25 @@ Fillio is a local-first Chromium extension for career-form autofill. It keeps a 
 
 ## Current Behavior
 
-- Progressive career profile workbench for core contact, professional, experience, education, skills, job preferences, languages, certifications, projects, reusable answers, and document metadata.
+- Full-page responsive career workspace for core contact, professional, experience, education, skills, job preferences, languages, certifications, projects, reusable answers, documents, correction memory, vault, and backup/recovery.
+- One-page sticky section navigation rather than a setup wizard.
+- Local CV import for text-based PDF, DOCX, and TXT. Extraction stays on-device, produces a deterministic review draft, and never overwrites the profile before explicit selection/import.
+- CV/document binaries are stored separately in extension-origin IndexedDB; `chrome.storage.local` keeps structured profile/document metadata only.
 - Base profile plus lightweight application variants.
 - Deterministic current-page application-variant recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
 - Toolbar popup with profile readiness, current-page form summary, and recommended application profile.
-- In-page floating panel for detected career forms.
+- In-page 48px floating launcher for detected forms. The detailed assistant opens only after a user click and becomes viewport-safe on narrow pages.
 - Ready / Needs review / Sensitive / Unknown field classification.
 - Explicit normal-field fill only; no automatic fill on scan.
 - Dynamic form re-analysis for multi-step or changing forms.
 - Per-site/form/field correction memory plus an Options UI to inspect/delete mappings, reset a site, reset all, and review stale mappings.
 - Sensitive Data Vault for encrypted-at-rest sensitive values.
 - Sensitive fields require vault setup/unlock plus a separate current-site approval before fill.
-- Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown. Fillio may show configured document metadata, but actual file selection/upload remains manual.
+- Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
+- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Fillio does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
 - Versioned normal-profile backup export/import validated through the same persisted-schema parser, plus backup diagnostics before recovery. Sensitive vault values are never exported as plaintext.
 - Machine-checked compatibility evidence state and a privacy-safe live ATS validation/feedback workflow.
-- No auto-submit, auto-next, automatic file upload, backend, cloud sync, analytics, or AI dependency.
+- No auto-submit, auto-next, backend, cloud sync, analytics, or AI dependency.
 
 ## Local Development
 
@@ -53,6 +57,18 @@ Load the built extension:
 3. Click Load unpacked.
 4. Select `.output/chrome-mv3`.
 
+## CV Import And Documents
+
+The CV flow intentionally separates three actions:
+
+```text
+Import from CV   = local file -> extracted review draft -> selected profile values
+Store CV         = local file -> extension-owned IndexedDB + profile metadata
+Attach CV        = stored file -> one detected file input after explicit click
+```
+
+Text-based PDF and DOCX are supported for extraction. Image-only/scanned PDF extraction is intentionally rejected instead of silently guessing. No CV contents are sent to a remote service.
+
 ## Verification
 
 Run the complete local gates:
@@ -70,7 +86,7 @@ pnpm zip
 git diff --check
 ```
 
-CI runs the same core verification plus Chromium installation for browser E2E. Tagged `v*` releases use a separate fail-closed workflow that reruns required verification, packages the extension, generates a SHA-256 checksum, and only then creates the GitHub Release.
+CI runs the same core verification plus Chromium installation for browser E2E. Browser acceptance includes the launcher-first UI and an explicit CV attachment journey. Tagged `v*` releases use a separate fail-closed workflow that reruns required verification, packages the extension, generates a SHA-256 checksum, and only then creates the GitHub Release.
 
 ## Compatibility Strategy
 
@@ -83,6 +99,8 @@ See `docs/compatibility.md` and `docs/ats-live-validation.md` for the evidence m
 ## Security And Privacy
 
 - Normal profile data is stored locally in extension storage.
+- CV/document bytes are stored locally in extension-origin IndexedDB rather than profile storage.
+- CV parsing is local and deterministic; no document content is transmitted to a backend or model.
 - Sensitive profile data is stored separately in an authenticated encrypted vault envelope.
 - Vault encryption uses PBKDF2-HMAC-SHA-256 and AES-256-GCM through Web Crypto.
 - The vault passphrase is never persisted.
@@ -91,11 +109,16 @@ See `docs/compatibility.md` and `docs/ats-live-validation.md` for the evidence m
 - Sensitive fill requests resolve only the approved current-page field paths.
 - Wrong passphrase and tampered ciphertext fail closed.
 - Host-page DOM/text is treated as untrusted input and is processed locally for matching.
-- Fillio never clicks Submit, Apply, Next, or file inputs.
-- Profile backup does not export vault values as plaintext.
+- Fillio never clicks Submit, Apply, or Next.
+- File attachment requires a separate user click for the specific detected document field and never triggers submission.
+- Profile backup does not export vault values or document binaries as plaintext.
 - Compatibility feedback is collected through redacted GitHub reports rather than runtime telemetry.
 
 See `docs/privacy.md` for the beta privacy disclosure.
+
+## Design Source Of Truth
+
+`DESIGN.md` owns the visual system and interaction rules. `.agent/system-design.md` owns runtime/software architecture. UI features must consume the shared design tokens rather than inventing per-screen colors and spacing.
 
 ## Release
 
