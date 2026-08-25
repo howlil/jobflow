@@ -19,6 +19,7 @@ const EMPTY_PAGE_CONTEXT: PageContextResponse = {
   variantOptions: [],
   fileInputCount: 0,
   recommendedResume: null,
+  documentFields: [],
 };
 
 async function getActiveTabId(): Promise<number | null> {
@@ -81,6 +82,7 @@ export default function App() {
       variantOptions={pageContext.variantOptions}
       fileInputCount={pageContext.fileInputCount}
       recommendedResume={pageContext.recommendedResume}
+      documentFields={pageContext.documentFields}
       onSelectVariant={selectPageVariant}
     />
   );

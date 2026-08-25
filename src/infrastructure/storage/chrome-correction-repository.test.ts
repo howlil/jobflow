@@ -67,6 +67,57 @@ describe('ChromeCorrectionRepository', () => {
     );
   });
 
+  it('lists all corrections for management UI', async () => {
+    const repository = new ChromeCorrectionRepository();
+    await repository.upsert(entry());
+    await repository.upsert(
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
+    );
+
+    await expect(repository.listAll()).resolves.toHaveLength(2);
+  });
+
+  it('deletes one exact correction without disturbing siblings', async () => {
+    const repository = new ChromeCorrectionRepository();
+    await repository.upsert(entry());
+    await repository.upsert(entry({ fieldFingerprint: 'field-b' }));
+
+    await repository.remove({
+      origin: 'https://jobs.example.test',
+      formFingerprint: 'form-a',
+      fieldFingerprint: 'field-a',
+    });
+
+    await expect(
+      repository.listForOrigin('https://jobs.example.test'),
+    ).resolves.toEqual([entry({ fieldFingerprint: 'field-b' })]);
+  });
+
+  it('resets one origin and can clear all learned corrections', async () => {
+    const repository = new ChromeCorrectionRepository();
+    await repository.upsert(entry());
+    await repository.upsert(
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
+    );
+
+    await repository.removeForOrigin('https://jobs.example.test');
+    await expect(repository.listAll()).resolves.toEqual([
+      entry({
+        origin: 'https://other.example.test',
+        fieldFingerprint: 'field-b',
+      }),
+    ]);
+
+    await repository.clear();
+    await expect(repository.listAll()).resolves.toEqual([]);
+  });
+
   it('rejects malformed persisted data', async () => {
     await browser.storage.local.set({
       [CORRECTION_STORAGE_KEY]: { schemaVersion: 1, entries: [{}] },

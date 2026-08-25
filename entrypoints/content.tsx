@@ -12,21 +12,30 @@ import {
   isGetPageAnalysisMessage,
   isGetPageContextMessage,
   isSetPageVariantMessage,
+  type PageDocumentFieldSummary,
   type PageVariantOption,
   type RecommendedDocumentSummary,
 } from '../src/application/forms/page-messages';
 import { createSensitiveFillInstructions } from '../src/application/vault/sensitive-values';
 import type { SensitiveFieldPath } from '../src/application/vault/vault-messages';
 import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
+import {
+  classifyDocumentFieldIntent,
+  type DocumentFieldIntent,
+} from '../src/domain/documents/classify-document-field';
 import { recommendDocumentsForVariant } from '../src/domain/documents/recommend-document';
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
 import { createEmptyStoredProfile } from '../src/domain/profile/create-empty-profile';
-import { resolveApplicationProfile } from '../src/domain/variants/resolve-profile';
+import type {
+  BaseProfile,
+  DocumentMetadata,
+} from '../src/domain/profile/profile-schema';
 import {
   recommendApplicationVariant,
   type VariantRecommendation,
 } from '../src/domain/variants/recommend-variant';
+import { resolveApplicationProfile } from '../src/domain/variants/resolve-profile';
 import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
 import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
 import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
@@ -55,6 +64,39 @@ function collectPageSignals(document: Document): string[] {
   );
 }
 
+function documentSummary(
+  document: DocumentMetadata | null | undefined,
+): RecommendedDocumentSummary | null {
+  return document === null || document === undefined
+    ? null
+    : { label: document.label, fileName: document.fileName };
+}
+
+function documentForIntent(
+  intent: DocumentFieldIntent,
+  baseProfile: BaseProfile,
+  recommended: ReturnType<typeof recommendDocumentsForVariant>,
+): DocumentMetadata | null {
+  if (intent === 'resume') return recommended.resume;
+  if (intent === 'cover_letter') return recommended.coverLetter;
+  if (intent === 'transcript')
+    return baseProfile.documents.transcripts[0] ?? null;
+  if (intent === 'certificate') {
+    return baseProfile.documents.certificates[0] ?? null;
+  }
+  return null;
+}
+
+function documentFieldLabel(field: FieldContext, index: number): string {
+  return (
+    field.label ||
+    field.ariaLabel ||
+    field.name ||
+    field.id ||
+    `File field ${index + 1}`
+  );
+}
+
 export default defineContentScript({
   matches: ['http://*/*', 'https://*/*'],
   runAt: 'document_idle',
@@ -68,6 +110,7 @@ export default defineContentScript({
     let currentVariantOptions: PageVariantOption[] = [];
     let currentFileInputCount = 0;
     let currentRecommendedResume: RecommendedDocumentSummary | null = null;
+    let currentDocumentFields: PageDocumentFieldSummary[] = [];
     let currentFieldSet = '';
     let currentVaultStatus: SensitiveVaultStatus = 'not-configured';
     let sensitiveError: string | null = null;
@@ -88,6 +131,7 @@ export default defineContentScript({
           variantOptions: currentVariantOptions,
           fileInputCount: currentFileInputCount,
           recommendedResume: currentRecommendedResume,
+          documentFields: currentDocumentFields,
         });
       }
       if (isSetPageVariantMessage(message)) {
@@ -191,6 +235,7 @@ export default defineContentScript({
           envelope.variants,
           collectPageSignals(document),
           envelope.preferences.defaultVariantId,
+          envelope.baseProfile,
         );
         currentActiveVariantId =
           pageVariantOverrideId ?? currentVariantRecommendation.variantId;
@@ -209,16 +254,27 @@ export default defineContentScript({
           selectedVariant,
         );
 
-        currentFileInputCount = fields.filter(
+        const fileFields = fields.filter(
           (field) => field.controlKind === 'file',
-        ).length;
+        );
+        currentFileInputCount = fileFields.length;
         currentRecommendedResume =
-          currentFileInputCount > 0 && documents.resume !== null
-            ? {
-                label: documents.resume.label,
-                fileName: documents.resume.fileName,
-              }
-            : null;
+          currentFileInputCount > 0 ? documentSummary(documents.resume) : null;
+        currentDocumentFields = fileFields.map((field, index) => {
+          const classification = classifyDocumentFieldIntent(field);
+          return {
+            fieldLabel: documentFieldLabel(field, index),
+            intent: classification.intent,
+            evidence: classification.evidence,
+            recommendedDocument: documentSummary(
+              documentForIntent(
+                classification.intent,
+                envelope.baseProfile,
+                documents,
+              ),
+            ),
+          };
+        });
         currentAnalysis = analyzeFieldContexts(fields, profile, corrections);
         currentSummary = currentAnalysis.summary;
         renderPanel();
@@ -316,6 +372,7 @@ export default defineContentScript({
       currentVariantOptions = [];
       currentFileInputCount = 0;
       currentRecommendedResume = null;
+      currentDocumentFields = [];
       forceAnalyzePage = null;
     }
   },

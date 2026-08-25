@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type {
+  PageDocumentFieldSummary,
   PageVariantOption,
   RecommendedDocumentSummary,
 } from '../../application/forms/page-messages';
@@ -21,6 +22,7 @@ type PopupPageProps = {
   variantOptions?: PageVariantOption[];
   fileInputCount?: number;
   recommendedResume?: RecommendedDocumentSummary | null;
+  documentFields?: PageDocumentFieldSummary[];
   onSelectVariant?: (variantId: string | null) => void | Promise<void>;
 };
 
@@ -32,6 +34,18 @@ const ESSENTIAL_LABELS = {
   education: 'Education',
   skills: 'Skills',
 } as const;
+
+const DOCUMENT_INTENT_LABELS: Record<
+  PageDocumentFieldSummary['intent'],
+  string
+> = {
+  resume: 'Resume',
+  cover_letter: 'Cover letter',
+  portfolio: 'Portfolio',
+  transcript: 'Transcript',
+  certificate: 'Certificate',
+  unknown: 'Unknown document type',
+};
 
 function getMissingEssentials(
   sections: ReturnType<typeof calculateProfileReadiness>['sections'],
@@ -68,6 +82,7 @@ export function PopupPage({
   variantOptions = [],
   fileInputCount = 0,
   recommendedResume,
+  documentFields = [],
   onSelectVariant,
 }: PopupPageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
@@ -127,6 +142,20 @@ export function PopupPage({
       : (profile.variants.find(
           (variant) => variant.id === variantRecommendation.variantId,
         ) ?? null);
+
+  const legacyDocumentFields: PageDocumentFieldSummary[] =
+    documentFields.length === 0 && fileInputCount > 0
+      ? [
+          {
+            fieldLabel: 'File upload',
+            intent: recommendedResume === null ? 'unknown' : 'resume',
+            evidence: [],
+            recommendedDocument: recommendedResume ?? null,
+          },
+        ]
+      : [];
+  const visibleDocumentFields =
+    documentFields.length > 0 ? documentFields : legacyDocumentFields;
 
   return (
     <main className="popup-page">
@@ -256,20 +285,42 @@ export function PopupPage({
             {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
             detected. Fillio will not choose or upload a file for you.
           </p>
-          {recommendedResume !== null && recommendedResume !== undefined ? (
-            <p>
-              Recommended resume:{' '}
-              <strong>
-                {recommendedResume.label || recommendedResume.fileName}
-              </strong>
-              {recommendedResume.fileName
-                ? ` — ${recommendedResume.fileName}`
-                : ''}
-            </p>
+          {visibleDocumentFields.length > 0 ? (
+            <ul className="variant-list">
+              {visibleDocumentFields.map((field, index) => (
+                <li key={`${field.fieldLabel}-${index}`}>
+                  <strong>{field.fieldLabel}</strong>
+                  <div className="popup-muted">
+                    {DOCUMENT_INTENT_LABELS[field.intent]}
+                  </div>
+                  {field.recommendedDocument !== null ? (
+                    <div>
+                      Suggested metadata:{' '}
+                      <strong>
+                        {field.recommendedDocument.label ||
+                          field.recommendedDocument.fileName}
+                      </strong>
+                      {field.recommendedDocument.fileName
+                        ? ` — ${field.recommendedDocument.fileName}`
+                        : ''}
+                    </div>
+                  ) : field.intent === 'unknown' ? (
+                    <div className="popup-muted">
+                      Unknown document type; choose the file manually after
+                      checking the site label.
+                    </div>
+                  ) : (
+                    <div className="popup-muted">
+                      No matching document metadata is configured.
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
           ) : (
             <p className="popup-muted">
-              Configure resume metadata in profile settings for a deterministic
-              recommendation.
+              Configure document metadata in profile settings for deterministic
+              guidance.
             </p>
           )}
         </section>

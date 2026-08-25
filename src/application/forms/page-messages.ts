@@ -1,3 +1,4 @@
+import type { DocumentFieldIntent } from '../../domain/documents/classify-document-field';
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import type { PageAnalysisSummary } from './analyze-field-contexts';
 
@@ -30,6 +31,13 @@ export type RecommendedDocumentSummary = {
   fileName: string;
 };
 
+export type PageDocumentFieldSummary = {
+  fieldLabel: string;
+  intent: DocumentFieldIntent;
+  evidence: string[];
+  recommendedDocument: RecommendedDocumentSummary | null;
+};
+
 export type PageContextResponse = {
   analysis: PageAnalysisSummary | null;
   variantRecommendation: VariantRecommendation | null;
@@ -37,6 +45,7 @@ export type PageContextResponse = {
   variantOptions: PageVariantOption[];
   fileInputCount: number;
   recommendedResume: RecommendedDocumentSummary | null;
+  documentFields: PageDocumentFieldSummary[];
 };
 
 export function isGetPageAnalysisMessage(
@@ -117,6 +126,33 @@ function isRecommendedDocumentSummary(
   );
 }
 
+function isDocumentFieldIntent(value: unknown): value is DocumentFieldIntent {
+  return (
+    value === 'resume' ||
+    value === 'cover_letter' ||
+    value === 'portfolio' ||
+    value === 'transcript' ||
+    value === 'certificate' ||
+    value === 'unknown'
+  );
+}
+
+function isPageDocumentFieldSummary(
+  value: unknown,
+): value is PageDocumentFieldSummary {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Record<string, unknown>;
+  const recommendedDocument = candidate.recommendedDocument;
+  return (
+    typeof candidate.fieldLabel === 'string' &&
+    isDocumentFieldIntent(candidate.intent) &&
+    Array.isArray(candidate.evidence) &&
+    candidate.evidence.every((item) => typeof item === 'string') &&
+    (recommendedDocument === null ||
+      isRecommendedDocumentSummary(recommendedDocument))
+  );
+}
+
 export function isPageContextResponse(
   value: unknown,
 ): value is PageContextResponse {
@@ -133,6 +169,8 @@ export function isPageContextResponse(
     Array.isArray(candidate.variantOptions) &&
     candidate.variantOptions.every(isPageVariantOption) &&
     typeof candidate.fileInputCount === 'number' &&
-    (resume === null || isRecommendedDocumentSummary(resume))
+    (resume === null || isRecommendedDocumentSummary(resume)) &&
+    Array.isArray(candidate.documentFields) &&
+    candidate.documentFields.every(isPageDocumentFieldSummary)
   );
 }

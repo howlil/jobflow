@@ -174,7 +174,7 @@ describe('PopupPage', () => {
         openOptions={vi.fn()}
         variantRecommendation={{
           variantId: 'backend',
-          score: 1,
+          score: 5,
           evidence: ['backend', 'engineer'],
         }}
         activeVariantId="backend"
@@ -197,16 +197,38 @@ describe('PopupPage', () => {
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith(null));
   });
 
-  it('shows manual-only resume guidance when a file input is detected', async () => {
+  it('shows manual-only deterministic guidance for each document field', async () => {
     render(
       <PopupPage
         repository={createRepository(createCompleteProfile())}
         openOptions={vi.fn()}
-        fileInputCount={1}
-        recommendedResume={{
-          label: 'Backend resume',
-          fileName: 'backend.pdf',
-        }}
+        fileInputCount={3}
+        documentFields={[
+          {
+            fieldLabel: 'Resume / CV',
+            intent: 'resume',
+            evidence: ['label:resume'],
+            recommendedDocument: {
+              label: 'Backend resume',
+              fileName: 'backend.pdf',
+            },
+          },
+          {
+            fieldLabel: 'Cover letter',
+            intent: 'cover_letter',
+            evidence: ['label:cover letter'],
+            recommendedDocument: {
+              label: 'Backend cover',
+              fileName: 'backend-cover.pdf',
+            },
+          },
+          {
+            fieldLabel: 'Supporting attachment',
+            intent: 'unknown',
+            evidence: [],
+            recommendedDocument: null,
+          },
+        ]}
       />,
     );
 
@@ -214,8 +236,14 @@ describe('PopupPage', () => {
       await screen.findByRole('heading', { name: 'Document upload' }),
     ).toBeTruthy();
     expect(screen.getByText(/will not choose or upload a file/i)).toBeTruthy();
+    expect(screen.getByText('Resume / CV')).toBeTruthy();
     expect(screen.getByText(/backend resume/i)).toBeTruthy();
-    expect(screen.getByText(/backend\.pdf/i)).toBeTruthy();
+    expect(screen.getAllByText('Cover letter')).toHaveLength(2);
+    expect(screen.getByText(/backend cover/i)).toBeTruthy();
+    expect(screen.getByText('Supporting attachment')).toBeTruthy();
+    expect(
+      screen.getAllByText(/unknown document type/i).length,
+    ).toBeGreaterThan(0);
   });
 
   it.each([
