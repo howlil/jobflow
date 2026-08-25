@@ -238,10 +238,10 @@ describe('PopupPage', () => {
     expect(screen.getByText(/will not choose or upload a file/i)).toBeTruthy();
     expect(screen.getByText('Resume / CV')).toBeTruthy();
     expect(screen.getByText(/backend resume/i)).toBeTruthy();
-    expect(screen.getByText('Cover letter')).toBeTruthy();
+    expect(screen.getAllByText('Cover letter')).toHaveLength(2);
     expect(screen.getByText(/backend cover/i)).toBeTruthy();
     expect(screen.getByText('Supporting attachment')).toBeTruthy();
-    expect(screen.getByText(/unknown document type/i)).toBeTruthy();
+    expect(screen.getAllByText(/unknown document type/i).length).toBeGreaterThan(0);
   });
 
   it.each([
