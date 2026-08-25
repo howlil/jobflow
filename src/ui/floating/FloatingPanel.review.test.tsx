@@ -38,7 +38,9 @@ it('lets the user remember or ignore a Review field after opening review', () =>
   );
 
   fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
-  fireEvent.click(screen.getByRole('button', { name: /Review fields/i }));
+  fireEvent.click(
+    screen.getByRole('button', { name: /Review ambiguous fields/i }),
+  );
   fireEvent.click(
     screen.getByRole('button', {
       name: 'Use personal.legalName.first for Name',
