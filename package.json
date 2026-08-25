@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/iteration3-acceptance.mjs && node e2e/iteration4-vault.mjs && node e2e/iteration6-design-polish.mjs",
+    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/iteration3-acceptance.mjs && node e2e/iteration4-vault.mjs && node e2e/iteration6-design-polish.mjs && node e2e/iteration14-workspace-cv.mjs",
     "verify:manifest": "node scripts/verify-manifest.mjs",
     "verify:compatibility": "node scripts/verify-compatibility-evidence.mjs",
     "lint": "eslint . --max-warnings=0",
