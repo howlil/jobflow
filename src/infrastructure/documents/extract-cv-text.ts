@@ -46,7 +46,7 @@ async function extractPdf(file: File): Promise<string> {
       pages.push(text);
     }
   } finally {
-    await pdf.destroy();
+    await task.destroy();
   }
 
   return pages.join('\n\n').trim();
