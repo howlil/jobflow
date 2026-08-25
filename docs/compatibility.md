@@ -2,6 +2,16 @@
 
 Fillio treats compatibility as an engineering property of the generic form engine, not as a count of hard-coded ATS integrations.
 
+## Sources of truth
+
+- `src/domain/forms/form-corpus.test.ts` executes the maintained labeled compatibility corpus.
+- `docs/compatibility-evidence.json` records fixture/live evidence state by ATS family.
+- `pnpm verify:compatibility` rejects unsupported live-verification or adapter claims.
+- `docs/ats-live-validation.md` defines the privacy-safe live browser protocol.
+- `.github/ISSUE_TEMPLATE/compatibility-report.yml` turns beta failures into structured evidence.
+
+Fixture-shaped evidence is not a claim that an ATS has been live-verified. Live status remains `pending` until an actual reproducible browser journey is recorded.
+
 ## Compatibility layers
 
 1. DOM extraction must recover useful serializable field context.
@@ -10,10 +20,11 @@ Fillio treats compatibility as an engineering property of the generic form engin
 4. DOM filling must update supported controls using browser/page-compatible setters and events.
 5. Dynamic forms must re-analyze semantically changed field sets without automatic fill/navigation/submission.
 6. Sensitive disclosure and correction memory must remain fail-closed.
+7. File controls remain non-fillable; document intent guidance must fail closed when context is ambiguous.
 
 ## Maintained corpus
 
-The automated corpus should cover at minimum:
+The automated corpus covers at minimum:
 
 - ordinary semantic HTML forms
 - controlled React-style fields
@@ -39,6 +50,8 @@ For each meaningful compatibility release, record:
 - successful fill operations for supported controls
 - dynamic rescan regressions
 - automatic Next/Submit/Apply count: must be zero
+- fixture status and live status for each maintained ATS family
+- any reproducible generic-engine failure that could justify an adapter
 
 Do not publish a fake confidence percentage. Metrics are meaningful only against the maintained labeled corpus.
 
@@ -52,4 +65,6 @@ A site-specific adapter is justified only when all are true:
 4. safety invariants remain identical to the generic path;
 5. the reason and removal conditions are documented.
 
-Prefer improving extraction, context normalization, events, or fingerprinting generically before adding vendor branches.
+The evidence verifier refuses `candidate` or `implemented` adapter status without a non-empty `reproducibleFailure` entry.
+
+Prefer improving extraction, context normalization, events, fingerprinting, or deterministic intent classification generically before adding vendor branches.
