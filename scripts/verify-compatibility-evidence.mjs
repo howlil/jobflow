@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { stdout } from 'node:process';
+import { URL } from 'node:url';
 
 const REQUIRED_FAMILIES = [
   'greenhouse',
@@ -84,6 +86,6 @@ const adapters = evidence.families.filter(
   (family) => family.adapterStatus === 'implemented',
 ).length;
 
-console.log(
-  `Compatibility evidence: ${fixtureVerified}/${evidence.families.length} fixture families verified; ${liveVerified}/${evidence.families.length} live verified; ${adapters} adapters implemented.`,
+stdout.write(
+  `Compatibility evidence: ${fixtureVerified}/${evidence.families.length} fixture families verified; ${liveVerified}/${evidence.families.length} live verified; ${adapters} adapters implemented.\n`,
 );
