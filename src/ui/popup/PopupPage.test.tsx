@@ -197,7 +197,7 @@ describe('PopupPage', () => {
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith(null));
   });
 
-  it('shows manual-only deterministic guidance for each document field', async () => {
+  it('shows explicit deterministic guidance for each document field', async () => {
     render(
       <PopupPage
         repository={createRepository(createCompleteProfile())}
@@ -205,24 +205,29 @@ describe('PopupPage', () => {
         fileInputCount={3}
         documentFields={[
           {
+            fieldFingerprint: 'resume-field',
             fieldLabel: 'Resume / CV',
             intent: 'resume',
             evidence: ['label:resume'],
             recommendedDocument: {
+              id: 'resume-1',
               label: 'Backend resume',
               fileName: 'backend.pdf',
             },
           },
           {
+            fieldFingerprint: 'cover-field',
             fieldLabel: 'Cover letter',
             intent: 'cover_letter',
             evidence: ['label:cover letter'],
             recommendedDocument: {
+              id: 'cover-1',
               label: 'Backend cover',
               fileName: 'backend-cover.pdf',
             },
           },
           {
+            fieldFingerprint: 'unknown-file',
             fieldLabel: 'Supporting attachment',
             intent: 'unknown',
             evidence: [],
@@ -235,7 +240,7 @@ describe('PopupPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Document upload' }),
     ).toBeTruthy();
-    expect(screen.getByText(/will not choose or upload a file/i)).toBeTruthy();
+    expect(screen.getByText(/attached only when you click Attach/i)).toBeTruthy();
     expect(screen.getByText('Resume / CV')).toBeTruthy();
     expect(screen.getByText(/backend resume/i)).toBeTruthy();
     expect(screen.getAllByText('Cover letter')).toHaveLength(2);
