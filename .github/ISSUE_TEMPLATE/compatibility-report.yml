@@ -1,8 +1,6 @@
 name: Compatibility report
 description: Report a reproducible Fillio form compatibility problem without sharing applicant data.
 title: "compat: "
-labels:
-  - compatibility
 body:
   - type: markdown
     attributes:
