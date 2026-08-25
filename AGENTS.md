@@ -1,24 +1,56 @@
-# Fillio Agent Entry Point
+# Fillio Agent Adapter
 
-This repository uses `.agent/` as the project-local engineering source of truth.
+This file is the agent adapter into Fillio's project-local Devland model. It routes work; it must not duplicate project truth.
 
-Before production work, read only the relevant canonical files rather than loading every historical artifact:
+## Read progressively
 
-1. `.agent/iteration-state.md` for the current product iteration and allowed scope.
-2. `.agent/rules.md` for engineering, TDD, delivery, privacy, security, and verification rules.
-3. `.agent/design.md` and `.agent/code-patterns.md` when architecture or dependency boundaries matter.
-4. `.agent/git-strategy.md` for branch/PR/merge discipline.
-5. `.agent/release-strategy.md` for packaging/release work.
-6. A specific `.agent/plan` or skill only when the current task actually requires it.
+Always start with:
 
-Default execution model is **fast verified delivery**:
+1. `.agent/iteration-state.md` — current work state and immediate scope.
+2. `.agent/rules.md` — engineering policy, safety invariants, and verification rules.
+
+Load only when the change touches the concern:
+
+- `.agent/requirements.md` — product contract and acceptance format.
+- `.agent/system-design.md` — architecture, runtime boundaries, and data flow.
+- `.agent/code-patterns.md` — implementation conventions.
+- `.agent/design.md` / `/DESIGN.md` — visual design.
+- `.agent/git-strategy.md` — branch/PR/merge rules.
+- `.agent/release-strategy.md` — release/version/rollback rules.
+- `.agent/skills/<skill>/SKILL.md` — a focused profile only when its trigger applies.
+
+## Devland semantic layers
+
+| Layer | Fillio source |
+| --- | --- |
+| Project | `.agent/requirements.md` |
+| Architecture | `.agent/system-design.md` |
+| Engineering policy | `.agent/rules.md`, `code-patterns.md`, `git-strategy.md`, `release-strategy.md` |
+| Profiles | `.agent/skills/` |
+| Work state | `.agent/iteration-state.md` |
+| Agent adapter | `AGENTS.md` |
+
+The universal unit of delivery is a **logical change/work item**. An iteration is an optional planning label, not a branch type, release train, or reason to batch unrelated work.
+
+## Default execution loop
 
 ```text
-goal -> acceptance criteria -> RED -> GREEN -> REFACTOR -> focused verification -> PR/CI -> merge -> observe
+problem
+ -> smallest useful acceptance criteria
+ -> test/fixture when behavior changes
+ -> implement minimum change
+ -> focused verification
+ -> draft PR early when non-trivial
+ -> fast CI
+ -> ready PR browser gate when runtime is affected
+ -> squash merge
+ -> observe real use
 ```
 
-Do not interpret “fast” as permission to bypass Fillio’s fail-closed autofill behavior, explicit user action, privacy rules, sensitive-data controls, migration safety, browser-permission review, or mandatory CI. Use the smallest safe vertical slice and widen verification according to risk.
+Rules of thumb:
 
-Iteration state does not advance automatically because maintenance, tooling, documentation, or policy work merged. Product iteration changes must be intentional and recorded in `.agent/iteration-state.md`.
-
-Never claim tests, browser verification, CI, merge, release, or deployment happened unless the current runtime actually performed or observed it.
+- WIP = 1 logical change.
+- Prefer a branch that lives less than one working day; split independent outcomes instead of extending the branch.
+- Do not create planning/history/report files for routine work.
+- Do not preserve dead code, old styling layers, or compatibility shims without a current caller and explicit reason.
+- Never claim tests, CI, browser verification, merge, release, or deployment unless it was actually observed.

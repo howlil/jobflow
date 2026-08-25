@@ -1,145 +1,74 @@
 # Release Strategy
 
-Fillio starts as a fast-moving `0.x` browser-extension product. Releases should be reproducible and boring. Do not build a release platform before users need one.
+Fillio is a fast-moving `0.x` browser-extension product. Releases should be small, reproducible, and boring.
+
+## Release model
+
+`master` is always the next release candidate. There are no release branches and no feature trains.
+
+```text
+small change
+ -> ready PR verification
+ -> squash merge to master
+ -> observe
+ -> tag a verified master commit when distribution is useful
+ -> full release workflow
+ -> immutable GitHub Release artifact
+```
+
+Do not wait for a large "iteration" to finish before integrating independently useful changes.
 
 ## Versioning
 
 Use Semantic Versioning with `0.x` expectations:
 
-- `0.MINOR.0` — meaningful MVP capability/breaking stored-schema behavior that is migrated safely
+- `0.MINOR.0` — meaningful user capability or intentionally breaking behavior with safe migration
 - `0.x.PATCH` — bug/security/compatibility fix without intentional feature expansion
-- prerelease suffixes when useful: `0.1.0-alpha.1`, `0.1.0-beta.1`
+- prerelease suffix (`-alpha.N`, `-beta.N`) for trusted testing when useful
 
-Before `1.0.0`, internal APIs may change freely, but persisted user data and user-visible behavior still require deliberate migration/release notes.
+Use one canonical version source. Do not create version-bump commits for every development change.
 
-## Environments
+## Verification tiers
 
-Keep only environments that have a real purpose:
+### Draft PR / inner loop
 
-### Development
+Fast deterministic CI only: install, unit tests, typecheck, lint/format, compatibility evidence, build, generated-manifest verification.
 
-- WXT dev mode/unpacked extension
-- local test fixtures
-- no production publishing
+### Ready PR / master
 
-### Release build
+Run the fast gate plus browser acceptance when runtime behavior is involved. This is the integration confidence gate; packaging is not needed on every development push.
 
-- deterministic production build from a tagged `master` commit
-- extension package ZIP
-- source commit/tag recorded
+### Release tag
 
-Do not create separate dev/staging/prod backend environments while there is no backend.
+Fail closed on:
 
-A store-unlisted/beta channel may be introduced later if actual external testers need it.
-
-## Release channels
-
-Recommended progression:
-
-1. Local unpacked builds during early iterations.
-2. GitHub prerelease ZIP for trusted testers.
-3. Chrome Web Store test/unlisted channel when external installation friction matters.
-4. Public stable listing only after permission/privacy/security behavior is ready for review.
-
-Firefox packaging is future work and must not block Chromium MVP.
-
-## Source of version
-
-Use one canonical application version source and let the extension build manifest derive from it. Do not maintain independent manual version numbers in multiple files.
-
-## CI release gates
-
-Before creating a release artifact, verify at minimum:
-
-- clean install from lockfile
-- unit tests
+- locked dependency install
+- tests
 - typecheck
-- lint/format check as configured
-- production extension build
-- targeted browser integration/E2E smoke journey
-- no unexpected increase in extension permissions
-- persisted-schema migration tests when schema changed
-- vault/security tests when crypto/sensitive flow changed
+- lint/format
+- compatibility evidence
+- production build
+- generated permission/manifest verification
+- browser acceptance
+- package ZIP
+- checksum
+- immutable GitHub Release creation
 
-A release workflow should fail closed; do not publish a package after a required verification failure.
-
-## Artifact strategy
-
-For a release, produce only useful artifacts:
-
-- extension ZIP suitable for the target distribution flow
-- checksum if distributed directly from GitHub
-- concise release notes
-
-Do not commit generated extension bundles to source control unless a distribution channel explicitly requires it.
+Schema/permission/vault/privacy changes need their relevant focused migration/security evidence in addition to the generic gate.
 
 ## Release notes
 
-Keep notes user-oriented:
+Keep them user-oriented and short:
 
 - Added
 - Fixed
 - Security/Privacy changes
 - Known limitations when material
 
-Call out explicitly:
-
-- new browser permissions
-- stored-data migration
-- vault behavior changes
-- behavior that may change autofill mappings
-
-Do not dump commit history as release notes.
-
-## Store permission/privacy gate
-
-Before any Chrome Web Store publication, perform a manual release checklist:
-
-- every requested permission is mapped to a current feature
-- broad host access is explained by automatic form detection
-- no remote executable code
-- no profile/form data is transmitted in MVP
-- sensitive vault behavior matches user-facing disclosure
-- extension does not auto-submit applications
-- privacy policy/store copy matches actual data flow
+Explicitly call out new browser permissions, stored-data migration, sensitive-data behavior, or compatibility changes that can affect autofill.
 
 ## Rollback
 
-Browser-extension distribution can lag and users may remain on old versions. Therefore:
+Never mutate an already tagged release. Fix on current `master`, verify, and publish a new patch version. Persisted-data changes must be designed so users on older distributed versions are not casually destroyed by upgrade/rollback timing.
 
-- persisted schema migrations must be forward-safe within the current version
-- never assume every user upgrades instantly
-- do not publish a release that irreversibly destroys prior user data without an explicit migration and backup/export design
-
-If a release is bad:
-
-1. stop/promote no further distribution if the channel allows
-2. fix on `master`
-3. verify
-4. issue a patch release
-
-Do not mutate or silently replace an already tagged release artifact. Tags/releases are immutable history; supersede them with a new version.
-
-## Release automation
-
-Start small. A GitHub Actions release workflow is justified when manual packaging becomes repetitive or external testers depend on artifacts.
-
-Do not add release-please, changesets, multi-channel deployment automation, or release branches before there is a concrete need.
-
-Recommended first automation later:
-
-```text
-manual/tag trigger
- -> install locked dependencies
- -> test/typecheck/lint
- -> build extension
- -> smoke test
- -> package ZIP
- -> attach to GitHub Release
-```
-
-Store publishing automation can be added separately once store credentials and release cadence make it worthwhile.
-
-## First release target
-
-The first distributable MVP should be `0.1.0` only after the Iteration 5 acceptance outcome is met. Earlier test packages should use prerelease versions rather than pretending production stability.
+Do not add release-please, changesets, multi-channel deployment machinery, or store automation until actual release cadence/testers make the manual path a measured burden.

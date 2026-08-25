@@ -1,13 +1,17 @@
 name: CI
 
 on:
-  push:
-    branches: ['master', 'feat/**', 'fix/**', 'chore/**']
   pull_request:
+    branches: ['master']
+  push:
     branches: ['master']
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
@@ -39,8 +43,8 @@ jobs:
       - name: Verify generated extension
         run: pnpm verify:manifest
       - name: Install Playwright Chromium
+        if: github.event_name == 'push' || github.event.pull_request.draft == false
         run: pnpm exec playwright install --with-deps chromium
-      - name: Browser extension smoke test
+      - name: Browser acceptance
+        if: github.event_name == 'push' || github.event.pull_request.draft == false
         run: pnpm test:e2e
-      - name: Package extension
-        run: pnpm zip

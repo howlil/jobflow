@@ -1,9 +1,7 @@
-# Visual Design Guidance
+# Visual Design Router
 
-The visual source of truth for Fillio is [`/DESIGN.md`](../DESIGN.md).
+The visual source of truth is [`/DESIGN.md`](../DESIGN.md). Use it for layout, typography, spacing, color, responsive behavior, interaction states, and component appearance.
 
-Use that file for layout, typography, color, spacing, responsive behavior, floating-assistant interaction, CV import UX, and component appearance.
+Runtime/software architecture lives in [`system-design.md`](./system-design.md).
 
-Software/runtime architecture moved to [`system-design.md`](./system-design.md).
-
-Do not invent visual tokens in feature files. Update `DESIGN.md` first, then map the approved tokens into `src/ui/design-system/tokens.css` and shared primitives.
+Maintain **one canonical styling system per UI surface**. When a styling system is replaced, migrate callers and remove the superseded CSS/tokens/shims in the same logical change rather than keeping parallel implementations.
