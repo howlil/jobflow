@@ -200,7 +200,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
 
       {error !== null ? <p role="alert">{error}</p> : null}
 
-      <section className="profile-readiness" aria-labelledby="profile-readiness-title">
+      <section
+        className="profile-readiness"
+        aria-labelledby="profile-readiness-title"
+      >
         <div className="fillio-section-heading">
           <div>
             <p className="eyebrow">Profile readiness</p>
@@ -235,7 +238,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.personal.legalName.first}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.first = event.target.value;
+                  draft.baseProfile.personal.legalName.first =
+                    event.target.value;
                 })
               }
             />
@@ -246,7 +250,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.personal.legalName.middle}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.middle = event.target.value;
+                  draft.baseProfile.personal.legalName.middle =
+                    event.target.value;
                 })
               }
             />
@@ -257,7 +262,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.personal.legalName.last}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.last = event.target.value;
+                  draft.baseProfile.personal.legalName.last =
+                    event.target.value;
                 })
               }
             />
@@ -391,7 +397,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.contact.address.postalCode}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.contact.address.postalCode = event.target.value;
+                  draft.baseProfile.contact.address.postalCode =
+                    event.target.value;
                 })
               }
             />
@@ -482,11 +489,14 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     <label key={key}>
                       {label}
                       <input
-                        value={String(experience[key as keyof typeof experience] ?? '')}
+                        value={String(
+                          experience[key as keyof typeof experience] ?? '',
+                        )}
                         onChange={(event) =>
                           changeProfile((draft) => {
-                            const item = draft.baseProfile.professional.experiences[index];
-                            if (item !== undefined) {
+                            const item =
+                              draft.baseProfile.professional.experiences[index];
+                            if (item !== undefined && key !== undefined) {
                               Reflect.set(item, key, event.target.value);
                             }
                           })
@@ -501,8 +511,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     checked={experience.current}
                     onChange={(event) =>
                       changeProfile((draft) => {
-                        const item = draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined) item.current = event.target.checked;
+                        const item =
+                          draft.baseProfile.professional.experiences[index];
+                        if (item !== undefined)
+                          item.current = event.target.checked;
                       })
                     }
                   />
@@ -514,8 +526,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     value={experience.description}
                     onChange={(event) =>
                       changeProfile((draft) => {
-                        const item = draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined) item.description = event.target.value;
+                        const item =
+                          draft.baseProfile.professional.experiences[index];
+                        if (item !== undefined)
+                          item.description = event.target.value;
                       })
                     }
                   />
@@ -526,8 +540,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     value={listValue(experience.achievements)}
                     onChange={(event) =>
                       changeProfile((draft) => {
-                        const item = draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined) item.achievements = parseList(event.target.value);
+                        const item =
+                          draft.baseProfile.professional.experiences[index];
+                        if (item !== undefined)
+                          item.achievements = parseList(event.target.value);
                       })
                     }
                   />
@@ -537,7 +553,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                   type="button"
                   onClick={() =>
                     changeProfile((draft) => {
-                      draft.baseProfile.professional.experiences.splice(index, 1);
+                      draft.baseProfile.professional.experiences.splice(
+                        index,
+                        1,
+                      );
                     })
                   }
                 >
@@ -593,11 +612,16 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     <label key={key}>
                       {label}
                       <input
-                        value={String(education[key as keyof typeof education] ?? '')}
+                        value={String(
+                          education[key as keyof typeof education] ?? '',
+                        )}
                         onChange={(event) =>
                           changeProfile((draft) => {
-                            const item = draft.baseProfile.professional.education[index];
-                            if (item !== undefined) Reflect.set(item, key, event.target.value);
+                            const item =
+                              draft.baseProfile.professional.education[index];
+                            if (item !== undefined && key !== undefined) {
+                              Reflect.set(item, key, event.target.value);
+                            }
                           })
                         }
                       />
@@ -610,8 +634,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                       value={education.gpa ?? ''}
                       onChange={(event) =>
                         changeProfile((draft) => {
-                          const item = draft.baseProfile.professional.education[index];
-                          if (item !== undefined) item.gpa = parseNullableNumber(event.target.value);
+                          const item =
+                            draft.baseProfile.professional.education[index];
+                          if (item !== undefined)
+                            item.gpa = parseNullableNumber(event.target.value);
                         })
                       }
                     />
@@ -623,8 +649,12 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                       value={education.maxGpa ?? ''}
                       onChange={(event) =>
                         changeProfile((draft) => {
-                          const item = draft.baseProfile.professional.education[index];
-                          if (item !== undefined) item.maxGpa = parseNullableNumber(event.target.value);
+                          const item =
+                            draft.baseProfile.professional.education[index];
+                          if (item !== undefined)
+                            item.maxGpa = parseNullableNumber(
+                              event.target.value,
+                            );
                         })
                       }
                     />
@@ -636,8 +666,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     value={education.description}
                     onChange={(event) =>
                       changeProfile((draft) => {
-                        const item = draft.baseProfile.professional.education[index];
-                        if (item !== undefined) item.description = event.target.value;
+                        const item =
+                          draft.baseProfile.professional.education[index];
+                        if (item !== undefined)
+                          item.description = event.target.value;
                       })
                     }
                   />
@@ -692,7 +724,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                       value={skill.name}
                       onChange={(event) =>
                         changeProfile((draft) => {
-                          const item = draft.baseProfile.professional.skills[index];
+                          const item =
+                            draft.baseProfile.professional.skills[index];
                           if (item !== undefined) item.name = event.target.value;
                         })
                       }
@@ -704,8 +737,10 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                       value={skill.level}
                       onChange={(event) =>
                         changeProfile((draft) => {
-                          const item = draft.baseProfile.professional.skills[index];
-                          if (item !== undefined) item.level = event.target.value;
+                          const item =
+                            draft.baseProfile.professional.skills[index];
+                          if (item !== undefined)
+                            item.level = event.target.value;
                         })
                       }
                     />
@@ -717,8 +752,12 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                       value={skill.yearsExperience ?? ''}
                       onChange={(event) =>
                         changeProfile((draft) => {
-                          const item = draft.baseProfile.professional.skills[index];
-                          if (item !== undefined) item.yearsExperience = parseNullableNumber(event.target.value);
+                          const item =
+                            draft.baseProfile.professional.skills[index];
+                          if (item !== undefined)
+                            item.yearsExperience = parseNullableNumber(
+                              event.target.value,
+                            );
                         })
                       }
                     />
@@ -750,7 +789,9 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={listValue(baseProfile.jobPreferences.desiredRoles)}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.desiredRoles = parseList(event.target.value);
+                  draft.baseProfile.jobPreferences.desiredRoles = parseList(
+                    event.target.value,
+                  );
                 })
               }
             />
@@ -761,7 +802,9 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={listValue(baseProfile.jobPreferences.employmentTypes)}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.employmentTypes = parseList(event.target.value);
+                  draft.baseProfile.jobPreferences.employmentTypes = parseList(
+                    event.target.value,
+                  );
                 })
               }
             />
@@ -772,7 +815,9 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={listValue(baseProfile.jobPreferences.workArrangements)}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.workArrangements = parseList(event.target.value);
+                  draft.baseProfile.jobPreferences.workArrangements = parseList(
+                    event.target.value,
+                  );
                 })
               }
             />
@@ -783,7 +828,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={listValue(baseProfile.jobPreferences.preferredLocations)}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.preferredLocations = parseList(event.target.value);
+                  draft.baseProfile.jobPreferences.preferredLocations =
+                    parseList(event.target.value);
                 })
               }
             />
@@ -795,7 +841,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.jobPreferences.availabilityDate}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.availabilityDate = event.target.value;
+                  draft.baseProfile.jobPreferences.availabilityDate =
+                    event.target.value;
                 })
               }
             />
@@ -806,7 +853,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={baseProfile.jobPreferences.noticePeriod}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.jobPreferences.noticePeriod = event.target.value;
+                  draft.baseProfile.jobPreferences.noticePeriod =
+                    event.target.value;
                 })
               }
             />
@@ -821,7 +869,15 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           <button
             className="fillio-button"
             type="button"
-            onClick={() => changeProfile((draft) => draft.baseProfile.professional.languages.push({ id: createId(), name: '', proficiency: '' }))}
+            onClick={() =>
+              changeProfile((draft) =>
+                draft.baseProfile.professional.languages.push({
+                  id: createId(),
+                  name: '',
+                  proficiency: '',
+                }),
+              )
+            }
           >
             Add language
           </button>
@@ -833,24 +889,41 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 Language
                 <input
                   value={language.name}
-                  onChange={(event) => changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.languages[index];
-                    if (item !== undefined) item.name = event.target.value;
-                  })}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.languages[index];
+                      if (item !== undefined) item.name = event.target.value;
+                    })
+                  }
                 />
               </label>
               <label>
                 Proficiency
                 <input
                   value={language.proficiency}
-                  onChange={(event) => changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.languages[index];
-                    if (item !== undefined) item.proficiency = event.target.value;
-                  })}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.languages[index];
+                      if (item !== undefined)
+                        item.proficiency = event.target.value;
+                    })
+                  }
                 />
               </label>
             </div>
-            <button className="fillio-button" type="button" onClick={() => changeProfile((draft) => draft.baseProfile.professional.languages.splice(index, 1))}>Remove</button>
+            <button
+              className="fillio-button"
+              type="button"
+              onClick={() =>
+                changeProfile((draft) =>
+                  draft.baseProfile.professional.languages.splice(index, 1),
+                )
+              }
+            >
+              Remove
+            </button>
           </article>
         ))}
 
@@ -859,46 +932,104 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           <button
             className="fillio-button"
             type="button"
-            onClick={() => changeProfile((draft) => draft.baseProfile.professional.certifications.push({ id: createId(), name: '', issuer: '', issueDate: '', expiryDate: '', credentialId: '', url: '' }))}
+            onClick={() =>
+              changeProfile((draft) =>
+                draft.baseProfile.professional.certifications.push({
+                  id: createId(),
+                  name: '',
+                  issuer: '',
+                  issueDate: '',
+                  expiryDate: '',
+                  credentialId: '',
+                  url: '',
+                }),
+              )
+            }
           >
             Add certification
           </button>
         </div>
-        {baseProfile.professional.certifications.map((certification, index) => (
-          <article className="record-card" key={certification.id}>
-            <div className="form-grid">
-              <label>
-                Certification
-                <input value={certification.name} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.certifications[index];
-                  if (item !== undefined) item.name = event.target.value;
-                })} />
-              </label>
-              <label>
-                Issuer
-                <input value={certification.issuer} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.certifications[index];
-                  if (item !== undefined) item.issuer = event.target.value;
-                })} />
-              </label>
-              <label>
-                Credential URL
-                <input value={certification.url} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.certifications[index];
-                  if (item !== undefined) item.url = event.target.value;
-                })} />
-              </label>
-            </div>
-            <button className="fillio-button" type="button" onClick={() => changeProfile((draft) => draft.baseProfile.professional.certifications.splice(index, 1))}>Remove</button>
-          </article>
-        ))}
+        {baseProfile.professional.certifications.map(
+          (certification, index) => (
+            <article className="record-card" key={certification.id}>
+              <div className="form-grid">
+                <label>
+                  Certification
+                  <input
+                    value={certification.name}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.name = event.target.value;
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  Issuer
+                  <input
+                    value={certification.issuer}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.issuer = event.target.value;
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  Credential URL
+                  <input
+                    value={certification.url}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.url = event.target.value;
+                      })
+                    }
+                  />
+                </label>
+              </div>
+              <button
+                className="fillio-button"
+                type="button"
+                onClick={() =>
+                  changeProfile((draft) =>
+                    draft.baseProfile.professional.certifications.splice(
+                      index,
+                      1,
+                    ),
+                  )
+                }
+              >
+                Remove
+              </button>
+            </article>
+          ),
+        )}
 
         <div className="fillio-section-heading">
           <h3>Projects</h3>
           <button
             className="fillio-button"
             type="button"
-            onClick={() => changeProfile((draft) => draft.baseProfile.professional.projects.push({ id: createId(), name: '', role: '', description: '', url: '', startDate: '', endDate: '', skills: [] }))}
+            onClick={() =>
+              changeProfile((draft) =>
+                draft.baseProfile.professional.projects.push({
+                  id: createId(),
+                  name: '',
+                  role: '',
+                  description: '',
+                  url: '',
+                  startDate: '',
+                  endDate: '',
+                  skills: [],
+                }),
+              )
+            }
           >
             Add project
           </button>
@@ -908,41 +1039,83 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             <div className="form-grid">
               <label>
                 Project
-                <input value={project.name} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.projects[index];
-                  if (item !== undefined) item.name = event.target.value;
-                })} />
+                <input
+                  value={project.name}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.projects[index];
+                      if (item !== undefined) item.name = event.target.value;
+                    })
+                  }
+                />
               </label>
               <label>
                 Role
-                <input value={project.role} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.projects[index];
-                  if (item !== undefined) item.role = event.target.value;
-                })} />
+                <input
+                  value={project.role}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.projects[index];
+                      if (item !== undefined) item.role = event.target.value;
+                    })
+                  }
+                />
               </label>
               <label>
                 URL
-                <input value={project.url} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.projects[index];
-                  if (item !== undefined) item.url = event.target.value;
-                })} />
+                <input
+                  value={project.url}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.projects[index];
+                      if (item !== undefined) item.url = event.target.value;
+                    })
+                  }
+                />
               </label>
               <label>
                 Skills, comma separated
-                <input value={listValue(project.skills)} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.professional.projects[index];
-                  if (item !== undefined) item.skills = parseList(event.target.value);
-                })} />
+                <input
+                  value={listValue(project.skills)}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.projects[index];
+                      if (item !== undefined)
+                        item.skills = parseList(event.target.value);
+                    })
+                  }
+                />
               </label>
             </div>
             <label>
               Description
-              <textarea value={project.description} onChange={(event) => changeProfile((draft) => {
-                const item = draft.baseProfile.professional.projects[index];
-                if (item !== undefined) item.description = event.target.value;
-              })} />
+              <textarea
+                value={project.description}
+                onChange={(event) =>
+                  changeProfile((draft) => {
+                    const item =
+                      draft.baseProfile.professional.projects[index];
+                    if (item !== undefined)
+                      item.description = event.target.value;
+                  })
+                }
+              />
             </label>
-            <button className="fillio-button" type="button" onClick={() => changeProfile((draft) => draft.baseProfile.professional.projects.splice(index, 1))}>Remove</button>
+            <button
+              className="fillio-button"
+              type="button"
+              onClick={() =>
+                changeProfile((draft) =>
+                  draft.baseProfile.professional.projects.splice(index, 1),
+                )
+              }
+            >
+              Remove
+            </button>
           </article>
         ))}
       </details>
@@ -952,12 +1125,24 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         <div className="fillio-section-heading">
           <div>
             <h3>Resume metadata</h3>
-            <p className="muted">Metadata only. Fillio never uploads the file for you.</p>
+            <p className="muted">
+              Metadata only. Fillio never uploads the file for you.
+            </p>
           </div>
           <button
             className="fillio-button"
             type="button"
-            onClick={() => changeProfile((draft) => draft.baseProfile.documents.resumes.push({ id: createId(), label: '', fileName: '', mimeType: 'application/pdf', lastKnownModified: null }))}
+            onClick={() =>
+              changeProfile((draft) =>
+                draft.baseProfile.documents.resumes.push({
+                  id: createId(),
+                  label: '',
+                  fileName: '',
+                  mimeType: 'application/pdf',
+                  lastKnownModified: null,
+                }),
+              )
+            }
           >
             Add resume
           </button>
@@ -967,20 +1152,41 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
             <div className="form-grid">
               <label>
                 Label
-                <input value={document.label} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.documents.resumes[index];
-                  if (item !== undefined) item.label = event.target.value;
-                })} />
+                <input
+                  value={document.label}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item = draft.baseProfile.documents.resumes[index];
+                      if (item !== undefined) item.label = event.target.value;
+                    })
+                  }
+                />
               </label>
               <label>
                 File name
-                <input value={document.fileName} onChange={(event) => changeProfile((draft) => {
-                  const item = draft.baseProfile.documents.resumes[index];
-                  if (item !== undefined) item.fileName = event.target.value;
-                })} />
+                <input
+                  value={document.fileName}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item = draft.baseProfile.documents.resumes[index];
+                      if (item !== undefined)
+                        item.fileName = event.target.value;
+                    })
+                  }
+                />
               </label>
             </div>
-            <button className="fillio-button" type="button" onClick={() => changeProfile((draft) => draft.baseProfile.documents.resumes.splice(index, 1))}>Remove resume</button>
+            <button
+              className="fillio-button"
+              type="button"
+              onClick={() =>
+                changeProfile((draft) =>
+                  draft.baseProfile.documents.resumes.splice(index, 1),
+                )
+              }
+            >
+              Remove resume
+            </button>
           </article>
         ))}
 
@@ -989,7 +1195,17 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           <button
             className="fillio-button"
             type="button"
-            onClick={() => changeProfile((draft) => draft.baseProfile.customAnswers.push({ id: createId(), question: '', answer: '', canonicalIntent: '', tags: [] }))}
+            onClick={() =>
+              changeProfile((draft) =>
+                draft.baseProfile.customAnswers.push({
+                  id: createId(),
+                  question: '',
+                  answer: '',
+                  canonicalIntent: '',
+                  tags: [],
+                }),
+              )
+            }
           >
             Add answer
           </button>
@@ -998,26 +1214,52 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           <article className="record-card" key={answer.id}>
             <label>
               Question
-              <input value={answer.question} onChange={(event) => changeProfile((draft) => {
-                const item = draft.baseProfile.customAnswers[index];
-                if (item !== undefined) item.question = event.target.value;
-              })} />
+              <input
+                value={answer.question}
+                onChange={(event) =>
+                  changeProfile((draft) => {
+                    const item = draft.baseProfile.customAnswers[index];
+                    if (item !== undefined) item.question = event.target.value;
+                  })
+                }
+              />
             </label>
             <label>
               Answer
-              <textarea value={answer.answer} onChange={(event) => changeProfile((draft) => {
-                const item = draft.baseProfile.customAnswers[index];
-                if (item !== undefined) item.answer = event.target.value;
-              })} />
+              <textarea
+                value={answer.answer}
+                onChange={(event) =>
+                  changeProfile((draft) => {
+                    const item = draft.baseProfile.customAnswers[index];
+                    if (item !== undefined) item.answer = event.target.value;
+                  })
+                }
+              />
             </label>
             <label>
               Tags, comma separated
-              <input value={listValue(answer.tags)} onChange={(event) => changeProfile((draft) => {
-                const item = draft.baseProfile.customAnswers[index];
-                if (item !== undefined) item.tags = parseList(event.target.value);
-              })} />
+              <input
+                value={listValue(answer.tags)}
+                onChange={(event) =>
+                  changeProfile((draft) => {
+                    const item = draft.baseProfile.customAnswers[index];
+                    if (item !== undefined)
+                      item.tags = parseList(event.target.value);
+                  })
+                }
+              />
             </label>
-            <button className="fillio-button" type="button" onClick={() => changeProfile((draft) => draft.baseProfile.customAnswers.splice(index, 1))}>Remove answer</button>
+            <button
+              className="fillio-button"
+              type="button"
+              onClick={() =>
+                changeProfile((draft) =>
+                  draft.baseProfile.customAnswers.splice(index, 1),
+                )
+              }
+            >
+              Remove answer
+            </button>
           </article>
         ))}
       </details>
@@ -1031,7 +1273,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
           <div>
             <h2>Application variants</h2>
             <p className="muted">
-              Keep factual data in the base profile; variants store only role-specific overrides and preferred documents.
+              Keep factual data in the base profile; variants store only
+              role-specific overrides and preferred documents.
             </p>
           </div>
           <button
@@ -1056,7 +1299,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
               value={profile.preferences.defaultVariantId ?? ''}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.preferences.defaultVariantId = event.target.value || null;
+                  draft.preferences.defaultVariantId =
+                    event.target.value || null;
                 })
               }
             >
@@ -1071,7 +1315,9 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
         ) : null}
 
         {profile.variants.length === 0 ? (
-          <div className="fillio-empty-row">No application variants added yet.</div>
+          <div className="fillio-empty-row">
+            No application variants added yet.
+          </div>
         ) : (
           <div className="record-list">
             {profile.variants.map((variant, index) => (
@@ -1081,44 +1327,61 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                     Variant name
                     <input
                       value={variant.name}
-                      onChange={(event) => changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) item.name = event.target.value;
-                      })}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined)
+                            item.name = event.target.value;
+                        })
+                      }
                     />
                   </label>
                   <label>
                     Target roles, comma separated
                     <input
                       value={listValue(variant.targetRoles)}
-                      onChange={(event) => changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) item.targetRoles = parseList(event.target.value);
-                      })}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined)
+                            item.targetRoles = parseList(event.target.value);
+                        })
+                      }
                     />
                   </label>
                   <label>
                     Variant headline
                     <input
                       value={variant.headlineOverride ?? ''}
-                      onChange={(event) => changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) item.headlineOverride = event.target.value;
-                      })}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined)
+                            item.headlineOverride = event.target.value;
+                        })
+                      }
                     />
                   </label>
                   <label>
                     Preferred resume
                     <select
                       value={variant.preferredResumeId ?? ''}
-                      onChange={(event) => changeProfile((draft) => {
-                        const item = draft.variants[index];
-                        if (item !== undefined) item.preferredResumeId = event.target.value || null;
-                      })}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item = draft.variants[index];
+                          if (item !== undefined)
+                            item.preferredResumeId =
+                              event.target.value || null;
+                        })
+                      }
                     >
                       <option value="">Use first configured resume</option>
                       {baseProfile.documents.resumes.map((resume) => (
-                        <option value={resume.id} key={resume.id}>{resume.label || resume.fileName || 'Untitled resume'}</option>
+                        <option value={resume.id} key={resume.id}>
+                          {resume.label ||
+                            resume.fileName ||
+                            'Untitled resume'}
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -1126,13 +1389,19 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
                 <button
                   className="fillio-button"
                   type="button"
-                  onClick={() => changeProfile((draft) => {
-                    const removed = draft.variants[index];
-                    draft.variants.splice(index, 1);
-                    if (removed !== undefined && draft.preferences.defaultVariantId === removed.id) {
-                      draft.preferences.defaultVariantId = draft.variants[0]?.id ?? null;
-                    }
-                  })}
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      const removed = draft.variants[index];
+                      draft.variants.splice(index, 1);
+                      if (
+                        removed !== undefined &&
+                        draft.preferences.defaultVariantId === removed.id
+                      ) {
+                        draft.preferences.defaultVariantId =
+                          draft.variants[0]?.id ?? null;
+                      }
+                    })
+                  }
                 >
                   Remove variant {index + 1}
                 </button>
@@ -1145,7 +1414,8 @@ export function ProfilePage({ repository, vaultClient }: ProfilePageProps) {
       <details className="profile-section">
         <summary>Backup and recovery</summary>
         <p className="muted">
-          Export contains the normal versioned profile and variants. Sensitive vault values are not exported as plaintext.
+          Export contains the normal versioned profile and variants. Sensitive
+          vault values are not exported as plaintext.
         </p>
         <div className="fillio-section-heading">
           <button className="fillio-button" type="button" onClick={exportProfile}>
