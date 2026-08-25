@@ -227,9 +227,7 @@ export function PopupPage({
             <span className={chipClass}>
               {pageSummary.needsReview} needs review
             </span>
-            <span className={chipClass}>
-              {pageSummary.sensitive} sensitive
-            </span>
+            <span className={chipClass}>{pageSummary.sensitive} sensitive</span>
             <span className={chipClass}>{pageSummary.unknown} unknown</span>
           </div>
         )}
@@ -239,7 +237,8 @@ export function PopupPage({
         <div className={sectionHeadingClass}>
           <h2 className="m-0 text-sm font-semibold">Application profiles</h2>
           <strong className="text-xs font-semibold text-app-text">
-            {variantCount} application {variantCount === 1 ? 'variant' : 'variants'}
+            {variantCount} application{' '}
+            {variantCount === 1 ? 'variant' : 'variants'}
           </strong>
         </div>
 
