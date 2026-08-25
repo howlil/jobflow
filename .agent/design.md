@@ -1,6 +1,6 @@
 # Visual Design Guidance
 
-The visual source of truth for Fillio is [`/DESIGN.md`](../../DESIGN.md).
+The visual source of truth for Fillio is [`/DESIGN.md`](../DESIGN.md).
 
 Use that file for layout, typography, color, spacing, responsive behavior, floating-assistant interaction, CV import UX, and component appearance.
 
