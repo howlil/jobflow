@@ -11,7 +11,6 @@ import { calculateProfileReadiness } from '../../application/profile/profile-rea
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import type { StoredProfileEnvelope } from '../../domain/profile/profile-schema';
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
-import './popup.css';
 
 type PopupPageProps = {
   repository: ProfileRepository;
@@ -47,6 +46,17 @@ const DOCUMENT_INTENT_LABELS: Record<
   unknown: 'Unknown document type',
 };
 
+const cardClass = 'rounded-app border border-app-border bg-white p-3';
+const sectionHeadingClass = 'flex items-center justify-between gap-2';
+const mutedClass = 'm-0 text-[13px] leading-[1.45] text-app-text';
+const chipClass =
+  'inline-flex items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text';
+const strongChipClass = `${chipClass} border-app-border-strong bg-white font-semibold text-app-ink`;
+const fieldClass =
+  'mt-1.5 min-h-9 w-full rounded-control border border-app-border bg-white px-2.5 py-2 text-xs text-app-ink outline-none transition hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-border';
+const buttonClass =
+  'inline-flex min-h-9 items-center justify-center gap-2 rounded-control border border-app-border-strong bg-white px-3 py-1.5 text-xs font-semibold text-app-ink transition hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50';
+
 function getMissingEssentials(
   sections: ReturnType<typeof calculateProfileReadiness>['sections'],
 ): string[] {
@@ -71,6 +81,14 @@ function getPrimaryActionLabel(
   }
   if (pageSummary.sensitive > 0) return 'Manage vault in settings';
   return 'Open profile settings';
+}
+
+function PopupShell({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="grid w-[340px] gap-3 bg-app-bg p-4 text-app-ink">
+      {children}
+    </main>
+  );
 }
 
 export function PopupPage({
@@ -110,16 +128,20 @@ export function PopupPage({
     };
   }, [repository]);
 
-  if (!loaded) return <main className="popup-page">Loading…</main>;
+  if (!loaded) return <PopupShell>Loading…</PopupShell>;
   if (error || profile === null) {
     return (
-      <main className="popup-page">
-        <h1>Fillio</h1>
-        <p>Could not load your career profile.</p>
-        <button type="button" onClick={() => void openOptions()}>
+      <PopupShell>
+        <h1 className="m-0 text-xl font-semibold tracking-tight">Fillio</h1>
+        <p className={mutedClass}>Could not load your career profile.</p>
+        <button
+          className={buttonClass}
+          type="button"
+          onClick={() => void openOptions()}
+        >
           Open profile settings
         </button>
-      </main>
+      </PopupShell>
     );
   }
 
@@ -153,27 +175,31 @@ export function PopupPage({
     documentFields.length > 0 ? documentFields : legacyDocumentFields;
 
   return (
-    <main className="popup-page">
-      <header className="popup-header">
+    <PopupShell>
+      <header className="grid grid-cols-[1fr_auto] items-start gap-x-3 gap-y-1">
         <div>
-          <p className="popup-eyebrow">Fillio</p>
-          <h1>Ready to apply</h1>
+          <p className="mb-1 mt-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+            Fillio
+          </p>
+          <h1 className="m-0 text-xl font-semibold tracking-tight">
+            Ready to apply
+          </h1>
         </div>
-        <strong className="popup-readiness">
+        <strong className="text-lg font-semibold text-emerald-700">
           {readiness.percentage}% ready
         </strong>
-        <p className="popup-muted popup-header__summary">
+        <p className={`${mutedClass} col-span-2`}>
           {readiness.completed} of {readiness.total} profile sections ready
         </p>
       </header>
 
       {missingEssentials.length > 0 ? (
-        <section className="popup-card popup-card--essentials">
-          <div className="popup-section-heading">
-            <h2>Missing essentials</h2>
-            <span className="fillio-chip">Next up</span>
+        <section className="rounded-app border border-amber-200 bg-amber-50 p-3">
+          <div className={sectionHeadingClass}>
+            <h2 className="m-0 text-sm font-semibold">Missing essentials</h2>
+            <span className={chipClass}>Next up</span>
           </div>
-          <ul className="popup-essentials-list">
+          <ul className="mb-0 mt-2 grid gap-1 pl-[18px] text-[13px] text-app-ink">
             {missingEssentials.map((essential) => (
               <li key={essential}>{essential}</li>
             ))}
@@ -181,46 +207,49 @@ export function PopupPage({
         </section>
       ) : null}
 
-      <section className="popup-card popup-card--page">
-        <div className="popup-section-heading">
-          <h2>Current page</h2>
+      <section className={cardClass}>
+        <div className={sectionHeadingClass}>
+          <h2 className="m-0 text-sm font-semibold">Current page</h2>
           {pageSummary !== null && pageSummary !== undefined ? (
-            <span className="fillio-chip fillio-chip-strong">Form found</span>
+            <span className={strongChipClass}>Form found</span>
           ) : null}
         </div>
         {pageSummary === null || pageSummary === undefined ? (
-          <p className="popup-muted popup-empty">
+          <p className={`${mutedClass} mt-2`}>
             Open a job application form to see safe fields Fillio can help with.
           </p>
         ) : (
-          <div className="page-summary" aria-label="Current page form analysis">
-            <span className="fillio-chip">{pageSummary.ready} ready</span>
-            <span className="fillio-chip">
+          <div
+            className="mt-2 flex flex-wrap gap-1"
+            aria-label="Current page form analysis"
+          >
+            <span className={chipClass}>{pageSummary.ready} ready</span>
+            <span className={chipClass}>
               {pageSummary.needsReview} needs review
             </span>
-            <span className="fillio-chip">
+            <span className={chipClass}>
               {pageSummary.sensitive} sensitive
             </span>
-            <span className="fillio-chip">{pageSummary.unknown} unknown</span>
+            <span className={chipClass}>{pageSummary.unknown} unknown</span>
           </div>
         )}
       </section>
 
-      <section className="popup-card popup-card--variants">
-        <div className="popup-section-heading">
-          <h2>Application profiles</h2>
-          <strong>
-            {variantCount} application{' '}
-            {variantCount === 1 ? 'variant' : 'variants'}
+      <section className={cardClass}>
+        <div className={sectionHeadingClass}>
+          <h2 className="m-0 text-sm font-semibold">Application profiles</h2>
+          <strong className="text-xs font-semibold text-app-text">
+            {variantCount} application {variantCount === 1 ? 'variant' : 'variants'}
           </strong>
         </div>
+
         {recommendedVariant !== null ? (
-          <div className="popup-empty">
-            <span className="fillio-chip fillio-chip-strong">Recommended</span>
-            <p>
+          <div className="mt-2">
+            <span className={strongChipClass}>Recommended</span>
+            <p className="mb-0 mt-2 text-[13px]">
               <strong>{recommendedVariant.name || 'Untitled variant'}</strong>
             </p>
-            <p className="popup-muted">
+            <p className={`${mutedClass} mt-1`}>
               {variantRecommendation?.evidence.length
                 ? `Matched page signals: ${variantRecommendation.evidence.join(', ')}`
                 : 'Using your default application profile because this page has no strong matching signal.'}
@@ -229,9 +258,10 @@ export function PopupPage({
         ) : null}
 
         {variantOptions.length > 0 && onSelectVariant !== undefined ? (
-          <label>
+          <label className="mt-2 grid text-[11px] font-medium text-app-text">
             Use for this page
             <select
+              className={fieldClass}
               value={activeVariantId ?? ''}
               onChange={(event) =>
                 void onSelectVariant(event.target.value || null)
@@ -249,7 +279,7 @@ export function PopupPage({
 
         {recommendedVariant !== null && onSelectVariant !== undefined ? (
           <button
-            className="fillio-button"
+            className={`${buttonClass} mt-2`}
             type="button"
             onClick={() => void onSelectVariant(null)}
           >
@@ -258,35 +288,35 @@ export function PopupPage({
         ) : null}
 
         {profile.variants.length > 0 ? (
-          <ul className="variant-list">
+          <ul className="mb-0 mt-2 grid gap-1 border-t border-app-border pt-2 pl-[18px] text-[13px]">
             {profile.variants.map((variant) => (
               <li key={variant.id}>{variant.name || 'Untitled variant'}</li>
             ))}
           </ul>
         ) : (
-          <p className="popup-muted popup-empty">
+          <p className={`${mutedClass} mt-2`}>
             Add variants for different target roles.
           </p>
         )}
       </section>
 
       {fileInputCount > 0 ? (
-        <section className="popup-card">
-          <div className="popup-section-heading">
-            <h2>Document upload</h2>
-            <span className="fillio-chip">Explicit</span>
+        <section className={cardClass}>
+          <div className={sectionHeadingClass}>
+            <h2 className="m-0 text-sm font-semibold">Document upload</h2>
+            <span className={chipClass}>Explicit</span>
           </div>
-          <p className="popup-muted">
+          <p className={`${mutedClass} mt-2`}>
             {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
             detected. Stored files are attached only when you click Attach in
             the page launcher.
           </p>
           {visibleDocumentFields.length > 0 ? (
-            <ul className="variant-list">
+            <ul className="mb-0 mt-2 grid gap-2 border-t border-app-border pt-2 pl-[18px] text-[13px]">
               {visibleDocumentFields.map((field, index) => (
                 <li key={`${field.fieldFingerprint}-${index}`}>
                   <strong>{field.fieldLabel}</strong>
-                  <div className="popup-muted">
+                  <div className="text-app-text">
                     {DOCUMENT_INTENT_LABELS[field.intent]}
                   </div>
                   {field.recommendedDocument !== null ? (
@@ -301,12 +331,12 @@ export function PopupPage({
                         : ''}
                     </div>
                   ) : field.intent === 'unknown' ? (
-                    <div className="popup-muted">
+                    <div className="text-app-text">
                       Unknown document type; choose the file manually after
                       checking the site label.
                     </div>
                   ) : (
-                    <div className="popup-muted">
+                    <div className="text-app-text">
                       No matching stored document is configured.
                     </div>
                   )}
@@ -314,7 +344,7 @@ export function PopupPage({
               ))}
             </ul>
           ) : (
-            <p className="popup-muted">
+            <p className={`${mutedClass} mt-2`}>
               Store a CV in the career workspace for deterministic guidance.
             </p>
           )}
@@ -322,12 +352,12 @@ export function PopupPage({
       ) : null}
 
       <button
-        className="fillio-button fillio-button-primary popup-primary"
+        className={`${buttonClass} w-full border-app-ink bg-app-ink text-white hover:border-black hover:bg-black`}
         type="button"
         onClick={() => void openOptions()}
       >
         {primaryActionLabel}
       </button>
-    </main>
+    </PopupShell>
   );
 }
