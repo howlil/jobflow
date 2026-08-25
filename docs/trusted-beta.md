@@ -18,11 +18,16 @@ Each tester should validate:
 
 - install/reload succeeds
 - profile persists after browser restart
+- career workspace remains usable at desktop, tablet, and narrow widths
+- detected forms show only the small Fillio launcher until explicitly opened
 - explicit Fill works on safe fields
 - non-empty user values are not silently overwritten
 - sensitive fields remain gated by the vault and site approval
-- document fields remain manual-only
-- no Next/Apply/Submit is triggered
+- PDF/DOCX/TXT CV import produces a review draft without silent profile overwrite
+- stored CV binaries remain local and can be removed
+- recognized native file inputs receive a stored document only after an explicit **Attach** click
+- unsupported custom upload widgets fall back to manual file selection rather than claiming success
+- no Next/Apply/Submit is triggered by fill or attachment
 - dynamic forms re-analyze without automatic action
 - backup export/inspection/recovery behaves as documented
 - learned corrections can be inspected and removed
@@ -48,6 +53,7 @@ Useful evidence includes:
 - visible field label without the applicant's entered value
 - expected classification
 - observed classification
+- whether explicit native-file attachment worked or required manual fallback
 - minimal reproduction steps
 - whether dynamic rendering was involved
 
@@ -58,7 +64,8 @@ A beta build is healthy enough for broader distribution when:
 - mandatory CI remains green
 - compatibility evidence has no unresolved safety regression
 - false Ready for sensitive/file inputs remains zero in maintained fixtures
-- no known automatic navigation/submission/file-upload behavior exists
+- no known automatic navigation, submission, or file-attachment behavior exists
+- explicit attachment never causes submission/navigation and fails closed on unsupported widgets
 - repeated live failures have either a generic fix or an explicitly documented adapter decision
 
 Chrome Web Store publication is intentionally outside this workflow.
