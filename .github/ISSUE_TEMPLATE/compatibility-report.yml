@@ -1,0 +1,97 @@
+name: Compatibility report
+description: Report a reproducible Fillio form compatibility problem without sharing applicant data.
+title: "compat: "
+labels:
+  - compatibility
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use synthetic/redacted evidence only. Do not include passwords, government IDs, compensation, candidate/session tokens, private application answers, resume contents, or unredacted personal screenshots.
+  - type: input
+    id: version
+    attributes:
+      label: Fillio release or commit
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 151
+    validations:
+      required: true
+  - type: dropdown
+    id: family
+    attributes:
+      label: ATS family
+      options:
+        - Greenhouse
+        - Lever
+        - Workday
+        - Ashby
+        - SmartRecruiters
+        - Custom / unknown
+    validations:
+      required: true
+  - type: input
+    id: hostname
+    attributes:
+      label: Sanitized hostname
+      description: Hostname only. Remove query strings and candidate/session tokens.
+      placeholder: jobs.example.com
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Failure layer
+      options:
+        - Field extraction / context
+        - Matching / classification
+        - Fill planning / safety
+        - DOM filling / events
+        - Dynamic re-analysis
+        - Correction memory
+        - Sensitive vault / disclosure
+        - Document intent
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: field
+    attributes:
+      label: Sanitized field context
+      description: Include labels/name/aria/section text only when safe. Do not include entered applicant values.
+      placeholder: "Label: LinkedIn Profile; name: linkedinUrl"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Describe the smallest reproducible journey and whether the page changed dynamically.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed applicant values, private documents, secrets, and candidate/session tokens from this report.
+          required: true
+        - label: I did not submit a real application while collecting this evidence.
+          required: true
