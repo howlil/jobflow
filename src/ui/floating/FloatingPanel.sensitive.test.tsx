@@ -34,7 +34,7 @@ function sensitiveItem(label = 'NIK'): FillAnalysis {
 
 function openSensitive() {
   fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
-  fireEvent.click(screen.getByRole('button', { name: /Sensitive data/i }));
+  fireEvent.click(screen.getByRole('button', { name: /Sensitive fields/i }));
 }
 
 describe('FloatingPanel sensitive disclosure', () => {

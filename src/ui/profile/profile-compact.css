@@ -1,0 +1,165 @@
+.workspace-topbar__inner {
+  min-height: 56px;
+}
+
+.workspace-brand__mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.workspace-nav-wrap {
+  top: 56px;
+}
+
+.workspace-nav {
+  padding: 5px 0;
+}
+
+.fillio-nav-link {
+  padding: 7px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.profile-page {
+  padding: 32px 0 48px;
+}
+
+.profile-header {
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.profile-page h1 {
+  margin-bottom: 6px;
+  font-size: clamp(30px, 3.2vw, 38px);
+  letter-spacing: -0.04em;
+}
+
+.profile-page h2 {
+  font-size: 20px;
+}
+
+.profile-header .muted {
+  max-width: 62ch;
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+.profile-readiness {
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 18px 0 20px;
+}
+
+.profile-readiness-list {
+  gap: 6px 14px;
+}
+
+.profile-readiness-list li {
+  position: relative;
+  padding: 0 0 0 10px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fillio-color-muted);
+}
+
+.profile-readiness-list li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--fillio-color-warning);
+  content: '';
+}
+
+.profile-section {
+  gap: 16px;
+  padding: 28px 0;
+  scroll-margin-top: 108px;
+}
+
+.form-grid {
+  gap: 16px 20px;
+}
+
+.profile-page label {
+  gap: 6px;
+  font-size: 11px;
+}
+
+.profile-page input,
+.profile-page select,
+.profile-page textarea {
+  padding: 9px 11px;
+}
+
+.profile-page textarea {
+  min-height: 104px;
+}
+
+.record-list {
+  gap: 12px;
+}
+
+.record-card {
+  gap: 16px;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.workspace-tool-section {
+  padding: 28px 0;
+  scroll-margin-top: 108px;
+}
+
+.workspace-tool-section__header {
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.workspace-tool-section__header h2 {
+  font-size: 20px;
+}
+
+.workspace-card {
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.cv-import-grid {
+  gap: 18px;
+}
+
+.cv-dropzone {
+  min-height: 190px;
+  padding: 20px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.cv-preview__row {
+  padding: 10px 0;
+}
+
+.document-row {
+  padding: 12px 0;
+}
+
+@media (max-width: 720px) {
+  .workspace-nav-wrap {
+    top: 56px;
+  }
+
+  .profile-page {
+    padding-top: 24px;
+  }
+
+  .profile-section,
+  .workspace-tool-section {
+    padding: 24px 0;
+  }
+}

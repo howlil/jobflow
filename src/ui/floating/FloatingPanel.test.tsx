@@ -20,16 +20,17 @@ describe('FloatingPanel', () => {
       />,
     );
 
-    expect(screen.queryByText('Ready')).toBeNull();
+    expect(screen.queryByLabelText('Form analysis summary')).toBeNull();
     const launcher = screen.getByRole('button', { name: 'Open Fillio' });
     expect(launcher.getAttribute('aria-expanded')).toBe('false');
 
     fireEvent.click(launcher);
 
-    expect(screen.getByText('Ready')).toBeTruthy();
-    expect(screen.getByText('Review')).toBeTruthy();
-    expect(screen.getByText('Sensitive')).toBeTruthy();
-    expect(screen.getByText('Unknown')).toBeTruthy();
+    const summary = screen.getByLabelText('Form analysis summary');
+    expect(summary.textContent).toContain('3 ready');
+    expect(summary.textContent).toContain('1 review');
+    expect(summary.textContent).toContain('1 sensitive');
+    expect(summary.textContent).toContain('2 unrecognized');
     expect(fill).not.toHaveBeenCalled();
 
     fireEvent.click(
