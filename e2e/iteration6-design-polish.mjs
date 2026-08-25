@@ -48,7 +48,6 @@ async function startFixtureServer() {
       response.end(fixtureHtml);
       return;
     }
-
     response.writeHead(404);
     response.end('Not found');
   });
@@ -63,11 +62,7 @@ async function startFixtureServer() {
     server.close();
     throw new Error('Could not determine fixture server port');
   }
-
-  return {
-    server,
-    url: `http://127.0.0.1:${address.port}/career-form`,
-  };
+  return { server, url: `http://127.0.0.1:${address.port}/career-form` };
 }
 
 async function getExtensionId(context) {
@@ -80,10 +75,7 @@ async function getExtensionId(context) {
 
 async function capture(page, name, viewport) {
   await page.setViewportSize(viewport);
-  await page.screenshot({
-    path: join(screenshotsDir, name),
-    fullPage: true,
-  });
+  await page.screenshot({ path: join(screenshotsDir, name), fullPage: true });
 }
 
 const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i6-'));
@@ -106,26 +98,39 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await expect(page.getByText('Profile readiness')).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Sensitive vault' }),
+    page.getByRole('heading', { name: 'Import from CV' }),
   ).toBeVisible();
+  await expect(page.getByText('Career data workspace')).toBeVisible();
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
+  await capture(page, 'options-tablet.png', { width: 1024, height: 900 });
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });
 
   await page.goto(fixture.url);
-  const panel = page.locator('fillio-form-assistant');
-  await expect(panel).toBeAttached();
+  const host = page.locator('fillio-form-assistant');
+  await expect(host).toBeAttached();
+  const launcher = page.getByRole('button', { name: 'Open Fillio' });
+  await expect(launcher).toBeVisible();
+  await expect(page.getByText('Sensitive fields detected')).toHaveCount(0);
+  await capture(page, 'floating-launcher-desktop.png', {
+    width: 1440,
+    height: 1000,
+  });
+
+  await launcher.click();
+  await expect(page.getByText('Sensitive')).toBeVisible();
+  await page.getByRole('button', { name: /Sensitive data/i }).click();
   await expect(page.getByText('Sensitive fields detected')).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'No safe fields ready to fill yet' }),
-  ).toBeVisible();
+  await expect(page.getByText('Date of birth')).toBeVisible();
+  await expect(page.getByText('National ID')).toBeVisible();
   await capture(page, 'floating-panel-desktop.png', {
     width: 1440,
     height: 1000,
   });
-  await capture(page, 'floating-panel-mobile.png', {
-    width: 390,
-    height: 844,
-  });
+
+  await page.getByRole('button', { name: 'Close Fillio' }).first().click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await capture(page, 'floating-panel-mobile.png', { width: 390, height: 844 });
 
   expect(await page.getByLabel('Date of birth').inputValue()).toBe('');
   expect(await page.getByLabel('National ID').inputValue()).toBe('');

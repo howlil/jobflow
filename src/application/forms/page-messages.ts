@@ -27,11 +27,13 @@ export type PageVariantOption = {
 };
 
 export type RecommendedDocumentSummary = {
+  id: string;
   label: string;
   fileName: string;
 };
 
 export type PageDocumentFieldSummary = {
+  fieldFingerprint: string;
   fieldLabel: string;
   intent: DocumentFieldIntent;
   evidence: string[];
@@ -121,6 +123,7 @@ function isRecommendedDocumentSummary(
   if (typeof value !== 'object' || value === null) return false;
   const candidate = value as Record<string, unknown>;
   return (
+    typeof candidate.id === 'string' &&
     typeof candidate.label === 'string' &&
     typeof candidate.fileName === 'string'
   );
@@ -144,6 +147,7 @@ function isPageDocumentFieldSummary(
   const candidate = value as Record<string, unknown>;
   const recommendedDocument = candidate.recommendedDocument;
   return (
+    typeof candidate.fieldFingerprint === 'string' &&
     typeof candidate.fieldLabel === 'string' &&
     isDocumentFieldIntent(candidate.intent) &&
     Array.isArray(candidate.evidence) &&

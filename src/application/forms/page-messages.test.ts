@@ -18,15 +18,18 @@ describe('isPageContextResponse', () => {
         ...baseContext,
         documentFields: [
           {
+            fieldFingerprint: 'field-resume',
             fieldLabel: 'Resume / CV',
             intent: 'resume',
             evidence: ['label:resume'],
             recommendedDocument: {
+              id: 'resume-backend',
               label: 'Backend resume',
               fileName: 'backend.pdf',
             },
           },
           {
+            fieldFingerprint: 'field-attachment',
             fieldLabel: 'Attachment',
             intent: 'unknown',
             evidence: [],
@@ -43,10 +46,30 @@ describe('isPageContextResponse', () => {
         ...baseContext,
         documentFields: [
           {
+            fieldFingerprint: 'field-attachment',
             fieldLabel: 'Attachment',
             intent: 'guess',
             evidence: [],
             recommendedDocument: null,
+          },
+        ],
+      }),
+    ).toBe(false);
+  });
+
+  it('rejects document summaries that cannot be attached deterministically', () => {
+    expect(
+      isPageContextResponse({
+        ...baseContext,
+        documentFields: [
+          {
+            fieldLabel: 'Resume',
+            intent: 'resume',
+            evidence: ['label:resume'],
+            recommendedDocument: {
+              label: 'Resume',
+              fileName: 'resume.pdf',
+            },
           },
         ],
       }),

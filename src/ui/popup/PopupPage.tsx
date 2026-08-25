@@ -91,7 +91,6 @@ export function PopupPage({
 
   useEffect(() => {
     let active = true;
-
     void repository
       .load()
       .then((stored) => {
@@ -106,16 +105,12 @@ export function PopupPage({
           setLoaded(true);
         }
       });
-
     return () => {
       active = false;
     };
   }, [repository]);
 
-  if (!loaded) {
-    return <main className="popup-page">Loading…</main>;
-  }
-
+  if (!loaded) return <main className="popup-page">Loading…</main>;
   if (error || profile === null) {
     return (
       <main className="popup-page">
@@ -142,11 +137,11 @@ export function PopupPage({
       : (profile.variants.find(
           (variant) => variant.id === variantRecommendation.variantId,
         ) ?? null);
-
   const legacyDocumentFields: PageDocumentFieldSummary[] =
     documentFields.length === 0 && fileInputCount > 0
       ? [
           {
+            fieldFingerprint: 'legacy-file-upload',
             fieldLabel: 'File upload',
             intent: recommendedResume === null ? 'unknown' : 'resume',
             evidence: [],
@@ -279,23 +274,24 @@ export function PopupPage({
         <section className="popup-card">
           <div className="popup-section-heading">
             <h2>Document upload</h2>
-            <span className="fillio-chip">Manual</span>
+            <span className="fillio-chip">Explicit</span>
           </div>
           <p className="popup-muted">
             {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
-            detected. Fillio will not choose or upload a file for you.
+            detected. Stored files are attached only when you click Attach in
+            the page launcher.
           </p>
           {visibleDocumentFields.length > 0 ? (
             <ul className="variant-list">
               {visibleDocumentFields.map((field, index) => (
-                <li key={`${field.fieldLabel}-${index}`}>
+                <li key={`${field.fieldFingerprint}-${index}`}>
                   <strong>{field.fieldLabel}</strong>
                   <div className="popup-muted">
                     {DOCUMENT_INTENT_LABELS[field.intent]}
                   </div>
                   {field.recommendedDocument !== null ? (
                     <div>
-                      Suggested metadata:{' '}
+                      Ready to attach:{' '}
                       <strong>
                         {field.recommendedDocument.label ||
                           field.recommendedDocument.fileName}
@@ -311,7 +307,7 @@ export function PopupPage({
                     </div>
                   ) : (
                     <div className="popup-muted">
-                      No matching document metadata is configured.
+                      No matching stored document is configured.
                     </div>
                   )}
                 </li>
@@ -319,8 +315,7 @@ export function PopupPage({
             </ul>
           ) : (
             <p className="popup-muted">
-              Configure document metadata in profile settings for deterministic
-              guidance.
+              Store a CV in the career workspace for deterministic guidance.
             </p>
           )}
         </section>
