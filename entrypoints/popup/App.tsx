@@ -3,18 +3,25 @@ import { browser } from 'wxt/browser';
 
 import type { PageAnalysisSummary } from '../../src/application/forms/analyze-field-contexts';
 import {
-  GET_PAGE_ANALYSIS,
-  isPageAnalysisSummary,
+  GET_PAGE_CONTEXT,
+  isPageContextResponse,
 } from '../../src/application/forms/page-messages';
+import type { VariantRecommendation } from '../../src/domain/variants/recommend-variant';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { PopupPage } from '../../src/ui/popup/PopupPage';
 
 const repository = new ChromeProfileRepository();
 
+type PageContext = {
+  analysis: PageAnalysisSummary | null;
+  variantRecommendation: VariantRecommendation | null;
+};
+
 export default function App() {
-  const [pageSummary, setPageSummary] = useState<PageAnalysisSummary | null>(
-    null,
-  );
+  const [pageContext, setPageContext] = useState<PageContext>({
+    analysis: null,
+    variantRecommendation: null,
+  });
 
   useEffect(() => {
     let active = true;
@@ -24,15 +31,17 @@ export default function App() {
       .then(async ([tab]) => {
         if (tab?.id === undefined) return null;
         const response: unknown = await browser.tabs.sendMessage(tab.id, {
-          type: GET_PAGE_ANALYSIS,
+          type: GET_PAGE_CONTEXT,
         });
-        return isPageAnalysisSummary(response) ? response : null;
+        return isPageContextResponse(response) ? response : null;
       })
-      .then((summary) => {
-        if (active) setPageSummary(summary);
+      .then((context) => {
+        if (active && context !== null) setPageContext(context);
       })
       .catch(() => {
-        if (active) setPageSummary(null);
+        if (active) {
+          setPageContext({ analysis: null, variantRecommendation: null });
+        }
       });
 
     return () => {
@@ -44,7 +53,8 @@ export default function App() {
     <PopupPage
       repository={repository}
       openOptions={() => browser.runtime.openOptionsPage()}
-      pageSummary={pageSummary}
+      pageSummary={pageContext.analysis}
+      variantRecommendation={pageContext.variantRecommendation}
     />
   );
 }
