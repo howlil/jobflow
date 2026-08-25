@@ -50,7 +50,9 @@ describe('BackupRecoveryInspector', () => {
       target: { files: [uploadFile(raw)] },
     });
 
-    expect(await screen.findByText(/validated backup/i)).toBeTruthy();
+    expect(
+      await screen.findByText('Validated backup', { selector: 'strong' }),
+    ).toBeTruthy();
     expect(screen.getByText(/25 Aug 2026/i)).toBeTruthy();
     expect(repo.save).not.toHaveBeenCalled();
 
