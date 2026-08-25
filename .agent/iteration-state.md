@@ -6,12 +6,12 @@ This file is the single current-state tracker for Fillio.
 
 - Iteration 15 is integrated on `master` at `9bb2080687ddb345f14805942758b8b74e834f68`.
 - Post-Iteration-15 workspace/navigation refinements are integrated on `master` at `e7ab8d5b26442bdeee5fdb1942157e6e8e40ea7d`.
-- Iteration 16 — MyPaas design-system convergence is active on `feat/iteration-16-mypaas-design-system`.
-- The active slice aligns Fillio's tokens and career-workspace visual grammar with `howlil/MyPaas` without changing runtime behavior or safety boundaries.
-- React/WXT remains the UI runtime for Iteration 16. Svelte migration is explicitly not part of this iteration because no measured runtime, bundle, or maintainability problem currently justifies a framework rewrite.
-- Tailwind is also deferred for this iteration. The transferable MyPaas design rules are being extracted into Fillio's existing token/primitive CSS layer first; Tailwind requires separate evidence that utility composition would materially improve maintainability.
-- Browser visual/E2E verification is required before Iteration 16 is marked complete.
-- Chrome Web Store publishing and a tagged release remain explicit future release actions.
+- Iteration 16 — MyPaas design-system convergence is active on `feat/iteration-16-mypaas-design-system` through draft PR #10.
+- The active slice refactors the options/career-profile surface into reusable React composition and migrates its visual layer to Tailwind using the concrete design grammar extracted from `howlil/MyPaas`.
+- React/WXT remains the UI runtime. Svelte migration is not part of Iteration 16.
+- Tailwind is now an explicit Iteration 16 implementation decision following the user's scope change; the previous CSS token/primitive workspace layer is being retired rather than maintained in parallel.
+- CI and browser visual/E2E verification remain required before Iteration 16 is marked complete or merged.
+- Chrome Web Store publishing and a tagged release remain separate future release actions.
 
 ## Locked product boundaries
 
@@ -52,36 +52,41 @@ Delivered:
 
 ## Iteration 16 — MyPaas design-system convergence
 
-Status: active.
+Status: active; implementation and verification in progress.
 
 Problem being solved:
 
 - the current career workspace under-uses wide screens
 - the navigation rail reads as a detached card instead of application chrome
-- spacing, surfaces, controls, and hierarchy are not yet driven by one consistent primitive grammar
-- the supplied MyPaas frontend provides a concrete visual reference for a denser, flatter production UI
+- options/profile markup and visual concerns are too coupled to large CSS files
+- spacing, surfaces, controls, and hierarchy need one reusable production UI grammar
+- the supplied MyPaas frontend provides a concrete reference for a denser, flatter production UI
 
 Implemented on the active branch so far:
 
-- MyPaas-derived neutral palette: `#fafafa` background, white surfaces, neutral-200 borders, neutral-900 ink
-- 6–8px surface/control radii and restrained elevation
-- responsive wide page shell with compact gutters
-- integrated left navigation rail with flat active-state treatment
-- denser typography, buttons, fields, readiness surface, editable sections, record cards, and document dropzones
+- MyPaas-derived Tailwind theme: `#fafafa` app background, white surfaces, `#f7f7f7` muted surfaces, `#e5e5e5` borders, `#171717` primary ink, restrained semantic colors
+- 6–8px surface/control radii, neutral 1px borders, and elevation reserved for overlays
+- responsive wide page shell and compact gutters
+- reusable React `WorkspaceFrame` for options application chrome
+- reusable responsive React `WorkspaceNavigation` with desktop rail and mobile selector
+- options workspace composed from React surfaces rather than repeated top-level HTML structure
+- Tailwind source-of-truth in `src/ui/design-system/tailwind.css` plus direct utility classes in reusable React shell/navigation components
+- legacy options/profile token, primitive, compact, and MyPaas-adaptation CSS layers retired to prevent two styling systems from drifting
+- existing ProfilePage behavior preserved while its compatibility CSS import is reduced to a no-op shim; further section extraction can happen incrementally without another visual system
 - coarse-pointer 44px target preservation and visible keyboard focus behavior
 - no storage, permission, autofill, vault, messaging, document, or security behavior changes
 
 Framework decision:
 
-- keep React/WXT for this iteration
+- keep React/WXT
+- options HTML remains only the browser-extension mount document; the application surface is React
 - do not rewrite the component tree to Svelte for stylistic reasons
-- reconsider Svelte only if measured bundle/startup/runtime cost or component-maintenance evidence establishes a concrete problem
 
-Styling-tool decision:
+Styling decision:
 
-- do not add Tailwind in the same change as the visual migration
-- first converge tokens/primitives and prove the visual system
-- reconsider Tailwind separately if repeated utility composition becomes a demonstrated maintenance cost
+- Tailwind is the canonical styling system for the options/profile workspace in Iteration 16
+- do not maintain a second token/primitive CSS implementation for the same workspace
+- popup CSS and content-script Shadow-DOM injected styles are separate extension surfaces; migrate them only with surface-specific verification because global Tailwind utilities do not automatically cross Shadow DOM boundaries
 
 Required verification before completion:
 
@@ -100,7 +105,7 @@ Browser visual/E2E validation must also inspect the current options workspace on
 
 ## Release-readiness gap
 
-Do not describe the product as release-ready until current browser E2E is run successfully against the integrated `master` behavior and any failures are resolved.
+Do not describe the product as release-ready until current browser E2E is run successfully against the integrated behavior and any failures are resolved.
 
 Release-readiness evidence should include at minimum:
 
@@ -120,4 +125,4 @@ A tagged release or Chrome Web Store publishing remains a separate explicit acti
 
 ## Next-state rule
 
-Finish Iteration 16 visual verification and integration before opening another UI refactor. After integration, prioritize real application use, compatibility failures, and trusted-beta feedback. Do not add automatic submission, automatic attachment, backend sync, AI, ATS-specific adapters, Svelte, or Tailwind without concrete evidence and an explicit scope decision.
+Finish Iteration 16 CI, browser visual validation, and integration before opening another UI refactor. After integration, prioritize real application use, compatibility failures, and trusted-beta feedback. Do not add automatic submission, automatic attachment, backend sync, AI, ATS-specific adapters, or a framework rewrite without concrete evidence and an explicit scope decision.
