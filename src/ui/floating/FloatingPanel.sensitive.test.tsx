@@ -32,23 +32,24 @@ function sensitiveItem(label = 'NIK'): FillAnalysis {
   };
 }
 
+function openSensitive() {
+  fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+  fireEvent.click(screen.getByRole('button', { name: /Sensitive data/i }));
+}
+
 describe('FloatingPanel sensitive disclosure', () => {
   it('groups sensitive field labels without exposing values', () => {
     render(
       <FloatingPanel
-        summary={{
-          ready: 0,
-          needsReview: 0,
-          sensitive: 2,
-          unknown: 0,
-          total: 2,
-        }}
+        summary={{ ready: 0, needsReview: 0, sensitive: 2, unknown: 0, total: 2 }}
         sensitiveItems={[sensitiveItem('Date of birth'), sensitiveItem('NIK')]}
         vaultStatus="locked"
         onFill={vi.fn()}
       />,
     );
 
+    expect(screen.queryByText('Date of birth')).toBeNull();
+    openSensitive();
     expect(screen.getByText('Sensitive fields detected')).toBeTruthy();
     expect(screen.getByText('Date of birth')).toBeTruthy();
     expect(screen.getByText('NIK')).toBeTruthy();
@@ -57,16 +58,9 @@ describe('FloatingPanel sensitive disclosure', () => {
 
   it('offers settings when sensitive fields are present but no vault exists', () => {
     const openOptions = vi.fn();
-
     render(
       <FloatingPanel
-        summary={{
-          ready: 0,
-          needsReview: 0,
-          sensitive: 1,
-          unknown: 0,
-          total: 1,
-        }}
+        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="not-configured"
         siteHost="jobs.example.test"
@@ -75,7 +69,7 @@ describe('FloatingPanel sensitive disclosure', () => {
       />,
     );
 
-    expect(screen.getByText('NIK')).toBeTruthy();
+    openSensitive();
     fireEvent.click(screen.getByRole('button', { name: 'Set up vault' }));
     expect(openOptions).toHaveBeenCalledTimes(1);
   });
@@ -83,16 +77,9 @@ describe('FloatingPanel sensitive disclosure', () => {
   it('unlocks without filling sensitive fields', () => {
     const unlock = vi.fn();
     const fillSensitive = vi.fn();
-
     render(
       <FloatingPanel
-        summary={{
-          ready: 0,
-          needsReview: 0,
-          sensitive: 1,
-          unknown: 0,
-          total: 1,
-        }}
+        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="locked"
         siteHost="jobs.example.test"
@@ -102,6 +89,7 @@ describe('FloatingPanel sensitive disclosure', () => {
       />,
     );
 
+    openSensitive();
     fireEvent.change(screen.getByLabelText('Vault passphrase'), {
       target: { value: 'local-passphrase' },
     });
@@ -114,13 +102,7 @@ describe('FloatingPanel sensitive disclosure', () => {
   it('shows an unlock error without exposing sensitive values', () => {
     render(
       <FloatingPanel
-        summary={{
-          ready: 0,
-          needsReview: 0,
-          sensitive: 1,
-          unknown: 0,
-          total: 1,
-        }}
+        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="locked"
         sensitiveError="Could not unlock the vault."
@@ -129,23 +111,15 @@ describe('FloatingPanel sensitive disclosure', () => {
       />,
     );
 
-    expect(screen.getByRole('alert').textContent).toBe(
-      'Could not unlock the vault.',
-    );
+    openSensitive();
+    expect(screen.getByRole('alert').textContent).toBe('Could not unlock the vault.');
   });
 
   it('requires a separate site-specific approval before sensitive fill', () => {
     const fillSensitive = vi.fn();
-
     render(
       <FloatingPanel
-        summary={{
-          ready: 0,
-          needsReview: 0,
-          sensitive: 1,
-          unknown: 0,
-          total: 1,
-        }}
+        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="unlocked"
         siteHost="jobs.example.test"
@@ -154,12 +128,12 @@ describe('FloatingPanel sensitive disclosure', () => {
       />,
     );
 
+    openSensitive();
     fireEvent.click(
       screen.getByRole('button', {
         name: 'Fill sensitive fields on jobs.example.test',
       }),
     );
-
     expect(fillSensitive).toHaveBeenCalledTimes(1);
   });
 });
