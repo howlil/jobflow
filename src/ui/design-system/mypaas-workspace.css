@@ -1,0 +1,390 @@
+/*
+ * Fillio workspace adaptation of the MyPaas product UI grammar.
+ *
+ * Keep the dependency direction intentional: these are visual rules, not a
+ * shared runtime package. MyPaas is used as a reference for neutral tokens,
+ * dense controls, flat surfaces, restrained elevation, and page-shell sizing.
+ */
+
+body {
+  background: var(--fillio-color-bg);
+  color: var(--fillio-color-text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.workspace-topbar {
+  border-bottom-color: var(--fillio-color-border);
+  background: color-mix(in srgb, var(--fillio-color-surface) 96%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.workspace-topbar__inner,
+.workspace-layout {
+  width: min(100%, 144rem);
+  padding-inline: clamp(14px, 1.1vw, 24px);
+}
+
+.workspace-topbar__inner {
+  min-height: 52px;
+}
+
+.workspace-brand {
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.workspace-brand__mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--fillio-color-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workspace-topbar__meta {
+  color: var(--fillio-color-tertiary);
+  font-size: 11px;
+}
+
+.workspace-layout {
+  grid-template-columns: 224px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.workspace-nav-wrap {
+  top: 68px;
+  min-height: calc(100vh - 84px);
+  padding: 20px 16px 24px 0;
+  border: 0;
+  border-right: 1px solid var(--fillio-color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.workspace-nav-heading {
+  gap: 2px;
+  padding-inline: 8px;
+}
+
+.workspace-nav-heading strong {
+  color: var(--fillio-color-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.workspace-nav-heading span {
+  color: var(--fillio-color-tertiary);
+  font-size: 11px;
+}
+
+.workspace-nav {
+  gap: 2px;
+  margin-top: 14px;
+  padding: 0;
+}
+
+.fillio-nav-link {
+  min-height: 34px;
+  gap: 9px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--fillio-color-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.fillio-nav-link:hover {
+  border-color: transparent;
+  background: var(--fillio-color-surface-subtle);
+  color: var(--fillio-color-text);
+}
+
+.fillio-nav-link[aria-current='page'] {
+  border-color: var(--fillio-color-border);
+  background: var(--fillio-color-surface);
+  color: var(--fillio-color-text);
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.workspace-content {
+  width: 100%;
+  min-width: 0;
+  max-width: 1180px;
+}
+
+.profile-page {
+  padding: 30px 0 64px;
+}
+
+.profile-header {
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.profile-header > div:first-child {
+  max-width: 720px;
+}
+
+.profile-page h1 {
+  margin-bottom: 5px;
+  font-size: clamp(28px, 2.2vw, 34px);
+  font-weight: 680;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.profile-page h2,
+.workspace-tool-section__header h2 {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.profile-page h3 {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.profile-header .muted,
+.profile-readiness-intro,
+.workspace-tool-section__header p {
+  color: var(--fillio-color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.profile-save-action {
+  gap: 6px;
+}
+
+.profile-save-state {
+  color: var(--fillio-color-tertiary);
+  font-size: 11px;
+}
+
+.fillio-button {
+  min-height: 36px;
+  padding: 7px 11px;
+  border-color: var(--fillio-color-border-strong);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fillio-button-primary,
+.fillio-button-accent {
+  border-color: var(--fillio-color-text);
+  background: var(--fillio-color-text);
+}
+
+.fillio-button-primary:hover:not(:disabled),
+.fillio-button-accent:hover:not(:disabled) {
+  border-color: #000;
+  background: #000;
+}
+
+.fillio-button-secondary {
+  background: var(--fillio-color-surface);
+}
+
+.profile-readiness {
+  position: relative;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid var(--fillio-color-border);
+  border-radius: 8px;
+  background: var(--fillio-color-surface);
+}
+
+.profile-readiness h2 {
+  font-size: 17px;
+}
+
+.profile-readiness-details {
+  gap: 8px;
+}
+
+.profile-readiness-label {
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.profile-readiness-list {
+  gap: 6px 16px;
+}
+
+.profile-readiness-list li {
+  color: var(--fillio-color-muted);
+  font-size: 11px;
+}
+
+.fillio-chip {
+  border-radius: 6px;
+  background: var(--fillio-color-surface-subtle);
+  font-size: 11px;
+}
+
+.profile-section,
+.workspace-tool-section {
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 20px;
+  border: 1px solid var(--fillio-color-border);
+  border-radius: 8px;
+  background: var(--fillio-color-surface);
+}
+
+.profile-section:last-child,
+.workspace-tool-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-heading,
+.fillio-section-heading,
+.workspace-tool-section__header {
+  gap: 18px;
+}
+
+.workspace-tool-section__header {
+  margin-bottom: 0;
+}
+
+.form-grid {
+  gap: 14px 16px;
+}
+
+.profile-page label {
+  gap: 5px;
+  color: var(--fillio-color-muted);
+  font-size: 11px;
+  font-weight: 550;
+}
+
+.profile-page input,
+.profile-page select,
+.profile-page textarea {
+  min-height: 38px;
+  padding: 8px 10px;
+  border-color: var(--fillio-color-border);
+  border-radius: 6px;
+  background: var(--fillio-color-surface);
+  font-size: 13px;
+}
+
+.profile-page textarea {
+  min-height: 96px;
+}
+
+.profile-page input:hover,
+.profile-page select:hover,
+.profile-page textarea:hover {
+  border-color: var(--fillio-color-border-strong);
+}
+
+.profile-page input:focus,
+.profile-page select:focus,
+.profile-page textarea:focus {
+  border-color: var(--fillio-color-text);
+  box-shadow:
+    0 0 0 1px var(--fillio-color-text),
+    0 0 0 4px color-mix(in srgb, var(--fillio-color-border) 70%, transparent);
+}
+
+.record-list {
+  gap: 10px;
+}
+
+.record-card,
+.workspace-card {
+  gap: 14px;
+  padding: 14px;
+  border-color: var(--fillio-color-border);
+  border-radius: 8px;
+  background: var(--fillio-color-surface-subtle);
+}
+
+.cv-dropzone {
+  min-height: 170px;
+  border-color: var(--fillio-color-border-strong);
+  border-radius: 8px;
+  background: var(--fillio-color-surface-subtle);
+}
+
+.document-row,
+.cv-preview__row {
+  border-color: var(--fillio-color-border);
+}
+
+@media (max-width: 900px) {
+  .workspace-topbar__inner,
+  .workspace-layout {
+    padding-inline: 16px;
+  }
+
+  .workspace-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 720px) {
+  .workspace-layout {
+    display: block;
+  }
+
+  .workspace-nav-wrap {
+    position: sticky;
+    top: 52px;
+    z-index: 20;
+    min-height: 0;
+    padding: 12px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--fillio-color-border);
+    background: color-mix(in srgb, var(--fillio-color-bg) 96%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .workspace-nav-heading,
+  .workspace-nav {
+    display: none;
+  }
+
+  .workspace-nav-select {
+    display: block;
+  }
+
+  .profile-page {
+    padding-top: 20px;
+  }
+
+  .profile-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profile-save-action {
+    align-items: stretch;
+    justify-items: stretch;
+  }
+
+  .profile-section,
+  .workspace-tool-section,
+  .profile-readiness {
+    padding: 16px;
+  }
+}
+
+@media (any-pointer: coarse) {
+  .fillio-button,
+  .fillio-nav-link {
+    min-height: 44px;
+  }
+}
