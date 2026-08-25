@@ -5,13 +5,14 @@ import {
   type GetDocumentFileResponse,
 } from '../../application/documents/document-messages';
 
-function decodeBase64(base64: string): Uint8Array {
+function decodeBase64(base64: string): ArrayBuffer {
   const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
+  const buffer = new ArrayBuffer(binary.length);
+  const bytes = new Uint8Array(buffer);
   for (let index = 0; index < binary.length; index += 1) {
     bytes[index] = binary.charCodeAt(index);
   }
-  return bytes;
+  return buffer;
 }
 
 export class ChromeDocumentClient {
@@ -22,8 +23,8 @@ export class ChromeDocumentClient {
     })) as GetDocumentFileResponse | undefined;
 
     if (response === undefined || !response.ok) return null;
-    const bytes = decodeBase64(response.file.base64);
-    return new File([bytes], response.file.fileName, {
+    const buffer = decodeBase64(response.file.base64);
+    return new File([buffer], response.file.fileName, {
       type: response.file.mimeType,
       lastModified: response.file.lastModified,
     });
