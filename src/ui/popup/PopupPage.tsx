@@ -91,7 +91,6 @@ export function PopupPage({
 
   useEffect(() => {
     let active = true;
-
     void repository
       .load()
       .then((stored) => {
@@ -106,16 +105,12 @@ export function PopupPage({
           setLoaded(true);
         }
       });
-
     return () => {
       active = false;
     };
   }, [repository]);
 
-  if (!loaded) {
-    return <main className="popup-page">Loading…</main>;
-  }
-
+  if (!loaded) return <main className="popup-page">Loading…</main>;
   if (error || profile === null) {
     return (
       <main className="popup-page">
@@ -142,11 +137,11 @@ export function PopupPage({
       : (profile.variants.find(
           (variant) => variant.id === variantRecommendation.variantId,
         ) ?? null);
-
   const legacyDocumentFields: PageDocumentFieldSummary[] =
     documentFields.length === 0 && fileInputCount > 0
       ? [
           {
+            fieldFingerprint: 'legacy-file-upload',
             fieldLabel: 'File upload',
             intent: recommendedResume === null ? 'unknown' : 'resume',
             evidence: [],
@@ -164,9 +159,7 @@ export function PopupPage({
           <p className="popup-eyebrow">Fillio</p>
           <h1>Ready to apply</h1>
         </div>
-        <strong className="popup-readiness">
-          {readiness.percentage}% ready
-        </strong>
+        <strong className="popup-readiness">{readiness.percentage}% ready</strong>
         <p className="popup-muted popup-header__summary">
           {readiness.completed} of {readiness.total} profile sections ready
         </p>
@@ -200,12 +193,8 @@ export function PopupPage({
         ) : (
           <div className="page-summary" aria-label="Current page form analysis">
             <span className="fillio-chip">{pageSummary.ready} ready</span>
-            <span className="fillio-chip">
-              {pageSummary.needsReview} needs review
-            </span>
-            <span className="fillio-chip">
-              {pageSummary.sensitive} sensitive
-            </span>
+            <span className="fillio-chip">{pageSummary.needsReview} needs review</span>
+            <span className="fillio-chip">{pageSummary.sensitive} sensitive</span>
             <span className="fillio-chip">{pageSummary.unknown} unknown</span>
           </div>
         )}
@@ -215,16 +204,13 @@ export function PopupPage({
         <div className="popup-section-heading">
           <h2>Application profiles</h2>
           <strong>
-            {variantCount} application{' '}
-            {variantCount === 1 ? 'variant' : 'variants'}
+            {variantCount} application {variantCount === 1 ? 'variant' : 'variants'}
           </strong>
         </div>
         {recommendedVariant !== null ? (
           <div className="popup-empty">
             <span className="fillio-chip fillio-chip-strong">Recommended</span>
-            <p>
-              <strong>{recommendedVariant.name || 'Untitled variant'}</strong>
-            </p>
+            <p><strong>{recommendedVariant.name || 'Untitled variant'}</strong></p>
             <p className="popup-muted">
               {variantRecommendation?.evidence.length
                 ? `Matched page signals: ${variantRecommendation.evidence.join(', ')}`
@@ -238,26 +224,18 @@ export function PopupPage({
             Use for this page
             <select
               value={activeVariantId ?? ''}
-              onChange={(event) =>
-                void onSelectVariant(event.target.value || null)
-              }
+              onChange={(event) => void onSelectVariant(event.target.value || null)}
             >
               <option value="">No application variant</option>
               {variantOptions.map((variant) => (
-                <option value={variant.id} key={variant.id}>
-                  {variant.name}
-                </option>
+                <option value={variant.id} key={variant.id}>{variant.name}</option>
               ))}
             </select>
           </label>
         ) : null}
 
         {recommendedVariant !== null && onSelectVariant !== undefined ? (
-          <button
-            className="fillio-button"
-            type="button"
-            onClick={() => void onSelectVariant(null)}
-          >
+          <button className="fillio-button" type="button" onClick={() => void onSelectVariant(null)}>
             Use automatic recommendation
           </button>
         ) : null}
@@ -269,9 +247,7 @@ export function PopupPage({
             ))}
           </ul>
         ) : (
-          <p className="popup-muted popup-empty">
-            Add variants for different target roles.
-          </p>
+          <p className="popup-muted popup-empty">Add variants for different target roles.</p>
         )}
       </section>
 
@@ -279,49 +255,34 @@ export function PopupPage({
         <section className="popup-card">
           <div className="popup-section-heading">
             <h2>Document upload</h2>
-            <span className="fillio-chip">Manual</span>
+            <span className="fillio-chip">Explicit</span>
           </div>
           <p className="popup-muted">
-            {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
-            detected. Fillio will not choose or upload a file for you.
+            {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'} detected. Stored files are attached only when you click Attach in the page launcher.
           </p>
           {visibleDocumentFields.length > 0 ? (
             <ul className="variant-list">
               {visibleDocumentFields.map((field, index) => (
-                <li key={`${field.fieldLabel}-${index}`}>
+                <li key={`${field.fieldFingerprint}-${index}`}>
                   <strong>{field.fieldLabel}</strong>
-                  <div className="popup-muted">
-                    {DOCUMENT_INTENT_LABELS[field.intent]}
-                  </div>
+                  <div className="popup-muted">{DOCUMENT_INTENT_LABELS[field.intent]}</div>
                   {field.recommendedDocument !== null ? (
                     <div>
-                      Suggested metadata:{' '}
-                      <strong>
-                        {field.recommendedDocument.label ||
-                          field.recommendedDocument.fileName}
-                      </strong>
-                      {field.recommendedDocument.fileName
-                        ? ` — ${field.recommendedDocument.fileName}`
-                        : ''}
+                      Ready to attach: <strong>{field.recommendedDocument.label || field.recommendedDocument.fileName}</strong>
+                      {field.recommendedDocument.fileName ? ` — ${field.recommendedDocument.fileName}` : ''}
                     </div>
                   ) : field.intent === 'unknown' ? (
                     <div className="popup-muted">
-                      Unknown document type; choose the file manually after
-                      checking the site label.
+                      Unknown document type; choose the file manually after checking the site label.
                     </div>
                   ) : (
-                    <div className="popup-muted">
-                      No matching document metadata is configured.
-                    </div>
+                    <div className="popup-muted">No matching stored document is configured.</div>
                   )}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="popup-muted">
-              Configure document metadata in profile settings for deterministic
-              guidance.
-            </p>
+            <p className="popup-muted">Store a CV in the career workspace for deterministic guidance.</p>
           )}
         </section>
       ) : null}
