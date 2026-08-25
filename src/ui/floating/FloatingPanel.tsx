@@ -112,13 +112,17 @@ export function FloatingPanel({
   }
 
   return (
-    <aside className="fillio-assistant" aria-label="Fillio form assistant">
+    <aside
+      className={`fillio-assistant${isOpen ? ' fillio-assistant--open' : ''}`}
+      aria-label="Fillio form assistant"
+    >
       {isOpen ? (
         <section className="fillio-panel" aria-label="Fillio assistant menu">
           <header className="fillio-panel__header">
             <div>
               <span className="fillio-panel__eyebrow">Fillio</span>
               <strong>{variantName || 'Application assistant'}</strong>
+              <span className="fillio-panel__host">{siteHost}</span>
             </div>
             <button
               className="fillio-panel__icon-button"
@@ -131,23 +135,20 @@ export function FloatingPanel({
           </header>
 
           {view === 'home' ? (
-            <>
+            <div className="fillio-panel__body">
               <div
                 className="fillio-panel__summary"
                 aria-label="Form analysis summary"
               >
-                <span>
-                  <strong>{summary.ready}</strong> Ready
-                </span>
-                <span>
-                  <strong>{summary.needsReview}</strong> Review
-                </span>
-                <span>
-                  <strong>{summary.sensitive}</strong> Sensitive
-                </span>
-                <span>
-                  <strong>{summary.unknown}</strong> Unknown
-                </span>
+                <div>
+                  <strong>{summary.ready} ready</strong>
+                  <span>
+                    {summary.needsReview} review · {summary.sensitive} sensitive
+                  </span>
+                </div>
+                {summary.unknown > 0 ? (
+                  <small>{summary.unknown} unrecognized</small>
+                ) : null}
               </div>
 
               <button
@@ -161,10 +162,12 @@ export function FloatingPanel({
 
               {attachableDocuments.length > 0 ? (
                 <section
-                  className="fillio-panel__documents"
+                  className="fillio-panel__section"
                   aria-label="Detected document fields"
                 >
-                  <p className="fillio-panel__section-label">Documents</p>
+                  <div className="fillio-panel__section-heading">
+                    <span>Documents</span>
+                  </div>
                   {attachableDocuments.map((item) => (
                     <div
                       className="fillio-panel__document"
@@ -191,20 +194,30 @@ export function FloatingPanel({
                 </section>
               ) : null}
 
-              <div className="fillio-panel__menu">
-                {summary.needsReview > 0 ? (
-                  <button type="button" onClick={() => setView('review')}>
-                    <span>Review fields</span>
-                    <strong>{summary.needsReview} →</strong>
-                  </button>
-                ) : null}
-                {summary.sensitive > 0 ? (
-                  <button type="button" onClick={() => setView('sensitive')}>
-                    <span>Sensitive data</span>
-                    <strong>{summary.sensitive} →</strong>
-                  </button>
-                ) : null}
-              </div>
+              {summary.needsReview > 0 || summary.sensitive > 0 ? (
+                <section className="fillio-panel__section">
+                  <div className="fillio-panel__section-heading">
+                    <span>Needs attention</span>
+                  </div>
+                  <div className="fillio-panel__menu">
+                    {summary.needsReview > 0 ? (
+                      <button type="button" onClick={() => setView('review')}>
+                        <span>Review ambiguous fields</span>
+                        <strong>{summary.needsReview}</strong>
+                      </button>
+                    ) : null}
+                    {summary.sensitive > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setView('sensitive')}
+                      >
+                        <span>Sensitive fields</span>
+                        <strong>{summary.sensitive}</strong>
+                      </button>
+                    ) : null}
+                  </div>
+                </section>
+              ) : null}
 
               {onOpenOptions !== undefined ? (
                 <button
@@ -212,10 +225,11 @@ export function FloatingPanel({
                   type="button"
                   onClick={onOpenOptions}
                 >
-                  Open career profile ↗
+                  Open profile workspace
+                  <span aria-hidden="true">↗</span>
                 </button>
               ) : null}
-            </>
+            </div>
           ) : null}
 
           {view === 'review' ? (
