@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
 import { FloatingPanel } from './FloatingPanel';
 
-it('lets the user remember or ignore a Review field', () => {
+it('lets the user remember or ignore a Review field after opening review', () => {
   const remember = vi.fn();
   const context = {
     controlKind: 'input' as const,
@@ -36,6 +36,9 @@ it('lets the user remember or ignore a Review field', () => {
       onRemember={remember}
     />,
   );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+  fireEvent.click(screen.getByRole('button', { name: /Review fields/i }));
   fireEvent.click(
     screen.getByRole('button', {
       name: 'Use personal.legalName.first for Name',
