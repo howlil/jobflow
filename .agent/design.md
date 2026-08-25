@@ -1,9 +1,9 @@
 # Visual Design Guidance
 
-The visual source of truth for Fillio is [`/DESIGN.md`](../DESIGN.md).
+The visual source of truth for Fillio is [`/DESIGN.md`](../DESIGN.md). Iteration 16 uses the restrained production UI grammar extracted from `howlil/MyPaas` as the concrete implementation reference.
 
-Use that file for layout, typography, color, spacing, responsive behavior, floating-assistant interaction, CV import UX, and component appearance.
+Use `DESIGN.md` for layout, typography, color, spacing, responsive behavior, floating-assistant interaction, CV import UX, and component appearance. Software/runtime architecture remains in [`system-design.md`](./system-design.md).
 
-Software/runtime architecture moved to [`system-design.md`](./system-design.md).
+For React extension surfaces, map approved design decisions into `tailwind.config.ts`, `src/ui/design-system/tailwind.css`, and reusable React primitives/components. Do not recreate the retired `tokens.css` / `primitives.css` stack or introduce feature-local design tokens.
 
-Do not invent visual tokens in feature files. Update `DESIGN.md` first, then map the approved tokens into `src/ui/design-system/tokens.css` and shared primitives.
+The content-script assistant is rendered in Shadow DOM. Its styles require a surface-specific bundle/injection strategy; do not assume document-level Tailwind CSS crosses the shadow boundary.
