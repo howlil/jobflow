@@ -63,7 +63,13 @@ describe('FloatingPanel', () => {
     const attach = vi.fn().mockResolvedValue('attached');
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 0, unknown: 1, total: 1 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 0,
+          unknown: 1,
+          total: 1,
+        }}
         documentFields={[
           {
             fieldFingerprint: 'resume-field',

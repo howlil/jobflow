@@ -38,7 +38,10 @@ Go, PostgreSQL
 
 describe('CvImportSection', () => {
   beforeEach(() => {
-    vi.mocked(extractCvText).mockResolvedValue({ text: cvText, format: 'text' });
+    vi.mocked(extractCvText).mockResolvedValue({
+      text: cvText,
+      format: 'text',
+    });
   });
 
   it('extracts locally but waits for explicit reviewed import', async () => {
@@ -60,15 +63,18 @@ describe('CvImportSection', () => {
     expect(screen.getByText('Backend Software Engineer')).toBeTruthy();
     expect(profileRepository.save).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Import selected data' }));
-    await waitFor(() => expect(profileRepository.save).toHaveBeenCalledTimes(1));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Import selected data' }),
+    );
+    await waitFor(() =>
+      expect(profileRepository.save).toHaveBeenCalledTimes(1),
+    );
 
     const saved = vi.mocked(profileRepository.save).mock.calls[0]?.[0];
     expect(saved?.baseProfile.personal.legalName.first).toBe('Maya');
-    expect(saved?.baseProfile.professional.skills.map((skill) => skill.name)).toEqual([
-      'Go',
-      'PostgreSQL',
-    ]);
+    expect(
+      saved?.baseProfile.professional.skills.map((skill) => skill.name),
+    ).toEqual(['Go', 'PostgreSQL']);
   });
 
   it('stores CV bytes only after Save CV locally', async () => {
@@ -90,7 +96,9 @@ describe('CvImportSection', () => {
     expect(documentRepository.save).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Save CV locally' }));
 
-    await waitFor(() => expect(documentRepository.save).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(documentRepository.save).toHaveBeenCalledTimes(1),
+    );
     expect(profileRepository.save).toHaveBeenCalledTimes(1);
   });
 });

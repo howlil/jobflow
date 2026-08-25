@@ -19,7 +19,8 @@ import {
   isSupportedCvFile,
 } from '../../infrastructure/documents/extract-cv-text';
 
-const ACCEPTED_FILES = '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
+const ACCEPTED_FILES =
+  '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
 
 function fileSize(size: number): string {
   if (size < 1024) return `${size} B`;
@@ -29,9 +30,7 @@ function fileSize(size: number): string {
 
 function initialSelection(preview: CvImportPreviewItem[]): Set<CvImportKey> {
   return new Set(
-    preview
-      .filter((item) => item.status === 'new')
-      .map((item) => item.key),
+    preview.filter((item) => item.status === 'new').map((item) => item.key),
   );
 }
 
@@ -128,18 +127,17 @@ export function CvImportSection({
     setBusy(true);
     setError(null);
     try {
-      const next = applyCvImport(
-        profile,
-        draft,
-        selected,
-        () => globalThis.crypto.randomUUID(),
+      const next = applyCvImport(profile, draft, selected, () =>
+        globalThis.crypto.randomUUID(),
       );
       await profileRepository.save(next);
       setProfile(next);
       setMessage(`Imported ${selected.size} reviewed profile groups.`);
       onProfileChanged?.();
     } catch {
-      setError('Could not apply the selected CV data. Your existing profile was left unchanged.');
+      setError(
+        'Could not apply the selected CV data. Your existing profile was left unchanged.',
+      );
     } finally {
       setBusy(false);
     }
@@ -165,7 +163,9 @@ export function CvImportSection({
       next.metadata.updatedAt = new Date().toISOString();
       await profileRepository.save(next);
       setProfile(next);
-      setMessage(`${file.name} is stored locally and can be attached from Fillio.`);
+      setMessage(
+        `${file.name} is stored locally and can be attached from Fillio.`,
+      );
       onProfileChanged?.();
     } catch {
       await documentRepository.remove(id).catch(() => undefined);
@@ -181,9 +181,10 @@ export function CvImportSection({
     setError(null);
     try {
       const next = structuredClone(profile);
-      next.baseProfile.documents.resumes = next.baseProfile.documents.resumes.filter(
-        (item) => item.id !== document.id,
-      );
+      next.baseProfile.documents.resumes =
+        next.baseProfile.documents.resumes.filter(
+          (item) => item.id !== document.id,
+        );
       next.variants = next.variants.map((variant) =>
         variant.preferredResumeId === document.id
           ? { ...variant, preferredResumeId: null }
@@ -203,14 +204,20 @@ export function CvImportSection({
   }
 
   return (
-    <section className="workspace-tool-section" id="cv-import" aria-labelledby="cv-import-title">
+    <section
+      className="workspace-tool-section"
+      id="cv-import"
+      aria-labelledby="cv-import-title"
+    >
       <div className="workspace-tool-section__header">
         <div>
           <p className="workspace-kicker">Documents</p>
           <h2 id="cv-import-title">Import from CV</h2>
         </div>
         <p>
-          PDF and DOCX extraction runs locally. Choosing a file never overwrites your profile; conflicting values stay unselected until you approve them.
+          PDF and DOCX extraction runs locally. Choosing a file never overwrites
+          your profile; conflicting values stay unselected until you approve
+          them.
         </p>
       </div>
 
@@ -218,7 +225,9 @@ export function CvImportSection({
         <div>
           <div className="cv-dropzone">
             <div className="cv-dropzone__content">
-              <div className="workspace-brand__mark" aria-hidden="true">CV</div>
+              <div className="workspace-brand__mark" aria-hidden="true">
+                CV
+              </div>
               <h3>{file ? file.name : 'Choose your CV'}</h3>
               <p>
                 {file
@@ -265,7 +274,9 @@ export function CvImportSection({
                   Files remain on this browser in extension-owned IndexedDB.
                 </p>
               </div>
-              <span className="fillio-chip fillio-chip-strong">{resumes.length}</span>
+              <span className="fillio-chip fillio-chip-strong">
+                {resumes.length}
+              </span>
             </div>
             {resumes.length === 0 ? (
               <div className="fillio-empty-row">No CV stored yet.</div>
@@ -303,16 +314,30 @@ export function CvImportSection({
               </p>
             </div>
             {preview.length > 0 ? (
-              <span className="fillio-chip fillio-chip-strong">{selectedCount} selected</span>
+              <span className="fillio-chip fillio-chip-strong">
+                {selectedCount} selected
+              </span>
             ) : null}
           </div>
 
-          {busy && draft === null ? <p className="muted">Extracting locally…</p> : null}
-          {error ? <p className="fillio-status fillio-status-danger" role="alert">{error}</p> : null}
-          {message ? <p className="fillio-status" role="status">{message}</p> : null}
+          {busy && draft === null ? (
+            <p className="muted">Extracting locally…</p>
+          ) : null}
+          {error ? (
+            <p className="fillio-status fillio-status-danger" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {message ? (
+            <p className="fillio-status" role="status">
+              {message}
+            </p>
+          ) : null}
 
           {preview.length === 0 && !busy ? (
-            <div className="fillio-empty-row">Choose a CV to preview extracted profile data.</div>
+            <div className="fillio-empty-row">
+              Choose a CV to preview extracted profile data.
+            </div>
           ) : (
             <div className="cv-preview">
               {preview.map((item) => (
@@ -330,7 +355,13 @@ export function CvImportSection({
                   </span>
                   <span className="cv-preview__value">
                     {item.extracted}
-                    <small style={{ display: 'block', marginTop: 4, color: 'var(--fillio-color-muted)' }}>
+                    <small
+                      style={{
+                        display: 'block',
+                        marginTop: 4,
+                        color: 'var(--fillio-color-muted)',
+                      }}
+                    >
                       {item.evidence}
                       {item.status === 'conflict' && item.current
                         ? ` · current: ${item.current}`

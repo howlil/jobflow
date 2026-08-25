@@ -28,7 +28,8 @@ const documentBroker = createDocumentBroker(new IndexedDbDocumentRepository());
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message) => {
     if (isPotentialVaultMessage(message)) return vaultBroker.handle(message);
-    if (isPotentialDocumentMessage(message)) return documentBroker.handle(message);
+    if (isPotentialDocumentMessage(message))
+      return documentBroker.handle(message);
     return undefined;
   });
 });

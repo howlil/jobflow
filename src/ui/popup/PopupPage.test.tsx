@@ -240,7 +240,9 @@ describe('PopupPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Document upload' }),
     ).toBeTruthy();
-    expect(screen.getByText(/attached only when you click Attach/i)).toBeTruthy();
+    expect(
+      screen.getByText(/attached only when you click Attach/i),
+    ).toBeTruthy();
     expect(screen.getByText('Resume / CV')).toBeTruthy();
     expect(screen.getByText(/backend resume/i)).toBeTruthy();
     expect(screen.getAllByText('Cover letter')).toHaveLength(2);

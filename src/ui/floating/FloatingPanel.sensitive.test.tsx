@@ -41,7 +41,13 @@ describe('FloatingPanel sensitive disclosure', () => {
   it('groups sensitive field labels without exposing values', () => {
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 2, unknown: 0, total: 2 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 2,
+          unknown: 0,
+          total: 2,
+        }}
         sensitiveItems={[sensitiveItem('Date of birth'), sensitiveItem('NIK')]}
         vaultStatus="locked"
         onFill={vi.fn()}
@@ -60,7 +66,13 @@ describe('FloatingPanel sensitive disclosure', () => {
     const openOptions = vi.fn();
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 1,
+          unknown: 0,
+          total: 1,
+        }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="not-configured"
         siteHost="jobs.example.test"
@@ -79,7 +91,13 @@ describe('FloatingPanel sensitive disclosure', () => {
     const fillSensitive = vi.fn();
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 1,
+          unknown: 0,
+          total: 1,
+        }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="locked"
         siteHost="jobs.example.test"
@@ -102,7 +120,13 @@ describe('FloatingPanel sensitive disclosure', () => {
   it('shows an unlock error without exposing sensitive values', () => {
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 1,
+          unknown: 0,
+          total: 1,
+        }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="locked"
         sensitiveError="Could not unlock the vault."
@@ -112,14 +136,22 @@ describe('FloatingPanel sensitive disclosure', () => {
     );
 
     openSensitive();
-    expect(screen.getByRole('alert').textContent).toBe('Could not unlock the vault.');
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Could not unlock the vault.',
+    );
   });
 
   it('requires a separate site-specific approval before sensitive fill', () => {
     const fillSensitive = vi.fn();
     render(
       <FloatingPanel
-        summary={{ ready: 0, needsReview: 0, sensitive: 1, unknown: 0, total: 1 }}
+        summary={{
+          ready: 0,
+          needsReview: 0,
+          sensitive: 1,
+          unknown: 0,
+          total: 1,
+        }}
         sensitiveItems={[sensitiveItem()]}
         vaultStatus="unlocked"
         siteHost="jobs.example.test"

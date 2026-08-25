@@ -256,7 +256,11 @@ export function parseCvText(text: string): CvImportDraft {
   const urls = joined.match(urlPattern) ?? [];
   const name = inferName(nonEmpty);
   const headline = inferHeadline(nonEmpty, name);
-  const summary = sections.summary.map(cleanBullet).filter(Boolean).slice(0, 4).join(' ');
+  const summary = sections.summary
+    .map(cleanBullet)
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(' ');
   const skills = parseSkills(sections.skills);
   const experiences = parseExperience(sections.experience);
   const education = parseEducation(sections.education);
@@ -313,13 +317,7 @@ export function parseCvText(text: string): CvImportDraft {
     );
   }
   if (skills.length > 0) {
-    addValue(
-      values,
-      'skills',
-      'Skills',
-      skills.join(', '),
-      'skills section',
-    );
+    addValue(values, 'skills', 'Skills', skills.join(', '), 'skills section');
   }
 
   return {
@@ -375,7 +373,9 @@ export function createCvImportPreview(
     const current = currentValue(profile, value.key);
     const normalizedCurrent = compact(current).toLowerCase();
     const normalizedExtracted = compact(value.value).toLowerCase();
-    const structured = ['experiences', 'education', 'skills'].includes(value.key);
+    const structured = ['experiences', 'education', 'skills'].includes(
+      value.key,
+    );
     return {
       key: value.key,
       label: value.label,
@@ -399,7 +399,10 @@ function replacePrimaryContact(
 ): StoredProfileEnvelope['baseProfile']['contact']['emails'] {
   const index = items.findIndex((item) => item.primary);
   if (index < 0) {
-    return [{ id: idFactory(), label: 'Primary', value, primary: true }, ...items];
+    return [
+      { id: idFactory(), label: 'Primary', value, primary: true },
+      ...items,
+    ];
   }
   return items.map((item, itemIndex) =>
     itemIndex === index ? { ...item, value } : item,
@@ -409,7 +412,8 @@ function replacePrimaryContact(
 function applyName(profile: StoredProfileEnvelope, value: string): void {
   const parts = compact(value).split(' ').filter(Boolean);
   profile.baseProfile.personal.legalName.first = parts[0] ?? '';
-  profile.baseProfile.personal.legalName.last = parts.length > 1 ? (parts.at(-1) ?? '') : '';
+  profile.baseProfile.personal.legalName.last =
+    parts.length > 1 ? (parts.at(-1) ?? '') : '';
   profile.baseProfile.personal.legalName.middle =
     parts.length > 2 ? parts.slice(1, -1).join(' ') : '';
 }
@@ -444,23 +448,28 @@ export function applyCvImport(
       idFactory,
     );
   }
-  if (selected.has('linkedin')) next.baseProfile.links.linkedin = byKey.get('linkedin') ?? '';
-  if (selected.has('github')) next.baseProfile.links.github = byKey.get('github') ?? '';
-  if (selected.has('portfolio')) next.baseProfile.links.portfolio = byKey.get('portfolio') ?? '';
+  if (selected.has('linkedin'))
+    next.baseProfile.links.linkedin = byKey.get('linkedin') ?? '';
+  if (selected.has('github'))
+    next.baseProfile.links.github = byKey.get('github') ?? '';
+  if (selected.has('portfolio'))
+    next.baseProfile.links.portfolio = byKey.get('portfolio') ?? '';
 
   if (selected.has('experiences')) {
-    next.baseProfile.professional.experiences = draft.experiences.map((item) => ({
-      id: idFactory(),
-      company: item.company,
-      title: item.title,
-      employmentType: '',
-      location: item.location,
-      startDate: item.startDate,
-      endDate: item.endDate,
-      current: item.current,
-      description: item.description,
-      achievements: [],
-    }));
+    next.baseProfile.professional.experiences = draft.experiences.map(
+      (item) => ({
+        id: idFactory(),
+        company: item.company,
+        title: item.title,
+        employmentType: '',
+        location: item.location,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        current: item.current,
+        description: item.description,
+        achievements: [],
+      }),
+    );
   }
 
   if (selected.has('education')) {

@@ -21,7 +21,9 @@ export default function App() {
       <div className="workspace-topbar">
         <div className="workspace-topbar__inner">
           <div className="workspace-brand">
-            <span className="workspace-brand__mark" aria-hidden="true">F</span>
+            <span className="workspace-brand__mark" aria-hidden="true">
+              F
+            </span>
             <span>Fillio</span>
           </div>
           <span className="workspace-topbar__meta">Local career workspace</span>
@@ -36,11 +38,15 @@ export default function App() {
             <p className="workspace-kicker">Career data workspace</p>
             <h1>Keep application data ready before the form asks for it.</h1>
             <p className="workspace-hero__copy">
-              Edit one reusable profile, import reviewed data from your CV, and keep documents on this browser for explicit attachment.
+              Edit one reusable profile, import reviewed data from your CV, and
+              keep documents on this browser for explicit attachment.
             </p>
           </div>
           <div className="workspace-hero__aside">
-            <p>One page, no setup wizard. Fillio never submits an application or attaches a file without your action.</p>
+            <p>
+              One page, no setup wizard. Fillio never submits an application or
+              attaches a file without your action.
+            </p>
           </div>
         </div>
       </header>

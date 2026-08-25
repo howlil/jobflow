@@ -97,7 +97,9 @@ try {
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await expect(page.getByText('Profile readiness')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Import from CV' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Import from CV' }),
+  ).toBeVisible();
   await expect(page.getByText('Career data workspace')).toBeVisible();
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
   await capture(page, 'options-tablet.png', { width: 1024, height: 900 });
@@ -109,7 +111,10 @@ try {
   const launcher = page.getByRole('button', { name: 'Open Fillio' });
   await expect(launcher).toBeVisible();
   await expect(page.getByText('Sensitive fields detected')).toHaveCount(0);
-  await capture(page, 'floating-launcher-desktop.png', { width: 1440, height: 1000 });
+  await capture(page, 'floating-launcher-desktop.png', {
+    width: 1440,
+    height: 1000,
+  });
 
   await launcher.click();
   await expect(page.getByText('Sensitive')).toBeVisible();
@@ -117,7 +122,10 @@ try {
   await expect(page.getByText('Sensitive fields detected')).toBeVisible();
   await expect(page.getByText('Date of birth')).toBeVisible();
   await expect(page.getByText('National ID')).toBeVisible();
-  await capture(page, 'floating-panel-desktop.png', { width: 1440, height: 1000 });
+  await capture(page, 'floating-panel-desktop.png', {
+    width: 1440,
+    height: 1000,
+  });
 
   await page.getByRole('button', { name: 'Close Fillio' }).first().click();
   await page.setViewportSize({ width: 390, height: 844 });

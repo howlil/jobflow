@@ -15,7 +15,9 @@ function encodeBase64(bytes: Uint8Array): string {
 
 export function createDocumentBroker(repository: DocumentBlobRepository) {
   return {
-    async handle(message: unknown): Promise<GetDocumentFileResponse | undefined> {
+    async handle(
+      message: unknown,
+    ): Promise<GetDocumentFileResponse | undefined> {
       if (!isGetDocumentFileMessage(message)) return undefined;
       try {
         const stored = await repository.get(message.documentId);

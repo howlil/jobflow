@@ -13,8 +13,12 @@ const items = [
 ] as const;
 
 function scrollToHeading(text: string): void {
-  const headings = Array.from(document.querySelectorAll<HTMLElement>('h1, h2, h3'));
-  const heading = headings.find((candidate) => candidate.textContent?.trim() === text);
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>('h1, h2, h3'),
+  );
+  const heading = headings.find(
+    (candidate) => candidate.textContent?.trim() === text,
+  );
   (heading?.closest('.profile-section') ?? heading)?.scrollIntoView({
     behavior: 'smooth',
     block: 'start',
@@ -23,7 +27,10 @@ function scrollToHeading(text: string): void {
 
 export function WorkspaceNavigation() {
   return (
-    <div className="workspace-nav-wrap" aria-label="Career workspace navigation">
+    <div
+      className="workspace-nav-wrap"
+      aria-label="Career workspace navigation"
+    >
       <nav className="workspace-nav">
         {items.map((item) => (
           <button

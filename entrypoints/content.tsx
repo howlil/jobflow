@@ -82,7 +82,8 @@ function documentForIntent(
 ): DocumentMetadata | null {
   if (intent === 'resume') return recommended.resume;
   if (intent === 'cover_letter') return recommended.coverLetter;
-  if (intent === 'transcript') return baseProfile.documents.transcripts[0] ?? null;
+  if (intent === 'transcript')
+    return baseProfile.documents.transcripts[0] ?? null;
   if (intent === 'certificate') {
     return baseProfile.documents.certificates[0] ?? null;
   }

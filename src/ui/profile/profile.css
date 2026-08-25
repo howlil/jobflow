@@ -333,7 +333,11 @@ textarea {
 }
 
 .profile-section > [role='status'] {
-  border-color: color-mix(in srgb, var(--fillio-color-success) 28%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--fillio-color-success) 28%,
+    transparent
+  );
   background: var(--fillio-color-success-bg);
   color: var(--fillio-color-success);
 }
@@ -364,7 +368,8 @@ textarea {
 .profile-page input:focus-visible,
 .profile-page select:focus-visible,
 .profile-page textarea:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--fillio-color-focus) 26%, transparent);
+  outline: 3px solid
+    color-mix(in srgb, var(--fillio-color-focus) 26%, transparent);
   outline-offset: 2px;
 }
 

@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createEmptyStoredProfile } from './create-empty-profile';
-import {
-  applyCvImport,
-  createCvImportPreview,
-  parseCvText,
-} from './cv-import';
+import { applyCvImport, createCvImportPreview, parseCvText } from './cv-import';
 
 describe('CV import', () => {
   const text = `

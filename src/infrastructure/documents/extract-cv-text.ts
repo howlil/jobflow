@@ -29,7 +29,9 @@ export function isSupportedCvFile(file: Pick<File, 'name' | 'type'>): boolean {
 async function extractPdf(file: File): Promise<string> {
   const pdfjs = await import('pdfjs-dist');
   pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-  const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
+  const task = pdfjs.getDocument({
+    data: new Uint8Array(await file.arrayBuffer()),
+  });
   const pdf = await task.promise;
   const pages: string[] = [];
 
@@ -52,7 +54,9 @@ async function extractPdf(file: File): Promise<string> {
 
 async function extractDocx(file: File): Promise<string> {
   const mammoth = await import('mammoth');
-  const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+  const result = await mammoth.extractRawText({
+    arrayBuffer: await file.arrayBuffer(),
+  });
   return result.value.trim();
 }
 
@@ -78,11 +82,13 @@ export async function extractCvText(file: File): Promise<CvTextExtraction> {
     extension === 'docx'
   ) {
     const text = await extractDocx(file);
-    if (text.length < 20) throw new Error('This DOCX does not contain enough text to import.');
+    if (text.length < 20)
+      throw new Error('This DOCX does not contain enough text to import.');
     return { text, format: 'docx' };
   }
 
   const text = (await file.text()).trim();
-  if (text.length < 20) throw new Error('This text CV does not contain enough content to import.');
+  if (text.length < 20)
+    throw new Error('This text CV does not contain enough content to import.');
   return { text, format: 'text' };
 }

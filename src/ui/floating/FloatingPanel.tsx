@@ -132,11 +132,22 @@ export function FloatingPanel({
 
           {view === 'home' ? (
             <>
-              <div className="fillio-panel__summary" aria-label="Form analysis summary">
-                <span><strong>{summary.ready}</strong> Ready</span>
-                <span><strong>{summary.needsReview}</strong> Review</span>
-                <span><strong>{summary.sensitive}</strong> Sensitive</span>
-                <span><strong>{summary.unknown}</strong> Unknown</span>
+              <div
+                className="fillio-panel__summary"
+                aria-label="Form analysis summary"
+              >
+                <span>
+                  <strong>{summary.ready}</strong> Ready
+                </span>
+                <span>
+                  <strong>{summary.needsReview}</strong> Review
+                </span>
+                <span>
+                  <strong>{summary.sensitive}</strong> Sensitive
+                </span>
+                <span>
+                  <strong>{summary.unknown}</strong> Unknown
+                </span>
               </div>
 
               <button
@@ -149,15 +160,23 @@ export function FloatingPanel({
               </button>
 
               {attachableDocuments.length > 0 ? (
-                <section className="fillio-panel__documents" aria-label="Detected document fields">
+                <section
+                  className="fillio-panel__documents"
+                  aria-label="Detected document fields"
+                >
                   <p className="fillio-panel__section-label">Documents</p>
                   {attachableDocuments.map((item) => (
-                    <div className="fillio-panel__document" key={item.fieldFingerprint}>
+                    <div
+                      className="fillio-panel__document"
+                      key={item.fieldFingerprint}
+                    >
                       <div className="fillio-panel__document-copy">
                         <strong>{intentLabel(item.intent)}</strong>
                         <span>{item.recommendedDocument?.fileName}</span>
                         {documentStatus[item.fieldFingerprint] ? (
-                          <small role="status">{documentStatus[item.fieldFingerprint]}</small>
+                          <small role="status">
+                            {documentStatus[item.fieldFingerprint]}
+                          </small>
                         ) : null}
                       </div>
                       <button
@@ -200,8 +219,15 @@ export function FloatingPanel({
           ) : null}
 
           {view === 'review' ? (
-            <section className="fillio-panel__detail" aria-label="Fields needing review">
-              <button className="fillio-panel__back" type="button" onClick={() => setView('home')}>
+            <section
+              className="fillio-panel__detail"
+              aria-label="Fields needing review"
+            >
+              <button
+                className="fillio-panel__back"
+                type="button"
+                onClick={() => setView('home')}
+              >
                 ← Back
               </button>
               <div>
@@ -212,7 +238,10 @@ export function FloatingPanel({
                 if (item.match.status !== 'review') return null;
                 const label = fieldLabel(item.context);
                 return (
-                  <div className="fillio-panel__review" key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}>
+                  <div
+                    className="fillio-panel__review"
+                    key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+                  >
                     <strong>{label}</strong>
                     <div className="fillio-panel__review-actions">
                       {item.match.candidates.map((candidate) => (
@@ -221,7 +250,9 @@ export function FloatingPanel({
                           type="button"
                           key={candidate.field}
                           aria-label={`Use ${candidate.field} for ${label}`}
-                          onClick={() => onRemember?.(item.context, candidate.field)}
+                          onClick={() =>
+                            onRemember?.(item.context, candidate.field)
+                          }
                         >
                           {candidate.field}
                         </button>
@@ -242,8 +273,15 @@ export function FloatingPanel({
           ) : null}
 
           {view === 'sensitive' ? (
-            <section className="fillio-panel__detail" aria-label="Sensitive fields requiring approval">
-              <button className="fillio-panel__back" type="button" onClick={() => setView('home')}>
+            <section
+              className="fillio-panel__detail"
+              aria-label="Sensitive fields requiring approval"
+            >
+              <button
+                className="fillio-panel__back"
+                type="button"
+                onClick={() => setView('home')}
+              >
                 ← Back
               </button>
               <div>
@@ -252,7 +290,9 @@ export function FloatingPanel({
               </div>
               <ul className="fillio-panel__sensitive-list">
                 {sensitiveItems.map((item) => (
-                  <li key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}>
+                  <li
+                    key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+                  >
                     {fieldLabel(item.context)}
                   </li>
                 ))}
@@ -263,7 +303,11 @@ export function FloatingPanel({
                 </p>
               ) : null}
               {vaultStatus === 'not-configured' ? (
-                <button className="fillio-panel__action fillio-panel__action--primary" type="button" onClick={onOpenOptions}>
+                <button
+                  className="fillio-panel__action fillio-panel__action--primary"
+                  type="button"
+                  onClick={onOpenOptions}
+                >
                   Set up vault
                 </button>
               ) : vaultStatus === 'locked' ? (
@@ -305,9 +349,14 @@ export function FloatingPanel({
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
-        <span className="fillio-launcher__mark" aria-hidden="true">F</span>
+        <span className="fillio-launcher__mark" aria-hidden="true">
+          F
+        </span>
         {attentionCount > 0 && !isOpen ? (
-          <span className="fillio-launcher__badge" aria-label={`${attentionCount} items need attention`}>
+          <span
+            className="fillio-launcher__badge"
+            aria-label={`${attentionCount} items need attention`}
+          >
             {attentionCount > 9 ? '9+' : attentionCount}
           </span>
         ) : null}

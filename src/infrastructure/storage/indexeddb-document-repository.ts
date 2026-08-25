@@ -18,7 +18,8 @@ type DocumentRecord = {
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-    request.onerror = () => reject(request.error ?? new Error('Could not open document storage.'));
+    request.onerror = () =>
+      reject(request.error ?? new Error('Could not open document storage.'));
     request.onupgradeneeded = () => {
       const database = request.result;
       if (!database.objectStoreNames.contains(STORE_NAME)) {
@@ -38,9 +39,13 @@ async function runTransaction<T>(
     const transaction = database.transaction(STORE_NAME, mode);
     const request = operation(transaction.objectStore(STORE_NAME));
 
-    request.onerror = () => reject(request.error ?? new Error('Document storage request failed.'));
+    request.onerror = () =>
+      reject(request.error ?? new Error('Document storage request failed.'));
     request.onsuccess = () => resolve(request.result);
-    transaction.onabort = () => reject(transaction.error ?? new Error('Document storage transaction aborted.'));
+    transaction.onabort = () =>
+      reject(
+        transaction.error ?? new Error('Document storage transaction aborted.'),
+      );
     transaction.oncomplete = () => database.close();
   });
 }
