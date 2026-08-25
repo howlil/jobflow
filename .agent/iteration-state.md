@@ -6,8 +6,11 @@ This file is the single current-state tracker for Fillio.
 
 - Iteration 15 is integrated on `master` at `9bb2080687ddb345f14805942758b8b74e834f68`.
 - Post-Iteration-15 workspace/navigation refinements are integrated on `master` at `e7ab8d5b26442bdeee5fdb1942157e6e8e40ea7d`.
-- No Iteration 16 is open. The next product iteration must start from a concrete user, compatibility, reliability, or release-readiness problem rather than speculative scope.
-- Browser E2E remains outstanding before release readiness can be claimed.
+- Iteration 16 — MyPaas design-system convergence is active on `feat/iteration-16-mypaas-design-system`.
+- The active slice aligns Fillio's tokens and career-workspace visual grammar with `howlil/MyPaas` without changing runtime behavior or safety boundaries.
+- React/WXT remains the UI runtime for Iteration 16. Svelte migration is explicitly not part of this iteration because no measured runtime, bundle, or maintainability problem currently justifies a framework rewrite.
+- Tailwind is also deferred for this iteration. The transferable MyPaas design rules are being extracted into Fillio's existing token/primitive CSS layer first; Tailwind requires separate evidence that utility composition would materially improve maintainability.
+- Browser visual/E2E verification is required before Iteration 16 is marked complete.
 - Chrome Web Store publishing and a tagged release remain explicit future release actions.
 
 ## Locked product boundaries
@@ -47,20 +50,40 @@ Delivered:
 - profile state preserved across workspace section changes
 - explicit workspace opening through the extension background runtime
 
-## Iteration 15 — Surface refactor
+## Iteration 16 — MyPaas design-system convergence
 
-Status: completed and integrated.
+Status: active.
 
-Integrated behavior:
+Problem being solved:
 
-- career workspace opens as a normal full browser tab rather than a constrained embedded options dialog
-- collapsed assistant is docked to the right viewport edge
-- expanded assistant is a fixed top-to-bottom right slide panel over the current job page
-- workspace removes duplicated marketing hierarchy
-- visual system is compact, monochrome, utility-first, and uses fewer pills/cards
-- existing fill, document, correction, and sensitive-data safety boundaries remain unchanged
+- the current career workspace under-uses wide screens
+- the navigation rail reads as a detached card instead of application chrome
+- spacing, surfaces, controls, and hierarchy are not yet driven by one consistent primitive grammar
+- the supplied MyPaas frontend provides a concrete visual reference for a denser, flatter production UI
 
-Fast deterministic merge gates were observed as passed for the Iteration 15 merge:
+Implemented on the active branch so far:
+
+- MyPaas-derived neutral palette: `#fafafa` background, white surfaces, neutral-200 borders, neutral-900 ink
+- 6–8px surface/control radii and restrained elevation
+- responsive wide page shell with compact gutters
+- integrated left navigation rail with flat active-state treatment
+- denser typography, buttons, fields, readiness surface, editable sections, record cards, and document dropzones
+- coarse-pointer 44px target preservation and visible keyboard focus behavior
+- no storage, permission, autofill, vault, messaging, document, or security behavior changes
+
+Framework decision:
+
+- keep React/WXT for this iteration
+- do not rewrite the component tree to Svelte for stylistic reasons
+- reconsider Svelte only if measured bundle/startup/runtime cost or component-maintenance evidence establishes a concrete problem
+
+Styling-tool decision:
+
+- do not add Tailwind in the same change as the visual migration
+- first converge tokens/primitives and prove the visual system
+- reconsider Tailwind separately if repeated utility composition becomes a demonstrated maintenance cost
+
+Required verification before completion:
 
 ```text
 pnpm install --frozen-lockfile
@@ -73,24 +96,7 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Browser E2E was explicitly deferred/non-blocking for the development merge and remains required before release readiness is claimed.
-
-## Post-Iteration-15 refinement
-
-Status: integrated on `master`.
-
-The workspace was refined without opening a new product iteration:
-
-- continuous-page anchor navigation was replaced with non-linear section navigation
-- desktop uses a sticky left navigation rail
-- mobile uses a compact section selector
-- one workspace category is visible at a time without wizard semantics
-- unsaved profile state remains mounted across category changes
-- document, correction, and backup surfaces render only in their relevant workspace sections
-- popup/content-script workspace actions open the workspace through the background runtime
-- visual acceptance/E2E fixtures were adjusted to the current surface model
-
-These changes are refinements of the Iteration 15 surface model, not evidence of a separate Iteration 16.
+Browser visual/E2E validation must also inspect the current options workspace on desktop and mobile before the iteration is marked complete.
 
 ## Release-readiness gap
 
@@ -114,4 +120,4 @@ A tagged release or Chrome Web Store publishing remains a separate explicit acti
 
 ## Next-state rule
 
-Prioritize real application use, browser E2E, recorded compatibility failures, and trusted-beta feedback before adding another feature iteration. Open Iteration 16 only when there is a concrete problem and explicit acceptance criteria. Do not add automatic submission, automatic attachment, backend sync, AI, or ATS-specific adapters without new evidence and an explicit scope decision.
+Finish Iteration 16 visual verification and integration before opening another UI refactor. After integration, prioritize real application use, compatibility failures, and trusted-beta feedback. Do not add automatic submission, automatic attachment, backend sync, AI, ATS-specific adapters, Svelte, or Tailwind without concrete evidence and an explicit scope decision.
