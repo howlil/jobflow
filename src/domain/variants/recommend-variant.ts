@@ -1,4 +1,8 @@
-import type { ApplicationVariant } from '../profile/profile-schema';
+import type {
+  ApplicationVariant,
+  BaseProfile,
+} from '../profile/profile-schema';
+import { extractJobContext, normalizeJobText } from './job-context';
 
 export type VariantRecommendation = {
   variantId: string | null;
@@ -7,9 +11,7 @@ export type VariantRecommendation = {
 };
 
 function normalize(value: string): string[] {
-  return value
-    .toLocaleLowerCase('en-US')
-    .replace(/[^a-z0-9+#.]+/g, ' ')
+  return normalizeJobText(value)
     .split(/\s+/)
     .map((token) => token.trim())
     .filter((token) => token.length >= 2);
@@ -27,21 +29,75 @@ function variantKeywords(variant: ApplicationVariant): string[] {
   );
 }
 
+function profileSkillNameById(baseProfile: BaseProfile | undefined) {
+  return new Map(
+    (baseProfile?.professional.skills ?? []).map((skill) => [
+      skill.id,
+      skill.name,
+    ]),
+  );
+}
+
 export function recommendApplicationVariant(
   variants: ApplicationVariant[],
   pageSignals: string[],
   defaultVariantId: string | null,
+  baseProfile?: BaseProfile,
 ): VariantRecommendation {
   if (variants.length === 0) {
     return { variantId: null, score: 0, evidence: [] };
   }
 
-  const signalTokens = new Set(pageSignals.flatMap(normalize));
+  const skillNameById = profileSkillNameById(baseProfile);
+  const candidateSkills = [...skillNameById.values()];
+  const pageContext = extractJobContext(pageSignals, candidateSkills);
+  const signalTokens = new Set(pageContext.tokens);
+  const pageSkills = new Set(pageContext.skills);
+  const pageDomains = new Set(pageContext.domains);
+
   const scored = variants.map((variant) => {
-    const keywords = variantKeywords(variant);
-    const evidence = keywords.filter((keyword) => signalTokens.has(keyword));
-    const score = keywords.length === 0 ? 0 : evidence.length / keywords.length;
-    return { variantId: variant.id, score, evidence };
+    const evidence: string[] = [];
+    let score = 0;
+
+    for (const keyword of variantKeywords(variant)) {
+      if (!signalTokens.has(keyword)) continue;
+      score += 5;
+      evidence.push(keyword);
+    }
+
+    for (const skillId of variant.emphasizedSkillIds ?? []) {
+      const skillName = skillNameById.get(skillId);
+      if (skillName === undefined) continue;
+      const normalizedSkill = normalizeJobText(skillName);
+      if (normalizedSkill !== '' && pageSkills.has(normalizedSkill)) {
+        score += 4;
+        evidence.push(`skill:${normalizedSkill}`);
+      }
+    }
+
+    const variantContext = extractJobContext([
+      variant.name,
+      ...variant.targetRoles,
+    ]);
+    if (
+      variantContext.seniority !== null &&
+      variantContext.seniority === pageContext.seniority
+    ) {
+      score += 3;
+      evidence.push(`seniority:${variantContext.seniority}`);
+    }
+
+    for (const domain of variantContext.domains) {
+      if (!pageDomains.has(domain)) continue;
+      score += 2;
+      evidence.push(`domain:${domain}`);
+    }
+
+    return {
+      variantId: variant.id,
+      score,
+      evidence: unique(evidence),
+    };
   });
 
   scored.sort((left, right) => {
