@@ -160,11 +160,11 @@ try {
   await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
   await page.getByLabel('Last name').fill('Tester');
-  await page.getByLabel('City').fill('Padang');
 
   await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await page.getByLabel('Primary email').fill('smoke@example.com');
   await page.getByLabel('Primary phone').fill('+628123456789');
+  await page.getByLabel('City').fill('Padang');
 
   await page.getByRole('button', { name: 'Links', exact: true }).click();
   await page.getByLabel('LinkedIn').fill('https://linkedin.com/in/smoke');
@@ -195,6 +195,7 @@ try {
 
   await page.goto(fixture.url);
   await expect(page.locator('fillio-form-assistant')).toBeAttached();
+  await page.getByRole('button', { name: 'Open Fillio' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 7 ready fields' }),
   ).toBeVisible();

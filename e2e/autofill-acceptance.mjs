@@ -35,12 +35,9 @@ const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i3-'));
 let context;
 
 async function expectReviewCount(page, count) {
-  const reviewChip = page
-    .getByLabel('Form analysis summary')
-    .locator('.fillio-chip')
-    .filter({ hasText: 'Review' });
-
-  await expect(reviewChip).toHaveText(new RegExp(`^Review\\s*${count}$`));
+  await expect(page.getByLabel('Fillio assistant menu')).toContainText(
+    new RegExp(`${count}\\s+review`),
+  );
 }
 
 try {
@@ -59,16 +56,21 @@ try {
   const page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
+  await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await page.getByLabel('Primary email').fill('smoke@example.com');
   await page.getByRole('button', { name: 'Save profile' }).click();
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
 
   await page.goto(fixtureUrl);
+  await page.getByRole('button', { name: 'Open Fillio' }).click();
   await expectReviewCount(page, 1);
+  await page.getByRole('button', { name: /Review ambiguous fields/i }).click();
   await page
     .getByRole('button', { name: 'Use personal.legalName.first for Name' })
     .click();
+  await page.getByRole('button', { name: 'Back' }).click();
   await expect(page.getByLabel('Name', { exact: true })).toHaveValue('');
   await expect(
     page.getByRole('button', { name: 'Fill 3 ready fields' }),
@@ -96,6 +98,7 @@ try {
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
 
   await page.reload();
+  await page.getByRole('button', { name: 'Open Fillio' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 3 ready fields' }),
   ).toBeVisible();

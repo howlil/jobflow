@@ -108,8 +108,11 @@ try {
   const page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Vault');
+  await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await page.getByLabel('Primary email').fill('vault@example.com');
+  await page.getByRole('button', { name: 'Sensitive', exact: true }).click();
   await expect(page.getByText('Vault not set up')).toBeVisible();
   await expect(page.getByLabel('Birth date')).toHaveCount(0);
   await page.getByLabel('New vault passphrase').fill('local-passphrase');
@@ -137,6 +140,7 @@ try {
   await expect(page.getByLabel('Vault passphrase')).toBeVisible();
 
   await page.goto(fixture.url);
+  await page.getByRole('button', { name: 'Open Fillio' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 2 ready fields' }),
   ).toBeVisible();
@@ -147,6 +151,7 @@ try {
   await expect(page.getByLabel('NIK')).toHaveValue('');
   await expect(page.getByLabel('Expected salary')).toHaveValue('');
 
+  await page.getByRole('button', { name: /Sensitive fields/i }).click();
   await expect(page.getByLabel('Vault passphrase')).toBeVisible();
   await page.getByLabel('Vault passphrase').fill('wrong-passphrase');
   await page.getByRole('button', { name: 'Unlock vault' }).click();
@@ -174,6 +179,7 @@ try {
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+  await page.getByRole('button', { name: 'Sensitive', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Reset vault' })).toBeVisible();
   await page.getByRole('button', { name: 'Reset vault' }).click();
   await page.getByRole('button', { name: 'Delete encrypted vault' }).click();

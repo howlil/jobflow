@@ -21,14 +21,14 @@ Load only when the change touches the concern:
 
 ## Devland semantic layers
 
-| Layer | Fillio source |
-| --- | --- |
-| Project | `.agent/requirements.md` |
-| Architecture | `.agent/system-design.md` |
+| Layer              | Fillio source                                                                   |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Project            | `.agent/requirements.md`                                                        |
+| Architecture       | `.agent/system-design.md`                                                       |
 | Engineering policy | `.agent/rules.md`, `code-patterns.md`, `git-strategy.md`, `release-strategy.md` |
-| Profiles | `.agent/skills/` |
-| Work state | `.agent/iteration-state.md` |
-| Agent adapter | `AGENTS.md` |
+| Profiles           | `.agent/skills/`                                                                |
+| Work state         | `.agent/iteration-state.md`                                                     |
+| Agent adapter      | `AGENTS.md`                                                                     |
 
 The universal unit of delivery is a **logical change/work item**. An iteration is an optional planning label, not a branch type, release train, or reason to batch unrelated work.
 
