@@ -35,6 +35,16 @@ function initialSelection(preview: CvImportPreviewItem[]): Set<CvImportKey> {
   );
 }
 
+function metadataForFile(file: File, id: string): DocumentMetadata {
+  return {
+    id,
+    label: file.name.replace(/\.[^.]+$/, '') || 'Resume',
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    lastKnownModified: file.lastModified,
+  };
+}
+
 type CvImportSectionProps = {
   profileRepository: ProfileRepository;
   documentRepository: DocumentBlobRepository;
@@ -144,18 +154,48 @@ export function CvImportSection({
     }
   }
 
+  async function importSelectedAndSaveCv() {
+    if (
+      profile === null ||
+      draft === null ||
+      file === null ||
+      selected.size === 0
+    )
+      return;
+    setBusy(true);
+    setError(null);
+    const id = globalThis.crypto.randomUUID();
+    const metadata = metadataForFile(file, id);
+
+    try {
+      await documentRepository.save(id, file);
+      const next = applyCvImport(profile, draft, selected, () =>
+        globalThis.crypto.randomUUID(),
+      );
+      next.baseProfile.documents.resumes.push(metadata);
+      next.metadata.updatedAt = new Date().toISOString();
+      await profileRepository.save(next);
+      setProfile(next);
+      setMessage(
+        `Imported ${selected.size} reviewed profile groups and stored ${file.name}.`,
+      );
+      onProfileChanged?.();
+    } catch {
+      await documentRepository.remove(id).catch(() => undefined);
+      setError(
+        'Could not import the selected CV data and file. Your existing profile was left unchanged.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function saveCvToLibrary() {
     if (profile === null || file === null) return;
     setBusy(true);
     setError(null);
     const id = globalThis.crypto.randomUUID();
-    const metadata: DocumentMetadata = {
-      id,
-      label: file.name.replace(/\.[^.]+$/, '') || 'Resume',
-      fileName: file.name,
-      mimeType: file.type || 'application/octet-stream',
-      lastKnownModified: file.lastModified,
-    };
+    const metadata = metadataForFile(file, id);
 
     try {
       await documentRepository.save(id, file);
@@ -378,6 +418,14 @@ export function CvImportSection({
             <div className="button-row" style={{ marginTop: 16 }}>
               <button
                 className="fillio-button fillio-button-accent"
+                type="button"
+                disabled={busy || selected.size === 0 || file === null}
+                onClick={() => void importSelectedAndSaveCv()}
+              >
+                Import data and save CV
+              </button>
+              <button
+                className="fillio-button"
                 type="button"
                 disabled={busy || selected.size === 0}
                 onClick={() => void applySelected()}

@@ -109,12 +109,34 @@ try {
   await expect(page.getByText('Maya Putri')).toBeVisible();
   await expect(page.getByText(/Go, PostgreSQL, Redis/)).toBeVisible();
 
-  await page.getByRole('button', { name: 'Save CV locally' }).click();
+  await page.getByRole('button', { name: 'Import data and save CV' }).click();
   await expect(
     page.getByText(
-      'backend-cv.txt is stored locally and can be attached from Fillio.',
+      /Imported .* reviewed profile groups and stored backend-cv\.txt/i,
     ),
   ).toBeVisible();
+  await expect(
+    page.locator('.document-row').getByText('backend-cv.txt'),
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Personal' }).click();
+  await expect(page.getByLabel('First name')).toHaveValue('Maya');
+  await expect(page.getByLabel('Last name')).toHaveValue('Putri');
+  await expect(page.getByLabel('Professional headline')).toHaveValue(
+    'Backend Software Engineer',
+  );
+
+  await page.getByRole('button', { name: 'Contact' }).click();
+  await expect(page.getByLabel('Primary email')).toHaveValue(
+    'maya@example.com',
+  );
+
+  await page.getByRole('button', { name: 'Skills' }).click();
+  await expect(page.locator('input[value="Go"]')).toBeVisible();
+  await expect(page.locator('input[value="PostgreSQL"]')).toBeVisible();
+  await expect(page.locator('input[value="Redis"]')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Documents' }).click();
   await expect(
     page.locator('.document-row').getByText('backend-cv.txt'),
   ).toBeVisible();
