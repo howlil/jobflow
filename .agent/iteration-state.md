@@ -19,14 +19,17 @@ Outcome:
 - converge options/profile/popup on the reusable React + Tailwind design system
 - remove superseded CSS paths instead of preserving parallel styling systems
 - preserve current storage, autofill, vault, document, permission, privacy, and explicit-user-action behavior
+- use `tailwind.config.ts` and `src/ui/design-system/tailwind.css` as the canonical document-level styling source for options/profile and popup surfaces
+- keep the content-script assistant isolated in Shadow DOM unless a separate Shadow-DOM-specific Tailwind delivery mechanism is implemented and verified
 
 Before merge:
 
 - finish the current UI outcome only; do not add adjacent product scope
-- remove the remaining no-op `src/ui/profile/profile.css` shim/import once rebased and verified
 - do not reintroduce `.agent/plans/iteration-16-mypaas-design-system.md` after the lean-delivery cleanup lands
 - require the current branch-head verification appropriate to the runtime/UI risk
 - squash merge, then delete the branch
+- inspect the current options workspace and popup on desktop/mobile where applicable before claiming visual completion
+- do not describe the product as release-ready until current browser E2E passes against the integrated behavior
 
 ## Delivery-system maintenance — PR #11
 

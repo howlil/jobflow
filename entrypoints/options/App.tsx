@@ -5,6 +5,7 @@ import { ChromeCorrectionRepository } from '../../src/infrastructure/storage/chr
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { IndexedDbDocumentRepository } from '../../src/infrastructure/storage/indexeddb-document-repository';
 import { CorrectionMemorySection } from '../../src/ui/corrections/CorrectionMemorySection';
+import { WorkspaceFrame } from '../../src/ui/design-system/WorkspaceFrame';
 import { BackupRecoveryInspector } from '../../src/ui/profile/BackupRecoveryInspector';
 import { CvImportSection } from '../../src/ui/profile/CvImportSection';
 import { ProfilePage } from '../../src/ui/profile/ProfilePage';
@@ -22,61 +23,47 @@ export default function App() {
   const [profileRevision, setProfileRevision] = useState(0);
   const refreshWorkspace = () => setProfileRevision((current) => current + 1);
 
+  const navigation = (
+    <WorkspaceNavigation
+      activeSection={activeSection}
+      onChange={setActiveSection}
+    />
+  );
+
   return (
-    <div className="workspace-shell">
-      <div className="workspace-topbar">
-        <div className="workspace-topbar__inner">
-          <div className="workspace-brand">
-            <span className="workspace-brand__mark" aria-hidden="true">
-              F
-            </span>
-            <span>Fillio</span>
-          </div>
-          <span className="workspace-topbar__meta">
-            Stored locally in this browser
-          </span>
-        </div>
-      </div>
-
-      <div className="workspace-layout">
-        <WorkspaceNavigation
+    <WorkspaceFrame navigation={navigation}>
+      {activeSection !== 'corrections' ? (
+        <ProfilePage
+          key={profileRevision}
+          repository={profileRepository}
+          vaultClient={vaultClient}
           activeSection={activeSection}
-          onChange={setActiveSection}
+          onSectionChange={setActiveSection}
         />
-        <div className="workspace-content">
-          {activeSection !== 'corrections' ? (
-            <ProfilePage
-              key={profileRevision}
-              repository={profileRepository}
-              vaultClient={vaultClient}
-              activeSection={activeSection}
-              onSectionChange={setActiveSection}
-            />
-          ) : null}
+      ) : null}
 
-          {activeSection === 'documents' ? (
-            <CvImportSection
-              profileRepository={profileRepository}
-              documentRepository={documentRepository}
-              onProfileChanged={refreshWorkspace}
-            />
-          ) : null}
+      {activeSection === 'documents' ? (
+        <CvImportSection
+          profileRepository={profileRepository}
+          documentRepository={documentRepository}
+          onProfileChanged={refreshWorkspace}
+        />
+      ) : null}
 
-          {activeSection === 'corrections' ? (
-            <div className="workspace-section-wrap" id="corrections">
-              <CorrectionMemorySection repository={correctionRepository} />
-            </div>
-          ) : null}
-          {activeSection === 'backup' ? (
-            <div className="workspace-section-wrap" id="backup-recovery">
-              <BackupRecoveryInspector
-                repository={profileRepository}
-                onRestored={refreshWorkspace}
-              />
-            </div>
-          ) : null}
+      {activeSection === 'corrections' ? (
+        <div className="w-full" id="corrections">
+          <CorrectionMemorySection repository={correctionRepository} />
         </div>
-      </div>
-    </div>
+      ) : null}
+
+      {activeSection === 'backup' ? (
+        <div className="w-full" id="backup-recovery">
+          <BackupRecoveryInspector
+            repository={profileRepository}
+            onRestored={refreshWorkspace}
+          />
+        </div>
+      ) : null}
+    </WorkspaceFrame>
   );
 }

@@ -156,13 +156,20 @@ try {
   let page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
   await page.getByLabel('Last name').fill('Tester');
+  await page.getByLabel('City').fill('Padang');
+
+  await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await page.getByLabel('Primary email').fill('smoke@example.com');
   await page.getByLabel('Primary phone').fill('+628123456789');
-  await page.getByLabel('City').fill('Padang');
+
+  await page.getByRole('button', { name: 'Links', exact: true }).click();
   await page.getByLabel('LinkedIn').fill('https://linkedin.com/in/smoke');
   await page.getByLabel('GitHub').fill('https://github.com/smoke');
+
   await page.getByRole('button', { name: 'Save profile' }).click();
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
 
@@ -174,8 +181,11 @@ try {
   page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await expect(page.getByLabel('First name')).toHaveValue('Smoke');
   await expect(page.getByLabel('Last name')).toHaveValue('Tester');
+
+  await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await expect(page.getByLabel('Primary email')).toHaveValue(
     'smoke@example.com',
   );

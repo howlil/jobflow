@@ -1,32 +1,28 @@
-# Fillio Design System
+# Fillio UI Design System
 
-The shared design system is intentionally small. `tokens.css` owns the visual
-values used by Fillio UI, while `primitives.css` provides reusable states for
-buttons, chips, status messages, section headings, and empty rows.
+The options/career-profile workspace uses **React + Tailwind**.
 
-## Tokens
+## Source of truth
 
-Use the `--fillio-*` custom properties instead of repeating shared values:
+- `tailwind.config.ts` — MyPaas-derived design tokens and theme values.
+- `src/ui/design-system/tailwind.css` — base rules and reusable component grammar.
+- `src/ui/design-system/WorkspaceFrame.tsx` — reusable options application shell.
+- React components may use Tailwind utilities directly when the composition is local to that component.
 
-- Colors: `bg`, `surface`, `surface-subtle`, `text`, `muted`, `border`,
-  `border-strong`, `focus`, `text-hover`, `danger`, `danger-bg`,
-  `danger-hover`, `success`, `success-bg`, `warning`, and `warning-bg`
-- Radius: `radius-sm`, `radius-md`, and `radius-lg`
-- Shadow: `shadow-panel`
-- Spacing: `space-1` through `space-8`
+## Visual grammar
 
-## Primitives
+The workspace intentionally follows the production UI grammar extracted from `howlil/MyPaas`:
 
-Apply `.fillio-button` to interactive buttons, then add one of
-`.fillio-button-primary`, `.fillio-button-secondary`, or
-`.fillio-button-danger` for the action hierarchy. Buttons keep a 40px minimum
-height, support disabled styling, and expose a visible `:focus-visible` ring.
+- neutral monochrome product chrome
+- `#fafafa` app background, white surfaces, `#f7f7f7` muted surfaces
+- `#e5e5e5` borders and `#171717` primary ink
+- 6–8px radii
+- flat surfaces and restrained elevation
+- dense controls with visible keyboard focus
+- 44px minimum target for coarse pointers
+- responsive wide page shell
+- semantic color only for actual status meaning
 
-Use `.fillio-chip` for compact labels and add `.fillio-chip-strong` when the
-label needs stronger emphasis. Use `.fillio-status` for inline feedback with
-`.fillio-status-success` or `.fillio-status-danger` for semantic states.
+Do not rebuild a parallel token/primitives CSS stack for the options workspace. Add or extend Tailwind theme/component rules instead.
 
-Use `.fillio-section-heading` for a heading and adjacent action, and
-`.fillio-empty-row` for compact empty modules. These classes are presentation
-primitives only; product behavior and data access remain in their owning UI
-components.
+Popup and content-script Shadow-DOM styling are separate surfaces and require surface-specific verification because global Tailwind utilities do not automatically cross Shadow DOM boundaries.
