@@ -46,7 +46,7 @@ LinkedIn URL / LinkedIn Profile -> links.linkedin
 Expected salary / Salary expectation -> application.compensation.expected
 ```
 
-Alias additions require positive and collision/negative fixtures.
+When an alias/rule changes deterministic matching behavior, protect the realistic intended or collision regression with the smallest high-signal fixture. Add a negative/collision case when there is a credible collision risk; do not add paired cases mechanically for test-count symmetry.
 
 ## Confidence
 
@@ -56,7 +56,7 @@ Product output uses:
 - Needs review
 - Unknown
 
-Internal numeric scores are implementation details and are not probabilities. Tune thresholds against fixture corpus, not intuition alone.
+Internal numeric scores are implementation details and are not probabilities. Tune thresholds against relevant fixture evidence, not intuition alone.
 
 ## Correction memory
 
@@ -84,4 +84,6 @@ Use deterministic job/page signals. Rank variants and include evidence. If score
 
 ## Verification
 
-Every matcher change should run against a small regression corpus containing English and Indonesian aliases, ambiguous labels, negative collisions, repeated records, and at least one dynamic/ATS-style fixture when relevant.
+Select the smallest relevant portion of the regression corpus for the changed rule/risk. Broaden only when the change affects shared matching policy or has a credible wider collision surface.
+
+Useful corpus dimensions include English/Indonesian aliases, ambiguous labels, negative collisions, repeated records, and dynamic/ATS-style fixtures. They are a coverage toolbox, not a mandatory checklist for every matcher edit.
