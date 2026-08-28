@@ -131,7 +131,6 @@ try {
     'Backend Software Engineer',
   );
 
-  await page.getByRole('button', { name: 'Contact' }).click();
   await expect(page.getByLabel('Primary email')).toHaveValue(
     'maya@example.com',
   );

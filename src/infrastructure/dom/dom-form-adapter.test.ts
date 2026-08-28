@@ -207,7 +207,7 @@ describe('DOM form adapter', () => {
       {
         fieldFingerprint: byName('available_from').fieldFingerprint,
         field: 'jobPreferences.availabilityDate',
-        value: '2026-09-01',
+        value: '01/09/2026',
         controlKind: 'input',
       },
     ];

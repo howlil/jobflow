@@ -4,10 +4,7 @@ import {
   FileText,
   GraduationCap,
   History,
-  Link,
-  LayoutDashboard,
   ListChecks,
-  Mail,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -17,10 +14,7 @@ import {
 import type { WorkspaceSection } from './workspace-sections';
 
 const items = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'personal', label: 'Personal', icon: UserRound },
-  { id: 'contact', label: 'Contact', icon: Mail },
-  { id: 'links', label: 'Links', icon: Link },
   { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
   { id: 'education', label: 'Education', icon: GraduationCap },
   { id: 'skills', label: 'Skills', icon: Sparkles },

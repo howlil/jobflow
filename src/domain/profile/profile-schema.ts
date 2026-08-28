@@ -43,6 +43,7 @@ const ExperienceSchema = z
     current: z.boolean(),
     description: z.string(),
     achievements: StringListSchema,
+    skills: StringListSchema.optional(),
   })
   .strict();
 

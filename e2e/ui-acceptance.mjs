@@ -97,10 +97,15 @@ try {
   const page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await expect(page.getByText('Profile readiness')).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Career profile' }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Basic information' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Contact' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Links' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Overview' })).toHaveCount(0);
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
   await capture(page, 'options-tablet.png', { width: 1024, height: 900 });
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });

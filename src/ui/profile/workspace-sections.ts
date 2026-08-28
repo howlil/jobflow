@@ -1,5 +1,4 @@
 export type WorkspaceSection =
-  | 'overview'
   | 'personal'
   | 'contact'
   | 'links'

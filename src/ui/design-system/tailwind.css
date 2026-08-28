@@ -329,6 +329,34 @@
     @apply grid gap-3.5 rounded-app border border-app-border bg-app-muted p-3.5;
   }
 
+  details.record-card {
+    @apply block;
+  }
+
+  details.record-card[open] {
+    @apply grid gap-3.5;
+  }
+
+  .record-summary {
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-app-ink;
+  }
+
+  .record-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .record-summary-meta {
+    @apply shrink-0 text-[11px] font-medium text-app-subtle;
+  }
+
+  .description-preview-list {
+    @apply m-0 grid gap-1 rounded-control border border-app-border bg-white px-4 py-3 text-xs leading-5 text-app-text;
+  }
+
+  .description-preview-list li {
+    @apply pl-1;
+  }
+
   .record-card > .fillio-button {
     @apply justify-self-start;
   }

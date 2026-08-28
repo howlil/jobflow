@@ -305,7 +305,9 @@ function SensitiveProfileFields({
       <label>
         Birth date
         <input
-          type="date"
+          inputMode="numeric"
+          pattern="\d{2}/\d{2}/\d{4}"
+          placeholder="DD/MM/YYYY"
           value={profile.personal.birthDate}
           onChange={(event) =>
             onChange((draft) => {

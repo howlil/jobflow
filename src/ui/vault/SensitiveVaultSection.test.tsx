@@ -7,7 +7,7 @@ import { SensitiveVaultSection } from './SensitiveVaultSection';
 
 function createVaultClient(): VaultClient {
   const profile = createEmptySensitiveProfile();
-  profile.personal.birthDate = '2001-02-03';
+  profile.personal.birthDate = '03/02/2001';
   profile.identity.nationalId = '3174000000000001';
   profile.compensation.expected.amount = 15_000_000;
   profile.compensation.expected.currency = 'IDR';
@@ -155,7 +155,7 @@ describe('SensitiveVaultSection', () => {
     await waitFor(() => expect(client.loadProfile).toHaveBeenCalledTimes(1));
     expect(
       (await screen.findByLabelText<HTMLInputElement>('Birth date')).value,
-    ).toBe('2001-02-03');
+    ).toBe('03/02/2001');
 
     fireEvent.change(screen.getByLabelText('Expected salary'), {
       target: { value: '20000000' },

@@ -8,14 +8,17 @@ describe('WorkspaceNavigation', () => {
     const onChange = vi.fn();
 
     render(
-      <WorkspaceNavigation activeSection="overview" onChange={onChange} />,
+      <WorkspaceNavigation activeSection="personal" onChange={onChange} />,
     );
 
     expect(
       screen
-        .getByRole('button', { name: 'Overview' })
+        .getByRole('button', { name: 'Personal' })
         .getAttribute('aria-current'),
     ).toBe('page');
+    expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Contact' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Links' })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Experience' }));
     expect(onChange).toHaveBeenCalledWith('experience');

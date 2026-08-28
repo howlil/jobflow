@@ -58,9 +58,8 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
-  await page.getByRole('button', { name: 'Contact', exact: true }).click();
   await page.getByLabel('Primary email').fill('smoke@example.com');
-  await page.getByRole('button', { name: 'Save profile' }).click();
+  await expect(page.getByRole('status')).toHaveText('Changes pending.');
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
 
   await page.goto(fixtureUrl);

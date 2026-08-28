@@ -14,12 +14,23 @@ function dispatchEvents(control: HTMLElement, includeInput = true): void {
   control.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
+function browserDateValue(value: string): string {
+  const displayDateMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());
+  if (displayDateMatch === null) return value;
+
+  const [, day, month, year] = displayDateMatch;
+  return `${year}-${month}-${day}`;
+}
+
 function setInputValue(control: HTMLInputElement, value: string): void {
   const setter = Object.getOwnPropertyDescriptor(
     HTMLInputElement.prototype,
     'value',
   )?.set;
-  setter?.call(control, value);
+  setter?.call(
+    control,
+    control.type === 'date' ? browserDateValue(value) : value,
+  );
   dispatchEvents(control);
 }
 

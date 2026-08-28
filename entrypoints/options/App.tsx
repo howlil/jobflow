@@ -19,7 +19,7 @@ const vaultClient = new ChromeVaultClient();
 
 export default function App() {
   const [activeSection, setActiveSection] =
-    useState<WorkspaceSection>('overview');
+    useState<WorkspaceSection>('personal');
   const [profileRevision, setProfileRevision] = useState(0);
   const refreshWorkspace = () => setProfileRevision((current) => current + 1);
 
@@ -38,7 +38,6 @@ export default function App() {
           repository={profileRepository}
           vaultClient={vaultClient}
           activeSection={activeSection}
-          onSectionChange={setActiveSection}
         />
       </div>
 
