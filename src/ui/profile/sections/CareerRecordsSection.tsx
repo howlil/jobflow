@@ -166,7 +166,8 @@ export function CareerRecordsSection({
                     changeProfile((draft) => {
                       const item =
                         draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined) item.issueDate = event.target.value;
+                      if (item !== undefined)
+                        item.issueDate = event.target.value;
                     })
                   }
                 />
@@ -249,7 +250,8 @@ export function CareerRecordsSection({
                 value={project.name}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined) item.name = event.target.value;
                   })
                 }
@@ -261,7 +263,8 @@ export function CareerRecordsSection({
                 value={project.role}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined) item.role = event.target.value;
                   })
                 }
@@ -273,7 +276,8 @@ export function CareerRecordsSection({
                 value={project.url}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined) item.url = event.target.value;
                   })
                 }
@@ -285,8 +289,10 @@ export function CareerRecordsSection({
                 {...dateInputProps(project.startDate)}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
-                    if (item !== undefined) item.startDate = event.target.value;
+                    const item =
+                      draft.baseProfile.professional.projects[index];
+                    if (item !== undefined)
+                      item.startDate = event.target.value;
                   })
                 }
               />
@@ -297,7 +303,8 @@ export function CareerRecordsSection({
                 {...dateInputProps(project.endDate)}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined) item.endDate = event.target.value;
                   })
                 }
@@ -309,7 +316,8 @@ export function CareerRecordsSection({
                 value={listValue(project.skills)}
                 onChange={(event) =>
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined)
                       item.skills = syncSkills(
                         draft,
@@ -330,7 +338,8 @@ export function CareerRecordsSection({
                   const selected = event.target.value;
                   if (selected === '') return;
                   changeProfile((draft) => {
-                    const item = draft.baseProfile.professional.projects[index];
+                    const item =
+                      draft.baseProfile.professional.projects[index];
                     if (item !== undefined) {
                       item.skills = addLinkedSkill(item.skills, selected);
                     }
@@ -354,7 +363,8 @@ export function CareerRecordsSection({
               onChange={(event) =>
                 changeProfile((draft) => {
                   const item = draft.baseProfile.professional.projects[index];
-                  if (item !== undefined) item.description = event.target.value;
+                  if (item !== undefined)
+                    item.description = event.target.value;
                 })
               }
             />
