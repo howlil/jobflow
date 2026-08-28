@@ -257,7 +257,8 @@ export function ProfilePage({
     <section className="profile-page w-full pb-10">
       <div className="mb-4 flex min-h-8 items-center justify-end gap-2 border-b border-app-border pb-3">
         <span
-          className={`h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveState]}`}
+          className={`profile-save-indicator h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveState]}`}
+          data-state={saveState}
           aria-hidden="true"
         />
         <p
