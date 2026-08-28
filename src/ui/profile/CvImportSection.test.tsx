@@ -1,16 +1,20 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { DocumentBlobRepository } from '../../application/documents/document-blob-repository';
+import { createCvImportWorkflow } from '../../application/profile/cv-import-workflow';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
-import { extractCvText } from '../../infrastructure/documents/extract-cv-text';
 import { CvImportSection } from './CvImportSection';
 
-vi.mock('../../infrastructure/documents/extract-cv-text', () => ({
-  isSupportedCvFile: () => true,
-  extractCvText: vi.fn(),
-}));
+const cvText = `
+Maya Putri
+Backend Software Engineer
+maya@example.com
+
+Skills
+Go, PostgreSQL
+`;
 
 function createRepositories() {
   const profile = createEmptyStoredProfile('2026-08-25T00:00:00.000Z');
@@ -27,31 +31,25 @@ function createRepositories() {
   return { profileRepository, documentRepository };
 }
 
-const cvText = `
-Maya Putri
-Backend Software Engineer
-maya@example.com
-
-Skills
-Go, PostgreSQL
-`;
+function createWorkflow(
+  profileRepository: ProfileRepository,
+  documentRepository: DocumentBlobRepository,
+) {
+  return createCvImportWorkflow({
+    profileRepository,
+    documentRepository,
+    extractText: vi.fn().mockResolvedValue({ text: cvText }),
+  });
+}
 
 describe('CvImportSection', () => {
-  beforeEach(() => {
-    vi.mocked(extractCvText).mockResolvedValue({
-      text: cvText,
-      format: 'text',
-    });
-  });
-
   it('starts from an empty profile when storage has not been initialized', async () => {
     const { profileRepository, documentRepository } = createRepositories();
     vi.mocked(profileRepository.load).mockResolvedValue(null);
 
     render(
       <CvImportSection
-        profileRepository={profileRepository}
-        documentRepository={documentRepository}
+        workflow={createWorkflow(profileRepository, documentRepository)}
       />,
     );
 
@@ -69,8 +67,7 @@ describe('CvImportSection', () => {
     const { profileRepository, documentRepository } = createRepositories();
     render(
       <CvImportSection
-        profileRepository={profileRepository}
-        documentRepository={documentRepository}
+        workflow={createWorkflow(profileRepository, documentRepository)}
       />,
     );
 
@@ -102,8 +99,7 @@ describe('CvImportSection', () => {
     const { profileRepository, documentRepository } = createRepositories();
     render(
       <CvImportSection
-        profileRepository={profileRepository}
-        documentRepository={documentRepository}
+        workflow={createWorkflow(profileRepository, documentRepository)}
       />,
     );
 
@@ -127,8 +123,7 @@ describe('CvImportSection', () => {
     const { profileRepository, documentRepository } = createRepositories();
     render(
       <CvImportSection
-        profileRepository={profileRepository}
-        documentRepository={documentRepository}
+        workflow={createWorkflow(profileRepository, documentRepository)}
       />,
     );
 
