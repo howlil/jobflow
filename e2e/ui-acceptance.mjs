@@ -98,7 +98,12 @@ try {
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await expect(
-    page.getByRole('heading', { name: 'Career profile' }),
+    page.getByRole('complementary', { name: 'Job Flow sidebar' }),
+  ).toBeVisible();
+  await expect(page.getByRole('banner')).toBeVisible();
+  await expect(page.getByRole('main')).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Personal' }),
   ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Basic information' }),
@@ -144,7 +149,10 @@ try {
   const workspacePage = await workspacePagePromise;
   await workspacePage.waitForLoadState('domcontentloaded');
   await expect(
-    workspacePage.getByRole('heading', { name: 'Career profile' }),
+    workspacePage.getByRole('complementary', { name: 'Job Flow sidebar' }),
+  ).toBeVisible();
+  await expect(
+    workspacePage.getByRole('heading', { level: 1, name: 'Personal' }),
   ).toBeVisible();
   await workspacePage.close();
 

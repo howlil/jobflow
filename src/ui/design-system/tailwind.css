@@ -37,76 +37,9 @@
 }
 
 @layer components {
-  /* MyPaas-derived product grammar: flat neutral surfaces, 1px borders,
-     6–8px radii, dense controls, shadow only for overlays. */
-  .workspace-shell {
-    @apply min-h-screen bg-app-bg;
-  }
-
-  .workspace-topbar {
-    @apply sticky top-0 z-30 border-b border-app-border bg-white/95 backdrop-blur-md;
-  }
-
-  .workspace-topbar__inner {
-    @apply mx-auto flex min-h-[52px] w-full max-w-[144rem] items-center justify-between gap-5 px-[clamp(14px,1.1vw,24px)];
-  }
-
-  .workspace-brand {
-    @apply inline-flex items-center gap-2 text-[13px] font-semibold tracking-tight text-app-ink;
-  }
-
-  .workspace-brand__mark {
-    @apply grid h-[26px] w-[26px] shrink-0 place-items-center rounded-md bg-app-ink text-xs font-bold text-white;
-  }
-
-  .workspace-topbar__meta {
-    @apply text-[11px] text-app-subtle;
-  }
-
-  .workspace-layout {
-    @apply mx-auto grid w-full max-w-[144rem] grid-cols-[224px_minmax(0,1fr)] items-start gap-6 px-[clamp(14px,1.1vw,24px)];
-  }
-
-  .workspace-content {
-    @apply min-w-0 w-full max-w-[1180px];
-  }
-
-  .workspace-nav-wrap {
-    @apply sticky top-[68px] min-h-[calc(100vh-84px)] self-start border-r border-app-border py-5 pr-4;
-  }
-
-  .workspace-nav-heading {
-    @apply grid gap-0.5 px-2;
-  }
-
-  .workspace-nav-heading strong {
-    @apply text-xs font-semibold text-app-ink;
-  }
-
-  .workspace-nav-heading span {
-    @apply text-[11px] text-app-subtle;
-  }
-
-  .workspace-nav {
-    @apply mt-3.5 grid gap-0.5;
-  }
-
-  .workspace-nav-select {
-    @apply hidden text-xs font-medium text-app-text;
-  }
-
-  .workspace-nav-select select {
-    @apply mt-1.5 w-full rounded-control border border-app-border bg-white px-3 py-2 text-sm text-app-ink outline-none transition focus:border-app-ink focus:ring-2 focus:ring-app-border;
-  }
-
-  .jobflow-nav-link {
-    @apply flex min-h-[34px] w-full items-center gap-2 rounded-control border border-transparent px-2 py-1.5 text-left text-xs font-medium text-app-text transition-colors hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2;
-  }
-
-  .jobflow-nav-link[aria-current='page'] {
-    @apply border-app-border bg-white font-semibold text-app-ink;
-  }
-
+  /* Keep this layer small: stable repeated primitives and form grammar only.
+     Page shells, navigation, spacing, and responsive composition belong in
+     React components as Tailwind utilities. */
   .jobflow-button {
     @apply inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-app-border-strong bg-white px-3 py-1.5 text-xs font-semibold text-app-ink transition-colors hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
@@ -160,30 +93,8 @@
     @apply border-red-200 bg-red-50 text-red-700;
   }
 
-  .profile-page,
   .workspace-section-wrap {
     @apply w-full;
-  }
-
-  .profile-page {
-    @apply py-[30px] pb-16;
-  }
-
-  .profile-header {
-    @apply mb-4 flex items-center justify-between gap-5 border-b border-app-border pb-4;
-  }
-
-  .profile-header-copy {
-    @apply max-w-[720px];
-  }
-
-  .eyebrow,
-  .workspace-kicker {
-    @apply mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
-  }
-
-  .profile-page h1 {
-    @apply mb-1 text-[clamp(28px,2.2vw,34px)] font-semibold leading-[1.05] tracking-normal text-app-ink;
   }
 
   .profile-page h2,
@@ -196,39 +107,16 @@
     @apply mb-0 text-sm font-semibold text-app-ink;
   }
 
+  .eyebrow,
+  .workspace-kicker {
+    @apply mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
+  }
+
   .muted,
   .profile-readiness-intro,
   .workspace-tool-section__header p,
   .cv-dropzone p {
     @apply text-xs leading-5 text-app-text;
-  }
-
-  .profile-save-action {
-    @apply flex min-w-max items-center justify-end gap-2;
-  }
-
-  .profile-save-indicator {
-    @apply h-2 w-2 rounded-full bg-app-border-strong;
-  }
-
-  .profile-save-indicator[data-state='dirty'] {
-    @apply bg-amber-600;
-  }
-
-  .profile-save-indicator[data-state='saving'] {
-    @apply bg-app-ink;
-  }
-
-  .profile-save-indicator[data-state='saved'] {
-    @apply bg-emerald-700;
-  }
-
-  .profile-save-indicator[data-state='error'] {
-    @apply bg-red-700;
-  }
-
-  .profile-save-state {
-    @apply m-0 text-[11px] leading-4 text-app-subtle;
   }
 
   .profile-readiness {
@@ -421,76 +309,12 @@
     margin: -1px;
   }
 
-  @media (max-width: 900px) {
-    .workspace-layout {
-      @apply grid-cols-[190px_minmax(0,1fr)] gap-[18px] px-4;
-    }
-
-    .workspace-topbar__inner {
-      @apply px-4;
-    }
-  }
-
   @media (max-width: 720px) {
-    .workspace-layout {
-      @apply block px-4;
-    }
-
-    .workspace-nav-wrap {
-      @apply sticky top-[52px] z-20 min-h-0 border-b border-r-0 border-app-border bg-app-bg/95 py-3 pr-0 backdrop-blur-md;
-    }
-
-    .workspace-nav-heading,
-    .workspace-nav {
-      @apply hidden;
-    }
-
-    .workspace-nav-select {
-      @apply block;
-    }
-
-    .profile-page {
-      @apply pt-4;
-    }
-
     .jobflow-section-heading,
     .section-heading,
     .workspace-tool-section__header,
     .jobflow-empty-row {
       @apply flex-col items-stretch;
-    }
-
-    .profile-header {
-      @apply mb-3 flex-row items-center gap-3 pb-3;
-    }
-
-    .profile-header-copy {
-      @apply min-w-0;
-    }
-
-    .profile-header-copy .eyebrow,
-    .profile-header-copy .muted {
-      @apply hidden;
-    }
-
-    .profile-page h1 {
-      @apply mb-0 text-xl leading-tight;
-    }
-
-    .profile-save-action {
-      @apply flex min-w-0 items-center gap-2;
-    }
-
-    .profile-save-state {
-      @apply max-w-[132px] text-right text-[10px] leading-3;
-    }
-
-    .profile-save-action .jobflow-button {
-      @apply h-11 w-11 shrink-0 p-0;
-    }
-
-    .profile-save-button-label {
-      @apply sr-only;
     }
 
     .form-grid,
@@ -506,8 +330,7 @@
   }
 
   @media (any-pointer: coarse) {
-    .jobflow-button,
-    .jobflow-nav-link {
+    .jobflow-button {
       min-height: 44px;
     }
   }
