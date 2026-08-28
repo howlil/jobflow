@@ -37,12 +37,14 @@ The universal unit of delivery is a **logical change/work item**. An iteration i
 ```text
 problem
  -> smallest useful acceptance criteria
- -> test/fixture when behavior changes
+ -> identify realistic regression risk
+ -> choose the cheapest high-signal verification
+ -> test-first only when a deterministic test is the best tool
  -> implement minimum change
  -> focused verification
  -> draft PR early when non-trivial
  -> fast CI
- -> ready PR browser gate when runtime is affected
+ -> ready PR browser gate when runtime risk requires it
  -> squash merge
  -> observe real use
 ```
@@ -51,6 +53,11 @@ Rules of thumb:
 
 - WIP = 1 logical change.
 - Prefer a branch that lives less than one working day; split independent outcomes instead of extending the branch.
+- Tests exist to reduce meaningful delivery risk, not to maximize test count or enforce TDD ceremony.
+- Do not require TDD for presentation-only changes, styling/layout, static markup, copy, trivial wiring, or exploratory implementation.
+- Prefer automated tests for domain invariants, data integrity, concurrency, migrations, security/privacy boundaries, provider contracts, and valuable deterministic regressions.
+- Avoid duplicated confidence across unit, integration, and browser layers. Add a layer only when it protects a distinct risk.
+- Before adding a test ask: **What realistic regression does this prevent?** If there is no strong answer, do not add it.
 - Do not create planning/history/report files for routine work.
 - Do not preserve dead code, old styling layers, or compatibility shims without a current caller and explicit reason.
 - Never claim tests, CI, browser verification, merge, release, or deployment unless it was actually observed.

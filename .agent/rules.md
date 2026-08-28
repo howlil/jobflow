@@ -11,20 +11,51 @@ These are Job Flow's default engineering rules. Optimize for **fast verified use
 - Open a draft PR early for non-trivial work; do not hide 30+ checkpoint commits and open the PR only when the branch is already finished.
 - Stop adding adjacent cleanup/features once acceptance criteria are satisfied. Ship, observe, then decide the next change.
 
-## 2. XP loop without ritual
+## 2. Testing principle: risk, signal, cost
 
-For a bug or observable behavior change:
+Tests exist to reduce **meaningful delivery risk**, not to maximize test count, coverage theater, or TDD ceremony.
+
+Use TDD when a deterministic automated test is the **cheapest high-signal way** to define or protect behavior. A useful loop is:
 
 ```text
-reproduce / failing test or fixture
+reproduce / focused failing test or fixture
  -> minimum implementation
- -> green focused tests
+ -> green focused test
  -> refactor while green
 ```
 
-Use test-first where it creates useful feedback. Do **not** manufacture RED tests for documentation, formatting, dependency metadata, or a mechanically behavior-preserving refactor. Those changes still require the smallest executable verification that can detect a mistake.
+That loop is a tool, not a mandatory ritual.
 
-Tests should protect public behavior, invariants, failure modes, migrations, security boundaries, and compatibility. Avoid coupling tests to private implementation details.
+Do **not** require TDD for:
+
+- presentation-only changes
+- styling or layout
+- static markup
+- copy
+- trivial wiring
+- exploratory implementation
+
+Those changes still need the cheapest verification capable of catching a realistic mistake, such as static checks, a focused browser check, or direct inspection when appropriate.
+
+Prioritize automated tests for:
+
+- domain invariants
+- persistence and data integrity
+- concurrency
+- migrations
+- security and privacy boundaries
+- provider or external contracts
+- valuable deterministic regressions
+
+Prefer testing public behavior, invariants, failure modes, and boundaries over private implementation details.
+
+Avoid duplicated confidence across layers. Prefer the lowest-cost layer that proves the risk is controlled. Add integration or browser coverage only when it protects a boundary or regression that a lower layer cannot prove with comparable confidence.
+
+For every proposed test ask:
+
+> **What realistic regression does this prevent?**
+
+If there is no strong answer, do not add the test.
 
 ## 3. Locked safety invariants
 
@@ -44,21 +75,21 @@ These outrank speed:
 
 ### Low risk
 
-Docs, metadata, formatting, local mechanical refactor with unchanged behavior.
+Docs, metadata, formatting, copy, presentation-only styling/layout, static markup, or a local mechanical refactor with unchanged behavior.
 
-Run only relevant static/focused checks. Browser E2E is not automatically required.
+Run only the cheapest relevant checks. Do not add unit tests or browser E2E merely because a file changed.
 
 ### Medium risk
 
 Normal UI behavior, matcher/extractor/filler behavior, messaging, correction memory, ordinary storage, document workflow.
 
-During development use focused tests. Draft PR CI stays fast. Before integration, the ready PR runs the browser acceptance gate when runtime behavior is touched.
+During development use focused deterministic tests when they protect a realistic regression. Before integration, the ready PR runs browser acceptance when runtime behavior or an important browser boundary is touched.
 
 ### High risk
 
 Vault/crypto, browser permissions, destructive data operations, schema migration, privacy/network boundaries, broad autofill safety rules, release workflow.
 
-Require focused negative-path/security/migration tests as applicable, fast CI, browser acceptance before merge, and the full release gate before publishing.
+Require the relevant negative-path, security, migration, data-integrity, or contract evidence. Use browser acceptance only where it contributes unique integration confidence, then run the full release gate before publishing.
 
 Never normalize flaky tests by repeatedly rerunning them until green. Treat flakiness as a delivery defect.
 
@@ -94,7 +125,7 @@ Useful guardrails, not promises:
 - fast CI target: < 5 minutes when repository size permits
 - one user/product outcome per PR
 
-Commit count, LOC, PR count, and number of generated files are diagnostics only. A large commit count inside one PR is a batching smell, not a productivity achievement.
+Commit count, LOC, PR count, test count, coverage percentage, and number of generated files are diagnostics only. A large commit count inside one PR is a batching smell, not a productivity achievement.
 
 ## 7. Definition of done
 
@@ -102,7 +133,7 @@ A change is done when:
 
 1. acceptance criteria are met
 2. obsolete path/code introduced or replaced by the change is removed
-3. relevant focused checks pass
+3. the cheapest relevant verification provides enough confidence for the actual risk
 4. required CI/risk gates pass
 5. current state/policy is updated only if the source of truth actually changed
 6. the change can be explained as one concise user/engineering outcome
