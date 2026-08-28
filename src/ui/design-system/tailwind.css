@@ -170,10 +170,10 @@
   }
 
   .profile-header {
-    @apply mb-5 flex items-start justify-between gap-6;
+    @apply mb-4 flex items-center justify-between gap-5 border-b border-app-border pb-4;
   }
 
-  .profile-header > div:first-child {
+  .profile-header-copy {
     @apply max-w-[720px];
   }
 
@@ -183,7 +183,7 @@
   }
 
   .profile-page h1 {
-    @apply mb-1 text-[clamp(28px,2.2vw,34px)] font-semibold leading-[1.05] tracking-[-0.035em] text-app-ink;
+    @apply mb-1 text-[clamp(28px,2.2vw,34px)] font-semibold leading-[1.05] tracking-normal text-app-ink;
   }
 
   .profile-page h2,
@@ -204,11 +204,31 @@
   }
 
   .profile-save-action {
-    @apply grid min-w-max justify-items-end gap-1.5;
+    @apply flex min-w-max items-center justify-end gap-2;
+  }
+
+  .profile-save-indicator {
+    @apply h-2 w-2 rounded-full bg-app-border-strong;
+  }
+
+  .profile-save-indicator[data-state='dirty'] {
+    @apply bg-amber-600;
+  }
+
+  .profile-save-indicator[data-state='saving'] {
+    @apply bg-app-ink;
+  }
+
+  .profile-save-indicator[data-state='saved'] {
+    @apply bg-emerald-700;
+  }
+
+  .profile-save-indicator[data-state='error'] {
+    @apply bg-red-700;
   }
 
   .profile-save-state {
-    @apply m-0 text-[11px] text-app-subtle;
+    @apply m-0 text-[11px] leading-4 text-app-subtle;
   }
 
   .profile-readiness {
@@ -402,10 +422,9 @@
     }
 
     .profile-page {
-      @apply pt-5;
+      @apply pt-4;
     }
 
-    .profile-header,
     .fillio-section-heading,
     .section-heading,
     .workspace-tool-section__header,
@@ -413,8 +432,37 @@
       @apply flex-col items-stretch;
     }
 
+    .profile-header {
+      @apply mb-3 flex-row items-center gap-3 pb-3;
+    }
+
+    .profile-header-copy {
+      @apply min-w-0;
+    }
+
+    .profile-header-copy .eyebrow,
+    .profile-header-copy .muted {
+      @apply hidden;
+    }
+
+    .profile-page h1 {
+      @apply mb-0 text-xl leading-tight;
+    }
+
     .profile-save-action {
-      @apply justify-items-stretch;
+      @apply flex min-w-0 items-center gap-2;
+    }
+
+    .profile-save-state {
+      @apply max-w-[132px] text-right text-[10px] leading-3;
+    }
+
+    .profile-save-action .fillio-button {
+      @apply h-11 w-11 shrink-0 p-0;
+    }
+
+    .profile-save-button-label {
+      @apply sr-only;
     }
 
     .form-grid,

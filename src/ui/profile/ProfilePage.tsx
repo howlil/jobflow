@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Download,
@@ -37,6 +37,10 @@ type ProfilePageProps = {
 
 type ContactItem = BaseProfile['contact']['emails'][number];
 type ProfileMutation = (profile: StoredProfileEnvelope) => void;
+type ProfileSaveState = 'clean' | 'dirty' | 'saving' | 'saved' | 'error';
+
+const AUTOSAVE_DEBOUNCE_MS = 800;
+const AUTOSAVE_MAX_WAIT_MS = 5_000;
 
 function createId(): string {
   return globalThis.crypto.randomUUID();
@@ -87,16 +91,118 @@ export function ProfilePage({
 }: ProfilePageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>(
-    'idle',
-  );
+  const [saveState, setSaveState] = useState<ProfileSaveState>('clean');
+  const profileRef = useRef<StoredProfileEnvelope | null>(null);
+  const revisionRef = useRef(0);
+  const savedRevisionRef = useRef(0);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxWaitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveInFlightRef = useRef<Promise<void> | null>(null);
+  const saveQueuedRef = useRef(false);
+  const mountedRef = useRef(true);
+  const persistLatestRef = useRef<() => Promise<void>>(async () => undefined);
+
+  const clearAutosaveTimers = useCallback(() => {
+    if (debounceTimerRef.current !== null) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    if (maxWaitTimerRef.current !== null) {
+      clearTimeout(maxWaitTimerRef.current);
+      maxWaitTimerRef.current = null;
+    }
+  }, []);
+
+  const persistLatestProfile = useCallback(async () => {
+    clearAutosaveTimers();
+
+    if (saveInFlightRef.current !== null) {
+      saveQueuedRef.current = true;
+      return saveInFlightRef.current;
+    }
+
+    const current = profileRef.current;
+    if (current === null || revisionRef.current === savedRevisionRef.current) {
+      return;
+    }
+
+    const savingRevision = revisionRef.current;
+    const next = {
+      ...current,
+      metadata: { ...current.metadata, updatedAt: new Date().toISOString() },
+    };
+
+    if (mountedRef.current) {
+      setSaveState('saving');
+      setError(null);
+    }
+
+    const operation = repository
+      .save(next)
+      .then(() => {
+        savedRevisionRef.current = savingRevision;
+        if (revisionRef.current === savingRevision) {
+          profileRef.current = next;
+          if (mountedRef.current) {
+            setProfile(next);
+            setSaveState('saved');
+          }
+        } else {
+          saveQueuedRef.current = true;
+          if (mountedRef.current) setSaveState('dirty');
+        }
+      })
+      .catch(() => {
+        if (mountedRef.current) {
+          setError('Could not save your profile.');
+          setSaveState('error');
+        }
+      })
+      .finally(() => {
+        saveInFlightRef.current = null;
+        if (saveQueuedRef.current) {
+          saveQueuedRef.current = false;
+          void persistLatestRef.current();
+        }
+      });
+
+    saveInFlightRef.current = operation;
+    return operation;
+  }, [clearAutosaveTimers, repository]);
+
+  persistLatestRef.current = persistLatestProfile;
+
+  const scheduleAutosave = useCallback(() => {
+    if (saveInFlightRef.current !== null) {
+      saveQueuedRef.current = true;
+      return;
+    }
+
+    if (debounceTimerRef.current !== null) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      void persistLatestRef.current();
+    }, AUTOSAVE_DEBOUNCE_MS);
+
+    maxWaitTimerRef.current ??= setTimeout(() => {
+      void persistLatestRef.current();
+    }, AUTOSAVE_MAX_WAIT_MS);
+  }, []);
 
   useEffect(() => {
     let active = true;
     void repository
       .load()
       .then((stored) => {
-        if (active) setProfile(stored ?? createEmptyStoredProfile());
+        if (active) {
+          const loaded = stored ?? createEmptyStoredProfile();
+          profileRef.current = loaded;
+          revisionRef.current = 0;
+          savedRevisionRef.current = 0;
+          setProfile(loaded);
+          setSaveState('clean');
+        }
       })
       .catch(() => {
         if (active) setError('Could not load your profile.');
@@ -106,32 +212,41 @@ export function ProfilePage({
     };
   }, [repository]);
 
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearAutosaveTimers();
+    };
+  }, [clearAutosaveTimers]);
+
+  useEffect(() => {
+    const flushWhenHidden = () => {
+      if (document.visibilityState === 'hidden') {
+        void persistLatestRef.current();
+      }
+    };
+    document.addEventListener('visibilitychange', flushWhenHidden);
+    return () => {
+      document.removeEventListener('visibilitychange', flushWhenHidden);
+    };
+  }, []);
+
   function changeProfile(mutate: ProfileMutation) {
-    setProfile((current) => {
-      if (current === null) return current;
-      const next = structuredClone(current);
-      mutate(next);
-      return next;
-    });
-    setSaveState('idle');
+    const current = profileRef.current;
+    if (current === null) return;
+    const next = structuredClone(current);
+    mutate(next);
+    profileRef.current = next;
+    revisionRef.current += 1;
+    setProfile(next);
+    setError(null);
+    setSaveState('dirty');
+    scheduleAutosave();
   }
 
   async function saveProfile() {
-    if (profile === null) return;
-    setSaveState('saving');
-    setError(null);
-    const next = {
-      ...profile,
-      metadata: { ...profile.metadata, updatedAt: new Date().toISOString() },
-    };
-    try {
-      await repository.save(next);
-      setProfile(next);
-      setSaveState('saved');
-    } catch {
-      setError('Could not save your profile.');
-      setSaveState('idle');
-    }
+    await persistLatestProfile();
   }
 
   function exportProfile() {
@@ -150,7 +265,14 @@ export function ProfilePage({
   async function importProfile(file: File) {
     try {
       const imported = parseProfileBackup(await file.text()).profile;
+      clearAutosaveTimers();
+      while (saveInFlightRef.current !== null) {
+        await saveInFlightRef.current;
+      }
       await repository.save(imported);
+      revisionRef.current += 1;
+      savedRevisionRef.current = revisionRef.current;
+      profileRef.current = imported;
       setProfile(imported);
       setError(null);
       setSaveState('saved');
@@ -187,12 +309,16 @@ export function ProfilePage({
       ? 'Saving profile...'
       : saveState === 'saved'
         ? 'Profile saved.'
-        : 'Changes not saved.';
+        : saveState === 'dirty'
+          ? 'Changes pending.'
+          : saveState === 'error'
+            ? 'Autosave failed. Use Save profile to retry.'
+            : 'All changes saved.';
 
   return (
     <main className="profile-page">
       <header className="profile-header">
-        <div>
+        <div className="profile-header-copy">
           <p className="eyebrow">Fillio</p>
           <h1>Career profile</h1>
           <p className="muted">
@@ -201,6 +327,11 @@ export function ProfilePage({
           </p>
         </div>
         <div className="profile-save-action">
+          <span
+            className="profile-save-indicator"
+            data-state={saveState}
+            aria-hidden="true"
+          />
           <p className="profile-save-state" role="status" aria-live="polite">
             {saveStateText}
           </p>
@@ -209,9 +340,13 @@ export function ProfilePage({
             type="button"
             onClick={() => void saveProfile()}
             disabled={saveState === 'saving'}
+            aria-label="Save profile"
+            title="Save profile now"
           >
             <Save aria-hidden="true" size={16} />
-            {saveState === 'saving' ? 'Saving...' : 'Save profile'}
+            <span className="profile-save-button-label">
+              {saveState === 'saving' ? 'Saving...' : 'Save profile'}
+            </span>
           </button>
         </div>
       </header>

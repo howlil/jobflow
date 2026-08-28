@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ProfileRepository } from '../../application/profile/profile-repository';
@@ -16,6 +22,135 @@ function createRepository(
 }
 
 describe('ProfilePage', () => {
+  it('autosaves the latest ordinary profile change after a quiet period', async () => {
+    const { repository, save } = createRepository(null);
+
+    render(<ProfilePage repository={repository} activeSection="personal" />);
+
+    const firstName =
+      await screen.findByLabelText<HTMLInputElement>('First name');
+    const saveIndicator = document.querySelector('.profile-save-indicator');
+    expect(screen.getByRole('status').textContent).toBe('All changes saved.');
+    expect(saveIndicator?.getAttribute('data-state')).toBe('clean');
+    expect(screen.getByTitle('Save profile now')).not.toBeNull();
+
+    vi.useFakeTimers();
+    try {
+      fireEvent.change(firstName, { target: { value: 'D' } });
+      fireEvent.change(firstName, { target: { value: 'Draft' } });
+
+      expect(screen.getByRole('status').textContent).toBe('Changes pending.');
+      expect(saveIndicator?.getAttribute('data-state')).toBe('dirty');
+      expect(save).not.toHaveBeenCalled();
+
+      await act(() => vi.advanceTimersByTimeAsync(799));
+      expect(save).not.toHaveBeenCalled();
+
+      await act(() => vi.advanceTimersByTimeAsync(1));
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(save.mock.calls[0]?.[0].baseProfile.personal.legalName.first).toBe(
+        'Draft',
+      );
+      expect(screen.getByRole('status').textContent).toBe('Profile saved.');
+      expect(saveIndicator?.getAttribute('data-state')).toBe('saved');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('autosaves within the maximum wait while edits keep arriving', async () => {
+    const { repository, save } = createRepository(null);
+
+    render(<ProfilePage repository={repository} activeSection="personal" />);
+    const firstName =
+      await screen.findByLabelText<HTMLInputElement>('First name');
+
+    vi.useFakeTimers();
+    try {
+      for (let index = 0; index < 7; index += 1) {
+        fireEvent.change(firstName, { target: { value: `Draft ${index}` } });
+        await act(() => vi.advanceTimersByTimeAsync(700));
+      }
+
+      expect(save).not.toHaveBeenCalled();
+      await act(() => vi.advanceTimersByTimeAsync(100));
+
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(save.mock.calls[0]?.[0].baseProfile.personal.legalName.first).toBe(
+        'Draft 6',
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('coalesces edits made during a pending autosave', async () => {
+    let resolveFirstSave: (() => void) | undefined;
+    const firstSave = new Promise<void>((resolve) => {
+      resolveFirstSave = resolve;
+    });
+    const { repository, save } = createRepository(null);
+    save
+      .mockImplementationOnce(() => firstSave)
+      .mockResolvedValueOnce(undefined);
+
+    render(<ProfilePage repository={repository} activeSection="personal" />);
+    const firstName =
+      await screen.findByLabelText<HTMLInputElement>('First name');
+
+    vi.useFakeTimers();
+    try {
+      fireEvent.change(firstName, { target: { value: 'First draft' } });
+      await act(() => vi.advanceTimersByTimeAsync(800));
+      expect(save).toHaveBeenCalledTimes(1);
+
+      fireEvent.change(firstName, { target: { value: 'Latest draft' } });
+      await act(async () => resolveFirstSave?.());
+
+      expect(save).toHaveBeenCalledTimes(2);
+      expect(save.mock.calls[1]?.[0].baseProfile.personal.legalName.first).toBe(
+        'Latest draft',
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('keeps failed autosave changes available for a manual retry', async () => {
+    const { repository, save } = createRepository(null);
+    save
+      .mockRejectedValueOnce(new Error('storage unavailable'))
+      .mockResolvedValueOnce(undefined);
+
+    render(<ProfilePage repository={repository} activeSection="personal" />);
+    const firstName =
+      await screen.findByLabelText<HTMLInputElement>('First name');
+
+    vi.useFakeTimers();
+    try {
+      fireEvent.change(firstName, { target: { value: 'Retained draft' } });
+      await act(() => vi.advanceTimersByTimeAsync(800));
+
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Could not save your profile.',
+      );
+      expect(screen.getByRole('status').textContent).toBe(
+        'Autosave failed. Use Save profile to retry.',
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Save profile' }));
+      await act(async () => undefined);
+
+      expect(save).toHaveBeenCalledTimes(2);
+      expect(save.mock.calls[1]?.[0].baseProfile.personal.legalName.first).toBe(
+        'Retained draft',
+      );
+      expect(screen.getByRole('status').textContent).toBe('Profile saved.');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('shows a guided readiness summary for an empty profile', async () => {
     const { repository } = createRepository(null);
 

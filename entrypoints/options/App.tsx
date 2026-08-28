@@ -32,7 +32,7 @@ export default function App() {
 
   return (
     <WorkspaceFrame navigation={navigation}>
-      {activeSection !== 'corrections' ? (
+      <div hidden={activeSection === 'corrections'}>
         <ProfilePage
           key={profileRevision}
           repository={profileRepository}
@@ -40,7 +40,7 @@ export default function App() {
           activeSection={activeSection}
           onSectionChange={setActiveSection}
         />
-      ) : null}
+      </div>
 
       {activeSection === 'documents' ? (
         <CvImportSection
