@@ -196,7 +196,7 @@ export function ProfilePage({
     );
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `fillio-profile-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = `jobflow-profile-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
   }
@@ -216,7 +216,7 @@ export function ProfilePage({
       setError(null);
       setSaveState('saved');
     } catch {
-      setError('Could not import this Fillio backup.');
+      setError('Could not import this Job Flow backup.');
     }
   }
 
@@ -242,7 +242,7 @@ export function ProfilePage({
     <main className="profile-page">
       <header className="profile-header">
         <div className="profile-header-copy">
-          <p className="eyebrow">Fillio</p>
+          <p className="eyebrow">Job Flow</p>
           <h1>Career profile</h1>
           <p className="muted">
             Save factual career data once. Sensitive information stays in the

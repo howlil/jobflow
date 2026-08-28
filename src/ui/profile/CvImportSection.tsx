@@ -205,7 +205,7 @@ export function CvImportSection({
       await profileRepository.save(next);
       setProfile(next);
       setMessage(
-        `${file.name} is stored locally and can be attached from Fillio.`,
+        `${file.name} is stored locally and can be attached from Job Flow.`,
       );
       onProfileChanged?.();
     } catch {
@@ -277,7 +277,7 @@ export function CvImportSection({
               </p>
               <input
                 ref={fileInput}
-                className="fillio-visually-hidden"
+                className="jobflow-visually-hidden"
                 type="file"
                 accept={ACCEPTED_FILES}
                 aria-label="Choose CV"
@@ -287,7 +287,7 @@ export function CvImportSection({
                 }}
               />
               <button
-                className="fillio-button fillio-button-primary"
+                className="jobflow-button jobflow-button-primary"
                 type="button"
                 disabled={busy}
                 onClick={() => fileInput.current?.click()}
@@ -296,7 +296,7 @@ export function CvImportSection({
               </button>
               {file ? (
                 <button
-                  className="fillio-button"
+                  className="jobflow-button"
                   type="button"
                   disabled={busy || profile === null}
                   onClick={() => void saveCvToLibrary()}
@@ -308,19 +308,19 @@ export function CvImportSection({
           </div>
 
           <div className="workspace-card" style={{ marginTop: 16 }}>
-            <div className="fillio-section-heading">
+            <div className="jobflow-section-heading">
               <div>
                 <strong>Stored resumes</strong>
                 <p className="muted" style={{ margin: '4px 0 0' }}>
                   Files remain on this browser in extension-owned IndexedDB.
                 </p>
               </div>
-              <span className="fillio-chip fillio-chip-strong">
+              <span className="jobflow-chip jobflow-chip-strong">
                 {resumes.length}
               </span>
             </div>
             {resumes.length === 0 ? (
-              <div className="fillio-empty-row">No CV stored yet.</div>
+              <div className="jobflow-empty-row">No CV stored yet.</div>
             ) : (
               <div className="document-list">
                 {resumes.map((document) => (
@@ -330,7 +330,7 @@ export function CvImportSection({
                       <span>{document.fileName}</span>
                     </div>
                     <button
-                      className="fillio-button fillio-button-danger"
+                      className="jobflow-button jobflow-button-danger"
                       type="button"
                       disabled={busy}
                       onClick={() => void removeResume(document)}
@@ -345,7 +345,7 @@ export function CvImportSection({
         </div>
 
         <div className="workspace-card">
-          <div className="fillio-section-heading">
+          <div className="jobflow-section-heading">
             <div>
               <strong>Review extracted data</strong>
               <p className="muted" style={{ margin: '4px 0 0' }}>
@@ -355,7 +355,7 @@ export function CvImportSection({
               </p>
             </div>
             {preview.length > 0 ? (
-              <span className="fillio-chip fillio-chip-strong">
+              <span className="jobflow-chip jobflow-chip-strong">
                 {selectedCount} selected
               </span>
             ) : null}
@@ -365,18 +365,18 @@ export function CvImportSection({
             <p className="muted">Extracting locally…</p>
           ) : null}
           {error ? (
-            <p className="fillio-status fillio-status-danger" role="alert">
+            <p className="jobflow-status jobflow-status-danger" role="alert">
               {error}
             </p>
           ) : null}
           {message ? (
-            <p className="fillio-status" role="status">
+            <p className="jobflow-status" role="status">
               {message}
             </p>
           ) : null}
 
           {preview.length === 0 && !busy ? (
-            <div className="fillio-empty-row">
+            <div className="jobflow-empty-row">
               Choose a CV to preview extracted profile data.
             </div>
           ) : (
@@ -400,7 +400,7 @@ export function CvImportSection({
                       style={{
                         display: 'block',
                         marginTop: 4,
-                        color: 'var(--fillio-color-muted)',
+                        color: 'var(--jobflow-color-muted)',
                       }}
                     >
                       {item.evidence}
@@ -417,7 +417,7 @@ export function CvImportSection({
           {preview.length > 0 ? (
             <div className="button-row" style={{ marginTop: 16 }}>
               <button
-                className="fillio-button fillio-button-accent"
+                className="jobflow-button jobflow-button-accent"
                 type="button"
                 disabled={busy || selected.size === 0 || file === null}
                 onClick={() => void importSelectedAndSaveCv()}
@@ -425,7 +425,7 @@ export function CvImportSection({
                 Import data and save CV
               </button>
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 disabled={busy || selected.size === 0}
                 onClick={() => void applySelected()}
@@ -433,7 +433,7 @@ export function CvImportSection({
                 Import selected data
               </button>
               <button
-                className="fillio-button fillio-button-ghost"
+                className="jobflow-button jobflow-button-ghost"
                 type="button"
                 disabled={busy}
                 onClick={() => setSelected(new Set())}

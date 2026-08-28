@@ -37,6 +37,18 @@ describe('ChromeVaultRepository', () => {
     expect(raw).toEqual({ [VAULT_STORAGE_KEY]: envelope });
   });
 
+  it('migrates a legacy vault storage key on load', async () => {
+    const envelope = createEmptyVaultEnvelope('2026-08-13T16:30:00.000Z');
+    await browser.storage.local.set({ 'fillio.vault': envelope });
+
+    await expect(new ChromeVaultRepository().load()).resolves.toEqual(envelope);
+    await expect(browser.storage.local.get(VAULT_STORAGE_KEY)).resolves.toEqual(
+      {
+        [VAULT_STORAGE_KEY]: envelope,
+      },
+    );
+  });
+
   it('rejects malformed stored data instead of type casting it', async () => {
     await browser.storage.local.set({
       [VAULT_STORAGE_KEY]: { schemaVersion: 1, ciphertext: 'bad' },
@@ -48,6 +60,9 @@ describe('ChromeVaultRepository', () => {
   it('deletes the persisted vault envelope', async () => {
     const repository = new ChromeVaultRepository();
     await repository.save(createEmptyVaultEnvelope());
+    await browser.storage.local.set({
+      'fillio.vault': createEmptyVaultEnvelope(),
+    });
 
     await repository.delete();
 

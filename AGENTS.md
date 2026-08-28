@@ -1,6 +1,6 @@
-# Fillio Agent Adapter
+# Job Flow Agent Adapter
 
-This file is the agent adapter into Fillio's project-local Devland model. It routes work; it must not duplicate project truth.
+This file is the agent adapter into Job Flow's project-local Devland model. It routes work; it must not duplicate project truth.
 
 ## Read progressively
 
@@ -21,7 +21,7 @@ Load only when the change touches the concern:
 
 ## Devland semantic layers
 
-| Layer              | Fillio source                                                                   |
+| Layer              | Job Flow source                                                                 |
 | ------------------ | ------------------------------------------------------------------------------- |
 | Project            | `.agent/requirements.md`                                                        |
 | Architecture       | `.agent/system-design.md`                                                       |

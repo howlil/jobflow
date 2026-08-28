@@ -3,7 +3,8 @@ import type {
   StoredDocumentBlob,
 } from '../../application/documents/document-blob-repository';
 
-const DATABASE_NAME = 'fillio-documents';
+const DATABASE_NAME = 'jobflow-documents';
+const LEGACY_DATABASE_NAME = 'fillio-documents';
 const DATABASE_VERSION = 1;
 const STORE_NAME = 'documents';
 
@@ -15,9 +16,9 @@ type DocumentRecord = {
   blob: Blob;
 };
 
-function openDatabase(): Promise<IDBDatabase> {
+function openDatabase(name = DATABASE_NAME): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+    const request = indexedDB.open(name, DATABASE_VERSION);
     request.onerror = () =>
       reject(request.error ?? new Error('Could not open document storage.'));
     request.onupgradeneeded = () => {
@@ -33,8 +34,9 @@ function openDatabase(): Promise<IDBDatabase> {
 async function runTransaction<T>(
   mode: IDBTransactionMode,
   operation: (store: IDBObjectStore) => IDBRequest<T>,
+  databaseName = DATABASE_NAME,
 ): Promise<T> {
-  const database = await openDatabase();
+  const database = await openDatabase(databaseName);
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, mode);
     const request = operation(transaction.objectStore(STORE_NAME));
@@ -67,7 +69,17 @@ export class IndexedDbDocumentRepository implements DocumentBlobRepository {
       'readonly',
       (store) => store.get(id),
     );
-    return result ?? null;
+    if (result !== undefined) return result;
+
+    const legacyResult = await runTransaction<DocumentRecord | undefined>(
+      'readonly',
+      (store) => store.get(id),
+      LEGACY_DATABASE_NAME,
+    );
+    if (legacyResult !== undefined) {
+      await runTransaction('readwrite', (store) => store.put(legacyResult));
+    }
+    return legacyResult ?? null;
   }
 
   async remove(id: string): Promise<void> {

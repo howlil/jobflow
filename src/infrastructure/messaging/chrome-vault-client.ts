@@ -8,12 +8,12 @@ import type {
 
 export class ChromeVaultClient {
   status(): Promise<VaultResponse> {
-    return browser.runtime.sendMessage({ type: 'fillio:vault/status' });
+    return browser.runtime.sendMessage({ type: 'jobflow:vault/status' });
   }
 
   setup(profile: SensitiveProfile, passphrase: string): Promise<VaultResponse> {
     return browser.runtime.sendMessage({
-      type: 'fillio:vault/setup',
+      type: 'jobflow:vault/setup',
       profile,
       passphrase,
     });
@@ -21,34 +21,34 @@ export class ChromeVaultClient {
 
   unlock(passphrase: string): Promise<VaultResponse> {
     return browser.runtime.sendMessage({
-      type: 'fillio:vault/unlock',
+      type: 'jobflow:vault/unlock',
       passphrase,
     });
   }
 
   lock(): Promise<VaultResponse> {
-    return browser.runtime.sendMessage({ type: 'fillio:vault/lock' });
+    return browser.runtime.sendMessage({ type: 'jobflow:vault/lock' });
   }
 
   loadProfile(): Promise<VaultResponse> {
-    return browser.runtime.sendMessage({ type: 'fillio:vault/load-profile' });
+    return browser.runtime.sendMessage({ type: 'jobflow:vault/load-profile' });
   }
 
   saveProfile(profile: SensitiveProfile): Promise<VaultResponse> {
     return browser.runtime.sendMessage({
-      type: 'fillio:vault/save-profile',
+      type: 'jobflow:vault/save-profile',
       profile,
     });
   }
 
   readFields(fields: SensitiveFieldPath[]): Promise<VaultResponse> {
     return browser.runtime.sendMessage({
-      type: 'fillio:vault/read-fields',
+      type: 'jobflow:vault/read-fields',
       fields,
     });
   }
 
   reset(): Promise<VaultResponse> {
-    return browser.runtime.sendMessage({ type: 'fillio:vault/reset' });
+    return browser.runtime.sendMessage({ type: 'jobflow:vault/reset' });
   }
 }

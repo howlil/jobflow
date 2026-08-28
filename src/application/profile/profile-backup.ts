@@ -5,7 +5,7 @@ import type { StoredProfileEnvelope } from '../../domain/profile/profile-schema'
 
 const ProfileBackupSchema = z
   .object({
-    format: z.literal('fillio-profile-backup'),
+    format: z.literal('jobflow-profile-backup'),
     formatVersion: z.literal(1),
     exportedAt: z.string(),
     profile: z.unknown(),
@@ -13,7 +13,7 @@ const ProfileBackupSchema = z
   .strict();
 
 export type ProfileBackup = {
-  format: 'fillio-profile-backup';
+  format: 'jobflow-profile-backup';
   formatVersion: 1;
   exportedAt: string;
   profile: StoredProfileEnvelope;
@@ -37,7 +37,7 @@ export function createProfileBackup(
   exportedAt = new Date().toISOString(),
 ): ProfileBackup {
   return {
-    format: 'fillio-profile-backup',
+    format: 'jobflow-profile-backup',
     formatVersion: 1,
     exportedAt,
     profile: parseStoredProfile(profile),
@@ -64,23 +64,24 @@ export function inspectProfileBackup(raw: string): ProfileBackupInspection {
     return {
       ok: false,
       reason: 'invalid_format',
-      message: 'This file is not a Fillio profile backup.',
+      message: 'This file is not a Job Flow profile backup.',
     };
   }
 
   const candidate = parsedJson as Record<string, unknown>;
-  if (candidate.format !== 'fillio-profile-backup') {
+  if (candidate.format !== 'jobflow-profile-backup') {
     return {
       ok: false,
       reason: 'invalid_format',
-      message: 'This file is not a Fillio profile backup.',
+      message: 'This file is not a Job Flow profile backup.',
     };
   }
   if (candidate.formatVersion !== 1) {
     return {
       ok: false,
       reason: 'unsupported_version',
-      message: 'This backup version is newer than this Fillio build supports.',
+      message:
+        'This backup version is newer than this Job Flow build supports.',
     };
   }
 
@@ -89,7 +90,7 @@ export function inspectProfileBackup(raw: string): ProfileBackupInspection {
     return {
       ok: false,
       reason: 'invalid_envelope',
-      message: 'The Fillio backup metadata is incomplete or invalid.',
+      message: 'The Job Flow backup metadata is incomplete or invalid.',
     };
   }
 

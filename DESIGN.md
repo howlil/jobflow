@@ -1,16 +1,16 @@
-# Fillio Visual Design System
+# Job Flow Visual Design System
 
-This file is the visual source of truth for Fillio. External design references are inspiration only, not templates. `.agent/system-design.md` owns software architecture.
+This file is the visual source of truth for Job Flow. External design references are inspiration only, not templates. `.agent/system-design.md` owns software architecture.
 
 ## Design principles
 
-1. **Utility before decoration.** Fillio is a work tool. Prefer legibility, speed, and obvious actions over expressive SaaS styling.
+1. **Utility before decoration.** Job Flow is a work tool. Prefer legibility, speed, and obvious actions over expressive SaaS styling.
 2. **Editorial before dashboard.** Prefer typography, whitespace, separators, and clear grouping over card soup.
 3. **Monochrome by default.** Product actions use near-black, white, and warm neutrals. Semantic colors are reserved for warning, success, and danger states.
 4. **Compact controls, clear hierarchy.** Form controls are dense enough for long career profiles without becoming cramped.
 5. **One workspace, not a wizard.** Career data uses non-linear section navigation with one focused category visible at a time. Users can switch categories freely without a forced sequence.
 6. **Use the correct surface.** Profile, CV, documents, variants, vault, corrections, and backup live in a normal browser tab. Job-page assistance stays on the current webpage.
-7. **Contextual extension UI.** On websites, Fillio defaults to a small launcher docked to the right viewport edge. Clicking it opens a fixed right slide panel over the page.
+7. **Contextual extension UI.** On websites, Job Flow defaults to a small launcher docked to the right viewport edge. Clicking it opens a fixed right slide panel over the page.
 8. **Motion is functional.** Short opacity/transform transitions only; respect `prefers-reduced-motion`.
 9. **No AI aesthetic noise.** No decorative gradients, glowing blobs, glassmorphism, excessive pills, repeated marketing copy, or arbitrary rounded cards.
 10. **Accessible by default.** Visible focus, practical touch targets, semantic labels, keyboard Escape close, and strong contrast.
@@ -100,7 +100,7 @@ Ordinary workspace sections have no shadow.
 
 ## Surface model
 
-Fillio has two primary surfaces and they must not be mixed.
+Job Flow has two primary surfaces and they must not be mixed.
 
 ### 1. Career workspace — normal browser tab
 
@@ -192,7 +192,7 @@ The collapsed launcher is the only persistent UI when the assistant is closed.
 Home view should be operational, not dashboard-like:
 
 ```text
-Fillio
+Job Flow
 Application / variant context
 site host
 

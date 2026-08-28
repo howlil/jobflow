@@ -22,7 +22,7 @@ function createCompleteProfile() {
   profile.baseProfile.links.github = 'https://github.com/ulil';
   profile.baseProfile.professional.experiences.push({
     id: 'experience-1',
-    company: 'Fillio',
+    company: 'Job Flow',
     title: 'Engineer',
     employmentType: '',
     location: '',
@@ -34,7 +34,7 @@ function createCompleteProfile() {
   });
   profile.baseProfile.professional.education.push({
     id: 'education-1',
-    institution: 'Fillio University',
+    institution: 'Job Flow University',
     degree: '',
     fieldOfStudy: '',
     location: '',

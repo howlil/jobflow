@@ -8,7 +8,7 @@ export default defineConfig({
     },
   }),
   manifest: {
-    name: 'Fillio',
+    name: 'Job Flow',
     description: 'Local-first career form autofill',
     permissions: ['storage'],
   },

@@ -1,6 +1,6 @@
 # Compatibility Evidence
 
-Fillio treats compatibility as an engineering property of the generic form engine, not as a count of hard-coded ATS integrations.
+Job Flow treats compatibility as an engineering property of the generic form engine, not as a count of hard-coded ATS integrations.
 
 ## Sources of truth
 

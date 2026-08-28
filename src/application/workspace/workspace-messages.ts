@@ -1,4 +1,4 @@
-export const OPEN_WORKSPACE = 'fillio:workspace/open' as const;
+export const OPEN_WORKSPACE = 'jobflow:workspace/open' as const;
 
 export type OpenWorkspaceMessage = {
   type: typeof OPEN_WORKSPACE;

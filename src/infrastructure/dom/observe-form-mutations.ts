@@ -4,15 +4,15 @@ type MutationWatcherOptions = {
 
 const FORM_SELECTOR = 'input, textarea, select, label, form, fieldset';
 
-function isFillioElement(element: Element): boolean {
+function isJobFlowElement(element: Element): boolean {
   return (
-    element.matches('fillio-form-assistant') ||
-    element.closest('fillio-form-assistant') !== null
+    element.matches('jobflow-form-assistant') ||
+    element.closest('jobflow-form-assistant') !== null
   );
 }
 
 function containsRelevantElement(node: Node): boolean {
-  if (!(node instanceof Element) || isFillioElement(node)) return false;
+  if (!(node instanceof Element) || isJobFlowElement(node)) return false;
   return (
     node.matches(FORM_SELECTOR) || node.querySelector(FORM_SELECTOR) !== null
   );
@@ -21,7 +21,7 @@ function containsRelevantElement(node: Node): boolean {
 function isRelevantMutation(mutation: MutationRecord): boolean {
   if (mutation.type === 'attributes') {
     return (
-      mutation.target instanceof Element && !isFillioElement(mutation.target)
+      mutation.target instanceof Element && !isJobFlowElement(mutation.target)
     );
   }
 

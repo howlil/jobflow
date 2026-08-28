@@ -48,7 +48,7 @@ function isPotentialVaultMessage(
     message !== null &&
     'type' in message &&
     typeof message.type === 'string' &&
-    message.type.startsWith('fillio:vault/')
+    message.type.startsWith('jobflow:vault/')
   );
 }
 
@@ -60,6 +60,6 @@ function isPotentialDocumentMessage(
     message !== null &&
     'type' in message &&
     typeof message.type === 'string' &&
-    message.type.startsWith('fillio:document/')
+    message.type.startsWith('jobflow:document/')
   );
 }

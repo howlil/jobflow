@@ -86,35 +86,35 @@ export function CorrectionMemorySection({
       className="profile-section"
       aria-labelledby="correction-memory-title"
     >
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <div>
           <p className="eyebrow">Autofill memory</p>
           <h2 id="correction-memory-title">Learned field mappings</h2>
         </div>
-        <span className="fillio-chip">{entries.length} saved</span>
+        <span className="jobflow-chip">{entries.length} saved</span>
       </div>
       <p className="muted">
-        Fillio stores exact site/form/field corrections locally. Review stale
+        Job Flow stores exact site/form/field corrections locally. Review stale
         mappings or remove anything that no longer matches the site.
       </p>
 
       {error !== null ? <p role="alert">{error}</p> : null}
       {!loaded ? <p className="muted">Loading learned mappings…</p> : null}
       {loaded && entries.length === 0 ? (
-        <div className="fillio-empty-row">No learned mappings yet.</div>
+        <div className="jobflow-empty-row">No learned mappings yet.</div>
       ) : null}
 
       {groups.map(([origin, siteEntries]) => {
         const label = originLabel(origin);
         return (
           <article className="record-card" key={origin}>
-            <div className="fillio-section-heading">
+            <div className="jobflow-section-heading">
               <div>
                 <strong>{label}</strong>
                 <p className="muted">{origin}</p>
               </div>
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 aria-label={`Reset ${label}`}
                 onClick={() => void resetOrigin(origin)}
@@ -132,7 +132,7 @@ export function CorrectionMemorySection({
                     <div>
                       <strong>{entry.target}</strong>{' '}
                       {stale ? (
-                        <span className="fillio-chip">Review stale</span>
+                        <span className="jobflow-chip">Review stale</span>
                       ) : null}
                       <div className="muted">
                         Form {entry.formFingerprint} · Field{' '}
@@ -140,7 +140,7 @@ export function CorrectionMemorySection({
                       </div>
                     </div>
                     <button
-                      className="fillio-button"
+                      className="jobflow-button"
                       type="button"
                       onClick={() => void remove(entry)}
                     >
@@ -155,10 +155,10 @@ export function CorrectionMemorySection({
       })}
 
       {entries.length > 0 ? (
-        <div className="fillio-section-heading">
+        <div className="jobflow-section-heading">
           {!confirmResetAll ? (
             <button
-              className="fillio-button"
+              className="jobflow-button"
               type="button"
               onClick={() => setConfirmResetAll(true)}
             >
@@ -170,14 +170,14 @@ export function CorrectionMemorySection({
                 This removes all learned field corrections from local storage.
               </p>
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 onClick={() => void resetAll()}
               >
                 Confirm reset all
               </button>{' '}
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 onClick={() => setConfirmResetAll(false)}
               >

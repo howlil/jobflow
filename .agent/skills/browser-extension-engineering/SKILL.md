@@ -1,6 +1,6 @@
 ---
 name: browser-extension-engineering
-description: Use when changing Fillio extension entrypoints, Manifest V3 configuration, content scripts, service workers, browser messaging, host permissions, storage access, or dynamic-page observation.
+description: Use when changing Job Flow extension entrypoints, Manifest V3 configuration, content scripts, service workers, browser messaging, host permissions, storage access, or dynamic-page observation.
 ---
 
 # Browser Extension Engineering
@@ -52,7 +52,7 @@ Use `MutationObserver` as a signal source, not as the analyzer itself:
 mutations -> filter -> debounce -> fingerprint/change check -> rescan
 ```
 
-Ignore Fillio's own shadow-root UI and avoid busy polling.
+Ignore Job Flow's own shadow-root UI and avoid busy polling.
 
 ## Messaging
 

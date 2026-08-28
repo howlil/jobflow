@@ -22,7 +22,7 @@ export function WorkspaceFrame({
             >
               F
             </span>
-            <span>Fillio</span>
+            <span>Job Flow</span>
           </div>
           <span className="text-[11px] text-app-subtle">{meta}</span>
         </div>

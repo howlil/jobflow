@@ -11,15 +11,24 @@ import {
   type StoredCorrectionEnvelope,
 } from '../../domain/corrections/correction-schema';
 
-export const CORRECTION_STORAGE_KEY = 'fillio.corrections';
+export const CORRECTION_STORAGE_KEY = 'jobflow.corrections';
+const LEGACY_CORRECTION_STORAGE_KEY = 'fillio.corrections';
 
 export class ChromeCorrectionRepository implements CorrectionRepository {
   private async load(): Promise<StoredCorrectionEnvelope> {
-    const stored = await browser.storage.local.get(CORRECTION_STORAGE_KEY);
-    const value = stored[CORRECTION_STORAGE_KEY];
-    return value === undefined
-      ? createEmptyStoredCorrections()
-      : parseStoredCorrections(value);
+    const stored = await browser.storage.local.get([
+      CORRECTION_STORAGE_KEY,
+      LEGACY_CORRECTION_STORAGE_KEY,
+    ]);
+    const value =
+      stored[CORRECTION_STORAGE_KEY] ?? stored[LEGACY_CORRECTION_STORAGE_KEY];
+    if (value === undefined) return createEmptyStoredCorrections();
+
+    const envelope = parseStoredCorrections(value);
+    if (stored[CORRECTION_STORAGE_KEY] === undefined) {
+      await this.save(envelope.entries);
+    }
+    return envelope;
   }
 
   private async save(entries: FieldCorrection[]): Promise<void> {

@@ -2,9 +2,9 @@ import type { DocumentFieldIntent } from '../../domain/documents/classify-docume
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import type { PageAnalysisSummary } from './analyze-field-contexts';
 
-export const GET_PAGE_ANALYSIS = 'fillio:get-page-analysis' as const;
-export const GET_PAGE_CONTEXT = 'fillio:get-page-context' as const;
-export const SET_PAGE_VARIANT = 'fillio:set-page-variant' as const;
+export const GET_PAGE_ANALYSIS = 'jobflow:get-page-analysis' as const;
+export const GET_PAGE_CONTEXT = 'jobflow:get-page-context' as const;
+export const SET_PAGE_VARIANT = 'jobflow:set-page-variant' as const;
 
 export type GetPageAnalysisMessage = {
   type: typeof GET_PAGE_ANALYSIS;

@@ -25,7 +25,7 @@ describe('ChromeVaultClient', () => {
     ).resolves.toEqual(response);
 
     expect(sendMessage).toHaveBeenCalledWith({
-      type: 'fillio:vault/setup',
+      type: 'jobflow:vault/setup',
       profile,
       passphrase: 'local-passphrase',
     });
@@ -45,7 +45,7 @@ describe('ChromeVaultClient', () => {
 
     expect(JSON.stringify(client)).not.toContain('local-passphrase');
     expect(sendMessage).toHaveBeenCalledWith({
-      type: 'fillio:vault/unlock',
+      type: 'jobflow:vault/unlock',
       passphrase: 'local-passphrase',
     });
   });

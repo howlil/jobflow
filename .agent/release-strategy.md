@@ -1,6 +1,6 @@
 # Release Strategy
 
-Fillio is a fast-moving `0.x` browser-extension product. Releases should be small, reproducible, and boring.
+Job Flow is a fast-moving `0.x` browser-extension product. Releases should be small, reproducible, and boring.
 
 ## Release model
 

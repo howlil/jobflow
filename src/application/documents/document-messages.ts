@@ -1,4 +1,4 @@
-export const GET_DOCUMENT_FILE_MESSAGE = 'fillio:document/get' as const;
+export const GET_DOCUMENT_FILE_MESSAGE = 'jobflow:document/get' as const;
 
 export type GetDocumentFileMessage = {
   type: typeof GET_DOCUMENT_FILE_MESSAGE;

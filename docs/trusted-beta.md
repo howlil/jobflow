@@ -19,7 +19,7 @@ Each tester should validate:
 - install/reload succeeds
 - profile persists after browser restart
 - career workspace remains usable at desktop, tablet, and narrow widths
-- detected forms show only the small Fillio launcher until explicitly opened
+- detected forms show only the small Job Flow launcher until explicitly opened
 - explicit Fill works on safe fields
 - non-empty user values are not silently overwritten
 - sensitive fields remain gated by the vault and site approval
@@ -46,7 +46,7 @@ Use the compatibility report issue form. Reports must not contain:
 
 Useful evidence includes:
 
-- Fillio release/commit
+- Job Flow release/commit
 - browser version
 - sanitized hostname
 - ATS family if known

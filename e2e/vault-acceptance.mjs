@@ -86,12 +86,12 @@ async function getExtensionId(context) {
 async function vaultStorage(context) {
   const serviceWorker = await getServiceWorker(context);
   return serviceWorker.evaluate(async () => {
-    const stored = await globalThis.chrome.storage.local.get('fillio.vault');
-    return stored['fillio.vault'] ?? null;
+    const stored = await globalThis.chrome.storage.local.get('jobflow.vault');
+    return stored['jobflow.vault'] ?? null;
   });
 }
 
-const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i4-'));
+const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-i4-'));
 const fixture = await startFixtureServer();
 let context;
 
@@ -139,7 +139,7 @@ try {
   await expect(page.getByLabel('Vault passphrase')).toBeVisible();
 
   await page.goto(fixture.url);
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 2 ready fields' }),
   ).toBeVisible();

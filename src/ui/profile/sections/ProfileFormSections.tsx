@@ -450,10 +450,10 @@ function ExperienceSection(props: ExperienceSectionProps) {
       className="profile-section"
       hidden={activeSection !== 'experience'}
     >
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <h2>Experience</h2>
         <button
-          className="fillio-button"
+          className="jobflow-button"
           type="button"
           onClick={() =>
             changeProfile((draft) => {
@@ -478,7 +478,7 @@ function ExperienceSection(props: ExperienceSectionProps) {
         </button>
       </div>
       {profile.baseProfile.professional.experiences.length === 0 ? (
-        <div className="fillio-empty-row">No experience added yet.</div>
+        <div className="jobflow-empty-row">No experience added yet.</div>
       ) : (
         <div className="record-list">
           {profile.baseProfile.professional.experiences.map(
@@ -648,7 +648,7 @@ function ExperienceSection(props: ExperienceSectionProps) {
                   </label>
                 ) : null}
                 <button
-                  className="fillio-button"
+                  className="jobflow-button"
                   type="button"
                   onClick={() =>
                     changeProfile((draft) => {
@@ -676,10 +676,10 @@ function EducationSection(props: EducationSectionProps) {
 
   return (
     <section className="profile-section" hidden={activeSection !== 'education'}>
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <h2>Education</h2>
         <button
-          className="fillio-button"
+          className="jobflow-button"
           type="button"
           onClick={() =>
             changeProfile((draft) => {
@@ -703,7 +703,7 @@ function EducationSection(props: EducationSectionProps) {
         </button>
       </div>
       {profile.baseProfile.professional.education.length === 0 ? (
-        <div className="fillio-empty-row">No education added yet.</div>
+        <div className="jobflow-empty-row">No education added yet.</div>
       ) : (
         <div className="record-list">
           {profile.baseProfile.professional.education.map(
@@ -829,7 +829,7 @@ function EducationSection(props: EducationSectionProps) {
                 </label>
                 {descriptionPreview(education.description)}
                 <button
-                  className="fillio-button"
+                  className="jobflow-button"
                   type="button"
                   onClick={() =>
                     changeProfile((draft) => {
@@ -855,10 +855,10 @@ function SkillsSection(props: SkillsSectionProps) {
   return (
     <>
       <section className="profile-section" hidden={activeSection !== 'skills'}>
-        <div className="fillio-section-heading">
+        <div className="jobflow-section-heading">
           <h2>Skills</h2>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) => {
@@ -876,7 +876,7 @@ function SkillsSection(props: SkillsSectionProps) {
           </button>
         </div>
         {profile.baseProfile.professional.skills.length === 0 ? (
-          <div className="fillio-empty-row">No skills added yet.</div>
+          <div className="jobflow-empty-row">No skills added yet.</div>
         ) : (
           <div className="record-list">
             {profile.baseProfile.professional.skills.map((skill, index) => (
@@ -929,7 +929,7 @@ function SkillsSection(props: SkillsSectionProps) {
                   </label>
                 </div>
                 <button
-                  className="fillio-button"
+                  className="jobflow-button"
                   type="button"
                   onClick={() =>
                     changeProfile((draft) => {
@@ -952,10 +952,10 @@ function SkillsSection(props: SkillsSectionProps) {
         hidden={activeSection !== 'experience'}
       >
         <summary>Languages, certifications, and projects</summary>
-        <div className="fillio-section-heading">
+        <div className="jobflow-section-heading">
           <h3>Languages</h3>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) =>
@@ -1003,7 +1003,7 @@ function SkillsSection(props: SkillsSectionProps) {
               </label>
             </div>
             <button
-              className="fillio-button"
+              className="jobflow-button"
               type="button"
               onClick={() =>
                 changeProfile((draft) =>
@@ -1017,10 +1017,10 @@ function SkillsSection(props: SkillsSectionProps) {
           </article>
         ))}
 
-        <div className="fillio-section-heading">
+        <div className="jobflow-section-heading">
           <h3>Certifications</h3>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) =>
@@ -1114,7 +1114,7 @@ function SkillsSection(props: SkillsSectionProps) {
                 </label>
               </div>
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 onClick={() =>
                   changeProfile((draft) =>
@@ -1132,10 +1132,10 @@ function SkillsSection(props: SkillsSectionProps) {
           ),
         )}
 
-        <div className="fillio-section-heading">
+        <div className="jobflow-section-heading">
           <h3>Projects</h3>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) =>
@@ -1297,7 +1297,7 @@ function SkillsSection(props: SkillsSectionProps) {
             </label>
             {descriptionPreview(project.description)}
             <button
-              className="fillio-button"
+              className="jobflow-button"
               type="button"
               onClick={() =>
                 changeProfile((draft) =>
@@ -1425,15 +1425,15 @@ function DocumentsSection(props: DocumentsSectionProps) {
       hidden={activeSection !== 'documents'}
     >
       <summary>Documents and reusable answers</summary>
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <div>
           <h3>Resume metadata</h3>
           <p className="muted">
-            Metadata only. Fillio never uploads the file for you.
+            Metadata only. Job Flow never uploads the file for you.
           </p>
         </div>
         <button
-          className="fillio-button"
+          className="jobflow-button"
           type="button"
           onClick={() =>
             changeProfile((draft) =>
@@ -1480,7 +1480,7 @@ function DocumentsSection(props: DocumentsSectionProps) {
             </label>
           </div>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) =>
@@ -1494,10 +1494,10 @@ function DocumentsSection(props: DocumentsSectionProps) {
         </article>
       ))}
 
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <h3>Reusable answers</h3>
         <button
-          className="fillio-button"
+          className="jobflow-button"
           type="button"
           onClick={() =>
             changeProfile((draft) =>
@@ -1555,7 +1555,7 @@ function DocumentsSection(props: DocumentsSectionProps) {
             />
           </label>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             onClick={() =>
               changeProfile((draft) =>
@@ -1585,7 +1585,7 @@ function VariantsSection(props: VariantsSectionProps) {
 
   return (
     <section className="profile-section" hidden={activeSection !== 'variants'}>
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <div>
           <h2>Application variants</h2>
           <p className="muted">
@@ -1594,7 +1594,7 @@ function VariantsSection(props: VariantsSectionProps) {
           </p>
         </div>
         <button
-          className="fillio-button"
+          className="jobflow-button"
           type="button"
           onClick={() =>
             changeProfile((draft) => {
@@ -1631,7 +1631,7 @@ function VariantsSection(props: VariantsSectionProps) {
       ) : null}
 
       {profile.variants.length === 0 ? (
-        <div className="fillio-empty-row">
+        <div className="jobflow-empty-row">
           No application variants added yet.
         </div>
       ) : (
@@ -1699,7 +1699,7 @@ function VariantsSection(props: VariantsSectionProps) {
                 </label>
               </div>
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 onClick={() =>
                   changeProfile((draft) => {
@@ -1740,12 +1740,16 @@ function BackupSection(props: BackupSectionProps) {
         Export contains the normal versioned profile and variants. Sensitive
         vault values are not exported as plaintext.
       </p>
-      <div className="fillio-section-heading">
-        <button className="fillio-button" type="button" onClick={exportProfile}>
+      <div className="jobflow-section-heading">
+        <button
+          className="jobflow-button"
+          type="button"
+          onClick={exportProfile}
+        >
           <Download aria-hidden="true" size={16} />
           Export profile backup
         </button>
-        <label className="fillio-button">
+        <label className="jobflow-button">
           <Upload aria-hidden="true" size={16} />
           Import profile backup
           <input

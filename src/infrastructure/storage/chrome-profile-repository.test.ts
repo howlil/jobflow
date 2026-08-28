@@ -29,6 +29,20 @@ describe('ChromeProfileRepository', () => {
     await expect(repository.load()).resolves.toEqual(profile);
   });
 
+  it('migrates a legacy profile storage key on load', async () => {
+    const repository = new ChromeProfileRepository();
+    const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
+    profile.baseProfile.personal.legalName.first = 'Legacy';
+    await browser.storage.local.set({ 'fillio.profile': profile });
+
+    await expect(repository.load()).resolves.toEqual(profile);
+    await expect(
+      browser.storage.local.get(PROFILE_STORAGE_KEY),
+    ).resolves.toEqual({
+      [PROFILE_STORAGE_KEY]: profile,
+    });
+  });
+
   it('rejects a corrupted persisted payload', async () => {
     await browser.storage.local.set({
       [PROFILE_STORAGE_KEY]: {

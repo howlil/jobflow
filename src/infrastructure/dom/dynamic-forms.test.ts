@@ -59,7 +59,7 @@ describe('dynamic form support', () => {
     );
   });
 
-  it('debounces relevant form mutations and ignores unrelated text or Fillio UI', async () => {
+  it('debounces relevant form mutations and ignores unrelated text or Job Flow UI', async () => {
     document.body.innerHTML =
       '<form id="application"></form><p id="copy">Hello</p>';
     const onChange = vi.fn();
@@ -68,9 +68,9 @@ describe('dynamic form support', () => {
     });
 
     document.querySelector('#copy')!.textContent = 'Updated copy';
-    const fillio = document.createElement('fillio-form-assistant');
-    fillio.innerHTML = '<input name="internal" />';
-    document.body.append(fillio);
+    const jobflow = document.createElement('jobflow-form-assistant');
+    jobflow.innerHTML = '<input name="internal" />';
+    document.body.append(jobflow);
     await flushMutations();
     expect(onChange).not.toHaveBeenCalled();
 

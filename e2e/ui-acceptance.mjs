@@ -79,7 +79,7 @@ async function capture(page, name, viewport, fullPage = true) {
   await page.screenshot({ path: join(screenshotsDir, name), fullPage });
 }
 
-const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i6-'));
+const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-i6-'));
 const fixture = await startFixtureServer();
 let context;
 
@@ -123,9 +123,9 @@ try {
   });
 
   await page.goto(fixture.url);
-  const host = page.locator('fillio-form-assistant');
+  const host = page.locator('jobflow-form-assistant');
   await expect(host).toBeAttached();
-  const launcher = page.getByRole('button', { name: 'Open Fillio' });
+  const launcher = page.getByRole('button', { name: 'Open Job Flow' });
   await expect(launcher).toBeVisible();
   await expect(page.getByText('Sensitive fields detected')).toHaveCount(0);
   await capture(
@@ -172,9 +172,9 @@ try {
     false,
   );
 
-  await page.getByRole('button', { name: 'Close Fillio' }).first().click();
+  await page.getByRole('button', { name: 'Close Job Flow' }).first().click();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await capture(
     page,
     'floating-panel-mobile.png',

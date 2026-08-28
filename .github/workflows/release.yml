@@ -45,15 +45,15 @@ jobs:
         run: pnpm zip
       - name: Create checksum
         shell: bash
-        run: sha256sum .output/fillio-*-chrome.zip > SHA256SUMS
+        run: sha256sum .output/jobflow-*-chrome.zip > SHA256SUMS
       - name: Publish immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          package=$(find .output -maxdepth 1 -name 'fillio-*-chrome.zip' -print -quit)
+          package=$(find .output -maxdepth 1 -name 'jobflow-*-chrome.zip' -print -quit)
           test -n "$package"
           gh release create "$GITHUB_REF_NAME" "$package" SHA256SUMS \
             --verify-tag \
             --generate-notes \
-            --title "Fillio $GITHUB_REF_NAME"
+            --title "Job Flow $GITHUB_REF_NAME"

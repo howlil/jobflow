@@ -33,7 +33,7 @@ function sensitiveItem(label = 'NIK'): FillAnalysis {
 }
 
 function openSensitive() {
-  fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
   fireEvent.click(screen.getByRole('button', { name: /Sensitive fields/i }));
 }
 
