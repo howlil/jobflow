@@ -7,13 +7,15 @@ description: Use when adding tests, fixing regressions, defining browser fixture
 
 ## Core principle
 
-Keep most tests fast and browser-free. Use browser automation only when the behavior genuinely depends on DOM/browser-extension runtime semantics.
+Tests exist to reduce meaningful delivery risk. Choose the **cheapest deterministic layer with enough signal** for the realistic regression. Browser automation is justified only when browser/DOM/extension runtime semantics are part of that risk.
 
-## Test pyramid
+Do not use this skill to turn every change into a test-writing task.
+
+## Layer selection guide
 
 ### Pure/unit tests
 
-Default for:
+Often the cheapest strong layer for:
 
 - schema validation and migrations
 - base profile + variant resolution
@@ -25,11 +27,11 @@ Default for:
 - fill-plan policy
 - vault crypto envelope functions
 
-For behavior changes and bugs, write the failing test/fixture first when feasible.
+Use test-first only when a focused deterministic test is the cheapest high-signal way to define/protect the behavior. For exploratory or presentation-only work, do not manufacture a RED test.
 
 ### DOM integration tests
 
-Use focused DOM fixtures for:
+Use focused DOM fixtures when the distinct risk is DOM semantics, for example:
 
 - label/context extraction
 - native setter/event behavior
@@ -37,25 +39,23 @@ Use focused DOM fixtures for:
 - dynamic DOM additions
 - repeated field structures
 
-Fixtures should model patterns, not copy entire proprietary career pages.
+Fixtures should model relevant patterns, not copy entire proprietary career pages.
 
 ### Extension E2E
 
-Use sparingly for critical journeys:
+Use sparingly for critical runtime boundaries/journeys that lower layers cannot prove with comparable confidence, for example:
 
-- unpacked extension starts
-- content/background messaging works
-- profile persistence is available to the UI
-- floating control appears on a representative form
-- user-triggered fill updates the page
-- dynamic next-step rescan works
-- vault unlock/disclosure/auto-lock boundary works
+- unpacked extension/bootstrap behavior
+- content/background messaging
+- user-triggered fill in the actual extension runtime
+- dynamic rescan behavior when extension lifecycle matters
+- vault unlock/disclosure/auto-lock boundary
 
-Do not turn every component state into an E2E test.
+Do not turn component state, copy, layout, or styling into E2E coverage merely because it is visible in the browser.
 
 ## Matcher regression corpus
 
-Maintain representative fixture cases across:
+Maintain representative fixture cases for risks that matter, such as:
 
 - English and Indonesian labels
 - synonyms/abbreviations
@@ -65,21 +65,23 @@ Maintain representative fixture cases across:
 - common controlled components
 - dynamic/multi-step sections
 
-Every new matcher alias/rule adds at least one positive and one meaningful negative/collision case when applicable.
+A matcher change should add/update the smallest fixture that protects its intended behavior or realistic collision risk. Do not mechanically add positive/negative pairs when they add no distinct confidence.
 
 ## Bugfix rule
 
-Preferred sequence:
+Preferred when automation is high-signal and cheap:
 
 ```text
-reproduce -> failing test/fixture -> minimal fix -> passing focused test -> broader relevant suite
+reproduce -> focused failing test/fixture -> minimal fix -> passing focused test -> broader checks only as risk requires
 ```
 
-If the failure cannot reasonably be automated, document the manual reproduction and why automation was disproportionate.
+If a deterministic automated regression test is disproportionate or low-signal, verify with the next cheapest reliable method instead. Document manual reproduction only when it is necessary to preserve important context.
 
 ## Crypto/security tests
 
-Do not mock away the cryptographic primitive in tests whose purpose is vault correctness. Verify wrong passphrase, tampering/authentication failure, version handling, and lock policy in addition to round trip.
+Security boundaries justify stronger deterministic evidence. Do not mock away the cryptographic primitive in tests whose purpose is vault correctness.
+
+Verify relevant cases such as wrong passphrase, tampering/authentication failure, version handling, lock policy, and round trip when that boundary is changed.
 
 ## What not to test
 
@@ -90,7 +92,21 @@ Avoid tests that merely assert:
 - React implementation details with no user behavior
 - constants duplicated from production code
 - third-party library behavior already guaranteed upstream
+- presentation-only styling/layout/copy with no behavior at risk
+- confidence already proven adequately at a cheaper layer
+
+For every proposed test ask:
+
+> **What realistic regression does this prevent?**
+
+If there is no strong answer, do not add it.
 
 ## Completion evidence
 
-Before claiming implementation complete, run the relevant focused tests plus repository-level required verification: typecheck, lint/format check, unit tests, production build, and critical browser smoke test when runtime behavior changed.
+Before claiming implementation complete:
+
+1. run the focused verification justified by the changed risk
+2. run repository-required integration gates that apply to the branch/CI policy
+3. add browser acceptance only when browser/runtime semantics are a distinct risk or repository protection runs it mechanically
+
+Do not interpret an existing CI suite as a requirement to add new tests for every change.
