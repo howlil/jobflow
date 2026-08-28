@@ -43,7 +43,11 @@ export function PersonalDetailsSection({
 
   return (
     <>
-      <section className="profile-section" id="basic-info" hidden={hidden}>
+      <section
+        className="profile-section"
+        id="basic-info"
+        hidden={hidden}
+      >
         <h2>Basic information</h2>
         <div className="form-grid">
           <label>
