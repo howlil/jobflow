@@ -43,11 +43,7 @@ export function PersonalDetailsSection({
 
   return (
     <>
-      <section
-        className="profile-section"
-        id="basic-info"
-        hidden={hidden}
-      >
+      <section className="profile-section" id="basic-info" hidden={hidden}>
         <h2>Basic information</h2>
         <div className="form-grid">
           <label>
@@ -56,7 +52,8 @@ export function PersonalDetailsSection({
               value={profile.baseProfile.personal.legalName.first}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.first = event.target.value;
+                  draft.baseProfile.personal.legalName.first =
+                    event.target.value;
                 })
               }
             />
@@ -79,7 +76,8 @@ export function PersonalDetailsSection({
               value={profile.baseProfile.personal.legalName.last}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.last = event.target.value;
+                  draft.baseProfile.personal.legalName.last =
+                    event.target.value;
                 })
               }
             />
@@ -202,7 +200,8 @@ export function PersonalDetailsSection({
               value={profile.baseProfile.contact.address.country}
               onChange={(event) =>
                 changeProfile((draft) => {
-                  draft.baseProfile.contact.address.country = event.target.value;
+                  draft.baseProfile.contact.address.country =
+                    event.target.value;
                 })
               }
             />
