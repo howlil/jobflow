@@ -146,9 +146,10 @@ export function createCvImportWorkflow({
     document: DocumentMetadata,
   ): Promise<StoredProfileEnvelope> {
     const next = structuredClone(profile);
-    next.baseProfile.documents.resumes = next.baseProfile.documents.resumes.filter(
-      (item) => item.id !== document.id,
-    );
+    next.baseProfile.documents.resumes =
+      next.baseProfile.documents.resumes.filter(
+        (item) => item.id !== document.id,
+      );
     next.variants = next.variants.map((variant) =>
       variant.preferredResumeId === document.id
         ? { ...variant, preferredResumeId: null }
