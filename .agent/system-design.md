@@ -4,7 +4,46 @@
 
 Job Flow is a local-first browser extension. Keep the architecture small: **functional core, imperative shell**. Pure domain/application logic owns meaning and policy; browser/DOM/storage/crypto/UI code owns side effects.
 
-Do not turn a browser extension into an enterprise platform before the product creates that pressure.
+Do not turn a browser extension into an enterprise platform before the current product requirement creates that pressure.
+
+## Design authority
+
+The agent has high autonomy for ordinary local design decisions inside existing boundaries. Do not ask for approval for routine module structure, function decomposition, local reuse, or behavior-preserving refactoring.
+
+The user owns material architecture decisions. Evidence and alternatives may be surfaced, but the agent must not silently change a material boundary.
+
+A material architecture decision includes a meaningful change to one or more of:
+
+- product-visible contract/semantics
+- data ownership or destructive persisted-data behavior
+- runtime/service ownership boundaries
+- cross-context/public communication contracts
+- consistency model
+- infrastructure/network boundary
+- privacy posture or browser permission surface
+- framework/runtime architecture
+
+If the user's explicit request already authorizes that material decision, execute it. Otherwise surface the decision before crossing the boundary.
+
+## Smallest-design rule
+
+Before introducing a design, determine:
+
+1. What behavior must change?
+2. Which existing component/module owns that behavior?
+3. Can the requirement be implemented with the current architecture and patterns?
+4. What is the smallest design with the lowest justified blast radius?
+
+Prefer, in order:
+
+1. reuse an existing pattern
+2. extend an existing owner/component
+3. introduce a small local abstraction when current pressure justifies it
+4. change architecture only when the current architecture cannot reasonably satisfy the requirement
+
+When multiple designs are valid, prefer lower coupling, smaller change surface, fewer new dependencies/abstractions, lower migration cost, easier reversibility, and clearer ownership.
+
+Do not introduce architectural complexity for hypothetical scale, future reuse, flexibility, or unrequested roadmap items.
 
 ## Runtime contexts
 
@@ -95,11 +134,11 @@ MutationObserver
 
 No busy polling and no full re-analysis for every mutation. Ignore Job Flow's own injected UI mutations.
 
-## Architecture escalation triggers
+## Design escalation triggers
 
-A change deserves explicit design work only when it crosses one of these boundaries:
+Do explicit design analysis only when the current change materially touches:
 
-- persisted schema/migration
+- persisted schema/migration/data integrity
 - browser permission surface
 - new network/data-flow boundary
 - vault/crypto/sensitive disclosure
@@ -107,13 +146,15 @@ A change deserves explicit design work only when it crosses one of these boundar
 - destructive data operation
 - measured performance bottleneck requiring architectural change
 - ATS-specific adapter after a reproducible generic-engine failure
-- framework/runtime migration backed by measured evidence
+- framework/runtime migration backed by measured evidence and authorized scope
+
+A trigger means "analyze the boundary"; it does not automatically mean "create an architecture document" or "ask for approval." Ask for user approval only when the decision is material and not already authorized by the request.
 
 Everything else should normally be handled as a small local change using existing boundaries.
 
 ## Anti-overengineering
 
-Do not add without concrete evidence:
+Do not add without concrete current need and authorized scope:
 
 - backend or distributed service architecture
 - DI container/service locator

@@ -1,5 +1,11 @@
 # Product Contract
 
+## Product authority
+
+The user owns product decisions: WHY, WHAT, product scope/boundaries, product semantics, and final direction. The agent may surface evidence, risks, alternatives, and recommendations, but must not silently expand scope or convert a recommendation into a product decision.
+
+When the user's request is clear, the agent may derive concise observable acceptance criteria and execute ordinary local engineering decisions without asking for approval.
+
 ## Product job
 
 Job Flow reduces repetitive data entry in job applications. The user owns one canonical local career profile; Job Flow detects application forms, maps fields deterministically, recommends an application variant, and fills approved safe data without taking over submission.
@@ -37,38 +43,46 @@ The codebase currently includes:
 
 This section describes current capability, not a promise to preserve every current implementation detail.
 
-## Requirement format for every change
+## Requirement discipline
 
-Do not write a mini-PRD for routine work. A change needs only:
+Specify only what is needed to remove ambiguity for the current logical change.
+
+For a routine bounded task, explicit user intent plus directly derived observable acceptance criteria is enough. Do not require a mini-PRD, fixed acceptance-criteria count, roadmap, metrics section, or planning artifact.
+
+When a short requirement note is useful, prefer:
 
 ```text
-Problem:
-User/engineering outcome:
-Acceptance criteria: 3-5 observable bullets
-Non-goals:
-Risk flags: none | runtime | storage/schema | permission | privacy/security | release
+Problem / request:
+Expected observable outcome:
+Acceptance criteria: only what is needed
+Material non-goals or boundaries: only when relevant
+Risk flags: only when they change verification/design
 ```
 
-If acceptance requires multiple independently useful outcomes, split the work item.
+If the unresolved ambiguity would change product scope, product semantics, destructive behavior, privacy posture, permission surface, or a material architecture decision, surface that decision rather than silently inventing it.
 
-## Product metrics
+If the request contains multiple independently useful outcomes, split only when doing so materially reduces risk or batch size; do not split mechanically when one coherent change is simpler.
 
-Because Job Flow is local-first and avoids applicant-data telemetry, prefer privacy-safe fixture/compatibility evidence and opt-in trusted-beta observations.
+## Product evidence and metrics
 
-Track or sample:
+Product evidence exists to answer a current product question, not to satisfy process ceremony.
 
-- **safe fill coverage** — supported safe fields that reach Ready and can be filled on maintained representative forms
-- **fill execution success** — approved fill instructions successfully applied without aborting unrelated fields
-- **review/unknown rate** — eligible discovered fields that still need review or remain unknown
-- **correction rate** — recognized mappings that users must correct in validation/beta sessions
-- **compatibility pass rate** — maintained ATS/custom-form journeys passing the expected invariants
-- **regression rate** — previously supported journeys broken by a change
-- **safety incidents** — automatic submission, automatic attachment, or sensitive disclosure without approval; target is always zero
-- **task friction** — manually sampled steps/time needed to configure a profile and complete a representative form journey
+Possible privacy-safe measures include:
 
-Do not add invasive telemetry to obtain these numbers. Establish a baseline before creating numeric performance targets.
+- safe fill coverage
+- fill execution success
+- review/unknown rate
+- correction rate
+- compatibility pass rate
+- regression rate
+- safety incidents
+- task friction
 
-## Explicit non-goals until evidence changes the contract
+These are reference measures, **not mandatory instrumentation or deliverables for every change**. Use only the evidence needed for the current decision. Prefer existing fixtures, compatibility evidence, direct observation, or opt-in trusted-beta feedback when sufficient.
+
+Do not add invasive telemetry to obtain these numbers. Before a meaningful release, decide whether new instrumentation is actually necessary to evaluate the expected outcome; default to none when it adds little decision value.
+
+## Explicit non-goals until the user changes the contract
 
 - backend/account/cloud sync
 - AI/LLM dependency for core autofill
@@ -81,4 +95,4 @@ Do not add invasive telemetry to obtain these numbers. Establish a baseline befo
 - analytics platform containing applicant/profile/form data
 - framework rewrites without measured runtime/maintenance evidence
 
-When a non-goal becomes necessary, update this contract in the same logical change and state the evidence that justified it.
+Evidence may justify recommending a change to a non-goal, but evidence alone does **not** authorize the agent to expand the product contract. If the user decides to change scope, update this contract in the same logical change that implements the approved decision.

@@ -2,21 +2,28 @@
 
 Job Flow is a fast-moving `0.x` browser-extension product. Releases should be small, reproducible, and boring.
 
-## Release model
+## Lifecycle boundary
 
-`master` is always the next release candidate. There are no release branches and no feature trains.
+Do not conflate integration, release readiness, distribution, and observation.
 
 ```text
-small change
- -> ready PR verification
- -> squash merge to master
- -> observe
- -> tag a verified master commit when distribution is useful
- -> full release workflow
- -> immutable GitHub Release artifact
+IMPLEMENT
+ -> VERIFY
+ -> QUALITY GATES
+ -> RELEASE READY
+ -> STOP
+
+explicit release/distribution decision
+ -> RELEASE
+ -> real use / observation when useful
+ -> evidence
+ -> recommend keep | iterate | revert | remove | investigate
+ -> user product decision
 ```
 
-Do not wait for a large "iteration" to finish before integrating independently useful changes.
+`master` is the integration source of truth and a potential release candidate. A merge to `master` is **not automatically a release** and does not automatically create a product-observation task.
+
+Actual distribution/release follows explicit user intent or an already-established release automation/policy. The user owns the final product/release decision.
 
 ## Versioning
 
@@ -28,33 +35,56 @@ Use Semantic Versioning with `0.x` expectations:
 
 Use one canonical version source. Do not create version-bump commits for every development change.
 
-## Verification tiers
+## Quality gates
 
-### Draft PR / inner loop
+Quality gates exist to control release/integration risk, not to maximize checks.
 
-Fast deterministic CI only: install, unit tests, typecheck, lint/format, compatibility evidence, build, generated-manifest verification.
+### Baseline integration gates
 
-### Ready PR / master
+Run the repository checks that are mandatory for the affected codebase and branch protection, such as typecheck, lint/format, build, and generated-manifest/permission validation where applicable.
 
-Run the fast gate plus browser acceptance when runtime behavior is involved. This is the integration confidence gate; packaging is not needed on every development push.
+Existing CI may execute a broader suite mechanically. That does not mean every change must add tests or browser coverage.
 
-### Release tag
+### Risk-specific gates
 
-Fail closed on:
+Add only the checks justified by the change, for example:
 
-- locked dependency install
-- tests
-- typecheck
-- lint/format
-- compatibility evidence
-- production build
-- generated permission/manifest verification
-- browser acceptance
-- package ZIP
-- checksum
-- immutable GitHub Release creation
+- deterministic domain/storage tests for invariants or regressions
+- migration/data-integrity evidence for persisted schema changes
+- security/negative-path checks for vault/privacy-sensitive changes
+- browser/runtime acceptance when browser semantics are part of the changed risk
+- compatibility fixtures when autofill/matcher compatibility is affected
+- permission review when manifest/host permission behavior changes
 
-Schema/permission/vault/privacy changes need their relevant focused migration/security evidence in addition to the generic gate.
+Presentation-only layout/copy/static-markup changes do not require new automated tests merely because they affect UI files.
+
+### Release tag / distribution
+
+When an actual release is requested, fail closed on the release-critical path appropriate to the product, including locked dependency install, production build, generated manifest/permission verification, required existing regression suites, browser smoke/acceptance for critical runtime journeys, packaging, checksum, and immutable release artifact creation.
+
+Schema/permission/vault/privacy changes require their relevant focused evidence in addition to generic release mechanics.
+
+## Instrumentation and observation
+
+Instrumentation is not automatically required before release.
+
+Before a meaningful release, ask whether additional evidence is necessary to evaluate the expected product outcome. Prefer existing privacy-safe evidence, deterministic fixtures, direct observation, or opt-in trusted-beta feedback when sufficient.
+
+After actual release or meaningful real-world use, observe only what helps answer a product/technical question, for example:
+
+- technical health
+- user behavior/friction
+- expected product outcome
+
+Compare evidence with the expected outcome and recommend one of:
+
+- keep
+- iterate
+- revert
+- remove
+- investigate
+
+The recommendation does not authorize the next product change. The user owns that decision.
 
 ## Release notes
 
@@ -69,6 +99,8 @@ Explicitly call out new browser permissions, stored-data migration, sensitive-da
 
 ## Rollback
 
-Never mutate an already tagged release. Fix on current `master`, verify, and publish a new patch version. Persisted-data changes must be designed so users on older distributed versions are not casually destroyed by upgrade/rollback timing.
+Never mutate an already tagged release. Fix on current `master`, verify according to risk, and publish a new patch version when distribution is required.
 
-Do not add release-please, changesets, multi-channel deployment machinery, or store automation until actual release cadence/testers make the manual path a measured burden.
+Persisted-data changes must be designed so users on older distributed versions are not casually destroyed by upgrade/rollback timing.
+
+Do not add release-please, changesets, multi-channel deployment machinery, store automation, analytics, or release infrastructure until actual release cadence/operational evidence makes the simpler path a measured burden.
