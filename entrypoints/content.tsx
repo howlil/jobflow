@@ -28,9 +28,11 @@ import { recommendDocumentsForVariant } from '../src/domain/documents/recommend-
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
 import { createEmptyStoredProfile } from '../src/domain/profile/create-empty-profile';
+import { parseStoredProfile } from '../src/domain/profile/migrations';
 import type {
   BaseProfile,
   DocumentMetadata,
+  StoredProfileEnvelope,
 } from '../src/domain/profile/profile-schema';
 import {
   recommendApplicationVariant,
@@ -44,7 +46,10 @@ import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-
 import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
 import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
-import { ChromeProfileRepository } from '../src/infrastructure/storage/chrome-profile-repository';
+import {
+  ChromeProfileRepository,
+  PROFILE_STORAGE_KEY,
+} from '../src/infrastructure/storage/chrome-profile-repository';
 import {
   FloatingPanel,
   type DocumentAttachStatus,
@@ -158,12 +163,27 @@ export default defineContentScript({
 
     try {
       const stored = await new ChromeProfileRepository().load();
-      const envelope = stored ?? createEmptyStoredProfile();
-      knownVariantIds = new Set(envelope.variants.map((variant) => variant.id));
-      currentVariantOptions = envelope.variants.map((variant) => ({
-        id: variant.id,
-        name: variant.name || 'Untitled variant',
-      }));
+      let envelope = stored ?? createEmptyStoredProfile();
+
+      const applyProfileEnvelope = (nextEnvelope: StoredProfileEnvelope) => {
+        envelope = nextEnvelope;
+        knownVariantIds = new Set(
+          envelope.variants.map((variant) => variant.id),
+        );
+        currentVariantOptions = envelope.variants.map((variant) => ({
+          id: variant.id,
+          name: variant.name || 'Untitled variant',
+        }));
+
+        if (
+          pageVariantOverrideId !== null &&
+          !knownVariantIds.has(pageVariantOverrideId)
+        ) {
+          pageVariantOverrideId = null;
+        }
+      };
+
+      applyProfileEnvelope(envelope);
 
       const correctionRepository = new ChromeCorrectionRepository();
       const vaultClient = new ChromeVaultClient();
@@ -304,6 +324,37 @@ export default defineContentScript({
         renderPanel();
       };
       forceAnalyzePage = () => analyzePage(true);
+
+      const profileChangeListener: Parameters<
+        typeof browser.storage.onChanged.addListener
+      >[0] = (changes, areaName) => {
+        if (areaName !== 'local') return;
+        const profileChange = changes[PROFILE_STORAGE_KEY];
+        if (profileChange === undefined) return;
+
+        try {
+          const nextEnvelope =
+            profileChange.newValue === undefined
+              ? createEmptyStoredProfile()
+              : parseStoredProfile(profileChange.newValue);
+          applyProfileEnvelope(nextEnvelope);
+          analyzePage(true);
+        } catch {
+          currentSummary = null;
+          currentAnalysis = null;
+          currentVariantRecommendation = null;
+          currentActiveVariantId = null;
+          currentVariantOptions = [];
+          currentFileInputCount = 0;
+          currentRecommendedResume = null;
+          currentDocumentFields = [];
+          renderPanel();
+        }
+      };
+      browser.storage.onChanged.addListener(profileChangeListener);
+      ctx.onInvalidated(() => {
+        browser.storage.onChanged.removeListener(profileChangeListener);
+      });
 
       const rememberCorrection = async (
         context: FieldContext,

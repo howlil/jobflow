@@ -91,8 +91,13 @@ try {
     ],
   });
   const extensionId = await getExtensionId(context);
-  const page = await context.newPage();
+  const applicationPage = await context.newPage();
+  await applicationPage.goto(fixture.url);
+  await expect(applicationPage.locator('fillio-form-assistant')).toBeAttached();
+  await applicationPage.getByRole('button', { name: 'Open Fillio' }).click();
+  await expect(applicationPage.getByText('backend-cv.txt')).toHaveCount(0);
 
+  const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Documents' }).click();
   await expect(
@@ -141,18 +146,17 @@ try {
     page.locator('.document-row').getByText('backend-cv.txt'),
   ).toBeVisible();
 
-  await page.goto(fixture.url);
-  await expect(page.locator('fillio-form-assistant')).toBeAttached();
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
-  await expect(page.getByText('backend-cv.txt')).toBeVisible();
-  await page.getByRole('button', { name: 'Attach' }).click();
-  await expect(page.getByRole('status')).toHaveText('Attached');
+  await expect(applicationPage.getByText('backend-cv.txt')).toBeVisible();
+  await applicationPage.getByRole('button', { name: 'Attach' }).click();
+  await expect(applicationPage.getByRole('status')).toHaveText('Attached');
 
-  const attachedName = await page
+  const attachedName = await applicationPage
     .locator('#resume')
     .evaluate((input) => input.files?.[0]?.name ?? '');
   expect(attachedName).toBe('backend-cv.txt');
-  expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
+  expect(await applicationPage.evaluate(() => globalThis.__submitCount)).toBe(
+    0,
+  );
 } finally {
   await context?.close();
   await new Promise((resolvePromise) => fixture.server.close(resolvePromise));
