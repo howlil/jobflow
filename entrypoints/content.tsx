@@ -4,41 +4,24 @@ import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root';
 import { defineContentScript } from 'wxt/utils/define-content-script';
 
 import {
-  analyzeFieldContexts,
-  type PageAnalysis,
-  type PageAnalysisSummary,
-} from '../src/application/forms/analyze-field-contexts';
+  analyzePageContext,
+  type AnalyzedPageContext,
+  toPageContextResponse,
+} from '../src/application/forms/analyze-page-context';
 import {
   isGetPageAnalysisMessage,
   isGetPageContextMessage,
   isSetPageVariantMessage,
-  type PageDocumentFieldSummary,
-  type PageVariantOption,
-  type RecommendedDocumentSummary,
 } from '../src/application/forms/page-messages';
 import { createSensitiveFillInstructions } from '../src/application/vault/sensitive-values';
 import type { SensitiveFieldPath } from '../src/application/vault/vault-messages';
 import { OPEN_WORKSPACE } from '../src/application/workspace/workspace-messages';
 import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
-import {
-  classifyDocumentFieldIntent,
-  type DocumentFieldIntent,
-} from '../src/domain/documents/classify-document-field';
-import { recommendDocumentsForVariant } from '../src/domain/documents/recommend-document';
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
 import { createEmptyStoredProfile } from '../src/domain/profile/create-empty-profile';
 import { parseStoredProfile } from '../src/domain/profile/migrations';
-import type {
-  BaseProfile,
-  DocumentMetadata,
-  StoredProfileEnvelope,
-} from '../src/domain/profile/profile-schema';
-import {
-  recommendApplicationVariant,
-  type VariantRecommendation,
-} from '../src/domain/variants/recommend-variant';
-import { resolveApplicationProfile } from '../src/domain/variants/resolve-profile';
+import type { StoredProfileEnvelope } from '../src/domain/profile/profile-schema';
 import { attachFileToField } from '../src/infrastructure/dom/attach-file-control';
 import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
 import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
@@ -73,53 +56,13 @@ function collectPageSignals(document: Document): string[] {
   );
 }
 
-function documentSummary(
-  document: DocumentMetadata | null | undefined,
-): RecommendedDocumentSummary | null {
-  return document === null || document === undefined
-    ? null
-    : { id: document.id, label: document.label, fileName: document.fileName };
-}
-
-function documentForIntent(
-  intent: DocumentFieldIntent,
-  baseProfile: BaseProfile,
-  recommended: ReturnType<typeof recommendDocumentsForVariant>,
-): DocumentMetadata | null {
-  if (intent === 'resume') return recommended.resume;
-  if (intent === 'cover_letter') return recommended.coverLetter;
-  if (intent === 'transcript')
-    return baseProfile.documents.transcripts[0] ?? null;
-  if (intent === 'certificate') {
-    return baseProfile.documents.certificates[0] ?? null;
-  }
-  return null;
-}
-
-function documentFieldLabel(field: FieldContext, index: number): string {
-  return (
-    field.label ||
-    field.ariaLabel ||
-    field.name ||
-    field.id ||
-    `File field ${index + 1}`
-  );
-}
-
 export default defineContentScript({
   matches: ['http://*/*', 'https://*/*'],
   runAt: 'document_idle',
   world: 'ISOLATED',
 
   async main(ctx) {
-    let currentSummary: PageAnalysisSummary | null = null;
-    let currentAnalysis: PageAnalysis | null = null;
-    let currentVariantRecommendation: VariantRecommendation | null = null;
-    let currentActiveVariantId: string | null = null;
-    let currentVariantOptions: PageVariantOption[] = [];
-    let currentFileInputCount = 0;
-    let currentRecommendedResume: RecommendedDocumentSummary | null = null;
-    let currentDocumentFields: PageDocumentFieldSummary[] = [];
+    let currentContext: AnalyzedPageContext | null = null;
     let currentFieldSet = '';
     let currentVaultStatus: SensitiveVaultStatus = 'not-configured';
     let sensitiveError: string | null = null;
@@ -130,18 +73,10 @@ export default defineContentScript({
 
     const messageListener = (message: unknown) => {
       if (isGetPageAnalysisMessage(message)) {
-        return Promise.resolve(currentSummary);
+        return Promise.resolve(currentContext?.analysis.summary ?? null);
       }
       if (isGetPageContextMessage(message)) {
-        return Promise.resolve({
-          analysis: currentSummary,
-          variantRecommendation: currentVariantRecommendation,
-          activeVariantId: currentActiveVariantId,
-          variantOptions: currentVariantOptions,
-          fileInputCount: currentFileInputCount,
-          recommendedResume: currentRecommendedResume,
-          documentFields: currentDocumentFields,
-        });
+        return Promise.resolve(toPageContextResponse(currentContext));
       }
       if (isSetPageVariantMessage(message)) {
         if (
@@ -170,10 +105,6 @@ export default defineContentScript({
         knownVariantIds = new Set(
           envelope.variants.map((variant) => variant.id),
         );
-        currentVariantOptions = envelope.variants.map((variant) => ({
-          id: variant.id,
-          name: variant.name || 'Untitled variant',
-        }));
 
         if (
           pageVariantOverrideId !== null &&
@@ -207,34 +138,37 @@ export default defineContentScript({
 
       const renderPanel = () => {
         if (reactRoot === null) return;
-        if (currentAnalysis === null || currentAnalysis.summary.total === 0) {
+        if (
+          currentContext === null ||
+          currentContext.analysis.summary.total === 0
+        ) {
           reactRoot.render(null);
           return;
         }
 
         const variantName =
-          currentActiveVariantId === null
+          currentContext.activeVariantId === null
             ? null
-            : (currentVariantOptions.find(
-                (variant) => variant.id === currentActiveVariantId,
+            : (currentContext.variantOptions.find(
+                (variant) => variant.id === currentContext?.activeVariantId,
               )?.name ?? null);
 
         reactRoot.render(
           <FloatingPanel
-            summary={currentAnalysis.summary}
-            reviewItems={currentAnalysis.plan.needsReview}
-            sensitiveItems={currentAnalysis.plan.sensitive}
-            documentFields={currentDocumentFields}
+            summary={currentContext.analysis.summary}
+            reviewItems={currentContext.analysis.plan.needsReview}
+            sensitiveItems={currentContext.analysis.plan.sensitive}
+            documentFields={currentContext.documentFields}
             vaultStatus={currentVaultStatus}
             sensitiveError={sensitiveError}
             siteHost={location.host}
             variantName={variantName}
             onFill={() => {
-              if (currentAnalysis === null) return;
+              if (currentContext === null) return;
               applyFillInstructions(
                 document,
                 location.origin,
-                currentAnalysis.plan.ready,
+                currentContext.analysis.plan.ready,
               );
             }}
             onOpenOptions={() => {
@@ -274,53 +208,13 @@ export default defineContentScript({
         if (!force && nextFieldSet === currentFieldSet) return;
 
         currentFieldSet = nextFieldSet;
-        currentVariantRecommendation = recommendApplicationVariant(
-          envelope.variants,
-          collectPageSignals(document),
-          envelope.preferences.defaultVariantId,
-          envelope.baseProfile,
-        );
-        currentActiveVariantId =
-          pageVariantOverrideId ?? currentVariantRecommendation.variantId;
-        const selectedVariant =
-          currentActiveVariantId === null
-            ? undefined
-            : envelope.variants.find(
-                (variant) => variant.id === currentActiveVariantId,
-              );
-        const profile = resolveApplicationProfile(
-          envelope.baseProfile,
-          selectedVariant,
-        );
-        const documents = recommendDocumentsForVariant(
-          envelope.baseProfile,
-          selectedVariant,
-        );
-
-        const fileFields = fields.filter(
-          (field) => field.controlKind === 'file',
-        );
-        currentFileInputCount = fileFields.length;
-        currentRecommendedResume =
-          currentFileInputCount > 0 ? documentSummary(documents.resume) : null;
-        currentDocumentFields = fileFields.map((field, index) => {
-          const classification = classifyDocumentFieldIntent(field);
-          return {
-            fieldFingerprint: field.fieldFingerprint,
-            fieldLabel: documentFieldLabel(field, index),
-            intent: classification.intent,
-            evidence: classification.evidence,
-            recommendedDocument: documentSummary(
-              documentForIntent(
-                classification.intent,
-                envelope.baseProfile,
-                documents,
-              ),
-            ),
-          };
+        currentContext = analyzePageContext({
+          fields,
+          envelope,
+          corrections,
+          pageSignals: collectPageSignals(document),
+          variantOverrideId: pageVariantOverrideId,
         });
-        currentAnalysis = analyzeFieldContexts(fields, profile, corrections);
-        currentSummary = currentAnalysis.summary;
         renderPanel();
       };
       forceAnalyzePage = () => analyzePage(true);
@@ -340,14 +234,7 @@ export default defineContentScript({
           applyProfileEnvelope(nextEnvelope);
           analyzePage(true);
         } catch {
-          currentSummary = null;
-          currentAnalysis = null;
-          currentVariantRecommendation = null;
-          currentActiveVariantId = null;
-          currentVariantOptions = [];
-          currentFileInputCount = 0;
-          currentRecommendedResume = null;
-          currentDocumentFields = [];
+          currentContext = null;
           renderPanel();
         }
       };
@@ -384,9 +271,9 @@ export default defineContentScript({
       };
 
       const fillSensitive = async () => {
-        if (currentAnalysis === null) return;
+        if (currentContext === null) return;
         const fields: SensitiveFieldPath[] = [];
-        for (const item of currentAnalysis.plan.sensitive) {
+        for (const item of currentContext.analysis.plan.sensitive) {
           if (item.match.status === 'sensitive') {
             fields.push(item.match.field);
           }
@@ -398,7 +285,7 @@ export default defineContentScript({
           document,
           location.origin,
           createSensitiveFillInstructions(
-            currentAnalysis.plan.sensitive,
+            currentContext.analysis.plan.sensitive,
             response.values,
           ),
         );
@@ -440,14 +327,7 @@ export default defineContentScript({
         watcher.disconnect();
       });
     } catch {
-      currentSummary = null;
-      currentAnalysis = null;
-      currentVariantRecommendation = null;
-      currentActiveVariantId = null;
-      currentVariantOptions = [];
-      currentFileInputCount = 0;
-      currentRecommendedResume = null;
-      currentDocumentFields = [];
+      currentContext = null;
       forceAnalyzePage = null;
     }
   },
