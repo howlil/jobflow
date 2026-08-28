@@ -1,32 +1,32 @@
 export const FLOATING_STYLES = `
-.fillio-assistant {
-  --fillio-surface: #ffffff;
-  --fillio-surface-subtle: #f6f6f4;
-  --fillio-text: #111111;
-  --fillio-muted: #666660;
-  --fillio-border: #deded9;
-  --fillio-border-strong: #bdbdb6;
-  --fillio-danger: #a61b12;
-  --fillio-danger-bg: #fff2f0;
-  color: var(--fillio-text);
+.jobflow-assistant {
+  --jobflow-surface: #ffffff;
+  --jobflow-surface-subtle: #f6f6f4;
+  --jobflow-text: #111111;
+  --jobflow-muted: #666660;
+  --jobflow-border: #deded9;
+  --jobflow-border-strong: #bdbdb6;
+  --jobflow-danger: #a61b12;
+  --jobflow-danger-bg: #fff2f0;
+  color: var(--jobflow-text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1.45;
   pointer-events: none;
 }
 
-.fillio-assistant *,
-.fillio-assistant *::before,
-.fillio-assistant *::after {
+.jobflow-assistant *,
+.jobflow-assistant *::before,
+.jobflow-assistant *::after {
   box-sizing: border-box;
 }
 
-.fillio-launcher,
-.fillio-panel {
+.jobflow-launcher,
+.jobflow-panel {
   pointer-events: auto;
 }
 
-.fillio-launcher {
+.jobflow-launcher {
   position: fixed;
   z-index: 2147483647;
   top: 50%;
@@ -47,29 +47,29 @@ export const FLOATING_STYLES = `
   transition: width 120ms ease, background 120ms ease;
 }
 
-.fillio-launcher:hover {
+.jobflow-launcher:hover {
   width: 46px;
   background: #242422;
 }
 
-.fillio-assistant--open .fillio-launcher {
+.jobflow-assistant--open .jobflow-launcher {
   display: none;
 }
 
-.fillio-launcher:focus-visible,
-.fillio-panel button:focus-visible,
-.fillio-panel input:focus-visible {
+.jobflow-launcher:focus-visible,
+.jobflow-panel button:focus-visible,
+.jobflow-panel input:focus-visible {
   outline: 2px solid #111111;
   outline-offset: 3px;
 }
 
-.fillio-launcher__mark {
+.jobflow-launcher__mark {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -.04em;
 }
 
-.fillio-launcher__badge {
+.jobflow-launcher__badge {
   position: absolute;
   top: -6px;
   left: -6px;
@@ -86,7 +86,7 @@ export const FLOATING_STYLES = `
   font-weight: 800;
 }
 
-.fillio-panel {
+.jobflow-panel {
   position: fixed;
   z-index: 2147483647;
   top: 0;
@@ -97,20 +97,20 @@ export const FLOATING_STYLES = `
   overflow-y: auto;
   overscroll-behavior: contain;
   border: 0;
-  border-left: 1px solid var(--fillio-border);
+  border-left: 1px solid var(--jobflow-border);
   border-radius: 0;
-  background: var(--fillio-surface);
+  background: var(--jobflow-surface);
   box-shadow: -18px 0 48px rgba(17, 17, 17, .12);
   scrollbar-width: thin;
-  animation: fillio-panel-in 160ms cubic-bezier(.2, .8, .2, 1);
+  animation: jobflow-panel-in 160ms cubic-bezier(.2, .8, .2, 1);
 }
 
-.fillio-panel button,
-.fillio-panel input {
+.jobflow-panel button,
+.jobflow-panel input {
   font: inherit;
 }
 
-.fillio-panel__header {
+.jobflow-panel__header {
   position: sticky;
   z-index: 2;
   top: 0;
@@ -120,18 +120,18 @@ export const FLOATING_STYLES = `
   justify-content: space-between;
   gap: 16px;
   padding: 14px 16px 14px 18px;
-  border-bottom: 1px solid var(--fillio-border);
+  border-bottom: 1px solid var(--jobflow-border);
   background: rgba(255, 255, 255, .96);
   backdrop-filter: blur(14px);
 }
 
-.fillio-panel__header > div {
+.jobflow-panel__header > div {
   display: grid;
   min-width: 0;
   gap: 1px;
 }
 
-.fillio-panel__header strong {
+.jobflow-panel__header strong {
   overflow: hidden;
   font-size: 15px;
   font-weight: 720;
@@ -140,25 +140,25 @@ export const FLOATING_STYLES = `
   white-space: nowrap;
 }
 
-.fillio-panel__eyebrow,
-.fillio-panel__section-label,
-.fillio-panel__section-heading span {
-  color: var(--fillio-muted);
+.jobflow-panel__eyebrow,
+.jobflow-panel__section-label,
+.jobflow-panel__section-heading span {
+  color: var(--jobflow-muted);
   font-size: 10px;
   font-weight: 740;
   letter-spacing: .075em;
   text-transform: uppercase;
 }
 
-.fillio-panel__host {
+.jobflow-panel__host {
   overflow: hidden;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.fillio-panel__icon-button {
+.jobflow-panel__icon-button {
   display: grid;
   width: 34px;
   height: 34px;
@@ -168,25 +168,25 @@ export const FLOATING_STYLES = `
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   font-size: 20px;
   cursor: pointer;
 }
 
-.fillio-panel__icon-button:hover {
-  background: var(--fillio-surface-subtle);
-  color: var(--fillio-text);
+.jobflow-panel__icon-button:hover {
+  background: var(--jobflow-surface-subtle);
+  color: var(--jobflow-text);
 }
 
-.fillio-panel svg {
+.jobflow-panel svg {
   flex: 0 0 auto;
 }
 
-.fillio-panel__body {
+.jobflow-panel__body {
   display: grid;
 }
 
-.fillio-panel__summary {
+.jobflow-panel__summary {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -194,29 +194,29 @@ export const FLOATING_STYLES = `
   padding: 20px 18px 16px;
 }
 
-.fillio-panel__summary > div {
+.jobflow-panel__summary > div {
   display: grid;
   gap: 3px;
 }
 
-.fillio-panel__summary strong {
+.jobflow-panel__summary strong {
   font-size: 22px;
   font-weight: 720;
   letter-spacing: -.035em;
 }
 
-.fillio-panel__summary span,
-.fillio-panel__summary small {
-  color: var(--fillio-muted);
+.jobflow-panel__summary span,
+.jobflow-panel__summary small {
+  color: var(--jobflow-muted);
   font-size: 11px;
 }
 
-.fillio-panel__summary small {
+.jobflow-panel__summary small {
   padding-bottom: 3px;
   text-align: right;
 }
 
-.fillio-panel__fill {
+.jobflow-panel__fill {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -232,31 +232,31 @@ export const FLOATING_STYLES = `
   cursor: pointer;
 }
 
-.fillio-panel__fill:hover:not(:disabled),
-.fillio-panel__action--primary:hover:not(:disabled) {
+.jobflow-panel__fill:hover:not(:disabled),
+.jobflow-panel__action--primary:hover:not(:disabled) {
   background: #292927;
 }
 
-.fillio-panel__fill:disabled {
-  border-color: var(--fillio-border);
-  background: var(--fillio-surface-subtle);
-  color: var(--fillio-muted);
+.jobflow-panel__fill:disabled {
+  border-color: var(--jobflow-border);
+  background: var(--jobflow-surface-subtle);
+  color: var(--jobflow-muted);
   cursor: not-allowed;
 }
 
-.fillio-panel__section {
+.jobflow-panel__section {
   display: grid;
-  border-top: 1px solid var(--fillio-border);
+  border-top: 1px solid var(--jobflow-border);
 }
 
-.fillio-panel__section-heading {
+.jobflow-panel__section-heading {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 14px 18px 8px;
 }
 
-.fillio-panel__document {
+.jobflow-panel__document {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -264,34 +264,34 @@ export const FLOATING_STYLES = `
   padding: 11px 18px;
 }
 
-.fillio-panel__document + .fillio-panel__document {
-  border-top: 1px solid var(--fillio-border);
+.jobflow-panel__document + .jobflow-panel__document {
+  border-top: 1px solid var(--jobflow-border);
 }
 
-.fillio-panel__document-copy {
+.jobflow-panel__document-copy {
   display: grid;
   min-width: 0;
   gap: 2px;
 }
 
-.fillio-panel__document-copy strong {
+.jobflow-panel__document-copy strong {
   font-size: 12px;
 }
 
-.fillio-panel__document-copy span,
-.fillio-panel__document-copy small {
+.jobflow-panel__document-copy span,
+.jobflow-panel__document-copy small {
   overflow: hidden;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.fillio-panel__menu {
+.jobflow-panel__menu {
   display: grid;
 }
 
-.fillio-panel__menu button {
+.jobflow-panel__menu button {
   display: flex;
   min-height: 48px;
   align-items: center;
@@ -299,38 +299,38 @@ export const FLOATING_STYLES = `
   gap: 12px;
   padding: 0 18px;
   border: 0;
-  border-top: 1px solid var(--fillio-border);
-  background: var(--fillio-surface);
-  color: var(--fillio-text);
+  border-top: 1px solid var(--jobflow-border);
+  background: var(--jobflow-surface);
+  color: var(--jobflow-text);
   cursor: pointer;
   text-align: left;
 }
 
-.fillio-panel__menu button:first-child {
+.jobflow-panel__menu button:first-child {
   border-top: 0;
 }
 
-.fillio-panel__menu button > span {
+.jobflow-panel__menu button > span {
   display: inline-flex;
   min-width: 0;
   align-items: center;
   gap: 8px;
 }
 
-.fillio-panel__menu button:hover,
-.fillio-panel__open-profile:hover,
-.fillio-panel__back:hover,
-.fillio-panel__action--secondary:hover {
-  background: var(--fillio-surface-subtle);
+.jobflow-panel__menu button:hover,
+.jobflow-panel__open-profile:hover,
+.jobflow-panel__back:hover,
+.jobflow-panel__action--secondary:hover {
+  background: var(--jobflow-surface-subtle);
 }
 
-.fillio-panel__menu strong {
-  color: var(--fillio-muted);
+.jobflow-panel__menu strong {
+  color: var(--jobflow-muted);
   font-size: 11px;
   font-weight: 650;
 }
 
-.fillio-panel__open-profile {
+.jobflow-panel__open-profile {
   display: flex;
   min-height: 50px;
   align-items: center;
@@ -338,28 +338,28 @@ export const FLOATING_STYLES = `
   gap: 12px;
   padding: 0 18px;
   border: 0;
-  border-top: 1px solid var(--fillio-border);
-  background: var(--fillio-surface);
-  color: var(--fillio-text);
+  border-top: 1px solid var(--jobflow-border);
+  background: var(--jobflow-surface);
+  color: var(--jobflow-text);
   font-weight: 650;
   cursor: pointer;
   text-align: left;
 }
 
-.fillio-panel__detail {
+.jobflow-panel__detail {
   display: grid;
   gap: 12px;
   padding: 16px 18px 24px;
 }
 
-.fillio-panel__detail h2 {
+.jobflow-panel__detail h2 {
   margin: 3px 0 0;
   font-size: 18px;
   font-weight: 720;
   letter-spacing: -.025em;
 }
 
-.fillio-panel__back {
+.jobflow-panel__back {
   display: inline-flex;
   width: max-content;
   min-height: 34px;
@@ -370,40 +370,40 @@ export const FLOATING_STYLES = `
   border: 0;
   border-radius: 7px;
   background: transparent;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   cursor: pointer;
 }
 
-.fillio-panel__section-label {
+.jobflow-panel__section-label {
   margin: 0;
 }
 
-.fillio-panel__helper {
+.jobflow-panel__helper {
   margin: 6px 0 0;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   font-size: 12px;
   line-height: 1.45;
 }
 
-.fillio-panel__review {
+.jobflow-panel__review {
   display: grid;
   gap: 9px;
   padding: 12px 0;
-  border-top: 1px solid var(--fillio-border);
+  border-top: 1px solid var(--jobflow-border);
 }
 
-.fillio-panel__review > strong {
+.jobflow-panel__review > strong {
   font-size: 12px;
 }
 
-.fillio-panel__review-actions {
+.jobflow-panel__review-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.fillio-panel__action,
-.fillio-panel__action--secondary {
+.jobflow-panel__action,
+.jobflow-panel__action--secondary {
   display: inline-flex;
   min-height: 36px;
   align-items: center;
@@ -413,66 +413,66 @@ export const FLOATING_STYLES = `
   cursor: pointer;
 }
 
-.fillio-panel__action--secondary {
+.jobflow-panel__action--secondary {
   padding: 6px 9px;
-  border: 1px solid var(--fillio-border-strong);
-  background: var(--fillio-surface);
-  color: var(--fillio-text);
+  border: 1px solid var(--jobflow-border-strong);
+  background: var(--jobflow-surface);
+  color: var(--jobflow-text);
   font-size: 11px;
   font-weight: 650;
 }
 
-.fillio-panel__sensitive-list {
+.jobflow-panel__sensitive-list {
   display: grid;
   gap: 0;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--fillio-border);
+  border-top: 1px solid var(--jobflow-border);
   list-style: none;
 }
 
-.fillio-panel__sensitive-list li {
+.jobflow-panel__sensitive-list li {
   padding: 10px 0;
-  border-bottom: 1px solid var(--fillio-border);
-  color: var(--fillio-muted);
+  border-bottom: 1px solid var(--jobflow-border);
+  color: var(--jobflow-muted);
 }
 
-.fillio-panel__sensitive-error {
+.jobflow-panel__sensitive-error {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   margin: 0;
   padding: 10px;
-  border: 1px solid color-mix(in srgb, var(--fillio-danger) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--jobflow-danger) 28%, transparent);
   border-radius: 7px;
-  background: var(--fillio-danger-bg);
-  color: var(--fillio-danger);
+  background: var(--jobflow-danger-bg);
+  color: var(--jobflow-danger);
 }
 
-.fillio-panel__unlock {
+.jobflow-panel__unlock {
   display: grid;
   gap: 8px;
 }
 
-.fillio-panel__unlock label {
+.jobflow-panel__unlock label {
   display: grid;
   gap: 6px;
-  color: var(--fillio-muted);
+  color: var(--jobflow-muted);
   font-size: 11px;
   font-weight: 650;
 }
 
-.fillio-panel__unlock input {
+.jobflow-panel__unlock input {
   width: 100%;
   min-height: 42px;
   padding: 9px 10px;
-  border: 1px solid var(--fillio-border-strong);
+  border: 1px solid var(--jobflow-border-strong);
   border-radius: 7px;
-  background: var(--fillio-surface);
-  color: var(--fillio-text);
+  background: var(--jobflow-surface);
+  color: var(--jobflow-text);
 }
 
-.fillio-panel__action--primary {
+.jobflow-panel__action--primary {
   width: 100%;
   min-height: 42px;
   padding: 9px 12px;
@@ -483,18 +483,18 @@ export const FLOATING_STYLES = `
   font-weight: 700;
 }
 
-@keyframes fillio-panel-in {
+@keyframes jobflow-panel-in {
   from { opacity: .7; transform: translateX(24px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
 @media (max-width: 560px) {
-  .fillio-panel {
+  .jobflow-panel {
     left: 0;
     width: auto;
   }
 
-  .fillio-launcher {
+  .jobflow-launcher {
     width: 40px;
     height: 52px;
     border-radius: 11px 0 0 11px;
@@ -502,8 +502,8 @@ export const FLOATING_STYLES = `
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fillio-launcher,
-  .fillio-panel {
+  .jobflow-launcher,
+  .jobflow-panel {
     animation: none;
     transition: none;
   }

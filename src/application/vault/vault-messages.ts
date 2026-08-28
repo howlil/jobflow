@@ -30,35 +30,35 @@ export type SensitiveFieldPath = z.infer<typeof SensitiveFieldPathSchema>;
 export type SensitiveFieldValue = string | number | boolean | null;
 
 const VaultMessageSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('fillio:vault/status') }).strict(),
+  z.object({ type: z.literal('jobflow:vault/status') }).strict(),
   z
     .object({
-      type: z.literal('fillio:vault/setup'),
+      type: z.literal('jobflow:vault/setup'),
       passphrase: z.string().min(1),
       profile: SensitiveProfileSchema,
     })
     .strict(),
   z
     .object({
-      type: z.literal('fillio:vault/unlock'),
+      type: z.literal('jobflow:vault/unlock'),
       passphrase: z.string().min(1),
     })
     .strict(),
-  z.object({ type: z.literal('fillio:vault/lock') }).strict(),
-  z.object({ type: z.literal('fillio:vault/load-profile') }).strict(),
+  z.object({ type: z.literal('jobflow:vault/lock') }).strict(),
+  z.object({ type: z.literal('jobflow:vault/load-profile') }).strict(),
   z
     .object({
-      type: z.literal('fillio:vault/save-profile'),
+      type: z.literal('jobflow:vault/save-profile'),
       profile: SensitiveProfileSchema,
     })
     .strict(),
   z
     .object({
-      type: z.literal('fillio:vault/read-fields'),
+      type: z.literal('jobflow:vault/read-fields'),
       fields: z.array(SensitiveFieldPathSchema),
     })
     .strict(),
-  z.object({ type: z.literal('fillio:vault/reset') }).strict(),
+  z.object({ type: z.literal('jobflow:vault/reset') }).strict(),
 ]);
 
 export type VaultMessage = z.infer<typeof VaultMessageSchema>;

@@ -2,7 +2,7 @@
 
 ## Design intent
 
-Fillio is a local-first browser extension. Keep the architecture small: **functional core, imperative shell**. Pure domain/application logic owns meaning and policy; browser/DOM/storage/crypto/UI code owns side effects.
+Job Flow is a local-first browser extension. Keep the architecture small: **functional core, imperative shell**. Pure domain/application logic owns meaning and policy; browser/DOM/storage/crypto/UI code owns side effects.
 
 Do not turn a browser extension into an enterprise platform before the product creates that pressure.
 
@@ -93,7 +93,7 @@ MutationObserver
  -> publish analysis state
 ```
 
-No busy polling and no full re-analysis for every mutation. Ignore Fillio's own injected UI mutations.
+No busy polling and no full re-analysis for every mutation. Ignore Job Flow's own injected UI mutations.
 
 ## Architecture escalation triggers
 

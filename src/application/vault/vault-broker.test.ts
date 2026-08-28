@@ -73,7 +73,7 @@ describe('createVaultBroker', () => {
 
   it('reports configured and unlocked state without exposing passphrase or key material', async () => {
     const response = await broker().handle({
-      type: 'fillio:vault/setup',
+      type: 'jobflow:vault/setup',
       passphrase: 'local-passphrase',
       profile: encryptedProfile,
     });
@@ -92,7 +92,7 @@ describe('createVaultBroker', () => {
   it('fails closed when unlocking an absent vault or an invalid passphrase', async () => {
     await expect(
       broker().handle({
-        type: 'fillio:vault/unlock',
+        type: 'jobflow:vault/unlock',
         passphrase: 'local-passphrase',
       }),
     ).resolves.toEqual({ ok: false, error: 'not-configured' });
@@ -113,7 +113,7 @@ describe('createVaultBroker', () => {
 
     await expect(
       invalidBroker.handle({
-        type: 'fillio:vault/unlock',
+        type: 'jobflow:vault/unlock',
         passphrase: 'wrong-passphrase',
       }),
     ).resolves.toEqual({ ok: false, error: 'invalid-passphrase' });
@@ -124,11 +124,11 @@ describe('createVaultBroker', () => {
     repository.envelope = createEmptyVaultEnvelope();
 
     await expect(
-      broker().handle({ type: 'fillio:vault/load-profile' }),
+      broker().handle({ type: 'jobflow:vault/load-profile' }),
     ).resolves.toEqual({ ok: false, error: 'locked' });
     await expect(
       broker().handle({
-        type: 'fillio:vault/save-profile',
+        type: 'jobflow:vault/save-profile',
         profile: encryptedProfile,
       }),
     ).resolves.toEqual({ ok: false, error: 'locked' });
@@ -140,12 +140,12 @@ describe('createVaultBroker', () => {
     const vaultBroker = broker();
 
     await expect(
-      vaultBroker.handle({ type: 'fillio:vault/load-profile' }),
+      vaultBroker.handle({ type: 'jobflow:vault/load-profile' }),
     ).resolves.toEqual({ ok: true, profile: encryptedProfile });
 
     await expect(
       vaultBroker.handle({
-        type: 'fillio:vault/read-fields',
+        type: 'jobflow:vault/read-fields',
         fields: ['identity.nationalId', 'personal.birthDate'],
       }),
     ).resolves.toEqual({
@@ -159,7 +159,7 @@ describe('createVaultBroker', () => {
     encryptedProfile.identity.taxId = '99.999.999.9-999.999';
     await expect(
       vaultBroker.handle({
-        type: 'fillio:vault/save-profile',
+        type: 'jobflow:vault/save-profile',
         profile: encryptedProfile,
       }),
     ).resolves.toMatchObject({
@@ -176,7 +176,7 @@ describe('createVaultBroker', () => {
     session.unlock(key('session'));
 
     await expect(
-      broker().handle({ type: 'fillio:vault/lock' }),
+      broker().handle({ type: 'jobflow:vault/lock' }),
     ).resolves.toEqual({
       ok: true,
       status: { configured: true, unlocked: false, expiresAt: null },
@@ -185,7 +185,7 @@ describe('createVaultBroker', () => {
 
     session.unlock(key('session'));
     await expect(
-      broker().handle({ type: 'fillio:vault/reset' }),
+      broker().handle({ type: 'jobflow:vault/reset' }),
     ).resolves.toEqual({
       ok: true,
       status: { configured: false, unlocked: false, expiresAt: null },

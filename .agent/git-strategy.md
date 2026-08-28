@@ -1,6 +1,6 @@
 # Git Strategy
 
-Fillio uses small-batch trunk-based development around `master`.
+Job Flow uses small-batch trunk-based development around `master`.
 
 ## Core flow
 

@@ -71,11 +71,11 @@ export function createVaultBroker({
   }
 
   async function handleParsed(message: VaultMessage): Promise<VaultResponse> {
-    if (message.type === 'fillio:vault/status') {
+    if (message.type === 'jobflow:vault/status') {
       return status();
     }
 
-    if (message.type === 'fillio:vault/setup') {
+    if (message.type === 'jobflow:vault/setup') {
       const { envelope, key } = await crypto.createEncryptedVault(
         message.profile,
         message.passphrase,
@@ -85,7 +85,7 @@ export function createVaultBroker({
       return status(true);
     }
 
-    if (message.type === 'fillio:vault/unlock') {
+    if (message.type === 'jobflow:vault/unlock') {
       const envelope = await loadConfiguredEnvelope();
       if ('ok' in envelope) return envelope;
 
@@ -103,12 +103,12 @@ export function createVaultBroker({
       return status(true);
     }
 
-    if (message.type === 'fillio:vault/lock') {
+    if (message.type === 'jobflow:vault/lock') {
       session.lock();
       return status();
     }
 
-    if (message.type === 'fillio:vault/reset') {
+    if (message.type === 'jobflow:vault/reset') {
       await repository.delete();
       session.lock();
       return status(false);
@@ -120,14 +120,14 @@ export function createVaultBroker({
     const key = requireSessionKey();
     if ('ok' in key) return key;
 
-    if (message.type === 'fillio:vault/load-profile') {
+    if (message.type === 'jobflow:vault/load-profile') {
       return {
         ok: true,
         profile: await crypto.decryptSensitiveProfile(envelope, key),
       };
     }
 
-    if (message.type === 'fillio:vault/save-profile') {
+    if (message.type === 'jobflow:vault/save-profile') {
       await repository.save(
         await crypto.reencryptSensitiveProfile(message.profile, envelope, key),
       );

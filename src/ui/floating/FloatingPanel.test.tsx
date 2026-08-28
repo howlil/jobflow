@@ -21,7 +21,7 @@ describe('FloatingPanel', () => {
     );
 
     expect(screen.queryByLabelText('Form analysis summary')).toBeNull();
-    const launcher = screen.getByRole('button', { name: 'Open Fillio' });
+    const launcher = screen.getByRole('button', { name: 'Open Job Flow' });
     expect(launcher.getAttribute('aria-expanded')).toBe('false');
 
     fireEvent.click(launcher);
@@ -53,7 +53,7 @@ describe('FloatingPanel', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
     const button = screen.getByRole('button', {
       name: 'No safe fields ready to fill yet',
     });
@@ -90,7 +90,7 @@ describe('FloatingPanel', () => {
     );
 
     expect(attach).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
     fireEvent.click(screen.getByRole('button', { name: 'Attach' }));
 
     expect(attach).toHaveBeenCalledWith('resume-field', 'resume-1');

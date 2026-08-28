@@ -7,7 +7,7 @@ Use an unlisted/test distribution channel before a public stable listing.
 Before submission, confirm store copy matches runtime behavior:
 
 - local-first career-form autofill assistant
-- no Fillio account/backend/cloud sync
+- no Job Flow account/backend/cloud sync
 - no AI dependency
 - no automatic Apply, Submit, Next, or file upload
 - sensitive data is optional, encrypted locally, and requires explicit disclosure approval

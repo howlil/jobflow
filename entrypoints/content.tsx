@@ -407,7 +407,7 @@ export default defineContentScript({
       analyzePage(true);
 
       const ui = await createShadowRootUi<Root>(ctx, {
-        name: 'fillio-form-assistant',
+        name: 'jobflow-form-assistant',
         position: 'inline',
         anchor: 'body',
         css: FLOATING_STYLES,

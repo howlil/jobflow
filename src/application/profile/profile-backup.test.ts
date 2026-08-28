@@ -16,7 +16,7 @@ describe('profile backup', () => {
     const backup = createProfileBackup(profile, '2026-08-25T00:00:00.000Z');
     const parsed = parseProfileBackup(serializeProfileBackup(backup));
 
-    expect(parsed.format).toBe('fillio-profile-backup');
+    expect(parsed.format).toBe('jobflow-profile-backup');
     expect(parsed.formatVersion).toBe(1);
     expect(parsed.profile.baseProfile.personal.legalName.first).toBe('Ulil');
   });
@@ -39,7 +39,7 @@ describe('profile backup', () => {
     expect(
       inspectProfileBackup(
         JSON.stringify({
-          format: 'fillio-profile-backup',
+          format: 'jobflow-profile-backup',
           formatVersion: 99,
           exportedAt: '2026-08-25T00:00:00.000Z',
           profile: {},
@@ -48,11 +48,12 @@ describe('profile backup', () => {
     ).toEqual({
       ok: false,
       reason: 'unsupported_version',
-      message: 'This backup version is newer than this Fillio build supports.',
+      message:
+        'This backup version is newer than this Job Flow build supports.',
     });
 
     const invalidProfile = JSON.stringify({
-      format: 'fillio-profile-backup',
+      format: 'jobflow-profile-backup',
       formatVersion: 1,
       exportedAt: '2026-08-25T00:00:00.000Z',
       profile: {},

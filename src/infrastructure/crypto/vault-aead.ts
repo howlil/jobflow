@@ -1,7 +1,7 @@
 import { VAULT_TAG_LENGTH } from '../../domain/vault/vault-envelope';
 
 const encoder = new TextEncoder();
-const VAULT_AAD = encoder.encode('fillio:vault:v1');
+const VAULT_AAD = encoder.encode('jobflow:vault:v1');
 
 export async function encryptVaultBytes(
   plaintext: Uint8Array<ArrayBuffer>,

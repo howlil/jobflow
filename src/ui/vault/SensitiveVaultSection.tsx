@@ -173,27 +173,27 @@ export function SensitiveVaultSection({
 
   return (
     <section className="profile-section vault-section" id="sensitive-vault">
-      <div className="section-heading fillio-section-heading">
+      <div className="section-heading jobflow-section-heading">
         <div>
           <h2>Sensitive vault</h2>
           <p className="muted">
             Add salary, identity, and other private answers here only when a job
-            form asks for them. Fillio still asks before using them on a site.
+            form asks for them. Job Flow still asks before using them on a site.
           </p>
         </div>
-        <strong className="fillio-chip fillio-chip-strong">
+        <strong className="jobflow-chip jobflow-chip-strong">
           <ShieldCheck aria-hidden="true" size={14} />
           {vaultStatus.configured ? 'Vault set up' : 'Vault not set up'}
         </strong>
       </div>
 
       {error !== null ? (
-        <p className="fillio-status fillio-status-danger" role="alert">
+        <p className="jobflow-status jobflow-status-danger" role="alert">
           {error}
         </p>
       ) : null}
       {message !== null ? (
-        <p className="fillio-status fillio-status-success" role="status">
+        <p className="jobflow-status jobflow-status-success" role="status">
           {message}
         </p>
       ) : null}
@@ -220,7 +220,7 @@ export function SensitiveVaultSection({
             </label>
           </div>
           <button
-            className="fillio-button fillio-button-primary"
+            className="jobflow-button jobflow-button-primary"
             type="button"
             onClick={() => void setupVault()}
           >
@@ -233,7 +233,7 @@ export function SensitiveVaultSection({
           <SensitiveProfileFields profile={profile} onChange={changeProfile} />
           <div className="button-row vault-actions">
             <button
-              className="fillio-button fillio-button-primary"
+              className="jobflow-button jobflow-button-primary"
               type="button"
               onClick={() => void saveVault()}
             >
@@ -241,7 +241,7 @@ export function SensitiveVaultSection({
               Save sensitive data
             </button>
             <button
-              className="fillio-button fillio-button-secondary"
+              className="jobflow-button jobflow-button-secondary"
               type="button"
               onClick={() => void lockVault()}
             >
@@ -250,7 +250,7 @@ export function SensitiveVaultSection({
             </button>
             {confirmReset ? (
               <button
-                className="fillio-button fillio-button-danger"
+                className="jobflow-button jobflow-button-danger"
                 type="button"
                 onClick={() => void resetVault()}
               >
@@ -259,7 +259,7 @@ export function SensitiveVaultSection({
               </button>
             ) : (
               <button
-                className="fillio-button"
+                className="jobflow-button"
                 type="button"
                 onClick={() => setConfirmReset(true)}
               >
@@ -280,7 +280,7 @@ export function SensitiveVaultSection({
             />
           </label>
           <button
-            className="fillio-button fillio-button-primary"
+            className="jobflow-button jobflow-button-primary"
             type="button"
             onClick={() => void unlockVault()}
           >

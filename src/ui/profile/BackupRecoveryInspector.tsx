@@ -38,7 +38,7 @@ export function BackupRecoveryInspector({
       setMessage('Backup restored successfully.');
       await onRestored?.();
     } catch {
-      setMessage('The backup is valid, but Fillio could not restore it.');
+      setMessage('The backup is valid, but Job Flow could not restore it.');
     } finally {
       setRestoring(false);
     }
@@ -49,7 +49,7 @@ export function BackupRecoveryInspector({
       className="profile-section"
       aria-labelledby="backup-inspector-title"
     >
-      <div className="fillio-section-heading">
+      <div className="jobflow-section-heading">
         <div>
           <p className="eyebrow">Recovery</p>
           <h2 id="backup-inspector-title">Backup diagnostics</h2>
@@ -85,7 +85,7 @@ export function BackupRecoveryInspector({
             . Restore only if this is the profile snapshot you intend to use.
           </p>
           <button
-            className="fillio-button"
+            className="jobflow-button"
             type="button"
             disabled={restoring}
             onClick={() => void restore()}

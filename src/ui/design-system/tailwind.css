@@ -99,63 +99,63 @@
     @apply mt-1.5 w-full rounded-control border border-app-border bg-white px-3 py-2 text-sm text-app-ink outline-none transition focus:border-app-ink focus:ring-2 focus:ring-app-border;
   }
 
-  .fillio-nav-link {
+  .jobflow-nav-link {
     @apply flex min-h-[34px] w-full items-center gap-2 rounded-control border border-transparent px-2 py-1.5 text-left text-xs font-medium text-app-text transition-colors hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2;
   }
 
-  .fillio-nav-link[aria-current='page'] {
+  .jobflow-nav-link[aria-current='page'] {
     @apply border-app-border bg-white font-semibold text-app-ink;
   }
 
-  .fillio-button {
+  .jobflow-button {
     @apply inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-app-border-strong bg-white px-3 py-1.5 text-xs font-semibold text-app-ink transition-colors hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
-  .fillio-button:active:not(:disabled) {
+  .jobflow-button:active:not(:disabled) {
     @apply translate-y-px;
   }
 
-  .fillio-button-primary,
-  .fillio-button-accent {
+  .jobflow-button-primary,
+  .jobflow-button-accent {
     @apply border-app-ink bg-app-ink text-white hover:border-black hover:bg-black;
   }
 
-  .fillio-button-secondary {
+  .jobflow-button-secondary {
     @apply bg-white;
   }
 
-  .fillio-button-ghost {
+  .jobflow-button-ghost {
     @apply border-transparent bg-transparent text-app-text hover:border-transparent hover:bg-app-muted hover:text-app-ink;
   }
 
-  .fillio-button-danger {
+  .jobflow-button-danger {
     @apply border-red-200 bg-red-50 text-red-700 hover:border-red-600 hover:bg-red-600 hover:text-white;
   }
 
-  .fillio-icon-button {
+  .jobflow-icon-button {
     @apply grid h-9 w-9 place-items-center rounded-control border border-app-border bg-white text-app-ink transition hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink;
   }
 
-  .fillio-chip {
+  .jobflow-chip {
     @apply inline-flex items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text;
   }
 
-  .fillio-chip-strong {
+  .jobflow-chip-strong {
     @apply border-app-border-strong bg-white font-semibold text-app-ink;
   }
 
-  .fillio-status,
+  .jobflow-status,
   .profile-section > [role='status'],
   .profile-section > [role='alert'] {
     @apply w-full rounded-control border border-app-border bg-app-muted px-3 py-2.5 text-xs text-app-text;
   }
 
-  .fillio-status-success,
+  .jobflow-status-success,
   .profile-section > [role='status'] {
     @apply border-emerald-200 bg-emerald-50 text-emerald-800;
   }
 
-  .fillio-status-danger,
+  .jobflow-status-danger,
   .profile-section > [role='alert'] {
     @apply border-red-200 bg-red-50 text-red-700;
   }
@@ -235,7 +235,7 @@
     @apply mb-[18px] grid gap-3.5 rounded-app border border-app-border bg-white p-[18px];
   }
 
-  .fillio-section-heading,
+  .jobflow-section-heading,
   .section-heading,
   .workspace-tool-section__header {
     @apply flex items-start justify-between gap-[18px];
@@ -357,11 +357,11 @@
     @apply pl-1;
   }
 
-  .record-card > .fillio-button {
+  .record-card > .jobflow-button {
     @apply justify-self-start;
   }
 
-  .fillio-empty-row {
+  .jobflow-empty-row {
     @apply flex items-center justify-between gap-4 border-y border-app-border py-3 text-xs text-app-text;
   }
 
@@ -415,7 +415,7 @@
     @apply text-sm font-semibold text-app-ink;
   }
 
-  .fillio-visually-hidden {
+  .jobflow-visually-hidden {
     @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
     clip: rect(0, 0, 0, 0);
     margin: -1px;
@@ -453,10 +453,10 @@
       @apply pt-4;
     }
 
-    .fillio-section-heading,
+    .jobflow-section-heading,
     .section-heading,
     .workspace-tool-section__header,
-    .fillio-empty-row {
+    .jobflow-empty-row {
       @apply flex-col items-stretch;
     }
 
@@ -485,7 +485,7 @@
       @apply max-w-[132px] text-right text-[10px] leading-3;
     }
 
-    .profile-save-action .fillio-button {
+    .profile-save-action .jobflow-button {
       @apply h-11 w-11 shrink-0 p-0;
     }
 
@@ -506,8 +506,8 @@
   }
 
   @media (any-pointer: coarse) {
-    .fillio-button,
-    .fillio-nav-link {
+    .jobflow-button,
+    .jobflow-nav-link {
       min-height: 44px;
     }
   }

@@ -31,11 +31,11 @@ if (address === null || typeof address === 'string') {
   throw new Error('Could not determine fixture port');
 }
 const fixtureUrl = `http://127.0.0.1:${address.port}/apply`;
-const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i3-'));
+const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-i3-'));
 let context;
 
 async function expectReviewCount(page, count) {
-  await expect(page.getByLabel('Fillio assistant menu')).toContainText(
+  await expect(page.getByLabel('Job Flow assistant menu')).toContainText(
     new RegExp(`${count}\\s+review`),
   );
 }
@@ -63,7 +63,7 @@ try {
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
 
   await page.goto(fixtureUrl);
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await expectReviewCount(page, 1);
   await page.getByRole('button', { name: /Review ambiguous fields/i }).click();
   await page
@@ -97,7 +97,7 @@ try {
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
 
   await page.reload();
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 3 ready fields' }),
   ).toBeVisible();

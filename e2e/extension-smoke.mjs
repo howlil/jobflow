@@ -146,7 +146,7 @@ async function getExtensionId(context) {
   return extensionId;
 }
 
-const userDataDir = await mkdtemp(join(tmpdir(), 'fillio-e2e-'));
+const userDataDir = await mkdtemp(join(tmpdir(), 'jobflow-e2e-'));
 const fixture = await startFixtureServer();
 let context;
 
@@ -191,8 +191,8 @@ try {
   await expect(page.getByText('3 of 6 profile sections ready')).toBeVisible();
 
   await page.goto(fixture.url);
-  await expect(page.locator('fillio-form-assistant')).toBeAttached();
-  await page.getByRole('button', { name: 'Open Fillio' }).click();
+  await expect(page.locator('jobflow-form-assistant')).toBeAttached();
+  await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await expect(
     page.getByRole('button', { name: 'Fill 7 ready fields' }),
   ).toBeVisible();
@@ -206,7 +206,7 @@ try {
     });
     if (tab?.id === undefined) throw new Error('Active fixture tab not found');
     return extensionApi.tabs.sendMessage(tab.id, {
-      type: 'fillio:get-page-analysis',
+      type: 'jobflow:get-page-analysis',
     });
   });
   expect(summary).toEqual({

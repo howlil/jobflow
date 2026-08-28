@@ -1,6 +1,6 @@
 ---
 name: frontend-extension-ui
-description: Use when building or changing Fillio popup, options/profile screens, floating in-page controls, form editing UX, accessibility, or React component/state boundaries.
+description: Use when building or changing Job Flow popup, options/profile screens, floating in-page controls, form editing UX, accessibility, or React component/state boundaries.
 ---
 
 # Frontend Extension UI
@@ -39,7 +39,7 @@ Keep uncommon/sensitive data in explicit additional sections. Complete schema do
 
 ## Floating UI
 
-Prefer an isolated mount/shadow root so host CSS cannot break Fillio. Keep it compact until the user opens Review. Do not cover application controls or steal focus unexpectedly.
+Prefer an isolated mount/shadow root so host CSS cannot break Job Flow. Keep it compact until the user opens Review. Do not cover application controls or steal focus unexpectedly.
 
 ## Autofill states
 

@@ -124,21 +124,21 @@ export function FloatingPanel({
 
   return (
     <aside
-      className={`fillio-assistant${isOpen ? ' fillio-assistant--open' : ''}`}
-      aria-label="Fillio form assistant"
+      className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`}
+      aria-label="Job Flow form assistant"
     >
       {isOpen ? (
-        <section className="fillio-panel" aria-label="Fillio assistant menu">
-          <header className="fillio-panel__header">
+        <section className="jobflow-panel" aria-label="Job Flow assistant menu">
+          <header className="jobflow-panel__header">
             <div>
-              <span className="fillio-panel__eyebrow">Fillio</span>
+              <span className="jobflow-panel__eyebrow">Job Flow</span>
               <strong>{variantName || 'Application assistant'}</strong>
-              <span className="fillio-panel__host">{siteHost}</span>
+              <span className="jobflow-panel__host">{siteHost}</span>
             </div>
             <button
-              className="fillio-panel__icon-button"
+              className="jobflow-panel__icon-button"
               type="button"
-              aria-label="Close Fillio"
+              aria-label="Close Job Flow"
               onClick={() => setIsOpen(false)}
             >
               <PanelRightClose aria-hidden="true" size={18} />
@@ -146,9 +146,9 @@ export function FloatingPanel({
           </header>
 
           {view === 'home' ? (
-            <div className="fillio-panel__body">
+            <div className="jobflow-panel__body">
               <div
-                className="fillio-panel__summary"
+                className="jobflow-panel__summary"
                 aria-label="Form analysis summary"
               >
                 <div>
@@ -163,7 +163,7 @@ export function FloatingPanel({
               </div>
 
               <button
-                className="fillio-panel__fill"
+                className="jobflow-panel__fill"
                 type="button"
                 disabled={summary.ready === 0}
                 onClick={onFill}
@@ -174,19 +174,19 @@ export function FloatingPanel({
 
               {attachableDocuments.length > 0 ? (
                 <section
-                  className="fillio-panel__section"
+                  className="jobflow-panel__section"
                   aria-label="Detected document fields"
                 >
-                  <div className="fillio-panel__section-heading">
+                  <div className="jobflow-panel__section-heading">
                     <FileText aria-hidden="true" size={14} />
                     <span>Documents</span>
                   </div>
                   {attachableDocuments.map((item) => (
                     <div
-                      className="fillio-panel__document"
+                      className="jobflow-panel__document"
                       key={item.fieldFingerprint}
                     >
-                      <div className="fillio-panel__document-copy">
+                      <div className="jobflow-panel__document-copy">
                         <strong>{intentLabel(item.intent)}</strong>
                         <span>{item.recommendedDocument?.fileName}</span>
                         {documentStatus[item.fieldFingerprint] ? (
@@ -196,7 +196,7 @@ export function FloatingPanel({
                         ) : null}
                       </div>
                       <button
-                        className="fillio-panel__action--secondary"
+                        className="jobflow-panel__action--secondary"
                         type="button"
                         onClick={() => void attachDocument(item)}
                       >
@@ -208,11 +208,11 @@ export function FloatingPanel({
               ) : null}
 
               {summary.needsReview > 0 || summary.sensitive > 0 ? (
-                <section className="fillio-panel__section">
-                  <div className="fillio-panel__section-heading">
+                <section className="jobflow-panel__section">
+                  <div className="jobflow-panel__section-heading">
                     <span>Needs attention</span>
                   </div>
-                  <div className="fillio-panel__menu">
+                  <div className="jobflow-panel__menu">
                     {summary.needsReview > 0 ? (
                       <button type="button" onClick={() => setView('review')}>
                         <span>
@@ -240,7 +240,7 @@ export function FloatingPanel({
 
               {onOpenOptions !== undefined ? (
                 <button
-                  className="fillio-panel__open-profile"
+                  className="jobflow-panel__open-profile"
                   type="button"
                   onClick={onOpenOptions}
                 >
@@ -253,11 +253,11 @@ export function FloatingPanel({
 
           {view === 'review' ? (
             <section
-              className="fillio-panel__detail"
+              className="jobflow-panel__detail"
               aria-label="Fields needing review"
             >
               <button
-                className="fillio-panel__back"
+                className="jobflow-panel__back"
                 type="button"
                 onClick={() => setView('home')}
               >
@@ -265,7 +265,7 @@ export function FloatingPanel({
                 Back
               </button>
               <div>
-                <p className="fillio-panel__section-label">Review</p>
+                <p className="jobflow-panel__section-label">Review</p>
                 <h2>Resolve ambiguous fields</h2>
               </div>
               {reviewItems.map((item) => {
@@ -273,14 +273,14 @@ export function FloatingPanel({
                 const label = fieldLabel(item.context);
                 return (
                   <div
-                    className="fillio-panel__review"
+                    className="jobflow-panel__review"
                     key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
                   >
                     <strong>{label}</strong>
-                    <div className="fillio-panel__review-actions">
+                    <div className="jobflow-panel__review-actions">
                       {item.match.candidates.map((candidate) => (
                         <button
-                          className="fillio-panel__action--secondary"
+                          className="jobflow-panel__action--secondary"
                           type="button"
                           key={candidate.field}
                           aria-label={`Use ${candidate.field} for ${label}`}
@@ -292,7 +292,7 @@ export function FloatingPanel({
                         </button>
                       ))}
                       <button
-                        className="fillio-panel__action--secondary"
+                        className="jobflow-panel__action--secondary"
                         type="button"
                         aria-label={`Ignore ${label}`}
                         onClick={() => onRemember?.(item.context, 'ignore')}
@@ -308,11 +308,11 @@ export function FloatingPanel({
 
           {view === 'sensitive' ? (
             <section
-              className="fillio-panel__detail"
+              className="jobflow-panel__detail"
               aria-label="Sensitive fields requiring approval"
             >
               <button
-                className="fillio-panel__back"
+                className="jobflow-panel__back"
                 type="button"
                 onClick={() => setView('home')}
               >
@@ -320,14 +320,14 @@ export function FloatingPanel({
                 Back
               </button>
               <div>
-                <p className="fillio-panel__section-label">Sensitive</p>
+                <p className="jobflow-panel__section-label">Sensitive</p>
                 <h2>Sensitive fields detected</h2>
-                <p className="fillio-panel__helper">
+                <p className="jobflow-panel__helper">
                   Review the detected fields first. Unlocking the vault does not
                   fill anything until you approve this site.
                 </p>
               </div>
-              <ul className="fillio-panel__sensitive-list">
+              <ul className="jobflow-panel__sensitive-list">
                 {sensitiveItems.map((item) => (
                   <li
                     key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
@@ -337,14 +337,14 @@ export function FloatingPanel({
                 ))}
               </ul>
               {sensitiveError !== null ? (
-                <p className="fillio-panel__sensitive-error" role="alert">
+                <p className="jobflow-panel__sensitive-error" role="alert">
                   <AlertTriangle aria-hidden="true" size={15} />
                   {sensitiveError}
                 </p>
               ) : null}
               {vaultStatus === 'not-configured' ? (
                 <button
-                  className="fillio-panel__action fillio-panel__action--primary"
+                  className="jobflow-panel__action jobflow-panel__action--primary"
                   type="button"
                   onClick={onOpenOptions}
                 >
@@ -352,7 +352,7 @@ export function FloatingPanel({
                   Set up vault
                 </button>
               ) : vaultStatus === 'locked' ? (
-                <div className="fillio-panel__unlock">
+                <div className="jobflow-panel__unlock">
                   <label>
                     Vault passphrase
                     <input
@@ -362,7 +362,7 @@ export function FloatingPanel({
                     />
                   </label>
                   <button
-                    className="fillio-panel__action fillio-panel__action--primary"
+                    className="jobflow-panel__action jobflow-panel__action--primary"
                     type="button"
                     onClick={() => onUnlockSensitive?.(passphrase)}
                   >
@@ -372,7 +372,7 @@ export function FloatingPanel({
                 </div>
               ) : vaultStatus === 'unlocked' ? (
                 <button
-                  className="fillio-panel__action fillio-panel__action--primary"
+                  className="jobflow-panel__action jobflow-panel__action--primary"
                   type="button"
                   onClick={onFillSensitive}
                 >
@@ -386,18 +386,18 @@ export function FloatingPanel({
       ) : null}
 
       <button
-        className="fillio-launcher"
+        className="jobflow-launcher"
         type="button"
-        aria-label={isOpen ? 'Close Fillio' : 'Open Fillio'}
+        aria-label={isOpen ? 'Close Job Flow' : 'Open Job Flow'}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
-        <span className="fillio-launcher__mark" aria-hidden="true">
+        <span className="jobflow-launcher__mark" aria-hidden="true">
           F
         </span>
         {attentionCount > 0 && !isOpen ? (
           <span
-            className="fillio-launcher__badge"
+            className="jobflow-launcher__badge"
             aria-label={`${attentionCount} items need attention`}
           >
             {attentionCount > 9 ? '9+' : attentionCount}

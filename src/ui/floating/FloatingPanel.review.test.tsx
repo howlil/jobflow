@@ -37,7 +37,7 @@ it('lets the user remember or ignore a Review field after opening review', () =>
     />,
   );
 
-  fireEvent.click(screen.getByRole('button', { name: 'Open Fillio' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
   fireEvent.click(
     screen.getByRole('button', { name: /Review ambiguous fields/i }),
   );

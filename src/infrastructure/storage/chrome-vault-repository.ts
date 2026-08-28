@@ -6,13 +6,23 @@ import {
   type StoredVaultEnvelope,
 } from '../../domain/vault/vault-envelope';
 
-export const VAULT_STORAGE_KEY = 'fillio.vault';
+export const VAULT_STORAGE_KEY = 'jobflow.vault';
+const LEGACY_VAULT_STORAGE_KEY = 'fillio.vault';
 
 export class ChromeVaultRepository implements VaultRepository {
   async load(): Promise<StoredVaultEnvelope | null> {
-    const stored = await browser.storage.local.get(VAULT_STORAGE_KEY);
-    const value = stored[VAULT_STORAGE_KEY];
-    return value === undefined ? null : parseStoredVaultEnvelope(value);
+    const stored = await browser.storage.local.get([
+      VAULT_STORAGE_KEY,
+      LEGACY_VAULT_STORAGE_KEY,
+    ]);
+    const value = stored[VAULT_STORAGE_KEY] ?? stored[LEGACY_VAULT_STORAGE_KEY];
+    if (value === undefined) return null;
+
+    const envelope = parseStoredVaultEnvelope(value);
+    if (stored[VAULT_STORAGE_KEY] === undefined) {
+      await this.save(envelope);
+    }
+    return envelope;
   }
 
   async save(envelope: StoredVaultEnvelope): Promise<void> {
@@ -22,6 +32,9 @@ export class ChromeVaultRepository implements VaultRepository {
   }
 
   async delete(): Promise<void> {
-    await browser.storage.local.remove(VAULT_STORAGE_KEY);
+    await browser.storage.local.remove([
+      VAULT_STORAGE_KEY,
+      LEGACY_VAULT_STORAGE_KEY,
+    ]);
   }
 }

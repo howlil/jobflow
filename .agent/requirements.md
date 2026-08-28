@@ -2,7 +2,7 @@
 
 ## Product job
 
-Fillio reduces repetitive data entry in job applications. The user owns one canonical local career profile; Fillio detects application forms, maps fields deterministically, recommends an application variant, and fills approved safe data without taking over submission.
+Job Flow reduces repetitive data entry in job applications. The user owns one canonical local career profile; Job Flow detects application forms, maps fields deterministically, recommends an application variant, and fills approved safe data without taking over submission.
 
 MVP/product success is not "support every ATS". It is reliable useful autofill with explicit user control, conservative failure behavior, and no silent disclosure of sensitive data.
 
@@ -53,7 +53,7 @@ If acceptance requires multiple independently useful outcomes, split the work it
 
 ## Product metrics
 
-Because Fillio is local-first and avoids applicant-data telemetry, prefer privacy-safe fixture/compatibility evidence and opt-in trusted-beta observations.
+Because Job Flow is local-first and avoids applicant-data telemetry, prefer privacy-safe fixture/compatibility evidence and opt-in trusted-beta observations.
 
 Track or sample:
 

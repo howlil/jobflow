@@ -18,7 +18,7 @@ Vault requirements:
 - disabled until user enables it
 - passphrase never persisted
 - encrypted payload stored locally
-- 30-minute Fillio-inactivity auto-lock
+- 30-minute Job Flow-inactivity auto-lock
 - browser restart returns vault to locked
 - no recovery in MVP; reset destroys encrypted data
 

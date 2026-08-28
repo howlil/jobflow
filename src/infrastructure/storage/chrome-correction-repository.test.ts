@@ -80,6 +80,21 @@ describe('ChromeCorrectionRepository', () => {
     await expect(repository.listAll()).resolves.toHaveLength(2);
   });
 
+  it('migrates legacy correction storage on load', async () => {
+    const correction = entry();
+    await browser.storage.local.set({
+      'fillio.corrections': { schemaVersion: 1, entries: [correction] },
+    });
+    const repository = new ChromeCorrectionRepository();
+
+    await expect(repository.listAll()).resolves.toEqual([correction]);
+    await expect(
+      browser.storage.local.get(CORRECTION_STORAGE_KEY),
+    ).resolves.toEqual({
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 1, entries: [correction] },
+    });
+  });
+
   it('deletes one exact correction without disturbing siblings', async () => {
     const repository = new ChromeCorrectionRepository();
     await repository.upsert(entry());

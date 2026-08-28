@@ -11,29 +11,31 @@ describe('vault runtime messages', () => {
   it('accepts supported vault commands and rejects malformed input', () => {
     const profile = createEmptySensitiveProfile();
 
-    expect(isVaultMessage({ type: 'fillio:vault/status' })).toBe(true);
+    expect(isVaultMessage({ type: 'jobflow:vault/status' })).toBe(true);
     expect(
       isVaultMessage({
-        type: 'fillio:vault/setup',
+        type: 'jobflow:vault/setup',
         passphrase: 'local-passphrase',
         profile,
       }),
     ).toBe(true);
     expect(
       isVaultMessage({
-        type: 'fillio:vault/read-fields',
+        type: 'jobflow:vault/read-fields',
         fields: ['identity.nationalId', 'personal.birthDate'],
       }),
     ).toBe(true);
 
-    expect(isVaultMessage({ type: 'fillio:vault/setup', profile })).toBe(false);
-    expect(isVaultMessage({ type: 'fillio:vault/read-fields' })).toBe(false);
-    expect(isVaultMessage({ type: 'fillio:vault/unknown' })).toBe(false);
+    expect(isVaultMessage({ type: 'jobflow:vault/setup', profile })).toBe(
+      false,
+    );
+    expect(isVaultMessage({ type: 'jobflow:vault/read-fields' })).toBe(false);
+    expect(isVaultMessage({ type: 'jobflow:vault/unknown' })).toBe(false);
     expect(isVaultMessage(null)).toBe(false);
   });
 
   it('returns a typed invalid-message result instead of throwing on unknown payloads', () => {
-    expect(parseVaultMessage({ type: 'fillio:vault/nope' })).toEqual({
+    expect(parseVaultMessage({ type: 'jobflow:vault/nope' })).toEqual({
       ok: false,
       error: 'invalid-message',
     });

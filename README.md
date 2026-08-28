@@ -1,6 +1,6 @@
-# Fillio
+# Job Flow
 
-Fillio is a local-first Chromium extension for career-form autofill. It keeps a reusable career profile on-device, analyzes supported HTTP/HTTPS application forms, recommends a role-specific application variant from local page signals, and fills only approved fields after explicit user action.
+Job Flow is a local-first Chromium extension for career-form autofill. It keeps a reusable career profile on-device, analyzes supported HTTP/HTTPS application forms, recommends a role-specific application variant from local page signals, and fills only approved fields after explicit user action.
 
 ## Current Behavior
 
@@ -19,7 +19,7 @@ Fillio is a local-first Chromium extension for career-form autofill. It keeps a 
 - Sensitive Data Vault for encrypted-at-rest sensitive values.
 - Sensitive fields require vault setup/unlock plus a separate current-site approval before fill.
 - Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
-- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Fillio does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
+- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
 - Versioned normal-profile backup export/import validated through the same persisted-schema parser, plus backup diagnostics before recovery. Sensitive vault values are never exported as plaintext.
 - Machine-checked compatibility evidence state and a privacy-safe live ATS validation/feedback workflow.
 - No auto-submit, auto-next, backend, cloud sync, analytics, or AI dependency.
@@ -90,7 +90,7 @@ CI runs the same core verification plus Chromium installation for browser E2E. B
 
 ## Compatibility Strategy
 
-Fillio prioritizes a generic form engine over ATS-specific production branches. The maintained compatibility corpus includes native and ATS-shaped field contexts, English/Indonesian labels, sensitive fields, file inputs, dynamic forms, and ambiguous questions. A vendor adapter is justified only after a reproducible generic-engine failure cannot be solved cleanly at the generic extraction/matching/filling layer.
+Job Flow prioritizes a generic form engine over ATS-specific production branches. The maintained compatibility corpus includes native and ATS-shaped field contexts, English/Indonesian labels, sensitive fields, file inputs, dynamic forms, and ambiguous questions. A vendor adapter is justified only after a reproducible generic-engine failure cannot be solved cleanly at the generic extraction/matching/filling layer.
 
 `docs/compatibility-evidence.json` keeps fixture and live evidence separate. CI rejects unsupported live-verification claims and refuses adapter candidate/implemented status without a documented reproducible failure.
 
@@ -109,7 +109,7 @@ See `docs/compatibility.md` and `docs/ats-live-validation.md` for the evidence m
 - Sensitive fill requests resolve only the approved current-page field paths.
 - Wrong passphrase and tampered ciphertext fail closed.
 - Host-page DOM/text is treated as untrusted input and is processed locally for matching.
-- Fillio never clicks Submit, Apply, or Next.
+- Job Flow never clicks Submit, Apply, or Next.
 - File attachment requires a separate user click for the specific detected document field and never triggers submission.
 - Profile backup does not export vault values or document binaries as plaintext.
 - Compatibility feedback is collected through redacted GitHub reports rather than runtime telemetry.

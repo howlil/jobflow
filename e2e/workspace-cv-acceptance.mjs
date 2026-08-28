@@ -77,7 +77,7 @@ Skills
 Go, PostgreSQL, Redis
 `;
 
-const dataDir = await mkdtemp(join(tmpdir(), 'fillio-i14-'));
+const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-i14-'));
 const fixture = await startFixtureServer();
 let context;
 
@@ -93,8 +93,10 @@ try {
   const extensionId = await getExtensionId(context);
   const applicationPage = await context.newPage();
   await applicationPage.goto(fixture.url);
-  await expect(applicationPage.locator('fillio-form-assistant')).toBeAttached();
-  await applicationPage.getByRole('button', { name: 'Open Fillio' }).click();
+  await expect(
+    applicationPage.locator('jobflow-form-assistant'),
+  ).toBeAttached();
+  await applicationPage.getByRole('button', { name: 'Open Job Flow' }).click();
   await expect(applicationPage.getByText('backend-cv.txt')).toHaveCount(0);
 
   const page = await context.newPage();

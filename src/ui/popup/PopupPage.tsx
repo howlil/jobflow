@@ -132,7 +132,7 @@ export function PopupPage({
   if (error || profile === null) {
     return (
       <PopupShell>
-        <h1 className="m-0 text-xl font-semibold tracking-tight">Fillio</h1>
+        <h1 className="m-0 text-xl font-semibold tracking-tight">Job Flow</h1>
         <p className={mutedClass}>Could not load your career profile.</p>
         <button
           className={buttonClass}
@@ -179,7 +179,7 @@ export function PopupPage({
       <header className="grid grid-cols-[1fr_auto] items-start gap-x-3 gap-y-1">
         <div>
           <p className="mb-1 mt-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
-            Fillio
+            Job Flow
           </p>
           <h1 className="m-0 text-xl font-semibold tracking-tight">
             Ready to apply
@@ -216,7 +216,8 @@ export function PopupPage({
         </div>
         {pageSummary === null || pageSummary === undefined ? (
           <p className={`${mutedClass} mt-2`}>
-            Open a job application form to see safe fields Fillio can help with.
+            Open a job application form to see safe fields Job Flow can help
+            with.
           </p>
         ) : (
           <div
