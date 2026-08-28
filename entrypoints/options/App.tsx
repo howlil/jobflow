@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { createCvImportWorkflow } from '../../src/application/profile/cv-import-workflow';
+import { extractCvText } from '../../src/infrastructure/documents/extract-cv-text';
 import { ChromeVaultClient } from '../../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../../src/infrastructure/storage/chrome-correction-repository';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
@@ -19,6 +21,11 @@ const profileRepository = new ChromeProfileRepository();
 const correctionRepository = new ChromeCorrectionRepository();
 const documentRepository = new IndexedDbDocumentRepository();
 const vaultClient = new ChromeVaultClient();
+const cvImportWorkflow = createCvImportWorkflow({
+  profileRepository,
+  documentRepository,
+  extractText: extractCvText,
+});
 
 export default function App() {
   const [activeSection, setActiveSection] =
@@ -52,8 +59,7 @@ export default function App() {
 
       {activeSection === 'documents' ? (
         <CvImportSection
-          profileRepository={profileRepository}
-          documentRepository={documentRepository}
+          workflow={cvImportWorkflow}
           onProfileChanged={refreshWorkspace}
         />
       ) : null}
