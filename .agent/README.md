@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Project / requirements | `requirements.md` | Product outcome, invariants, acceptance format, product metrics |
 | System design | `system-design.md` | Runtime contexts, data flow, dependency boundaries, design escalation triggers |
-| Engineering rules | `rules.md` | Lean/XP delivery policy, safety, verification, delivery metrics |
+| Engineering rules | `rules.md` | Lean/XP delivery policy, testing principles, safety, verification, delivery metrics |
 | Code patterns | `code-patterns.md` | Small implementation patterns and anti-patterns |
 | Work state | `iteration-state.md` | Current state only; iteration naming is optional |
 | Git strategy | `git-strategy.md` | Trunk-based small-batch integration |
@@ -23,8 +23,8 @@ Root `AGENTS.md` is only the adapter/router for coding agents.
 1. User outcome over process artifacts.
 2. Small reversible changes over feature trains.
 3. WIP = 1; finish before starting adjacent scope.
-4. Test behavior and risk, not implementation trivia.
-5. Focused local feedback first; broaden verification only when risk requires it.
+4. Tests reduce meaningful delivery risk; test count, coverage percentage, and TDD ceremony are not goals.
+5. Use the cheapest high-signal verification for the realistic regression risk; avoid duplicated confidence across layers.
 6. KISS/YAGNI before abstractions. Introduce a layer only after real change pressure.
 7. Delete obsolete code and obsolete decisions instead of keeping parallel paths.
 8. Preserve the expensive-to-repair boundaries: privacy, sensitive data, explicit user action, persisted-data migration, browser permissions, and no automatic submission.
