@@ -11,21 +11,16 @@ This file contains only the state needed to resume work safely. It is not an ite
 
 ## Active product change
 
-### ProfilePage modular section decomposition
+None. `master` is synchronized after the options dashboard and Tailwind cleanup.
 
-Outcome:
+## Current integrated state
 
-- split `ProfilePage.tsx` along real workspace-section boundaries (Personal, Contact, Experience, Education, Skills, Links, Preferences, Documents, Variants) into clean modular components
-- preserve existing autosave, validation, storage envelope, and readiness semantics
-- ensure all unit, integration, and browser-level tests continue passing cleanly
-
-Before merge:
-
-- verify section boundary modularity without introducing parallel state managers
-- run full static and browser test suites
+- profile workspace streamlining and autosave are integrated
+- the options surface uses one reusable dashboard shell with sidebar, topbar, and main content
+- options/profile layout composition uses Tailwind utilities in React; `tailwind.css` is limited to base rules and stable repeated primitives/form grammar
+- the obsolete `profile.css` compatibility shim is removed
+- `ProfileFormSections.tsx` remains a large implementation hotspot; do not claim that full per-section modular decomposition is complete
 
 ## Next candidate
 
-Explore live adapter telemetry and additional ATS job board compatibility fixtures once modular section architecture is in place.
-
-No other feature is committed until the active product change is complete.
+Define the product contract for an end-to-end `JobApplication` pipeline before implementation. The current requirements still list an application tracker as a non-goal, so that contract must be changed explicitly before tracker work starts.

@@ -23,6 +23,24 @@ vi.mock('../../src/ui/profile/BackupRecoveryInspector', () => ({
 import App from './App';
 
 describe('options App', () => {
+  it('renders the dashboard shell and updates the topbar with navigation', () => {
+    render(<App />);
+
+    expect(
+      screen.getByRole('complementary', { name: 'Job Flow sidebar' }),
+    ).not.toBeNull();
+    expect(screen.getByRole('banner')).not.toBeNull();
+    expect(screen.getByRole('main')).not.toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Personal' }),
+    ).not.toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Corrections' }));
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Corrections' }),
+    ).not.toBeNull();
+  });
+
   it('preserves an unsaved profile draft while visiting Corrections', async () => {
     render(<App />);
 

@@ -14,7 +14,6 @@ import {
   type ProfileMutation,
 } from './sections/ProfileFormSections';
 import type { WorkspaceSection } from './workspace-sections';
-import './profile.css';
 
 type ProfilePageProps = {
   repository: ProfileRepository;
@@ -26,6 +25,14 @@ type ProfileSaveState = 'clean' | 'dirty' | 'saving' | 'saved' | 'error';
 
 const AUTOSAVE_DEBOUNCE_MS = 800;
 const AUTOSAVE_MAX_WAIT_MS = 5_000;
+
+const saveIndicatorTone: Record<ProfileSaveState, string> = {
+  clean: 'bg-app-border-strong',
+  dirty: 'bg-amber-600',
+  saving: 'bg-app-ink',
+  saved: 'bg-emerald-700',
+  error: 'bg-red-700',
+};
 
 export function ProfilePage({
   repository,
@@ -221,10 +228,18 @@ export function ProfilePage({
   }
 
   if (error !== null && profile === null) {
-    return <main className="profile-page">{error}</main>;
+    return (
+      <section className="profile-page w-full pb-10 text-sm text-red-700">
+        {error}
+      </section>
+    );
   }
   if (profile === null) {
-    return <main className="profile-page">Loading profile…</main>;
+    return (
+      <section className="profile-page w-full pb-10 text-sm text-app-text">
+        Loading profile…
+      </section>
+    );
   }
 
   const saveStateText =
@@ -239,29 +254,29 @@ export function ProfilePage({
             : 'All changes saved.';
 
   return (
-    <main className="profile-page">
-      <header className="profile-header">
-        <div className="profile-header-copy">
-          <p className="eyebrow">Job Flow</p>
-          <h1>Career profile</h1>
-          <p className="muted">
-            Save factual career data once. Sensitive information stays in the
-            separate encrypted vault.
-          </p>
-        </div>
-        <div className="profile-save-action">
-          <span
-            className="profile-save-indicator"
-            data-state={saveState}
-            aria-hidden="true"
-          />
-          <p className="profile-save-state" role="status" aria-live="polite">
-            {saveStateText}
-          </p>
-        </div>
-      </header>
+    <section className="profile-page w-full pb-10">
+      <div className="mb-4 flex min-h-8 items-center justify-end gap-2 border-b border-app-border pb-3">
+        <span
+          className={`h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveState]}`}
+          aria-hidden="true"
+        />
+        <p
+          className="m-0 text-[11px] leading-4 text-app-subtle"
+          role="status"
+          aria-live="polite"
+        >
+          {saveStateText}
+        </p>
+      </div>
 
-      {error !== null ? <p role="alert">{error}</p> : null}
+      {error !== null ? (
+        <p
+          className="mb-4 rounded-control border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700"
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
 
       <ProfileFormSections
         activeSection={activeSection}
@@ -271,6 +286,6 @@ export function ProfilePage({
         profile={profile}
         vaultClient={vaultClient}
       />
-    </main>
+    </section>
   );
 }

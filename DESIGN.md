@@ -5,8 +5,8 @@ This file is the visual source of truth for Job Flow. External design references
 ## Design principles
 
 1. **Utility before decoration.** Job Flow is a work tool. Prefer legibility, speed, and obvious actions over expressive SaaS styling.
-2. **Editorial before dashboard.** Prefer typography, whitespace, separators, and clear grouping over card soup.
-3. **Monochrome by default.** Product actions use near-black, white, and warm neutrals. Semantic colors are reserved for warning, success, and danger states.
+2. **Dashboard shell, editorial content.** Use a stable sidebar/topbar/main application shell; inside the main content prefer typography, whitespace, separators, and clear grouping over card soup.
+3. **Monochrome by default.** Product actions use near-black, white, and neutral surfaces. Semantic colors are reserved for warning, success, and danger states.
 4. **Compact controls, clear hierarchy.** Form controls are dense enough for long career profiles without becoming cramped.
 5. **One workspace, not a wizard.** Career data uses non-linear section navigation with one focused category visible at a time. Users can switch categories freely without a forced sequence.
 6. **Use the correct surface.** Profile, CV, documents, variants, vault, corrections, and backup live in a normal browser tab. Job-page assistance stays on the current webpage.
@@ -19,21 +19,22 @@ This file is the visual source of truth for Job Flow. External design references
 
 ### Color
 
+The implementation source is `tailwind.config.ts`. Keep documentation and runtime tokens aligned.
+
 ```text
-canvas          #F6F6F3
+canvas          #FAFAFA
 surface         #FFFFFF
-surface-subtle  #F1F1EE
-surface-strong  #111111
-text            #111111
-text-hover      #292927
-text-secondary  #62625D
-text-tertiary   #808079
-border          #DEDED8
-border-strong   #BDBDB5
-focus           #111111
-accent          #111111
-accent-hover    #292927
-accent-soft     #EEEEEA
+surface-subtle  #F7F7F7
+surface-strong  #171717
+text            #171717
+text-secondary  #525252
+text-tertiary   #737373
+border          #E5E5E5
+border-strong   #D4D4D4
+focus           #171717
+accent          #171717
+accent-hover    #000000
+accent-soft     #F7F7F7
 success         #176448
 success-soft    #EEF7F2
 warning         #85510F
@@ -49,19 +50,19 @@ Do not add decorative product colors. Semantic colors communicate state only.
 Use the system sans stack; do not ship a font file only for branding.
 
 ```text
-h1       30–38 / ~1.05  weight 700
-h2       20 / 1.15      weight 680
-h3       16 / 1.3       weight 650
+h1       18–20 / ~1.25  weight 600   shell/page title
+h2       18 / 1.2       weight 600   section title
+h3       14–16 / 1.3    weight 600
 body     13–14 / 1.5    weight 400
 small    11–12 / 1.4    weight 500
-label    11–12 / 1.35   weight 650
+label    11–12 / 1.35   weight 600
 ```
 
 The workspace should not use oversized marketing typography. Extension panels stay compact.
 
 ### Spacing
 
-4px base grid.
+Use the Tailwind 4px base grid.
 
 ```text
 1  4
@@ -70,24 +71,22 @@ The workspace should not use oversized marketing typography. Extension panels st
 4  16
 5  20
 6  24
-7  32
-8  40
-9  48
-10 64
-11 80
+8  32
+10 40
+12 48
+16 64
+20 80
 ```
 
 ### Radius
 
 ```text
-sm     6
-md     8
-lg     10
-xl     12
-round  999  status-only when genuinely useful
+control  6
+surface  8
+round    999  status-only when genuinely useful
 ```
 
-Do not round every container. Large sections are open layouts separated by rules.
+Do not round every container. Large content groups may use open layouts separated by rules.
 
 ### Shadows
 
@@ -116,11 +115,26 @@ Used for:
 
 The WXT options page sets `manifest.open_in_tab`, so browser extension settings open as a full tab rather than a constrained embedded options dialog.
 
+The options HTML file is only the application mount document. Product layout belongs in reusable React components, not hard-coded HTML chrome.
+
+Desktop shell:
+
 ```text
-max-width: 1180px
-page gutter desktop: 40px
-page gutter tablet: 28px
-page gutter mobile: 16px
+┌──────────────────┬────────────────────────────────────────────┐
+│ sidebar 224px    │ sticky topbar                              │
+│                  ├────────────────────────────────────────────┤
+│ section nav      │ main content                               │
+│                  │ max-width 1280px                           │
+│                  │                                            │
+└──────────────────┴────────────────────────────────────────────┘
+```
+
+Responsive gutters:
+
+```text
+desktop  32px
+tablet   24px
+mobile   16px
 ```
 
 Responsive field grids:
@@ -135,14 +149,11 @@ Long text, addresses, summaries, and record descriptions span the useful content
 
 ### Workspace navigation
 
-Desktop uses a sticky left navigation rail beside the active category. Mobile uses a compact native section selector above the content. Only one category is rendered visibly at a time; switching categories does not imply completion and is not a wizard step.
+Desktop navigation lives in the persistent left sidebar. The topbar shows the active workspace title and lightweight context. Mobile uses a compact native section selector before the content instead of forcing the desktop rail into a narrow viewport.
 
-Sections:
+Top-level sections:
 
-- Overview
 - Personal
-- Contact
-- Links
 - Experience
 - Education
 - Skills
@@ -153,7 +164,22 @@ Sections:
 - Corrections
 - Backup
 
-Navigation changes the active workspace category. Profile state stays mounted so unsaved edits survive category changes.
+`Personal` contains identity, contact, and links as internal groups; Contact and Links are not separate top-level navigation items.
+
+Navigation changes the active workspace category. Profile state stays mounted where needed so draft edits survive category changes.
+
+### Tailwind composition rule
+
+For the options/profile surface:
+
+```text
+tailwind.config.ts              shared tokens
+src/ui/design-system/tailwind.css
+                                Tailwind directives + base + stable repeated primitives/form grammar
+React components                layout, spacing, responsive composition, local presentation
+```
+
+Do not use `@apply` to recreate a parallel BEM stylesheet for page shells or navigation. Prefer direct utilities for local composition and reusable React components for repeated structural patterns.
 
 ### 2. Job-page assistant — fixed right slide panel
 
@@ -187,9 +213,11 @@ On narrow viewports the panel may occupy the full viewport width. It remains an 
 
 The collapsed launcher is the only persistent UI when the assistant is closed.
 
+The content-script assistant is mounted in Shadow DOM. Its isolated styling is an intentional runtime boundary and must not be deleted merely because the options surface uses Tailwind.
+
 ## Job-page information hierarchy
 
-Home view should be operational, not dashboard-like:
+Home view should be operational, not dashboard-card-heavy:
 
 ```text
 Job Flow
@@ -225,20 +253,19 @@ Danger: semantic danger styling only for destructive actions.
 
 ### Input
 
-Workspace controls target roughly 44px height. Labels sit above controls. Placeholder text is never used as a label.
+Workspace controls target roughly 38–44px height. Labels sit above controls. Placeholder text is never used as a label.
 
 ### Section
 
-Default workspace section is open:
+Default workspace section is operational and restrained:
 
 ```text
 section heading
 short supporting text only when necessary
 content
-1px divider
 ```
 
-Use a bordered container only when the object benefits from a real boundary, such as an experience record or sensitive/destructive operation.
+Use a bordered container when the object benefits from a real boundary, such as an experience record, CV import region, or sensitive/destructive operation. Do not wrap every text group in a card.
 
 ### Status
 

@@ -10,7 +10,10 @@ import { BackupRecoveryInspector } from '../../src/ui/profile/BackupRecoveryInsp
 import { CvImportSection } from '../../src/ui/profile/CvImportSection';
 import { ProfilePage } from '../../src/ui/profile/ProfilePage';
 import { WorkspaceNavigation } from '../../src/ui/profile/WorkspaceNavigation';
-import type { WorkspaceSection } from '../../src/ui/profile/workspace-sections';
+import {
+  WORKSPACE_SECTION_TITLES,
+  type WorkspaceSection,
+} from '../../src/ui/profile/workspace-sections';
 
 const profileRepository = new ChromeProfileRepository();
 const correctionRepository = new ChromeCorrectionRepository();
@@ -30,9 +33,15 @@ export default function App() {
     />
   );
 
+  const hideProfileSurface =
+    activeSection === 'corrections' || activeSection === 'backup';
+
   return (
-    <WorkspaceFrame navigation={navigation}>
-      <div hidden={activeSection === 'corrections'}>
+    <WorkspaceFrame
+      navigation={navigation}
+      title={WORKSPACE_SECTION_TITLES[activeSection]}
+    >
+      <div hidden={hideProfileSurface}>
         <ProfilePage
           key={profileRevision}
           repository={profileRepository}
