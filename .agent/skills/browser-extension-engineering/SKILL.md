@@ -26,9 +26,9 @@ Never assume the background service worker is permanently alive. Persist durable
 
 ## Permission rule
 
-Before adding a permission, write down the exact current behavior that needs it. Prefer the narrowest permission that works. Never add history, downloads, tabs, scripting, or broad host access merely "for future use".
+Before adding or widening a permission, identify the exact current behavior that requires it. Prefer the narrowest permission that works.
 
-Automatic arbitrary career-site detection may justify broad HTTPS host matching, but that choice must remain explicit and reviewed before store release.
+Permission expansion changes the browser trust/privacy surface. If the user's request does not already authorize that material product/security decision, surface it before implementation. Never add history, downloads, tabs, scripting, or broad host access merely "for future use".
 
 ## Content-script pattern
 
@@ -60,6 +60,8 @@ Messages should be small, typed, and intent-based, e.g. `ANALYZE_PAGE`, `GET_RES
 
 Do not send the whole decrypted sensitive vault to content scripts.
 
+When a change materially alters a cross-context/public message contract beyond the already-authorized requirement, treat that as a material architecture decision rather than silently expanding the protocol.
+
 ## Common mistakes
 
 - module-global background state assumed to persist forever
@@ -72,4 +74,15 @@ Do not send the whole decrypted sensitive vault to content scripts.
 
 ## Verification
 
-For extension-runtime changes, verify unpacked load, manifest permissions, content/background messaging, one real DOM journey, and that service-worker restart does not corrupt durable state.
+Verify only the extension boundaries that the change can realistically break.
+
+Possible high-signal checks include:
+
+- unpacked load/bootstrap when entrypoint/manifest behavior changed
+- generated permission/manifest verification when permissions/config changed
+- content/background messaging when the message boundary changed
+- focused real DOM journey when browser DOM semantics are part of the change
+- service-worker restart behavior when ephemeral lifecycle/state handling changed
+- durable-state integrity when storage ownership changed
+
+This is a risk menu, not a mandatory checklist. Do not run or add browser journeys merely because the modified code lives in an extension project.
