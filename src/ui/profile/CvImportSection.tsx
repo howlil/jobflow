@@ -1,24 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { DocumentBlobRepository } from '../../application/documents/document-blob-repository';
-import type { ProfileRepository } from '../../application/profile/profile-repository';
-import {
-  applyCvImport,
-  createCvImportPreview,
-  parseCvText,
-  type CvImportDraft,
-  type CvImportKey,
-  type CvImportPreviewItem,
+import type { CvImportWorkflow } from '../../application/profile/cv-import-workflow';
+import type {
+  CvImportDraft,
+  CvImportKey,
+  CvImportPreviewItem,
 } from '../../domain/profile/cv-import';
 import type {
   DocumentMetadata,
   StoredProfileEnvelope,
 } from '../../domain/profile/profile-schema';
-import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
-import {
-  extractCvText,
-  isSupportedCvFile,
-} from '../../infrastructure/documents/extract-cv-text';
 
 const ACCEPTED_FILES =
   '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
@@ -35,25 +26,13 @@ function initialSelection(preview: CvImportPreviewItem[]): Set<CvImportKey> {
   );
 }
 
-function metadataForFile(file: File, id: string): DocumentMetadata {
-  return {
-    id,
-    label: file.name.replace(/\.[^.]+$/, '') || 'Resume',
-    fileName: file.name,
-    mimeType: file.type || 'application/octet-stream',
-    lastKnownModified: file.lastModified,
-  };
-}
-
 type CvImportSectionProps = {
-  profileRepository: ProfileRepository;
-  documentRepository: DocumentBlobRepository;
+  workflow: CvImportWorkflow;
   onProfileChanged?: () => void;
 };
 
 export function CvImportSection({
-  profileRepository,
-  documentRepository,
+  workflow,
   onProfileChanged,
 }: CvImportSectionProps) {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -68,13 +47,13 @@ export function CvImportSection({
 
   useEffect(() => {
     let active = true;
-    void profileRepository.load().then((stored) => {
-      if (active) setProfile(stored ?? createEmptyStoredProfile());
+    void workflow.loadProfile().then((stored) => {
+      if (active) setProfile(stored);
     });
     return () => {
       active = false;
     };
-  }, [profileRepository]);
+  }, [workflow]);
 
   const resumes = profile?.baseProfile.documents.resumes ?? [];
   const selectedCount = selected.size;
@@ -90,27 +69,17 @@ export function CvImportSection({
     setPreview([]);
     setSelected(new Set());
     setFile(nextFile);
-
-    if (!isSupportedCvFile(nextFile)) {
-      setError('Use a PDF, DOCX, or TXT CV.');
-      return;
-    }
     setBusy(true);
+
     try {
-      const sourceProfile =
-        profile ??
-        (await profileRepository.load()) ??
-        createEmptyStoredProfile();
-      if (profile === null) setProfile(sourceProfile);
-      const extraction = await extractCvText(nextFile);
-      const nextDraft = parseCvText(extraction.text);
-      const nextPreview = createCvImportPreview(sourceProfile, nextDraft);
-      setDraft(nextDraft);
-      setPreview(nextPreview);
-      setSelected(initialSelection(nextPreview));
+      const prepared = await workflow.prepare(nextFile, profile);
+      setProfile(prepared.profile);
+      setDraft(prepared.draft);
+      setPreview(prepared.preview);
+      setSelected(initialSelection(prepared.preview));
       setMessage(
-        nextPreview.length > 0
-          ? `Found ${nextPreview.length} profile candidates. Review them before importing.`
+        prepared.preview.length > 0
+          ? `Found ${prepared.preview.length} profile candidates. Review them before importing.`
           : 'No supported profile fields were found. You can still save this CV to your document library.',
       );
     } catch (caught) {
@@ -137,11 +106,9 @@ export function CvImportSection({
     if (profile === null || draft === null || selected.size === 0) return;
     setBusy(true);
     setError(null);
+
     try {
-      const next = applyCvImport(profile, draft, selected, () =>
-        globalThis.crypto.randomUUID(),
-      );
-      await profileRepository.save(next);
+      const next = await workflow.applySelected(profile, draft, selected);
       setProfile(next);
       setMessage(`Imported ${selected.size} reviewed profile groups.`);
       onProfileChanged?.();
@@ -164,24 +131,20 @@ export function CvImportSection({
       return;
     setBusy(true);
     setError(null);
-    const id = globalThis.crypto.randomUUID();
-    const metadata = metadataForFile(file, id);
 
     try {
-      await documentRepository.save(id, file);
-      const next = applyCvImport(profile, draft, selected, () =>
-        globalThis.crypto.randomUUID(),
+      const next = await workflow.importSelectedAndSaveCv(
+        profile,
+        draft,
+        selected,
+        file,
       );
-      next.baseProfile.documents.resumes.push(metadata);
-      next.metadata.updatedAt = new Date().toISOString();
-      await profileRepository.save(next);
       setProfile(next);
       setMessage(
         `Imported ${selected.size} reviewed profile groups and stored ${file.name}.`,
       );
       onProfileChanged?.();
     } catch {
-      await documentRepository.remove(id).catch(() => undefined);
       setError(
         'Could not import the selected CV data and file. Your existing profile was left unchanged.',
       );
@@ -194,22 +157,15 @@ export function CvImportSection({
     if (profile === null || file === null) return;
     setBusy(true);
     setError(null);
-    const id = globalThis.crypto.randomUUID();
-    const metadata = metadataForFile(file, id);
 
     try {
-      await documentRepository.save(id, file);
-      const next = structuredClone(profile);
-      next.baseProfile.documents.resumes.push(metadata);
-      next.metadata.updatedAt = new Date().toISOString();
-      await profileRepository.save(next);
+      const next = await workflow.saveCvToLibrary(profile, file);
       setProfile(next);
       setMessage(
         `${file.name} is stored locally and can be attached from Job Flow.`,
       );
       onProfileChanged?.();
     } catch {
-      await documentRepository.remove(id).catch(() => undefined);
       setError('Could not save this CV to local document storage.');
     } finally {
       setBusy(false);
@@ -220,20 +176,9 @@ export function CvImportSection({
     if (profile === null) return;
     setBusy(true);
     setError(null);
+
     try {
-      const next = structuredClone(profile);
-      next.baseProfile.documents.resumes =
-        next.baseProfile.documents.resumes.filter(
-          (item) => item.id !== document.id,
-        );
-      next.variants = next.variants.map((variant) =>
-        variant.preferredResumeId === document.id
-          ? { ...variant, preferredResumeId: null }
-          : variant,
-      );
-      next.metadata.updatedAt = new Date().toISOString();
-      await profileRepository.save(next);
-      await documentRepository.remove(document.id).catch(() => undefined);
+      const next = await workflow.removeResume(profile, document);
       setProfile(next);
       setMessage(`Removed ${document.fileName}.`);
       onProfileChanged?.();
