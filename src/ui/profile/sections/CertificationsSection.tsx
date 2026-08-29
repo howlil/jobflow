@@ -72,7 +72,8 @@ export function CertificationsSection({
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.certifications[index];
-                        if (item !== undefined) item.issuer = event.target.value;
+                        if (item !== undefined)
+                          item.issuer = event.target.value;
                       })
                     }
                   />
