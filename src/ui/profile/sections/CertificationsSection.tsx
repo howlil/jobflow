@@ -1,5 +1,12 @@
 import { Plus, Trash2 } from 'lucide-react';
 
+import {
+  Button,
+  EmptyState,
+  FieldGrid,
+  Subsection,
+  TextField,
+} from '../../design-system/primitives';
 import { createProfileItemId, dateInputProps } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -13,12 +20,10 @@ export function CertificationsSection({
   profile,
 }: CertificationsSectionProps) {
   return (
-    <>
-      <div className="jobflow-section-heading">
-        <h3>Certifications</h3>
-        <button
-          className="jobflow-button"
-          type="button"
+    <Subsection
+      title="Certifications"
+      action={
+        <Button
           onClick={() =>
             changeProfile((draft) =>
               draft.baseProfile.professional.certifications.push({
@@ -35,98 +40,100 @@ export function CertificationsSection({
         >
           <Plus aria-hidden="true" size={16} />
           Add certification
-        </button>
-      </div>
-      {profile.baseProfile.professional.certifications.map(
-        (certification, index) => (
-          <article className="record-card" key={certification.id}>
-            <div className="form-grid">
-              <label>
-                Certification
-                <input
-                  value={certification.name}
-                  onChange={(event) =>
-                    changeProfile((draft) => {
-                      const item =
-                        draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined) item.name = event.target.value;
-                    })
+        </Button>
+      }
+    >
+      {profile.baseProfile.professional.certifications.length === 0 ? (
+        <EmptyState>No certifications added yet.</EmptyState>
+      ) : (
+        <div className="grid gap-3">
+          {profile.baseProfile.professional.certifications.map(
+            (certification, index) => (
+              <article
+                className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+                key={certification.id}
+              >
+                <FieldGrid columns={3}>
+                  <TextField
+                    label="Certification"
+                    value={certification.name}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.name = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    label="Issuer"
+                    value={certification.issuer}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined)
+                          item.issuer = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    label="Credential URL"
+                    value={certification.url}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.url = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    label="Issue date"
+                    {...dateInputProps(certification.issueDate)}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined)
+                          item.issueDate = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    className="lg:col-span-2"
+                    label="Expiry date"
+                    {...dateInputProps(certification.expiryDate)}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined)
+                          item.expiryDate = event.target.value;
+                      })
+                    }
+                  />
+                </FieldGrid>
+                <Button
+                  className="justify-self-start"
+                  variant="danger"
+                  onClick={() =>
+                    changeProfile((draft) =>
+                      draft.baseProfile.professional.certifications.splice(
+                        index,
+                        1,
+                      ),
+                    )
                   }
-                />
-              </label>
-              <label>
-                Issuer
-                <input
-                  value={certification.issuer}
-                  onChange={(event) =>
-                    changeProfile((draft) => {
-                      const item =
-                        draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined) item.issuer = event.target.value;
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Credential URL
-                <input
-                  value={certification.url}
-                  onChange={(event) =>
-                    changeProfile((draft) => {
-                      const item =
-                        draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined) item.url = event.target.value;
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Issue date
-                <input
-                  {...dateInputProps(certification.issueDate)}
-                  onChange={(event) =>
-                    changeProfile((draft) => {
-                      const item =
-                        draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined)
-                        item.issueDate = event.target.value;
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Expiry date
-                <input
-                  {...dateInputProps(certification.expiryDate)}
-                  onChange={(event) =>
-                    changeProfile((draft) => {
-                      const item =
-                        draft.baseProfile.professional.certifications[index];
-                      if (item !== undefined)
-                        item.expiryDate = event.target.value;
-                    })
-                  }
-                />
-              </label>
-            </div>
-            <button
-              className="jobflow-button"
-              type="button"
-              onClick={() =>
-                changeProfile((draft) =>
-                  draft.baseProfile.professional.certifications.splice(
-                    index,
-                    1,
-                  ),
-                )
-              }
-            >
-              <Trash2 aria-hidden="true" size={16} />
-              Remove
-            </button>
-          </article>
-        ),
+                >
+                  <Trash2 aria-hidden="true" size={16} />
+                  Remove certification
+                </Button>
+              </article>
+            ),
+          )}
+        </div>
       )}
-    </>
+    </Subsection>
   );
 }

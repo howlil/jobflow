@@ -37,11 +37,10 @@
 }
 
 @layer components {
-  /* Keep this layer small: stable repeated primitives and form grammar only.
-     Page shells, navigation, spacing, and responsive composition belong in
-     React components as Tailwind utilities. */
+  /* Compatibility grammar for call sites not yet expressed through React
+     primitives. New repeated interface patterns belong in primitives.tsx. */
   .jobflow-button {
-    @apply inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-app-border-strong bg-white px-3 py-1.5 text-xs font-semibold text-app-ink transition-colors hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-app-border-strong bg-white px-3 py-2 text-xs font-semibold text-app-ink transition-colors hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .jobflow-button:active:not(:disabled) {
@@ -66,11 +65,11 @@
   }
 
   .jobflow-icon-button {
-    @apply grid h-9 w-9 place-items-center rounded-control border border-app-border bg-white text-app-ink transition hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink;
+    @apply grid h-10 w-10 place-items-center rounded-control border border-app-border bg-white text-app-ink transition hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink;
   }
 
   .jobflow-chip {
-    @apply inline-flex items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text;
+    @apply inline-flex min-h-6 items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text;
   }
 
   .jobflow-chip-strong {
@@ -80,7 +79,7 @@
   .jobflow-status,
   .profile-section > [role='status'],
   .profile-section > [role='alert'] {
-    @apply w-full rounded-control border border-app-border bg-app-muted px-3 py-2.5 text-xs text-app-text;
+    @apply m-0 w-full rounded-control border border-app-border bg-app-muted px-3 py-2.5 text-xs leading-5 text-app-text;
   }
 
   .jobflow-status-success,
@@ -99,34 +98,40 @@
 
   .profile-page h2,
   .workspace-tool-section__header h2 {
-    @apply mb-0 text-lg font-semibold tracking-tight text-app-ink;
+    @apply m-0 text-lg font-semibold tracking-tight text-app-ink;
   }
 
   .profile-page h3,
   .workspace-tool-section h3 {
-    @apply mb-0 text-sm font-semibold text-app-ink;
+    @apply m-0 text-sm font-semibold text-app-ink;
   }
 
   .eyebrow,
   .workspace-kicker {
-    @apply mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
+    @apply m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
   }
 
   .muted,
   .profile-readiness-intro,
   .workspace-tool-section__header p,
   .cv-dropzone p {
-    @apply text-xs leading-5 text-app-text;
+    @apply m-0 text-xs leading-5 text-app-text;
   }
 
   .profile-readiness {
-    @apply mb-[18px] grid gap-3.5 rounded-app border border-app-border bg-white p-[18px];
+    @apply mb-4 grid gap-4 rounded-app border border-app-border bg-white p-4;
   }
 
   .jobflow-section-heading,
   .section-heading,
   .workspace-tool-section__header {
-    @apply flex items-start justify-between gap-[18px];
+    @apply flex items-start justify-between gap-4;
+  }
+
+  .jobflow-section-heading > div,
+  .section-heading > div,
+  .workspace-tool-section__header > div {
+    @apply grid min-w-0 gap-2;
   }
 
   .profile-readiness-details {
@@ -138,11 +143,11 @@
   }
 
   .profile-readiness-list {
-    @apply m-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0;
+    @apply m-0 flex list-none flex-wrap gap-x-4 gap-y-2 p-0;
   }
 
   .profile-readiness-list li {
-    @apply relative pl-2.5 text-[11px] text-app-text;
+    @apply relative pl-3 text-[11px] text-app-text;
   }
 
   .profile-readiness-list li::before {
@@ -153,15 +158,15 @@
   .profile-readiness-actions,
   .button-row,
   .vault-actions {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap items-center gap-2;
   }
 
   .profile-section {
-    @apply mb-6 grid gap-4 border-b border-app-border pb-6;
+    @apply grid gap-6 border-b border-app-border pb-8 last:border-b-0 last:pb-0;
   }
 
   .workspace-tool-section {
-    @apply mb-4 grid gap-4 rounded-app border border-app-border bg-white p-5;
+    @apply grid gap-6 rounded-app border border-app-border bg-white p-5;
   }
 
   details.profile-section > summary {
@@ -173,16 +178,12 @@
   }
 
   .form-grid {
-    @apply grid grid-cols-2 gap-x-4 gap-y-3.5;
-  }
-
-  .profile-section:first-of-type .form-grid:first-of-type {
-    @apply grid-cols-3;
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
   }
 
   .profile-page label,
   .workspace-tool-section label {
-    @apply grid gap-1.5 text-[11px] font-medium text-app-text;
+    @apply grid gap-2 text-xs font-semibold text-app-text;
   }
 
   .profile-page input:not([type='checkbox']):not([type='file']),
@@ -191,19 +192,19 @@
   .workspace-tool-section input:not([type='checkbox']):not([type='file']),
   .workspace-tool-section select,
   .workspace-tool-section textarea {
-    @apply w-full rounded-control border border-app-border bg-white px-2.5 py-2 text-[13px] text-app-ink outline-none transition placeholder:text-app-subtle hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-border;
+    @apply w-full rounded-control border border-app-border bg-white px-3 py-2 text-[13px] text-app-ink outline-none transition placeholder:text-app-subtle hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-border disabled:cursor-not-allowed disabled:bg-app-muted disabled:text-app-subtle;
   }
 
   .profile-page input:not([type='checkbox']):not([type='file']),
   .profile-page select,
   .workspace-tool-section input:not([type='checkbox']):not([type='file']),
   .workspace-tool-section select {
-    @apply min-h-[38px];
+    @apply min-h-10;
   }
 
   .profile-page textarea,
   .workspace-tool-section textarea {
-    @apply min-h-24 resize-y leading-5;
+    @apply min-h-28 resize-y leading-5;
   }
 
   .profile-page input[type='checkbox'],
@@ -212,12 +213,12 @@
   }
 
   .record-list {
-    @apply grid gap-2.5;
+    @apply grid gap-3;
   }
 
   .record-card,
   .workspace-card {
-    @apply grid gap-3.5 rounded-app border border-app-border bg-app-muted p-3.5;
+    @apply grid gap-4 rounded-app border border-app-border bg-app-muted p-4;
   }
 
   details.record-card {
@@ -225,7 +226,7 @@
   }
 
   details.record-card[open] {
-    @apply grid gap-3.5;
+    @apply grid gap-4;
   }
 
   .record-summary {
@@ -253,14 +254,15 @@
   }
 
   .jobflow-empty-row {
-    @apply flex items-center justify-between gap-4 border-y border-app-border py-3 text-xs text-app-text;
+    @apply flex min-h-12 items-center justify-between gap-4 border-y border-app-border py-3 text-xs text-app-text;
   }
 
   .default-variant {
-    @apply max-w-[440px];
+    @apply max-w-md;
   }
 
-  .vault-section {
+  .vault-section,
+  .cv-import-grid {
     @apply grid gap-4;
   }
 
@@ -268,34 +270,40 @@
     @apply mb-0;
   }
 
-  .cv-import-grid {
-    @apply grid gap-4;
+  .workspace-brand__mark {
+    @apply grid h-10 w-10 place-items-center rounded-control bg-app-ink text-xs font-bold text-white;
   }
 
   .cv-dropzone {
-    @apply grid min-h-[170px] place-items-center rounded-app border border-dashed border-app-border-strong bg-app-muted p-5 text-center;
+    @apply grid min-h-[176px] place-items-center rounded-app border border-dashed border-app-border-strong bg-app-muted p-6 text-center;
   }
 
   .cv-dropzone__content {
-    @apply grid max-w-xl justify-items-center gap-2.5;
+    @apply grid max-w-xl justify-items-center gap-3;
   }
 
   .cv-preview {
-    @apply grid gap-2;
+    @apply grid gap-0;
   }
 
-  .cv-preview__row,
+  .cv-preview__row {
+    @apply grid grid-cols-[auto_minmax(120px,0.6fr)_minmax(0,1.4fr)] items-start gap-3 border-b border-app-border py-3 text-xs last:border-b-0;
+  }
+
+  .cv-preview__row > input[type='checkbox'] {
+    @apply mt-0.5;
+  }
+
+  .cv-preview__value {
+    @apply min-w-0 text-xs leading-5 text-app-text;
+  }
+
   .document-row {
-    @apply flex items-start justify-between gap-4 border-b border-app-border py-2.5 text-xs last:border-b-0;
+    @apply flex items-start justify-between gap-4 border-b border-app-border py-3 text-xs last:border-b-0;
   }
 
-  .cv-preview__row label {
-    @apply flex grid-cols-none items-start gap-2;
-  }
-
-  .cv-preview__value,
   .document-row__meta {
-    @apply text-xs leading-5 text-app-text;
+    @apply grid min-w-0 gap-1 text-xs leading-5 text-app-text;
   }
 
   .document-list {
@@ -320,14 +328,17 @@
       @apply flex-col items-stretch;
     }
 
-    .form-grid,
-    .profile-section:first-of-type .form-grid:first-of-type {
-      @apply grid-cols-1;
-    }
-
     .workspace-tool-section,
     .profile-readiness {
       @apply p-4;
+    }
+
+    .cv-preview__row {
+      @apply grid-cols-[auto_minmax(0,1fr)];
+    }
+
+    .cv-preview__value {
+      @apply col-start-2;
     }
   }
 

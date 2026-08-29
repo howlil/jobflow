@@ -3,6 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CorrectionRepository } from '../../application/corrections/correction-repository';
 import type { FieldCorrection } from '../../domain/corrections/correction-schema';
 import { isCorrectionStale } from '../../domain/corrections/correction-staleness';
+import {
+  ActionRow,
+  Button,
+  Chip,
+  EmptyState,
+  Section,
+  SectionHeader,
+  StatusMessage,
+} from '../design-system/primitives';
 
 type CorrectionMemorySectionProps = {
   repository: CorrectionRepository;
@@ -82,111 +91,111 @@ export function CorrectionMemorySection({
   }
 
   return (
-    <section
-      className="profile-section"
-      aria-labelledby="correction-memory-title"
-    >
-      <div className="jobflow-section-heading">
-        <div>
-          <p className="eyebrow">Autofill memory</p>
-          <h2 id="correction-memory-title">Learned field mappings</h2>
-        </div>
-        <span className="jobflow-chip">{entries.length} saved</span>
-      </div>
-      <p className="muted">
-        Job Flow stores exact site/form/field corrections locally. Review stale
-        mappings or remove anything that no longer matches the site.
-      </p>
+    <Section aria-labelledby="correction-memory-title">
+      <SectionHeader
+        eyebrow="Autofill memory"
+        title={<span id="correction-memory-title">Learned field mappings</span>}
+        description="Job Flow stores exact site/form/field corrections locally. Review stale mappings or remove anything that no longer matches the site."
+        action={<Chip>{entries.length} saved</Chip>}
+      />
 
-      {error !== null ? <p role="alert">{error}</p> : null}
-      {!loaded ? <p className="muted">Loading learned mappings…</p> : null}
+      {error !== null ? (
+        <StatusMessage tone="danger" role="alert">
+          {error}
+        </StatusMessage>
+      ) : null}
+      {!loaded ? (
+        <p className="m-0 text-xs leading-5 text-app-text">
+          Loading learned mappings…
+        </p>
+      ) : null}
       {loaded && entries.length === 0 ? (
-        <div className="jobflow-empty-row">No learned mappings yet.</div>
+        <EmptyState>No learned mappings yet.</EmptyState>
       ) : null}
 
-      {groups.map(([origin, siteEntries]) => {
-        const label = originLabel(origin);
-        return (
-          <article className="record-card" key={origin}>
-            <div className="jobflow-section-heading">
-              <div>
-                <strong>{label}</strong>
-                <p className="muted">{origin}</p>
+      <div className="grid gap-3">
+        {groups.map(([origin, siteEntries]) => {
+          const label = originLabel(origin);
+          return (
+            <article
+              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+              key={origin}
+            >
+              <div className="flex items-start justify-between gap-4 max-sm:flex-col max-sm:items-stretch">
+                <div className="grid min-w-0 gap-1">
+                  <strong className="text-sm font-semibold text-app-ink">
+                    {label}
+                  </strong>
+                  <p className="m-0 break-all text-xs leading-5 text-app-text">
+                    {origin}
+                  </p>
+                </div>
+                <Button
+                  className="shrink-0"
+                  aria-label={`Reset ${label}`}
+                  onClick={() => void resetOrigin(origin)}
+                >
+                  Reset site
+                </Button>
               </div>
-              <button
-                className="jobflow-button"
-                type="button"
-                aria-label={`Reset ${label}`}
-                onClick={() => void resetOrigin(origin)}
-              >
-                Reset site
-              </button>
-            </div>
-            <ul className="profile-readiness-list">
-              {siteEntries.map((entry) => {
-                const stale = isCorrectionStale(entry, now);
-                return (
-                  <li
-                    key={`${entry.formFingerprint}:${entry.fieldFingerprint}`}
-                  >
-                    <div>
-                      <strong>{entry.target}</strong>{' '}
-                      {stale ? (
-                        <span className="jobflow-chip">Review stale</span>
-                      ) : null}
-                      <div className="muted">
-                        Form {entry.formFingerprint} · Field{' '}
-                        {entry.fieldFingerprint}
-                      </div>
-                    </div>
-                    <button
-                      className="jobflow-button"
-                      type="button"
-                      onClick={() => void remove(entry)}
+
+              <ul className="m-0 grid list-none p-0">
+                {siteEntries.map((entry) => {
+                  const stale = isCorrectionStale(entry, now);
+                  return (
+                    <li
+                      className="flex items-start justify-between gap-4 border-t border-app-border py-3 first:border-t-0 first:pt-0 last:pb-0 max-sm:flex-col"
+                      key={`${entry.formFingerprint}:${entry.fieldFingerprint}`}
                     >
-                      Delete mapping
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </article>
-        );
-      })}
+                      <div className="grid min-w-0 gap-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <strong className="text-xs font-semibold text-app-ink">
+                            {entry.target}
+                          </strong>
+                          {stale ? <Chip>Review stale</Chip> : null}
+                        </div>
+                        <div className="break-all text-[11px] leading-4 text-app-subtle">
+                          Form {entry.formFingerprint} · Field{' '}
+                          {entry.fieldFingerprint}
+                        </div>
+                      </div>
+                      <Button
+                        className="shrink-0"
+                        variant="danger"
+                        onClick={() => void remove(entry)}
+                      >
+                        Delete mapping
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </article>
+          );
+        })}
+      </div>
 
       {entries.length > 0 ? (
-        <div className="jobflow-section-heading">
-          {!confirmResetAll ? (
-            <button
-              className="jobflow-button"
-              type="button"
-              onClick={() => setConfirmResetAll(true)}
-            >
+        !confirmResetAll ? (
+          <ActionRow>
+            <Button variant="danger" onClick={() => setConfirmResetAll(true)}>
               Reset all learned mappings
-            </button>
-          ) : (
-            <div>
-              <p>
-                This removes all learned field corrections from local storage.
-              </p>
-              <button
-                className="jobflow-button"
-                type="button"
-                onClick={() => void resetAll()}
-              >
+            </Button>
+          </ActionRow>
+        ) : (
+          <div className="grid gap-3 border-t border-app-border pt-6">
+            <p className="m-0 text-xs leading-5 text-app-text">
+              This removes all learned field corrections from local storage.
+            </p>
+            <ActionRow>
+              <Button variant="danger" onClick={() => void resetAll()}>
                 Confirm reset all
-              </button>{' '}
-              <button
-                className="jobflow-button"
-                type="button"
-                onClick={() => setConfirmResetAll(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
+              </Button>
+              <Button onClick={() => setConfirmResetAll(false)}>Cancel</Button>
+            </ActionRow>
+          </div>
+        )
       ) : null}
-    </section>
+    </Section>
   );
 }

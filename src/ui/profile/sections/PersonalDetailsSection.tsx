@@ -1,4 +1,11 @@
 import type { StoredProfileEnvelope } from '../../../domain/profile/profile-schema';
+import {
+  FieldGrid,
+  Section,
+  SectionHeader,
+  TextareaField,
+  TextField,
+} from '../../design-system/primitives';
 import type { WorkspaceSection } from '../workspace-sections';
 import { createProfileItemId } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
@@ -42,223 +49,187 @@ export function PersonalDetailsSection({
   const hidden = !isPersonalSurface(activeSection);
 
   return (
-    <>
-      <section className="profile-section" id="basic-info" hidden={hidden}>
-        <h2>Basic information</h2>
-        <div className="form-grid">
-          <label>
-            First name
-            <input
-              value={profile.baseProfile.personal.legalName.first}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.first =
-                    event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Middle name
-            <input
-              value={profile.baseProfile.personal.legalName.middle}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.middle =
-                    event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Last name
-            <input
-              value={profile.baseProfile.personal.legalName.last}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.personal.legalName.last =
-                    event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Preferred name
-            <input
-              value={profile.baseProfile.personal.preferredName}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.personal.preferredName = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Professional headline
-            <input
-              value={profile.baseProfile.professional.headline}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.professional.headline = event.target.value;
-                })
-              }
-            />
-          </label>
-        </div>
-        <label>
-          Professional summary
-          <textarea
-            value={profile.baseProfile.professional.summary}
+    <div className="grid gap-8">
+      <Section id="basic-info" hidden={hidden}>
+        <SectionHeader title="Basic information" />
+        <FieldGrid columns={3}>
+          <TextField
+            label="First name"
+            value={profile.baseProfile.personal.legalName.first}
             onChange={(event) =>
               changeProfile((draft) => {
-                draft.baseProfile.professional.summary = event.target.value;
+                draft.baseProfile.personal.legalName.first = event.target.value;
               })
             }
           />
-        </label>
-      </section>
+          <TextField
+            label="Middle name"
+            value={profile.baseProfile.personal.legalName.middle}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.personal.legalName.middle =
+                  event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Last name"
+            value={profile.baseProfile.personal.legalName.last}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.personal.legalName.last = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Preferred name"
+            value={profile.baseProfile.personal.preferredName}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.personal.preferredName = event.target.value;
+              })
+            }
+          />
+          <TextField
+            className="sm:col-span-2 lg:col-span-2"
+            label="Professional headline"
+            value={profile.baseProfile.professional.headline}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.professional.headline = event.target.value;
+              })
+            }
+          />
+        </FieldGrid>
+        <TextareaField
+          label="Professional summary"
+          value={profile.baseProfile.professional.summary}
+          onChange={(event) =>
+            changeProfile((draft) => {
+              draft.baseProfile.professional.summary = event.target.value;
+            })
+          }
+        />
+      </Section>
 
-      <section className="profile-section" hidden={hidden}>
-        <h2>Contact</h2>
-        <div className="form-grid">
-          <label>
-            Primary email
-            <input
-              type="email"
-              value={primaryContactValue(profile.baseProfile.contact.emails)}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.emails = updatePrimaryContact(
-                    draft.baseProfile.contact.emails,
-                    event.target.value,
-                  );
-                })
-              }
-            />
-          </label>
-          <label>
-            Primary phone
-            <input
-              value={primaryContactValue(profile.baseProfile.contact.phones)}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.phones = updatePrimaryContact(
-                    draft.baseProfile.contact.phones,
-                    event.target.value,
-                  );
-                })
-              }
-            />
-          </label>
-          <label>
-            WhatsApp
-            <input
-              value={profile.baseProfile.contact.whatsapp}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.whatsapp = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Address line
-            <input
-              value={profile.baseProfile.contact.address.line1}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.address.line1 = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            City
-            <input
-              value={profile.baseProfile.contact.address.city}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.address.city = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            State / province
-            <input
-              value={profile.baseProfile.contact.address.state}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.address.state = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Country
-            <input
-              value={profile.baseProfile.contact.address.country}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.address.country =
-                    event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Postal code
-            <input
-              value={profile.baseProfile.contact.address.postalCode}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.contact.address.postalCode =
-                    event.target.value;
-                })
-              }
-            />
-          </label>
-        </div>
-      </section>
+      <Section hidden={hidden}>
+        <SectionHeader title="Contact" />
+        <FieldGrid>
+          <TextField
+            type="email"
+            label="Primary email"
+            value={primaryContactValue(profile.baseProfile.contact.emails)}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.emails = updatePrimaryContact(
+                  draft.baseProfile.contact.emails,
+                  event.target.value,
+                );
+              })
+            }
+          />
+          <TextField
+            label="Primary phone"
+            value={primaryContactValue(profile.baseProfile.contact.phones)}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.phones = updatePrimaryContact(
+                  draft.baseProfile.contact.phones,
+                  event.target.value,
+                );
+              })
+            }
+          />
+          <TextField
+            label="WhatsApp"
+            value={profile.baseProfile.contact.whatsapp}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.whatsapp = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Address line"
+            value={profile.baseProfile.contact.address.line1}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.address.line1 = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="City"
+            value={profile.baseProfile.contact.address.city}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.address.city = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="State / province"
+            value={profile.baseProfile.contact.address.state}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.address.state = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Country"
+            value={profile.baseProfile.contact.address.country}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.address.country = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Postal code"
+            value={profile.baseProfile.contact.address.postalCode}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.contact.address.postalCode =
+                  event.target.value;
+              })
+            }
+          />
+        </FieldGrid>
+      </Section>
 
-      <section className="profile-section" hidden={hidden}>
-        <h2>Links</h2>
-        <div className="form-grid">
-          <label>
-            LinkedIn
-            <input
-              value={profile.baseProfile.links.linkedin}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.links.linkedin = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            GitHub
-            <input
-              value={profile.baseProfile.links.github}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.links.github = event.target.value;
-                })
-              }
-            />
-          </label>
-          <label>
-            Portfolio
-            <input
-              value={profile.baseProfile.links.portfolio}
-              onChange={(event) =>
-                changeProfile((draft) => {
-                  draft.baseProfile.links.portfolio = event.target.value;
-                })
-              }
-            />
-          </label>
-        </div>
-      </section>
-    </>
+      <Section hidden={hidden}>
+        <SectionHeader title="Links" />
+        <FieldGrid columns={3}>
+          <TextField
+            label="LinkedIn"
+            value={profile.baseProfile.links.linkedin}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.links.linkedin = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="GitHub"
+            value={profile.baseProfile.links.github}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.links.github = event.target.value;
+              })
+            }
+          />
+          <TextField
+            label="Portfolio"
+            value={profile.baseProfile.links.portfolio}
+            onChange={(event) =>
+              changeProfile((draft) => {
+                draft.baseProfile.links.portfolio = event.target.value;
+              })
+            }
+          />
+        </FieldGrid>
+      </Section>
+    </div>
   );
 }
