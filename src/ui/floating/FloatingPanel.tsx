@@ -124,9 +124,9 @@ export function FloatingPanel({
               documentStatus={documentStatus}
               onAttachDocument={attachDocument}
               onFill={onFill}
-              onOpenOptions={onOpenOptions}
               onOpenReview={() => setView('review')}
               onOpenSensitive={() => setView('sensitive')}
+              {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
             />
           ) : null}
 
@@ -134,7 +134,7 @@ export function FloatingPanel({
             <AssistantReviewView
               reviewItems={reviewItems}
               onBack={() => setView('home')}
-              onRemember={onRemember}
+              {...(onRemember === undefined ? {} : { onRemember })}
             />
           ) : null}
 
@@ -142,14 +142,16 @@ export function FloatingPanel({
             <AssistantSensitiveView
               sensitiveItems={sensitiveItems}
               sensitiveError={sensitiveError}
-              vaultStatus={vaultStatus}
               passphrase={passphrase}
               siteHost={siteHost}
               onBack={() => setView('home')}
-              onOpenOptions={onOpenOptions}
               onPassphraseChange={setPassphrase}
-              onUnlockSensitive={onUnlockSensitive}
-              onFillSensitive={onFillSensitive}
+              {...(vaultStatus === undefined ? {} : { vaultStatus })}
+              {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
+              {...(onUnlockSensitive === undefined
+                ? {}
+                : { onUnlockSensitive })}
+              {...(onFillSensitive === undefined ? {} : { onFillSensitive })}
             />
           ) : null}
         </section>
