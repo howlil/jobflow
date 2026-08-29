@@ -67,7 +67,8 @@ export function PersonalDetailsSection({
             value={profile.baseProfile.personal.legalName.middle}
             onChange={(event) =>
               changeProfile((draft) => {
-                draft.baseProfile.personal.legalName.middle = event.target.value;
+                draft.baseProfile.personal.legalName.middle =
+                  event.target.value;
               })
             }
           />
