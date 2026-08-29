@@ -45,8 +45,6 @@ export type PageContextResponse = {
   variantRecommendation: VariantRecommendation | null;
   activeVariantId: string | null;
   variantOptions: PageVariantOption[];
-  fileInputCount: number;
-  recommendedResume: RecommendedDocumentSummary | null;
   documentFields: PageDocumentFieldSummary[];
 };
 
@@ -164,7 +162,6 @@ export function isPageContextResponse(
   const candidate = value as Record<string, unknown>;
   const analysis = candidate.analysis;
   const recommendation = candidate.variantRecommendation;
-  const resume = candidate.recommendedResume;
   return (
     (analysis === null || isPageAnalysisSummary(analysis)) &&
     (recommendation === null || isVariantRecommendation(recommendation)) &&
@@ -172,8 +169,6 @@ export function isPageContextResponse(
       typeof candidate.activeVariantId === 'string') &&
     Array.isArray(candidate.variantOptions) &&
     candidate.variantOptions.every(isPageVariantOption) &&
-    typeof candidate.fileInputCount === 'number' &&
-    (resume === null || isRecommendedDocumentSummary(resume)) &&
     Array.isArray(candidate.documentFields) &&
     candidate.documentFields.every(isPageDocumentFieldSummary)
   );

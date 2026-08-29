@@ -31,8 +31,6 @@ export type AnalyzedPageContext = {
   variantRecommendation: VariantRecommendation;
   activeVariantId: string | null;
   variantOptions: PageVariantOption[];
-  fileInputCount: number;
-  recommendedResume: RecommendedDocumentSummary | null;
   documentFields: PageDocumentFieldSummary[];
 };
 
@@ -137,9 +135,6 @@ export function analyzePageContext({
     variantRecommendation,
     activeVariantId,
     variantOptions,
-    fileInputCount: fileFields.length,
-    recommendedResume:
-      fileFields.length > 0 ? documentSummary(documents.resume) : null,
     documentFields,
   };
 }
@@ -153,8 +148,6 @@ export function toPageContextResponse(
       variantRecommendation: null,
       activeVariantId: null,
       variantOptions: [],
-      fileInputCount: 0,
-      recommendedResume: null,
       documentFields: [],
     };
   }
@@ -164,8 +157,6 @@ export function toPageContextResponse(
     variantRecommendation: context.variantRecommendation,
     activeVariantId: context.activeVariantId,
     variantOptions: context.variantOptions,
-    fileInputCount: context.fileInputCount,
-    recommendedResume: context.recommendedResume,
     documentFields: context.documentFields,
   };
 }

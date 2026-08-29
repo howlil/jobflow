@@ -202,7 +202,6 @@ describe('PopupPage', () => {
       <PopupPage
         repository={createRepository(createCompleteProfile())}
         openOptions={vi.fn()}
-        fileInputCount={3}
         documentFields={[
           {
             fieldFingerprint: 'resume-field',

@@ -62,8 +62,6 @@ describe('analyzePageContext', () => {
       { id: 'backend', name: 'Backend' },
     ]);
     expect(context.analysis.summary.total).toBe(2);
-    expect(context.fileInputCount).toBe(1);
-    expect(context.recommendedResume?.id).toBe('resume-1');
     expect(context.documentFields).toHaveLength(1);
     expect(context.documentFields[0]).toMatchObject({
       fieldFingerprint: 'resume-upload',
@@ -75,8 +73,12 @@ describe('analyzePageContext', () => {
     expect(toPageContextResponse(context)).toMatchObject({
       analysis: context.analysis.summary,
       activeVariantId: 'backend',
-      fileInputCount: 1,
-      recommendedResume: { id: 'resume-1' },
+      documentFields: [
+        {
+          fieldFingerprint: 'resume-upload',
+          recommendedDocument: { id: 'resume-1' },
+        },
+      ],
     });
   });
 
@@ -86,8 +88,6 @@ describe('analyzePageContext', () => {
       variantRecommendation: null,
       activeVariantId: null,
       variantOptions: [],
-      fileInputCount: 0,
-      recommendedResume: null,
       documentFields: [],
     });
   });

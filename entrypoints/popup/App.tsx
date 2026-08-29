@@ -18,8 +18,6 @@ const EMPTY_PAGE_CONTEXT: PageContextResponse = {
   variantRecommendation: null,
   activeVariantId: null,
   variantOptions: [],
-  fileInputCount: 0,
-  recommendedResume: null,
   documentFields: [],
 };
 
@@ -81,8 +79,6 @@ export default function App() {
       variantRecommendation={pageContext.variantRecommendation}
       activeVariantId={pageContext.activeVariantId}
       variantOptions={pageContext.variantOptions}
-      fileInputCount={pageContext.fileInputCount}
-      recommendedResume={pageContext.recommendedResume}
       documentFields={pageContext.documentFields}
       onSelectVariant={selectPageVariant}
     />
