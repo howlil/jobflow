@@ -129,7 +129,8 @@ export function ExperienceSection({
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined) item.endDate = event.target.value;
+                        if (item !== undefined)
+                          item.endDate = event.target.value;
                       })
                     }
                   />
@@ -141,7 +142,8 @@ export function ExperienceSection({
                     changeProfile((draft) => {
                       const item =
                         draft.baseProfile.professional.experiences[index];
-                      if (item !== undefined) item.current = event.target.checked;
+                      if (item !== undefined)
+                        item.current = event.target.checked;
                     })
                   }
                 />
@@ -153,7 +155,8 @@ export function ExperienceSection({
                     changeProfile((draft) => {
                       const item =
                         draft.baseProfile.professional.experiences[index];
-                      if (item !== undefined) item.description = event.target.value;
+                      if (item !== undefined)
+                        item.description = event.target.value;
                     })
                   }
                 />
