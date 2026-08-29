@@ -198,196 +198,203 @@ export function CvImportSection({
       <div className="workspace-tool-section__header">
         <div>
           <p className="workspace-kicker">Documents</p>
-          <h2 id="cv-import-title">Import from CV</h2>
+          <h2 id="cv-import-title">Resumes</h2>
         </div>
         <p>
-          PDF and DOCX extraction runs locally. Choosing a file never overwrites
-          your profile; conflicting values stay unselected until you approve
-          them.
+          Resume entries represent files stored locally by Job Flow. They can be
+          selected by application variants and attached only after you approve
+          the action.
         </p>
       </div>
 
-      <div className="cv-import-grid">
-        <div>
-          <div className="cv-dropzone">
-            <div className="cv-dropzone__content">
-              <div className="workspace-brand__mark" aria-hidden="true">
-                CV
-              </div>
-              <h3>{file ? file.name : 'Choose your CV'}</h3>
-              <p>
-                {file
-                  ? `${fileSize(file.size)} · ${file.type || 'document'}`
-                  : 'Text-based PDF, DOCX, or TXT. Scanned PDFs stay unsupported rather than guessed.'}
-              </p>
-              <input
-                ref={fileInput}
-                className="jobflow-visually-hidden"
-                type="file"
-                accept={ACCEPTED_FILES}
-                aria-label="Choose CV"
-                onChange={(event) => {
-                  const nextFile = event.target.files?.[0];
-                  if (nextFile) void chooseFile(nextFile);
-                }}
-              />
-              <button
-                className="jobflow-button jobflow-button-primary"
-                type="button"
-                disabled={busy}
-                onClick={() => fileInput.current?.click()}
-              >
-                {file ? 'Choose another CV' : 'Choose CV'}
-              </button>
-              {file ? (
+      <div className="workspace-card">
+        <div className="jobflow-section-heading">
+          <div>
+            <strong>Stored resumes</strong>
+            <p className="muted" style={{ margin: '4px 0 0' }}>
+              Files remain on this browser in extension-owned IndexedDB.
+            </p>
+          </div>
+          <span className="jobflow-chip jobflow-chip-strong">
+            {resumes.length}
+          </span>
+        </div>
+        {resumes.length === 0 ? (
+          <div className="jobflow-empty-row">No CV stored yet.</div>
+        ) : (
+          <div className="document-list">
+            {resumes.map((document) => (
+              <div className="document-row" key={document.id}>
+                <div className="document-row__meta">
+                  <strong>{document.label || document.fileName}</strong>
+                  <span>{document.fileName}</span>
+                </div>
                 <button
-                  className="jobflow-button"
+                  className="jobflow-button jobflow-button-danger"
                   type="button"
-                  disabled={busy || profile === null}
-                  onClick={() => void saveCvToLibrary()}
+                  disabled={busy}
+                  onClick={() => void removeResume(document)}
                 >
-                  Save CV locally
+                  Remove
                 </button>
-              ) : null}
-            </div>
+              </div>
+            ))}
           </div>
+        )}
+      </div>
 
-          <div className="workspace-card" style={{ marginTop: 16 }}>
-            <div className="jobflow-section-heading">
-              <div>
-                <strong>Stored resumes</strong>
-                <p className="muted" style={{ margin: '4px 0 0' }}>
-                  Files remain on this browser in extension-owned IndexedDB.
-                </p>
-              </div>
-              <span className="jobflow-chip jobflow-chip-strong">
-                {resumes.length}
-              </span>
-            </div>
-            {resumes.length === 0 ? (
-              <div className="jobflow-empty-row">No CV stored yet.</div>
-            ) : (
-              <div className="document-list">
-                {resumes.map((document) => (
-                  <div className="document-row" key={document.id}>
-                    <div className="document-row__meta">
-                      <strong>{document.label || document.fileName}</strong>
-                      <span>{document.fileName}</span>
-                    </div>
-                    <button
-                      className="jobflow-button jobflow-button-danger"
-                      type="button"
-                      disabled={busy}
-                      onClick={() => void removeResume(document)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      <div className="jobflow-section-heading">
+        <div>
+          <h3>Add or import CV</h3>
+          <p className="muted">
+            PDF and DOCX extraction runs locally. Choosing a file never
+            overwrites your profile; conflicting values stay unselected until
+            you approve them.
+          </p>
         </div>
+      </div>
 
-        <div className="workspace-card">
-          <div className="jobflow-section-heading">
-            <div>
-              <strong>Review extracted data</strong>
-              <p className="muted" style={{ margin: '4px 0 0' }}>
-                {conflicts > 0
-                  ? `${conflicts} conflicts require an explicit choice.`
-                  : 'New values are selected automatically; existing values are preserved.'}
-              </p>
-            </div>
-            {preview.length > 0 ? (
-              <span className="jobflow-chip jobflow-chip-strong">
-                {selectedCount} selected
-              </span>
-            ) : null}
+      <div className="cv-dropzone">
+        <div className="cv-dropzone__content">
+          <div className="workspace-brand__mark" aria-hidden="true">
+            CV
           </div>
-
-          {busy && draft === null ? (
-            <p className="muted">Extracting locally…</p>
+          <h3>{file ? file.name : 'Choose your CV'}</h3>
+          <p>
+            {file
+              ? `${fileSize(file.size)} · ${file.type || 'document'}`
+              : 'Text-based PDF, DOCX, or TXT. Scanned PDFs stay unsupported rather than guessed.'}
+          </p>
+          <input
+            ref={fileInput}
+            className="jobflow-visually-hidden"
+            type="file"
+            accept={ACCEPTED_FILES}
+            aria-label="Choose CV"
+            onChange={(event) => {
+              const nextFile = event.target.files?.[0];
+              if (nextFile) void chooseFile(nextFile);
+            }}
+          />
+          <button
+            className="jobflow-button jobflow-button-primary"
+            type="button"
+            disabled={busy}
+            onClick={() => fileInput.current?.click()}
+          >
+            {file ? 'Choose another CV' : 'Choose CV'}
+          </button>
+          {file ? (
+            <button
+              className="jobflow-button"
+              type="button"
+              disabled={busy || profile === null}
+              onClick={() => void saveCvToLibrary()}
+            >
+              Save CV locally
+            </button>
           ) : null}
-          {error ? (
-            <p className="jobflow-status jobflow-status-danger" role="alert">
-              {error}
+        </div>
+      </div>
+
+      <div className="workspace-card">
+        <div className="jobflow-section-heading">
+          <div>
+            <strong>Review extracted data</strong>
+            <p className="muted" style={{ margin: '4px 0 0' }}>
+              {conflicts > 0
+                ? `${conflicts} conflicts require an explicit choice.`
+                : 'New values are selected automatically; existing values are preserved.'}
             </p>
-          ) : null}
-          {message ? (
-            <p className="jobflow-status" role="status">
-              {message}
-            </p>
-          ) : null}
-
-          {preview.length === 0 && !busy ? (
-            <div className="jobflow-empty-row">
-              Choose a CV to preview extracted profile data.
-            </div>
-          ) : (
-            <div className="cv-preview">
-              {preview.map((item) => (
-                <label className="cv-preview__row" key={item.key}>
-                  <input
-                    type="checkbox"
-                    checked={selected.has(item.key)}
-                    onChange={() => toggle(item.key)}
-                  />
-                  <span className="cv-preview__label">
-                    {item.label}
-                    {item.status === 'conflict' ? (
-                      <span className="cv-preview__conflict"> · conflict</span>
-                    ) : null}
-                  </span>
-                  <span className="cv-preview__value">
-                    {item.extracted}
-                    <small
-                      style={{
-                        display: 'block',
-                        marginTop: 4,
-                        color: 'var(--jobflow-color-muted)',
-                      }}
-                    >
-                      {item.evidence}
-                      {item.status === 'conflict' && item.current
-                        ? ` · current: ${item.current}`
-                        : ''}
-                    </small>
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
-
+          </div>
           {preview.length > 0 ? (
-            <div className="button-row" style={{ marginTop: 16 }}>
-              <button
-                className="jobflow-button jobflow-button-accent"
-                type="button"
-                disabled={busy || selected.size === 0 || file === null}
-                onClick={() => void importSelectedAndSaveCv()}
-              >
-                Import data and save CV
-              </button>
-              <button
-                className="jobflow-button"
-                type="button"
-                disabled={busy || selected.size === 0}
-                onClick={() => void applySelected()}
-              >
-                Import selected data
-              </button>
-              <button
-                className="jobflow-button jobflow-button-ghost"
-                type="button"
-                disabled={busy}
-                onClick={() => setSelected(new Set())}
-              >
-                Clear selection
-              </button>
-            </div>
+            <span className="jobflow-chip jobflow-chip-strong">
+              {selectedCount} selected
+            </span>
           ) : null}
         </div>
+
+        {busy && draft === null ? (
+          <p className="muted">Extracting locally…</p>
+        ) : null}
+        {error ? (
+          <p className="jobflow-status jobflow-status-danger" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {message ? (
+          <p className="jobflow-status" role="status">
+            {message}
+          </p>
+        ) : null}
+
+        {preview.length === 0 && !busy ? (
+          <div className="jobflow-empty-row">
+            Choose a CV to preview extracted profile data.
+          </div>
+        ) : (
+          <div className="cv-preview">
+            {preview.map((item) => (
+              <label className="cv-preview__row" key={item.key}>
+                <input
+                  type="checkbox"
+                  checked={selected.has(item.key)}
+                  onChange={() => toggle(item.key)}
+                />
+                <span className="cv-preview__label">
+                  {item.label}
+                  {item.status === 'conflict' ? (
+                    <span className="cv-preview__conflict"> · conflict</span>
+                  ) : null}
+                </span>
+                <span className="cv-preview__value">
+                  {item.extracted}
+                  <small
+                    style={{
+                      display: 'block',
+                      marginTop: 4,
+                      color: 'var(--jobflow-color-muted)',
+                    }}
+                  >
+                    {item.evidence}
+                    {item.status === 'conflict' && item.current
+                      ? ` · current: ${item.current}`
+                      : ''}
+                  </small>
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {preview.length > 0 ? (
+          <div className="button-row" style={{ marginTop: 16 }}>
+            <button
+              className="jobflow-button jobflow-button-accent"
+              type="button"
+              disabled={busy || selected.size === 0 || file === null}
+              onClick={() => void importSelectedAndSaveCv()}
+            >
+              Import data and save CV
+            </button>
+            <button
+              className="jobflow-button"
+              type="button"
+              disabled={busy || selected.size === 0}
+              onClick={() => void applySelected()}
+            >
+              Import selected data
+            </button>
+            <button
+              className="jobflow-button jobflow-button-ghost"
+              type="button"
+              disabled={busy}
+              onClick={() => setSelected(new Set())}
+            >
+              Clear selection
+            </button>
+          </div>
+        ) : null}
       </div>
     </section>
   );
