@@ -66,9 +66,7 @@ try {
   await page.getByRole('button', { name: 'Open Job Flow' }).click();
   await expectReviewCount(page, 1);
   await page.getByRole('button', { name: /Review ambiguous fields/i }).click();
-  await page
-    .getByRole('button', { name: 'Use First name for Name' })
-    .click();
+  await page.getByRole('button', { name: 'Use First name for Name' }).click();
   await page.getByRole('button', { name: 'Back' }).click();
   await expect(page.getByLabel('Name', { exact: true })).toHaveValue('');
   await expect(
