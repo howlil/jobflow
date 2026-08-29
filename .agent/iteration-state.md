@@ -12,7 +12,7 @@ This file contains only the state needed to resume work safely. It is not an ite
 
 ## Active product change
 
-None. `master` is synchronized after the options dashboard/Tailwind cleanup and testing-policy alignment.
+None. Current work is bounded codebase-quality refactoring inside the existing profile workspace contract.
 
 ## Current integrated state
 
@@ -21,10 +21,13 @@ None. `master` is synchronized after the options dashboard/Tailwind cleanup and 
 - options/profile layout composition uses Tailwind utilities in React; `tailwind.css` is limited to base rules and stable repeated primitives/form grammar
 - the obsolete `profile.css` compatibility shim is removed
 - testing policy is risk/signal/cost based; TDD is optional rather than ceremonial
-- `ProfileFormSections.tsx` remains a large implementation hotspot; do not claim that full per-section modular decomposition is complete
+- CV import orchestration is owned by the application layer rather than React/infrastructure coupling
+- content-script semantic page analysis is owned by the application layer while the content entrypoint remains the browser/runtime shell
+- `ProfileFormSections.tsx` is composition-only; profile editing surfaces are separated into cohesive owner modules
+- career records preserve one experience surface while languages, certifications, and projects have independent UI ownership
 
 ## Uncommitted candidate context
 
-An end-to-end `JobApplication` pipeline has been discussed as a possible next product direction. The current product contract still lists an application tracker as a non-goal.
+An end-to-end `JobApplication` pipeline has been discussed as a possible future product direction. The current product contract still lists an application tracker as a non-goal.
 
 This candidate is **not an active requirement**. If the user explicitly chooses that direction, update `requirements.md` in the same logical change before or with implementation, then execute the canonical lifecycle.
