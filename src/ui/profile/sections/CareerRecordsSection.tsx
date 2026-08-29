@@ -1,3 +1,4 @@
+import { Section, SectionHeader } from '../../design-system/primitives';
 import { CertificationsSection } from './CertificationsSection';
 import { LanguagesSection } from './LanguagesSection';
 import { ProjectsSection } from './ProjectsSection';
@@ -9,15 +10,13 @@ export function CareerRecordsSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <details
-      className="profile-section"
-      open
-      hidden={activeSection !== 'experience'}
-    >
-      <summary>Languages, certifications, and projects</summary>
-      <LanguagesSection changeProfile={changeProfile} profile={profile} />
-      <CertificationsSection changeProfile={changeProfile} profile={profile} />
-      <ProjectsSection changeProfile={changeProfile} profile={profile} />
-    </details>
+    <Section hidden={activeSection !== 'experience'}>
+      <SectionHeader title="Languages, certifications, and projects" />
+      <div className="grid gap-6">
+        <LanguagesSection changeProfile={changeProfile} profile={profile} />
+        <CertificationsSection changeProfile={changeProfile} profile={profile} />
+        <ProjectsSection changeProfile={changeProfile} profile={profile} />
+      </div>
+    </Section>
   );
 }
