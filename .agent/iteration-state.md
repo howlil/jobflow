@@ -25,6 +25,7 @@ None. Current work remains inside the existing Job Flow product contract.
 - the obsolete `profile.css` compatibility shim is removed
 - testing policy is risk/signal/cost based; TDD is optional rather than ceremonial
 - CV import orchestration is owned by the application layer rather than React/infrastructure coupling
+- the Documents workspace treats resumes as stored local files; metadata remains the persisted reference contract but users cannot create metadata-only resume entries
 - content-script semantic page analysis is owned by the application layer while the content entrypoint remains the browser/runtime shell
 - page-context document analysis uses `documentFields` as the single source of truth for detected upload fields and recommendations
 - `ProfileFormSections.tsx` is composition-only; profile editing surfaces are separated into cohesive owner modules

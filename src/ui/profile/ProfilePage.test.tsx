@@ -274,7 +274,7 @@ describe('ProfilePage', () => {
     );
   });
 
-  it('adds richer career records, preferences, documents, and a variant', async () => {
+  it('adds richer career records, preferences, reusable answers, and a variant', async () => {
     const { repository, save } = createRepository(null);
 
     const { rerender } = render(
@@ -340,12 +340,15 @@ describe('ProfilePage', () => {
       rerender(
         <ProfilePage repository={repository} activeSection="documents" />,
       );
-      fireEvent.click(screen.getByRole('button', { name: 'Add resume' }));
-      fireEvent.change(screen.getByLabelText('Label'), {
-        target: { value: 'Backend resume' },
+      fireEvent.click(screen.getByRole('button', { name: 'Add answer' }));
+      fireEvent.change(screen.getByLabelText('Question'), {
+        target: { value: 'Why are you interested in this role?' },
       });
-      fireEvent.change(screen.getByLabelText('File name'), {
-        target: { value: 'backend.pdf' },
+      fireEvent.change(screen.getByLabelText('Answer'), {
+        target: { value: 'I enjoy building reliable backend systems.' },
+      });
+      fireEvent.change(screen.getByLabelText('Tags, comma separated'), {
+        target: { value: 'motivation, backend' },
       });
 
       rerender(
@@ -385,9 +388,10 @@ describe('ProfilePage', () => {
       'Backend Engineer',
       'Software Engineer',
     ]);
-    expect(saved?.baseProfile.documents.resumes[0]).toMatchObject({
-      label: 'Backend resume',
-      fileName: 'backend.pdf',
+    expect(saved?.baseProfile.customAnswers[0]).toMatchObject({
+      question: 'Why are you interested in this role?',
+      answer: 'I enjoy building reliable backend systems.',
+      tags: ['motivation', 'backend'],
     });
     expect(saved?.variants).toHaveLength(1);
     expect(saved?.variants[0]).toMatchObject({

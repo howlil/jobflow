@@ -20,6 +20,19 @@ function createRepositories() {
 }
 
 describe('createCvImportWorkflow', () => {
+  it('reports whether resume bytes exist in document storage', async () => {
+    const { profileRepository, documentRepository } = createRepositories();
+    vi.mocked(documentRepository.has).mockResolvedValue(true);
+    const workflow = createCvImportWorkflow({
+      profileRepository,
+      documentRepository,
+      extractText: vi.fn(),
+    });
+
+    await expect(workflow.hasStoredResume('resume-1')).resolves.toBe(true);
+    expect(documentRepository.has).toHaveBeenCalledWith('resume-1');
+  });
+
   it('removes newly stored bytes when profile persistence fails', async () => {
     const { profileRepository, documentRepository } = createRepositories();
     vi.mocked(profileRepository.save).mockRejectedValue(

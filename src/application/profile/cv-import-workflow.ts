@@ -24,6 +24,7 @@ export type CvImportPreparation = {
 
 export type CvImportWorkflow = {
   loadProfile(): Promise<StoredProfileEnvelope>;
+  hasStoredResume(documentId: string): Promise<boolean>;
   prepare(
     file: File,
     currentProfile?: StoredProfileEnvelope | null,
@@ -76,6 +77,10 @@ export function createCvImportWorkflow({
 }: CvImportWorkflowDependencies): CvImportWorkflow {
   async function loadProfile(): Promise<StoredProfileEnvelope> {
     return (await profileRepository.load()) ?? createEmptyStoredProfile();
+  }
+
+  async function hasStoredResume(documentId: string): Promise<boolean> {
+    return documentRepository.has(documentId);
   }
 
   async function prepare(
@@ -164,6 +169,7 @@ export function createCvImportWorkflow({
 
   return {
     loadProfile,
+    hasStoredResume,
     prepare,
     applySelected,
     importSelectedAndSaveCv,
