@@ -10,7 +10,11 @@ import { CorrectionMemorySection } from '../../src/ui/corrections/CorrectionMemo
 import { WorkspaceFrame } from '../../src/ui/design-system/WorkspaceFrame';
 import { BackupRecoveryInspector } from '../../src/ui/profile/BackupRecoveryInspector';
 import { CvImportSection } from '../../src/ui/profile/CvImportSection';
-import { ProfilePage } from '../../src/ui/profile/ProfilePage';
+import {
+  ProfilePage,
+  type ProfileSaveState,
+  type ProfileSaveStatus,
+} from '../../src/ui/profile/ProfilePage';
 import { WorkspaceNavigation } from '../../src/ui/profile/WorkspaceNavigation';
 import {
   WORKSPACE_SECTION_TITLES,
@@ -27,10 +31,22 @@ const cvImportWorkflow = createCvImportWorkflow({
   extractText: extractCvText,
 });
 
+const saveIndicatorTone: Record<ProfileSaveState, string> = {
+  clean: 'bg-app-border-strong',
+  dirty: 'bg-amber-600',
+  saving: 'bg-app-ink',
+  saved: 'bg-emerald-700',
+  error: 'bg-red-700',
+};
+
 export default function App() {
   const [activeSection, setActiveSection] =
     useState<WorkspaceSection>('personal');
   const [profileRevision, setProfileRevision] = useState(0);
+  const [saveStatus, setSaveStatus] = useState<ProfileSaveStatus>({
+    state: 'clean',
+    text: 'All changes saved.',
+  });
   const refreshWorkspace = () => setProfileRevision((current) => current + 1);
 
   const navigation = (
@@ -43,10 +59,27 @@ export default function App() {
   const hideProfileSurface =
     activeSection === 'corrections' || activeSection === 'backup';
 
+  const workspaceMeta = hideProfileSurface ? (
+    'Stored locally'
+  ) : (
+    <div
+      className="flex items-center gap-2"
+      role="status"
+      aria-live="polite"
+    >
+      <span
+        className={`h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
+        aria-hidden="true"
+      />
+      <span>{saveStatus.text}</span>
+    </div>
+  );
+
   return (
     <WorkspaceFrame
       navigation={navigation}
       title={WORKSPACE_SECTION_TITLES[activeSection]}
+      meta={workspaceMeta}
     >
       <div hidden={hideProfileSurface}>
         <ProfilePage
@@ -54,6 +87,7 @@ export default function App() {
           repository={profileRepository}
           vaultClient={vaultClient}
           activeSection={activeSection}
+          onSaveStatusChange={setSaveStatus}
         />
       </div>
 
