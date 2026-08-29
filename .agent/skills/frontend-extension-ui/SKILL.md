@@ -15,6 +15,62 @@ Keep the UI thin: render application state, collect user intent, and delegate po
 - Options/profile page: canonical profile editing, variants, additional/sensitive sections.
 - Floating UI: small page-local action/status surface only.
 
+Do not audit or change only `options.html`. A UI change must identify every affected product surface and its styling/runtime boundary.
+
+## UI implementation workflow
+
+For a bounded UI change:
+
+```text
+user task
+  -> identify affected surfaces
+  -> inspect existing primitive and visual grammar
+  -> reuse the existing primitive when it owns the concept
+  -> if no owner exists, ask whether the concept is repeated + stable
+       -> yes: introduce the smallest reusable primitive
+       -> no: keep the composition local
+  -> define spacing and responsive behavior explicitly
+  -> implement the feature/surface change
+  -> migrate affected duplicate callers in the same logical change
+  -> remove superseded styling when safe
+  -> verify representative widths and interaction states
+  -> run behavior/quality gates
+  -> stop
+```
+
+Prefer semantic ownership over selector reuse. Do not reuse a class named for another feature merely because it currently looks similar.
+
+## Primitive boundary
+
+Shared workspace/popup primitives live in `src/ui/design-system/primitives.tsx`.
+
+Prefer shared primitives for repeated concepts such as:
+
+- buttons and icon actions
+- labeled text/select/textarea/checkbox fields
+- file selection
+- field grids
+- section headers/subsections
+- action rows
+- status, chips, and empty states
+
+Keep local layout in feature components. Do not create generic `Box`, `Flex`, `Grid`, `Stack`, or `Card` wrappers solely to hide Tailwind utilities.
+
+The in-page assistant is a Shadow-DOM runtime boundary. It follows the same semantic design grammar but keeps surface-local CSS/primitives so host styles cannot interfere.
+
+## Spacing and layout
+
+Use the 4px design grid. Prefer the established relationship rhythm rather than arbitrary gaps:
+
+- label to control: 8px
+- field to field: 16px
+- inline actions: 8px
+- record internal groups: 16px
+- subsection separation: 24px
+- major surface separation: 32px
+
+Field grids must be chosen from information relationships, not DOM position. Do not use `:first-of-type` or similar selectors to infer that a form should have more columns. Avoid accidental trailing empty cells by choosing the correct grid or explicit field span.
+
 ## State
 
 Start with React local state and focused hooks. Persisted state belongs in repositories. Do not add Redux/Zustand or a generic form framework until current complexity demonstrates the need.
@@ -36,6 +92,8 @@ Job Preferences
 ```
 
 Keep uncommon/sensitive data in explicit additional sections. Complete schema does not mean one giant onboarding form.
+
+Do not add a second disclosure control inside an already selected primary workspace category unless the contained object itself benefits from collapse/expand behavior.
 
 ## Floating UI
 
@@ -81,6 +139,21 @@ Use a feature/application hook or adapter instead.
 - no color-only status
 - no unexpected focus capture
 - meaningful accessible names for icon buttons
+- native semantic controls may remain native when the product design explicitly calls for them
+
+## Visual verification
+
+Check representative surfaces that are affected by the change:
+
+- workspace at 1440px
+- workspace at 1024px
+- workspace at 390px
+- popup
+- collapsed launcher
+- expanded assistant desktop
+- expanded assistant narrow viewport
+
+Do not run every visual width as ritual when the changed surface cannot affect it, but do not claim cross-surface consistency after checking only one mount point.
 
 ## Common mistakes
 
@@ -90,3 +163,7 @@ Use a feature/application hook or adapter instead.
 - floating UI styled by host-page CSS
 - showing fake numeric confidence percentages
 - asking for every possible profile field during first-run
+- duplicated popup/workspace button or field class strings
+- positional form-grid selectors
+- exposed native file controls when a styled file-selection primitive already exists
+- semantic CSS leaks such as using a readiness-list class for unrelated data
