@@ -13,7 +13,10 @@ export function DocumentsSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <section className="profile-section" hidden={activeSection !== 'documents'}>
+    <section
+      className="profile-section"
+      hidden={activeSection !== 'documents'}
+    >
       <div className="jobflow-section-heading">
         <div>
           <h2>Reusable answers</h2>
