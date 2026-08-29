@@ -107,7 +107,8 @@ export function EducationSection({
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.education[index];
-                        if (item !== undefined) item.startDate = event.target.value;
+                        if (item !== undefined)
+                          item.startDate = event.target.value;
                       })
                     }
                   />
@@ -118,7 +119,8 @@ export function EducationSection({
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.education[index];
-                        if (item !== undefined) item.endDate = event.target.value;
+                        if (item !== undefined)
+                          item.endDate = event.target.value;
                       })
                     }
                   />
@@ -157,7 +159,8 @@ export function EducationSection({
                     changeProfile((draft) => {
                       const item =
                         draft.baseProfile.professional.education[index];
-                      if (item !== undefined) item.description = event.target.value;
+                      if (item !== undefined)
+                        item.description = event.target.value;
                     })
                   }
                 />
