@@ -1,10 +1,7 @@
 import type { FieldCorrection } from '../corrections/correction-schema';
 import type { FieldContext } from '../forms/field-context';
-import {
-  matchField,
-  type CanonicalField,
-  type MatchResult,
-} from './match-field';
+import type { CanonicalField } from './canonical-fields';
+import { matchField, type MatchResult } from './match-field';
 
 export type CorrectionAwareMatchResult =
   | MatchResult

@@ -1,29 +1,10 @@
 import type { FieldContext } from '../forms/field-context';
+import type { CanonicalField } from './canonical-fields';
 import { normalizeFieldText } from './normalize-field-text';
 import {
   findSensitiveFieldMatch,
   type SensitiveCanonicalField,
 } from './sensitive-fields';
-
-export type CanonicalField =
-  | 'personal.legalName.first'
-  | 'personal.legalName.middle'
-  | 'personal.legalName.last'
-  | 'personal.preferredName'
-  | 'contact.email.primary'
-  | 'contact.phone.primary'
-  | 'contact.whatsapp'
-  | 'contact.address.city'
-  | 'contact.address.state'
-  | 'contact.address.country'
-  | 'contact.address.postalCode'
-  | 'links.linkedin'
-  | 'links.github'
-  | 'links.portfolio'
-  | 'professional.headline'
-  | 'jobPreferences.willingToRelocate'
-  | 'jobPreferences.willingToTravel'
-  | 'jobPreferences.availabilityDate';
 
 export type CandidateMatch = {
   field: CanonicalField;

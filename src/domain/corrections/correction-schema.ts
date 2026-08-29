@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-import { isCanonicalField } from '../matching/canonical-fields';
-import type { CanonicalField } from '../matching/match-field';
+import {
+  isCanonicalField,
+  type CanonicalField,
+} from '../matching/canonical-fields';
 
 export type CorrectionTarget = CanonicalField | 'ignore';
 
