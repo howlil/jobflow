@@ -80,7 +80,8 @@ export function ProjectsSection({
                   value={project.name}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined) item.name = event.target.value;
                     })
                   }
@@ -90,7 +91,8 @@ export function ProjectsSection({
                   value={project.role}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined) item.role = event.target.value;
                     })
                   }
@@ -100,7 +102,8 @@ export function ProjectsSection({
                   value={project.url}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined) item.url = event.target.value;
                     })
                   }
@@ -110,8 +113,10 @@ export function ProjectsSection({
                   {...dateInputProps(project.startDate)}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
-                      if (item !== undefined) item.startDate = event.target.value;
+                      const item =
+                        draft.baseProfile.professional.projects[index];
+                      if (item !== undefined)
+                        item.startDate = event.target.value;
                     })
                   }
                 />
@@ -120,7 +125,8 @@ export function ProjectsSection({
                   {...dateInputProps(project.endDate)}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined) item.endDate = event.target.value;
                     })
                   }
@@ -130,7 +136,8 @@ export function ProjectsSection({
                   value={listValue(project.skills)}
                   onChange={(event) =>
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined)
                         item.skills = syncSkills(
                           draft,
@@ -149,7 +156,8 @@ export function ProjectsSection({
                     const selected = event.target.value;
                     if (selected === '') return;
                     changeProfile((draft) => {
-                      const item = draft.baseProfile.professional.projects[index];
+                      const item =
+                        draft.baseProfile.professional.projects[index];
                       if (item !== undefined) {
                         item.skills = addLinkedSkill(item.skills, selected);
                       }
@@ -171,7 +179,8 @@ export function ProjectsSection({
                 onChange={(event) =>
                   changeProfile((draft) => {
                     const item = draft.baseProfile.professional.projects[index];
-                    if (item !== undefined) item.description = event.target.value;
+                    if (item !== undefined)
+                      item.description = event.target.value;
                   })
                 }
               />
