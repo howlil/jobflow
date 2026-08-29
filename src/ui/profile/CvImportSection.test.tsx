@@ -28,7 +28,7 @@ function createRepositories() {
     remove: vi.fn().mockResolvedValue(undefined),
     has: vi.fn().mockResolvedValue(false),
   };
-  return { profileRepository, documentRepository };
+  return { profile, profileRepository, documentRepository };
 }
 
 function createWorkflow(
@@ -43,6 +43,28 @@ function createWorkflow(
 }
 
 describe('CvImportSection', () => {
+  it('marks legacy resume metadata when the local file is unavailable', async () => {
+    const { profile, profileRepository, documentRepository } =
+      createRepositories();
+    profile.baseProfile.documents.resumes.push({
+      id: 'legacy-resume',
+      label: 'Legacy resume',
+      fileName: 'legacy.pdf',
+      mimeType: 'application/pdf',
+      lastKnownModified: null,
+    });
+
+    render(
+      <CvImportSection
+        workflow={createWorkflow(profileRepository, documentRepository)}
+      />,
+    );
+
+    expect(await screen.findByText('Legacy resume')).toBeTruthy();
+    expect(screen.getByText(/File unavailable/)).toBeTruthy();
+    expect(documentRepository.has).toHaveBeenCalledWith('legacy-resume');
+  });
+
   it('starts from an empty profile when storage has not been initialized', async () => {
     const { profileRepository, documentRepository } = createRepositories();
     vi.mocked(profileRepository.load).mockResolvedValue(null);
