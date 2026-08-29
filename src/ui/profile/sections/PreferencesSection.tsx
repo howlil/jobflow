@@ -58,7 +58,9 @@ export function PreferencesSection({
         />
         <TextField
           label="Preferred locations"
-          value={listValue(profile.baseProfile.jobPreferences.preferredLocations)}
+          value={listValue(
+            profile.baseProfile.jobPreferences.preferredLocations,
+          )}
           onChange={(event) =>
             changeProfile((draft) => {
               draft.baseProfile.jobPreferences.preferredLocations = parseList(
@@ -69,7 +71,9 @@ export function PreferencesSection({
         />
         <TextField
           label="Availability date"
-          {...dateInputProps(profile.baseProfile.jobPreferences.availabilityDate)}
+          {...dateInputProps(
+            profile.baseProfile.jobPreferences.availabilityDate,
+          )}
           onChange={(event) =>
             changeProfile((draft) => {
               draft.baseProfile.jobPreferences.availabilityDate =
@@ -82,7 +86,8 @@ export function PreferencesSection({
           value={profile.baseProfile.jobPreferences.noticePeriod}
           onChange={(event) =>
             changeProfile((draft) => {
-              draft.baseProfile.jobPreferences.noticePeriod = event.target.value;
+              draft.baseProfile.jobPreferences.noticePeriod =
+                event.target.value;
             })
           }
         />
