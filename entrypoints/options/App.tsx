@@ -62,11 +62,7 @@ export default function App() {
   const workspaceMeta = hideProfileSurface ? (
     'Stored locally'
   ) : (
-    <div
-      className="flex items-center gap-2"
-      role="status"
-      aria-live="polite"
-    >
+    <div className="flex items-center gap-2" role="status" aria-live="polite">
       <span
         className={`h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
         aria-hidden="true"
