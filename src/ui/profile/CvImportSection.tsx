@@ -350,7 +350,9 @@ export function CvImportSection({
         ) : null}
 
         {preview.length === 0 && !busy ? (
-          <EmptyState>Choose a CV to preview extracted profile data.</EmptyState>
+          <EmptyState>
+            Choose a CV to preview extracted profile data.
+          </EmptyState>
         ) : (
           <div className="cv-preview">
             {preview.map((item) => (
