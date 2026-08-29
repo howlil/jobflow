@@ -96,16 +96,30 @@ Implement the minimum coherent change.
 - preserve unrelated behavior
 - do not refactor unrelated code
 - do not introduce speculative flexibility or future architecture
+- before removing or renaming an interaction, contract, identifier, or user-visible behavior, search the bounded codebase surface for direct callers, tests, fixtures, and acceptance checks that depend on it; migrate those consumers in the same logical change
 - migrate current callers before deleting a replaced path
 - remove obsolete code/styles/shims created or superseded by the change once callers are migrated and behavior is verified
+- when repository formatting tooling exists, use it rather than manually approximating formatter output; format touched files before the first remote verification when practical
 
 ### VERIFY
 
 Choose verification from realistic failure risk, signal, and cost. See the testing principle below.
 
+Prefer the fastest deterministic feedback available **before** using remote CI as the first debugger. For a non-trivial change, perform a bounded preflight based on the changed surface:
+
+1. run the affected tests/fixtures or direct acceptance check for behavior that changed
+2. run type checking when types, contracts, or TypeScript call sites changed
+3. run the repository formatter and relevant lint/static checks on touched files when tooling supports it
+
+Do not run a full local suite merely as ritual when focused checks provide equivalent confidence; mandatory integration gates still run afterward.
+
+Do not mutate CI/workflow configuration for routine formatting, test discovery, or diagnostics when existing repository commands, local formatter output, diffs, or CI logs can answer the question. If a temporary CI diagnostic change is genuinely the only practical option, keep it minimal and revert it before final verification.
+
 ### QUALITY GATES
 
 Pass the repository's mandatory integration checks plus any risk-specific checks justified by the change. Running an existing CI suite does not imply that every change needed new tests.
+
+Remote CI is the integration gate, not the preferred place to discover cheap deterministic failures that repository tooling could have caught earlier.
 
 ### RELEASE READY
 
