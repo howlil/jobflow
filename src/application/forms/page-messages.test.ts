@@ -7,8 +7,6 @@ const baseContext = {
   variantRecommendation: null,
   activeVariantId: null,
   variantOptions: [],
-  fileInputCount: 1,
-  recommendedResume: null,
 };
 
 describe('isPageContextResponse', () => {
