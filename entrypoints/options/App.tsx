@@ -77,37 +77,39 @@ export default function App() {
       title={WORKSPACE_SECTION_TITLES[activeSection]}
       meta={workspaceMeta}
     >
-      {activeSection === 'documents' ? (
-        <CvImportSection
-          workflow={cvImportWorkflow}
-          onProfileChanged={refreshWorkspace}
-        />
-      ) : null}
+      <div className="grid gap-8">
+        {activeSection === 'documents' ? (
+          <CvImportSection
+            workflow={cvImportWorkflow}
+            onProfileChanged={refreshWorkspace}
+          />
+        ) : null}
 
-      <div hidden={hideProfileSurface}>
-        <ProfilePage
-          key={profileRevision}
-          repository={profileRepository}
-          vaultClient={vaultClient}
-          activeSection={activeSection}
-          onSaveStatusChange={setSaveStatus}
-        />
-      </div>
-
-      {activeSection === 'corrections' ? (
-        <div className="w-full" id="corrections">
-          <CorrectionMemorySection repository={correctionRepository} />
-        </div>
-      ) : null}
-
-      {activeSection === 'backup' ? (
-        <div className="w-full" id="backup-recovery">
-          <BackupRecoveryInspector
+        <div hidden={hideProfileSurface}>
+          <ProfilePage
+            key={profileRevision}
             repository={profileRepository}
-            onRestored={refreshWorkspace}
+            vaultClient={vaultClient}
+            activeSection={activeSection}
+            onSaveStatusChange={setSaveStatus}
           />
         </div>
-      ) : null}
+
+        {activeSection === 'corrections' ? (
+          <div className="w-full" id="corrections">
+            <CorrectionMemorySection repository={correctionRepository} />
+          </div>
+        ) : null}
+
+        {activeSection === 'backup' ? (
+          <div className="w-full" id="backup-recovery">
+            <BackupRecoveryInspector
+              repository={profileRepository}
+              onRestored={refreshWorkspace}
+            />
+          </div>
+        ) : null}
+      </div>
     </WorkspaceFrame>
   );
 }
