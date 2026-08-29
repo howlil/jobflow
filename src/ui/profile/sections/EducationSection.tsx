@@ -1,6 +1,15 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
+  Button,
+  EmptyState,
+  FieldGrid,
+  Section,
+  SectionHeader,
+  TextareaField,
+  TextField,
+} from '../../design-system/primitives';
+import {
   CollapsibleRecord,
   createProfileItemId,
   dateInputProps,
@@ -16,37 +25,37 @@ export function EducationSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <section className="profile-section" hidden={activeSection !== 'education'}>
-      <div className="jobflow-section-heading">
-        <h2>Education</h2>
-        <button
-          className="jobflow-button"
-          type="button"
-          onClick={() =>
-            changeProfile((draft) => {
-              draft.baseProfile.professional.education.push({
-                id: createProfileItemId(),
-                institution: '',
-                degree: '',
-                fieldOfStudy: '',
-                location: '',
-                startDate: '',
-                endDate: '',
-                gpa: null,
-                maxGpa: null,
-                description: '',
-              });
-            })
-          }
-        >
-          <Plus aria-hidden="true" size={16} />
-          Add education
-        </button>
-      </div>
+    <Section hidden={activeSection !== 'education'}>
+      <SectionHeader
+        title="Education"
+        action={
+          <Button
+            onClick={() =>
+              changeProfile((draft) => {
+                draft.baseProfile.professional.education.push({
+                  id: createProfileItemId(),
+                  institution: '',
+                  degree: '',
+                  fieldOfStudy: '',
+                  location: '',
+                  startDate: '',
+                  endDate: '',
+                  gpa: null,
+                  maxGpa: null,
+                  description: '',
+                });
+              })
+            }
+          >
+            <Plus aria-hidden="true" size={16} />
+            Add education
+          </Button>
+        }
+      />
       {profile.baseProfile.professional.education.length === 0 ? (
-        <div className="jobflow-empty-row">No education added yet.</div>
+        <EmptyState>No education added yet.</EmptyState>
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {profile.baseProfile.professional.education.map(
             (education, index) => (
               <CollapsibleRecord
@@ -67,111 +76,95 @@ export function EducationSection({
                       `Education ${index + 1}`}
                   </span>
                 </summary>
-                <div className="form-grid">
+                <FieldGrid>
                   {[
                     ['Institution', 'institution'],
                     ['Degree', 'degree'],
                     ['Field of study', 'fieldOfStudy'],
                     ['Location', 'location'],
                   ].map(([label, key]) => (
-                    <label key={key}>
-                      {label}
-                      <input
-                        value={String(
-                          education[key as keyof typeof education] ?? '',
-                        )}
-                        onChange={(event) =>
-                          changeProfile((draft) => {
-                            const item =
-                              draft.baseProfile.professional.education[index];
-                            if (item !== undefined && key !== undefined) {
-                              Reflect.set(item, key, event.target.value);
-                            }
-                          })
-                        }
-                      />
-                    </label>
+                    <TextField
+                      key={key}
+                      label={label}
+                      value={String(
+                        education[key as keyof typeof education] ?? '',
+                      )}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.education[index];
+                          if (item !== undefined && key !== undefined) {
+                            Reflect.set(item, key, event.target.value);
+                          }
+                        })
+                      }
+                    />
                   ))}
-                  <label>
-                    Start date
-                    <input
-                      {...dateInputProps(education.startDate)}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.education[index];
-                          if (item !== undefined)
-                            item.startDate = event.target.value;
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    End date
-                    <input
-                      {...dateInputProps(education.endDate)}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.education[index];
-                          if (item !== undefined)
-                            item.endDate = event.target.value;
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    GPA
-                    <input
-                      inputMode="decimal"
-                      value={education.gpa ?? ''}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.education[index];
-                          if (item !== undefined)
-                            item.gpa = parseNullableNumber(event.target.value);
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Max GPA
-                    <input
-                      inputMode="decimal"
-                      value={education.maxGpa ?? ''}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.education[index];
-                          if (item !== undefined)
-                            item.maxGpa = parseNullableNumber(
-                              event.target.value,
-                            );
-                        })
-                      }
-                    />
-                  </label>
-                </div>
-                <label>
-                  Description
-                  <textarea
-                    placeholder={'Use one academic highlight per line.'}
-                    value={education.description}
+                  <TextField
+                    label="Start date"
+                    {...dateInputProps(education.startDate)}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.education[index];
+                        if (item !== undefined) item.startDate = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    label="End date"
+                    {...dateInputProps(education.endDate)}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.education[index];
+                        if (item !== undefined) item.endDate = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    inputMode="decimal"
+                    label="GPA"
+                    value={education.gpa ?? ''}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.education[index];
                         if (item !== undefined)
-                          item.description = event.target.value;
+                          item.gpa = parseNullableNumber(event.target.value);
                       })
                     }
                   />
-                </label>
+                  <TextField
+                    inputMode="decimal"
+                    label="Max GPA"
+                    value={education.maxGpa ?? ''}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.education[index];
+                        if (item !== undefined)
+                          item.maxGpa = parseNullableNumber(event.target.value);
+                      })
+                    }
+                  />
+                </FieldGrid>
+                <TextareaField
+                  label="Description"
+                  placeholder="Use one academic highlight per line."
+                  value={education.description}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.education[index];
+                      if (item !== undefined) item.description = event.target.value;
+                    })
+                  }
+                />
                 {descriptionPreview(education.description)}
-                <button
-                  className="jobflow-button"
-                  type="button"
+                <Button
+                  className="justify-self-start"
+                  variant="danger"
                   onClick={() =>
                     changeProfile((draft) => {
                       draft.baseProfile.professional.education.splice(index, 1);
@@ -180,12 +173,12 @@ export function EducationSection({
                 >
                   <Trash2 aria-hidden="true" size={16} />
                   Remove education {index + 1}
-                </button>
+                </Button>
               </CollapsibleRecord>
             ),
           )}
         </div>
       )}
-    </section>
+    </Section>
   );
 }
