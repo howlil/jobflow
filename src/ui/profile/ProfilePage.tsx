@@ -15,29 +15,40 @@ import {
 } from './sections/ProfileFormSections';
 import type { WorkspaceSection } from './workspace-sections';
 
+export type ProfileSaveState = 'clean' | 'dirty' | 'saving' | 'saved' | 'error';
+
+export type ProfileSaveStatus = {
+  state: ProfileSaveState;
+  text: string;
+};
+
 type ProfilePageProps = {
   repository: ProfileRepository;
   vaultClient?: VaultClient;
   activeSection?: WorkspaceSection;
+  onSaveStatusChange?: (status: ProfileSaveStatus) => void;
 };
-
-type ProfileSaveState = 'clean' | 'dirty' | 'saving' | 'saved' | 'error';
 
 const AUTOSAVE_DEBOUNCE_MS = 800;
 const AUTOSAVE_MAX_WAIT_MS = 5_000;
 
-const saveIndicatorTone: Record<ProfileSaveState, string> = {
-  clean: 'bg-app-border-strong',
-  dirty: 'bg-amber-600',
-  saving: 'bg-app-ink',
-  saved: 'bg-emerald-700',
-  error: 'bg-red-700',
-};
+function saveStateText(saveState: ProfileSaveState): string {
+  return saveState === 'saving'
+    ? 'Saving profile...'
+    : saveState === 'saved'
+      ? 'Profile saved.'
+      : saveState === 'dirty'
+        ? 'Changes pending.'
+        : saveState === 'error'
+          ? 'Autosave failed. Edit again to retry.'
+          : 'All changes saved.';
+}
 
 export function ProfilePage({
   repository,
   vaultClient,
   activeSection = 'personal',
+  onSaveStatusChange,
 }: ProfilePageProps) {
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -141,6 +152,10 @@ export function ProfilePage({
   }, []);
 
   useEffect(() => {
+    onSaveStatusChange?.({ state: saveState, text: saveStateText(saveState) });
+  }, [onSaveStatusChange, saveState]);
+
+  useEffect(() => {
     let active = true;
     void repository
       .load()
@@ -242,33 +257,17 @@ export function ProfilePage({
     );
   }
 
-  const saveStateText =
-    saveState === 'saving'
-      ? 'Saving profile...'
-      : saveState === 'saved'
-        ? 'Profile saved.'
-        : saveState === 'dirty'
-          ? 'Changes pending.'
-          : saveState === 'error'
-            ? 'Autosave failed. Edit again to retry.'
-            : 'All changes saved.';
+  const statusText = saveStateText(saveState);
 
   return (
     <section className="profile-page w-full pb-10">
-      <div className="mb-4 flex min-h-8 items-center justify-end gap-2 border-b border-app-border pb-3">
-        <span
-          className={`profile-save-indicator h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveState]}`}
-          data-state={saveState}
-          aria-hidden="true"
-        />
-        <p
-          className="m-0 text-[11px] leading-4 text-app-subtle"
-          role="status"
-          aria-live="polite"
-        >
-          {saveStateText}
-        </p>
-      </div>
+      <p
+        className="jobflow-visually-hidden"
+        role="status"
+        aria-live="polite"
+      >
+        {statusText}
+      </p>
 
       {error !== null ? (
         <p
