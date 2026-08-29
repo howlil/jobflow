@@ -1,9 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 
-import {
-  createProfileItemId,
-  dateInputProps,
-} from './profile-section-helpers';
+import { createProfileItemId, dateInputProps } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
 type CertificationsSectionProps = Pick<
