@@ -102,10 +102,10 @@ try {
   const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Documents' }).click();
-  await expect(
-    page.getByRole('heading', { name: 'Import from CV' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Resumes' })).toBeVisible();
   await expect(page.getByText('No CV stored yet.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add resume' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Reusable answers' })).toBeVisible();
 
   await page.getByLabel('Choose CV').setInputFiles({
     name: 'backend-cv.txt',
