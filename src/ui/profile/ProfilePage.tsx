@@ -269,9 +269,11 @@ export function ProfilePage({
         data-state={saveState}
         aria-hidden="true"
       />
-      <p className="jobflow-visually-hidden" role="status" aria-live="polite">
-        {statusText}
-      </p>
+      {onSaveStatusChange === undefined ? (
+        <p className="jobflow-visually-hidden" role="status" aria-live="polite">
+          {statusText}
+        </p>
+      ) : null}
 
       {error !== null ? (
         <p
