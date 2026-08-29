@@ -26,6 +26,19 @@ function initialSelection(preview: CvImportPreviewItem[]): Set<CvImportKey> {
   );
 }
 
+async function readResumeAvailability(
+  workflow: CvImportWorkflow,
+  profile: StoredProfileEnvelope,
+): Promise<Record<string, boolean>> {
+  const entries = await Promise.all(
+    profile.baseProfile.documents.resumes.map(async (document) => [
+      document.id,
+      await workflow.hasStoredResume(document.id),
+    ] as const),
+  );
+  return Object.fromEntries(entries);
+}
+
 type CvImportSectionProps = {
   workflow: CvImportWorkflow;
   onProfileChanged?: () => void;
@@ -41,14 +54,21 @@ export function CvImportSection({
   const [draft, setDraft] = useState<CvImportDraft | null>(null);
   const [preview, setPreview] = useState<CvImportPreviewItem[]>([]);
   const [selected, setSelected] = useState<Set<CvImportKey>>(new Set());
+  const [resumeAvailability, setResumeAvailability] = useState<
+    Record<string, boolean>
+  >({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    void workflow.loadProfile().then((stored) => {
-      if (active) setProfile(stored);
+    void workflow.loadProfile().then(async (stored) => {
+      const availability = await readResumeAvailability(workflow, stored);
+      if (active) {
+        setProfile(stored);
+        setResumeAvailability(availability);
+      }
     });
     return () => {
       active = false;
@@ -140,6 +160,7 @@ export function CvImportSection({
         file,
       );
       setProfile(next);
+      setResumeAvailability(await readResumeAvailability(workflow, next));
       setMessage(
         `Imported ${selected.size} reviewed profile groups and stored ${file.name}.`,
       );
@@ -161,6 +182,7 @@ export function CvImportSection({
     try {
       const next = await workflow.saveCvToLibrary(profile, file);
       setProfile(next);
+      setResumeAvailability(await readResumeAvailability(workflow, next));
       setMessage(
         `${file.name} is stored locally and can be attached from Job Flow.`,
       );
@@ -180,6 +202,7 @@ export function CvImportSection({
     try {
       const next = await workflow.removeResume(profile, document);
       setProfile(next);
+      setResumeAvailability(await readResumeAvailability(workflow, next));
       setMessage(`Removed ${document.fileName}.`);
       onProfileChanged?.();
     } catch {
@@ -223,22 +246,31 @@ export function CvImportSection({
           <div className="jobflow-empty-row">No CV stored yet.</div>
         ) : (
           <div className="document-list">
-            {resumes.map((document) => (
-              <div className="document-row" key={document.id}>
-                <div className="document-row__meta">
-                  <strong>{document.label || document.fileName}</strong>
-                  <span>{document.fileName}</span>
+            {resumes.map((document) => {
+              const available = resumeAvailability[document.id];
+              return (
+                <div className="document-row" key={document.id}>
+                  <div className="document-row__meta">
+                    <strong>{document.label || document.fileName}</strong>
+                    <span>{document.fileName}</span>
+                    {available === false ? (
+                      <span className="text-red-700">
+                        File unavailable · remove this legacy entry and add the
+                        CV again.
+                      </span>
+                    ) : null}
+                  </div>
+                  <button
+                    className="jobflow-button jobflow-button-danger"
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void removeResume(document)}
+                  >
+                    Remove
+                  </button>
                 </div>
-                <button
-                  className="jobflow-button jobflow-button-danger"
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void removeResume(document)}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
