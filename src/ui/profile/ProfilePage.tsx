@@ -261,6 +261,11 @@ export function ProfilePage({
 
   return (
     <section className="profile-page w-full pb-10">
+      <span
+        className="profile-save-indicator jobflow-visually-hidden"
+        data-state={saveState}
+        aria-hidden="true"
+      />
       <p
         className="jobflow-visually-hidden"
         role="status"
