@@ -10,6 +10,7 @@ import { calculateProfileReadiness } from '../../application/profile/profile-rea
 import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import type { StoredProfileEnvelope } from '../../domain/profile/profile-schema';
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
+import { Button, Chip, SelectField } from '../design-system/primitives';
 
 type PopupPageProps = {
   repository: ProfileRepository;
@@ -46,13 +47,6 @@ const DOCUMENT_INTENT_LABELS: Record<
 const cardClass = 'rounded-app border border-app-border bg-white p-3';
 const sectionHeadingClass = 'flex items-center justify-between gap-2';
 const mutedClass = 'm-0 text-[13px] leading-[1.45] text-app-text';
-const chipClass =
-  'inline-flex items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text';
-const strongChipClass = `${chipClass} border-app-border-strong bg-white font-semibold text-app-ink`;
-const fieldClass =
-  'mt-1.5 min-h-9 w-full rounded-control border border-app-border bg-white px-2.5 py-2 text-xs text-app-ink outline-none transition hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-border';
-const buttonClass =
-  'inline-flex min-h-9 items-center justify-center gap-2 rounded-control border border-app-border-strong bg-white px-3 py-1.5 text-xs font-semibold text-app-ink transition hover:border-app-ink hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50';
 
 function getMissingEssentials(
   sections: ReturnType<typeof calculateProfileReadiness>['sections'],
@@ -129,13 +123,9 @@ export function PopupPage({
       <PopupShell>
         <h1 className="m-0 text-xl font-semibold tracking-tight">Job Flow</h1>
         <p className={mutedClass}>Could not load your career profile.</p>
-        <button
-          className={buttonClass}
-          type="button"
-          onClick={() => void openOptions()}
-        >
+        <Button onClick={() => void openOptions()}>
           Open profile settings
-        </button>
+        </Button>
       </PopupShell>
     );
   }
@@ -179,7 +169,7 @@ export function PopupPage({
         <section className="rounded-app border border-amber-200 bg-amber-50 p-3">
           <div className={sectionHeadingClass}>
             <h2 className="m-0 text-sm font-semibold">Missing essentials</h2>
-            <span className={chipClass}>Next up</span>
+            <Chip>Next up</Chip>
           </div>
           <ul className="mb-0 mt-2 grid gap-1 pl-[18px] text-[13px] text-app-ink">
             {missingEssentials.map((essential) => (
@@ -193,7 +183,7 @@ export function PopupPage({
         <div className={sectionHeadingClass}>
           <h2 className="m-0 text-sm font-semibold">Current page</h2>
           {pageSummary !== null && pageSummary !== undefined ? (
-            <span className={strongChipClass}>Form found</span>
+            <Chip strong>Form found</Chip>
           ) : null}
         </div>
         {pageSummary === null || pageSummary === undefined ? (
@@ -206,12 +196,10 @@ export function PopupPage({
             className="mt-2 flex flex-wrap gap-1"
             aria-label="Current page form analysis"
           >
-            <span className={chipClass}>{pageSummary.ready} ready</span>
-            <span className={chipClass}>
-              {pageSummary.needsReview} needs review
-            </span>
-            <span className={chipClass}>{pageSummary.sensitive} sensitive</span>
-            <span className={chipClass}>{pageSummary.unknown} unknown</span>
+            <Chip>{pageSummary.ready} ready</Chip>
+            <Chip>{pageSummary.needsReview} needs review</Chip>
+            <Chip>{pageSummary.sensitive} sensitive</Chip>
+            <Chip>{pageSummary.unknown} unknown</Chip>
           </div>
         )}
       </section>
@@ -227,7 +215,7 @@ export function PopupPage({
 
         {recommendedVariant !== null ? (
           <div className="mt-2">
-            <span className={strongChipClass}>Recommended</span>
+            <Chip strong>Recommended</Chip>
             <p className="mb-0 mt-2 text-[13px]">
               <strong>{recommendedVariant.name || 'Untitled variant'}</strong>
             </p>
@@ -240,33 +228,27 @@ export function PopupPage({
         ) : null}
 
         {variantOptions.length > 0 && onSelectVariant !== undefined ? (
-          <label className="mt-2 grid text-[11px] font-medium text-app-text">
-            Use for this page
-            <select
-              className={fieldClass}
-              value={activeVariantId ?? ''}
-              onChange={(event) =>
-                void onSelectVariant(event.target.value || null)
-              }
-            >
-              <option value="">No application variant</option>
-              {variantOptions.map((variant) => (
-                <option value={variant.id} key={variant.id}>
-                  {variant.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectField
+            className="mt-2"
+            label="Use for this page"
+            value={activeVariantId ?? ''}
+            onChange={(event) =>
+              void onSelectVariant(event.target.value || null)
+            }
+          >
+            <option value="">No application variant</option>
+            {variantOptions.map((variant) => (
+              <option value={variant.id} key={variant.id}>
+                {variant.name}
+              </option>
+            ))}
+          </SelectField>
         ) : null}
 
         {recommendedVariant !== null && onSelectVariant !== undefined ? (
-          <button
-            className={`${buttonClass} mt-2`}
-            type="button"
-            onClick={() => void onSelectVariant(null)}
-          >
+          <Button className="mt-2" onClick={() => void onSelectVariant(null)}>
             Use automatic recommendation
-          </button>
+          </Button>
         ) : null}
 
         {profile.variants.length > 0 ? (
@@ -286,7 +268,7 @@ export function PopupPage({
         <section className={cardClass}>
           <div className={sectionHeadingClass}>
             <h2 className="m-0 text-sm font-semibold">Document upload</h2>
-            <span className={chipClass}>Explicit</span>
+            <Chip>Explicit</Chip>
           </div>
           <p className={`${mutedClass} mt-2`}>
             {fileInputCount} file {fileInputCount === 1 ? 'field' : 'fields'}{' '}
@@ -327,13 +309,13 @@ export function PopupPage({
         </section>
       ) : null}
 
-      <button
-        className={`${buttonClass} w-full border-app-ink bg-app-ink text-white hover:border-black hover:bg-black`}
-        type="button"
+      <Button
+        className="w-full"
+        variant="primary"
         onClick={() => void openOptions()}
       >
         {primaryActionLabel}
-      </button>
+      </Button>
     </PopupShell>
   );
 }
