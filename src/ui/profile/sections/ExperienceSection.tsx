@@ -1,6 +1,17 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
+  Button,
+  CheckboxField,
+  EmptyState,
+  FieldGrid,
+  Section,
+  SectionHeader,
+  SelectField,
+  TextareaField,
+  TextField,
+} from '../../design-system/primitives';
+import {
   addLinkedSkill,
   CollapsibleRecord,
   createProfileItemId,
@@ -20,41 +31,38 @@ export function ExperienceSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <section
-      className="profile-section"
-      hidden={activeSection !== 'experience'}
-    >
-      <div className="jobflow-section-heading">
-        <h2>Experience</h2>
-        <button
-          className="jobflow-button"
-          type="button"
-          onClick={() =>
-            changeProfile((draft) => {
-              draft.baseProfile.professional.experiences.push({
-                id: createProfileItemId(),
-                company: '',
-                title: '',
-                employmentType: '',
-                location: '',
-                startDate: '',
-                endDate: '',
-                current: false,
-                description: '',
-                achievements: [],
-                skills: [],
-              });
-            })
-          }
-        >
-          <Plus aria-hidden="true" size={16} />
-          Add experience
-        </button>
-      </div>
+    <Section hidden={activeSection !== 'experience'}>
+      <SectionHeader
+        title="Experience"
+        action={
+          <Button
+            onClick={() =>
+              changeProfile((draft) => {
+                draft.baseProfile.professional.experiences.push({
+                  id: createProfileItemId(),
+                  company: '',
+                  title: '',
+                  employmentType: '',
+                  location: '',
+                  startDate: '',
+                  endDate: '',
+                  current: false,
+                  description: '',
+                  achievements: [],
+                  skills: [],
+                });
+              })
+            }
+          >
+            <Plus aria-hidden="true" size={16} />
+            Add experience
+          </Button>
+        }
+      />
       {profile.baseProfile.professional.experiences.length === 0 ? (
-        <div className="jobflow-empty-row">No experience added yet.</div>
+        <EmptyState>No experience added yet.</EmptyState>
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {profile.baseProfile.professional.experiences.map(
             (experience, index) => (
               <CollapsibleRecord
@@ -77,153 +85,135 @@ export function ExperienceSection({
                     ) || `Experience ${index + 1}`}
                   </span>
                 </summary>
-                <div className="form-grid">
+                <FieldGrid>
                   {[
                     ['Company', 'company'],
                     ['Job title', 'title'],
                     ['Employment type', 'employmentType'],
                     ['Location', 'location'],
                   ].map(([label, key]) => (
-                    <label key={key}>
-                      {label}
-                      <input
-                        value={String(
-                          experience[key as keyof typeof experience] ?? '',
-                        )}
-                        onChange={(event) =>
-                          changeProfile((draft) => {
-                            const item =
-                              draft.baseProfile.professional.experiences[index];
-                            if (item !== undefined && key !== undefined) {
-                              Reflect.set(item, key, event.target.value);
-                            }
-                          })
-                        }
-                      />
-                    </label>
+                    <TextField
+                      key={key}
+                      label={label}
+                      value={String(
+                        experience[key as keyof typeof experience] ?? '',
+                      )}
+                      onChange={(event) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.experiences[index];
+                          if (item !== undefined && key !== undefined) {
+                            Reflect.set(item, key, event.target.value);
+                          }
+                        })
+                      }
+                    />
                   ))}
-                  <label>
-                    Start date
-                    <input
-                      {...dateInputProps(experience.startDate)}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.experiences[index];
-                          if (item !== undefined)
-                            item.startDate = event.target.value;
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    End date
-                    <input
-                      {...dateInputProps(experience.endDate)}
-                      onChange={(event) =>
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.experiences[index];
-                          if (item !== undefined)
-                            item.endDate = event.target.value;
-                        })
-                      }
-                    />
-                  </label>
-                </div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={experience.current}
+                  <TextField
+                    label="Start date"
+                    {...dateInputProps(experience.startDate)}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.experiences[index];
                         if (item !== undefined)
-                          item.current = event.target.checked;
+                          item.startDate = event.target.value;
                       })
                     }
                   />
-                  Current role
-                </label>
-                <label>
-                  Description
-                  <textarea
-                    placeholder={'Lead with one impact per line.'}
-                    value={experience.description}
+                  <TextField
+                    label="End date"
+                    {...dateInputProps(experience.endDate)}
+                    disabled={experience.current}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined)
-                          item.description = event.target.value;
+                        if (item !== undefined) item.endDate = event.target.value;
                       })
                     }
                   />
-                </label>
+                </FieldGrid>
+                <CheckboxField
+                  label="Current role"
+                  checked={experience.current}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.experiences[index];
+                      if (item !== undefined) item.current = event.target.checked;
+                    })
+                  }
+                />
+                <TextareaField
+                  label="Description"
+                  placeholder="Lead with one impact per line."
+                  value={experience.description}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.experiences[index];
+                      if (item !== undefined) item.description = event.target.value;
+                    })
+                  }
+                />
                 {descriptionPreview(experience.description)}
-                <label>
-                  Achievements, comma separated
-                  <input
-                    value={listValue(experience.achievements)}
-                    onChange={(event) =>
-                      changeProfile((draft) => {
-                        const item =
-                          draft.baseProfile.professional.experiences[index];
-                        if (item !== undefined)
-                          item.achievements = parseList(event.target.value);
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Related skills, comma separated
-                  <input
-                    value={listValue(experience.skills ?? [])}
-                    onChange={(event) =>
+                <TextField
+                  label="Achievements, comma separated"
+                  value={listValue(experience.achievements)}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.experiences[index];
+                      if (item !== undefined)
+                        item.achievements = parseList(event.target.value);
+                    })
+                  }
+                />
+                <TextField
+                  label="Related skills, comma separated"
+                  value={listValue(experience.skills ?? [])}
+                  onChange={(event) =>
+                    changeProfile((draft) => {
+                      const item =
+                        draft.baseProfile.professional.experiences[index];
+                      if (item !== undefined) {
+                        item.skills = syncSkills(
+                          draft,
+                          parseList(event.target.value),
+                        );
+                      }
+                    })
+                  }
+                />
+                {skillNames(profile).length > 0 ? (
+                  <SelectField
+                    label="Add existing skill"
+                    value=""
+                    aria-label={`Add existing skill to experience ${index + 1}`}
+                    onChange={(event) => {
+                      const selected = event.target.value;
+                      if (selected === '') return;
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.experiences[index];
                         if (item !== undefined) {
-                          item.skills = syncSkills(
-                            draft,
-                            parseList(event.target.value),
-                          );
+                          item.skills = addLinkedSkill(item.skills, selected);
                         }
-                      })
-                    }
-                  />
-                </label>
-                {skillNames(profile).length > 0 ? (
-                  <label>
-                    Add existing skill
-                    <select
-                      value=""
-                      aria-label={`Add existing skill to experience ${index + 1}`}
-                      onChange={(event) => {
-                        const selected = event.target.value;
-                        if (selected === '') return;
-                        changeProfile((draft) => {
-                          const item =
-                            draft.baseProfile.professional.experiences[index];
-                          if (item !== undefined) {
-                            item.skills = addLinkedSkill(item.skills, selected);
-                          }
-                        });
-                      }}
-                    >
-                      <option value="">Choose skill</option>
-                      {skillNames(profile).map((skill) => (
-                        <option value={skill} key={skill}>
-                          {skill}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                      });
+                    }}
+                  >
+                    <option value="">Choose skill</option>
+                    {skillNames(profile).map((skill) => (
+                      <option value={skill} key={skill}>
+                        {skill}
+                      </option>
+                    ))}
+                  </SelectField>
                 ) : null}
-                <button
-                  className="jobflow-button"
-                  type="button"
+                <Button
+                  className="justify-self-start"
+                  variant="danger"
                   onClick={() =>
                     changeProfile((draft) => {
                       draft.baseProfile.professional.experiences.splice(
@@ -235,12 +225,12 @@ export function ExperienceSection({
                 >
                   <Trash2 aria-hidden="true" size={16} />
                   Remove experience {index + 1}
-                </button>
+                </Button>
               </CollapsibleRecord>
             ),
           )}
         </div>
       )}
-    </section>
+    </Section>
   );
 }
