@@ -12,12 +12,15 @@ This file contains only the state needed to resume work safely. It is not an ite
 
 ## Active product change
 
-None. Current work is bounded codebase-quality refactoring inside the existing profile workspace contract.
+None. Current work remains inside the existing Job Flow product contract.
 
 ## Current integrated state
 
 - profile workspace streamlining and autosave are integrated
 - the options surface uses one reusable dashboard shell with sidebar, topbar, and main content
+- workspace navigation is visually grouped into profile, application, and privacy/data areas without changing section routing
+- profile content uses editorial section separators while record objects and operational tools retain explicit boundaries
+- profile autosave status is surfaced in the workspace topbar instead of a separate content strip
 - options/profile layout composition uses Tailwind utilities in React; `tailwind.css` is limited to base rules and stable repeated primitives/form grammar
 - the obsolete `profile.css` compatibility shim is removed
 - testing policy is risk/signal/cost based; TDD is optional rather than ceremonial
@@ -27,6 +30,7 @@ None. Current work is bounded codebase-quality refactoring inside the existing p
 - `ProfileFormSections.tsx` is composition-only; profile editing surfaces are separated into cohesive owner modules
 - career records preserve one experience surface while languages, certifications, and projects have independent UI ownership
 - normal canonical autofill fields are defined once in `canonical-fields.ts`; runtime validation and compile-time consumers share that source
+- the floating assistant uses the canonical neutral visual tokens and presents human-readable canonical-field labels
 
 ## Uncommitted candidate context
 

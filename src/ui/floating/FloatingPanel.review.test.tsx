@@ -43,10 +43,11 @@ it('lets the user remember or ignore a Review field after opening review', () =>
   );
   fireEvent.click(
     screen.getByRole('button', {
-      name: 'Use personal.legalName.first for Name',
+      name: 'Use First name for Name',
     }),
   );
   expect(remember).toHaveBeenCalledWith(context, 'personal.legalName.first');
+  expect(screen.queryByText('personal.legalName.first')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Ignore Name' }));
   expect(remember).toHaveBeenCalledWith(context, 'ignore');
 });

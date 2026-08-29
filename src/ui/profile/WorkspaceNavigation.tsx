@@ -13,17 +13,32 @@ import {
 
 import type { WorkspaceSection } from './workspace-sections';
 
-const items = [
-  { id: 'personal', label: 'Personal', icon: UserRound },
-  { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
-  { id: 'education', label: 'Education', icon: GraduationCap },
-  { id: 'skills', label: 'Skills', icon: Sparkles },
-  { id: 'documents', label: 'Documents', icon: FileText },
-  { id: 'preferences', label: 'Preferences', icon: MapPin },
-  { id: 'variants', label: 'Variants', icon: ListChecks },
-  { id: 'sensitive', label: 'Sensitive', icon: ShieldCheck },
-  { id: 'corrections', label: 'Corrections', icon: History },
-  { id: 'backup', label: 'Backup', icon: FileArchive },
+const groups = [
+  {
+    label: 'Profile',
+    items: [
+      { id: 'personal', label: 'Personal', icon: UserRound },
+      { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
+      { id: 'education', label: 'Education', icon: GraduationCap },
+      { id: 'skills', label: 'Skills', icon: Sparkles },
+    ],
+  },
+  {
+    label: 'Application',
+    items: [
+      { id: 'documents', label: 'Documents', icon: FileText },
+      { id: 'preferences', label: 'Preferences', icon: MapPin },
+      { id: 'variants', label: 'Variants', icon: ListChecks },
+    ],
+  },
+  {
+    label: 'Privacy & data',
+    items: [
+      { id: 'sensitive', label: 'Sensitive', icon: ShieldCheck },
+      { id: 'corrections', label: 'Corrections', icon: History },
+      { id: 'backup', label: 'Backup', icon: FileArchive },
+    ],
+  },
 ] as const;
 
 type WorkspaceNavigationProps = {
@@ -39,16 +54,7 @@ export function WorkspaceNavigation({
   onChange,
 }: WorkspaceNavigationProps) {
   return (
-    <div className="space-y-4">
-      <div className="hidden px-2 md:block">
-        <p className="m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
-          Career data
-        </p>
-        <p className="mt-1 text-[11px] leading-4 text-app-text">
-          Profile, documents, privacy, and recovery.
-        </p>
-      </div>
-
+    <div>
       <label className="block text-xs font-medium text-app-text md:hidden">
         Section
         <select
@@ -56,38 +62,51 @@ export function WorkspaceNavigation({
           value={activeSection}
           onChange={(event) => onChange(event.target.value as WorkspaceSection)}
         >
-          {items.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.label}
-            </option>
+          {groups.map((group) => (
+            <optgroup label={group.label} key={group.label}>
+              {group.items.map((item) => (
+                <option value={item.id} key={item.id}>
+                  {item.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </label>
 
       <nav
-        className="hidden gap-1 md:grid"
+        className="hidden space-y-5 md:block"
         aria-label="Career workspace sections"
       >
-        {items.map((item) => {
-          const Icon = item.icon;
-          const active = activeSection === item.id;
-          return (
-            <button
-              className={`${navItemBase} ${
-                active
-                  ? 'border-app-border bg-app-muted text-app-ink'
-                  : 'border-transparent text-app-text hover:bg-app-muted hover:text-app-ink'
-              }`}
-              type="button"
-              key={item.id}
-              aria-current={active ? 'page' : undefined}
-              onClick={() => onChange(item.id)}
-            >
-              <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+        {groups.map((group) => (
+          <div key={group.label}>
+            <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+              {group.label}
+            </p>
+            <div className="grid gap-1">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = activeSection === item.id;
+                return (
+                  <button
+                    className={`${navItemBase} ${
+                      active
+                        ? 'border-app-border bg-app-muted text-app-ink'
+                        : 'border-transparent text-app-text hover:bg-app-muted hover:text-app-ink'
+                    }`}
+                    type="button"
+                    key={item.id}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => onChange(item.id)}
+                  >
+                    <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
     </div>
   );

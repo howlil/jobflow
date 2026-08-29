@@ -1,11 +1,11 @@
 export const FLOATING_STYLES = `
 .jobflow-assistant {
   --jobflow-surface: #ffffff;
-  --jobflow-surface-subtle: #f6f6f4;
-  --jobflow-text: #111111;
-  --jobflow-muted: #666660;
-  --jobflow-border: #deded9;
-  --jobflow-border-strong: #bdbdb6;
+  --jobflow-surface-subtle: #f7f7f7;
+  --jobflow-text: #171717;
+  --jobflow-muted: #525252;
+  --jobflow-border: #e5e5e5;
+  --jobflow-border-strong: #d4d4d4;
   --jobflow-danger: #a61b12;
   --jobflow-danger-bg: #fff2f0;
   color: var(--jobflow-text);
@@ -36,12 +36,12 @@ export const FLOATING_STYLES = `
   height: 56px;
   place-items: center;
   padding: 0;
-  border: 1px solid #111111;
+  border: 1px solid var(--jobflow-text);
   border-right: 0;
   border-radius: 12px 0 0 12px;
-  background: #111111;
+  background: var(--jobflow-text);
   color: #ffffff;
-  box-shadow: 0 8px 24px rgba(17, 17, 17, .18);
+  box-shadow: 0 8px 24px rgba(23, 23, 23, .18);
   cursor: pointer;
   transform: translateY(-50%);
   transition: width 120ms ease, background 120ms ease;
@@ -49,7 +49,7 @@ export const FLOATING_STYLES = `
 
 .jobflow-launcher:hover {
   width: 46px;
-  background: #242422;
+  background: #000000;
 }
 
 .jobflow-assistant--open .jobflow-launcher {
@@ -59,7 +59,7 @@ export const FLOATING_STYLES = `
 .jobflow-launcher:focus-visible,
 .jobflow-panel button:focus-visible,
 .jobflow-panel input:focus-visible {
-  outline: 2px solid #111111;
+  outline: 2px solid var(--jobflow-text);
   outline-offset: 3px;
 }
 
@@ -80,7 +80,7 @@ export const FLOATING_STYLES = `
   padding: 0 5px;
   border: 2px solid #ffffff;
   border-radius: 999px;
-  background: #111111;
+  background: var(--jobflow-text);
   color: #ffffff;
   font-size: 10px;
   font-weight: 800;
@@ -100,7 +100,7 @@ export const FLOATING_STYLES = `
   border-left: 1px solid var(--jobflow-border);
   border-radius: 0;
   background: var(--jobflow-surface);
-  box-shadow: -18px 0 48px rgba(17, 17, 17, .12);
+  box-shadow: -18px 0 48px rgba(23, 23, 23, .12);
   scrollbar-width: thin;
   animation: jobflow-panel-in 160ms cubic-bezier(.2, .8, .2, 1);
 }
@@ -224,9 +224,9 @@ export const FLOATING_STYLES = `
   gap: 8px;
   margin: 0 18px 18px;
   padding: 10px 14px;
-  border: 1px solid #111111;
+  border: 1px solid var(--jobflow-text);
   border-radius: 8px;
-  background: #111111;
+  background: var(--jobflow-text);
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -234,7 +234,7 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__fill:hover:not(:disabled),
 .jobflow-panel__action--primary:hover:not(:disabled) {
-  background: #292927;
+  background: #000000;
 }
 
 .jobflow-panel__fill:disabled {
@@ -476,9 +476,9 @@ export const FLOATING_STYLES = `
   width: 100%;
   min-height: 42px;
   padding: 9px 12px;
-  border: 1px solid #111111;
+  border: 1px solid var(--jobflow-text);
   border-radius: 7px;
-  background: #111111;
+  background: var(--jobflow-text);
   color: #ffffff;
   font-weight: 700;
 }

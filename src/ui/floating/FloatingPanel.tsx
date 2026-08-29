@@ -16,6 +16,7 @@ import type { PageAnalysisSummary } from '../../application/forms/analyze-field-
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
 import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
+import type { CanonicalField } from '../../domain/matching/canonical-fields';
 
 export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
 export type DocumentAttachStatus = 'attached' | 'missing' | 'unsupported';
@@ -42,6 +43,27 @@ type FloatingPanelProps = {
   ) => Promise<DocumentAttachStatus>;
 };
 
+const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
+  'personal.legalName.first': 'First name',
+  'personal.legalName.middle': 'Middle name',
+  'personal.legalName.last': 'Last name',
+  'personal.preferredName': 'Preferred name',
+  'contact.email.primary': 'Primary email',
+  'contact.phone.primary': 'Primary phone',
+  'contact.whatsapp': 'WhatsApp',
+  'contact.address.city': 'City',
+  'contact.address.state': 'State / province',
+  'contact.address.country': 'Country',
+  'contact.address.postalCode': 'Postal code',
+  'links.linkedin': 'LinkedIn',
+  'links.github': 'GitHub',
+  'links.portfolio': 'Portfolio',
+  'professional.headline': 'Professional headline',
+  'jobPreferences.willingToRelocate': 'Willing to relocate',
+  'jobPreferences.willingToTravel': 'Willing to travel',
+  'jobPreferences.availabilityDate': 'Availability date',
+};
+
 function fieldLabel(context: FieldContext): string {
   return (
     context.label ||
@@ -50,6 +72,10 @@ function fieldLabel(context: FieldContext): string {
     context.name ||
     'Unlabeled field'
   );
+}
+
+function canonicalFieldLabel(field: CanonicalField): string {
+  return CANONICAL_FIELD_LABELS[field];
 }
 
 function intentLabel(intent: PageDocumentFieldSummary['intent']): string {
@@ -278,19 +304,24 @@ export function FloatingPanel({
                   >
                     <strong>{label}</strong>
                     <div className="jobflow-panel__review-actions">
-                      {item.match.candidates.map((candidate) => (
-                        <button
-                          className="jobflow-panel__action--secondary"
-                          type="button"
-                          key={candidate.field}
-                          aria-label={`Use ${candidate.field} for ${label}`}
-                          onClick={() =>
-                            onRemember?.(item.context, candidate.field)
-                          }
-                        >
-                          {candidate.field}
-                        </button>
-                      ))}
+                      {item.match.candidates.map((candidate) => {
+                        const candidateLabel = canonicalFieldLabel(
+                          candidate.field,
+                        );
+                        return (
+                          <button
+                            className="jobflow-panel__action--secondary"
+                            type="button"
+                            key={candidate.field}
+                            aria-label={`Use ${candidateLabel} for ${label}`}
+                            onClick={() =>
+                              onRemember?.(item.context, candidate.field)
+                            }
+                          >
+                            {candidateLabel}
+                          </button>
+                        );
+                      })}
                       <button
                         className="jobflow-panel__action--secondary"
                         type="button"
@@ -393,7 +424,7 @@ export function FloatingPanel({
         onClick={() => setIsOpen((current) => !current)}
       >
         <span className="jobflow-launcher__mark" aria-hidden="true">
-          F
+          J
         </span>
         {attentionCount > 0 && !isOpen ? (
           <span
