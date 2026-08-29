@@ -1,6 +1,4 @@
-import type { CanonicalField } from './match-field';
-
-export const CANONICAL_FIELDS: readonly CanonicalField[] = [
+export const CANONICAL_FIELDS = [
   'personal.legalName.first',
   'personal.legalName.middle',
   'personal.legalName.last',
@@ -19,7 +17,9 @@ export const CANONICAL_FIELDS: readonly CanonicalField[] = [
   'jobPreferences.willingToRelocate',
   'jobPreferences.willingToTravel',
   'jobPreferences.availabilityDate',
-];
+] as const;
+
+export type CanonicalField = (typeof CANONICAL_FIELDS)[number];
 
 export function isCanonicalField(value: unknown): value is CanonicalField {
   return (
