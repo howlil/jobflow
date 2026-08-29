@@ -77,6 +77,13 @@ export default function App() {
       title={WORKSPACE_SECTION_TITLES[activeSection]}
       meta={workspaceMeta}
     >
+      {activeSection === 'documents' ? (
+        <CvImportSection
+          workflow={cvImportWorkflow}
+          onProfileChanged={refreshWorkspace}
+        />
+      ) : null}
+
       <div hidden={hideProfileSurface}>
         <ProfilePage
           key={profileRevision}
@@ -86,13 +93,6 @@ export default function App() {
           onSaveStatusChange={setSaveStatus}
         />
       </div>
-
-      {activeSection === 'documents' ? (
-        <CvImportSection
-          workflow={cvImportWorkflow}
-          onProfileChanged={refreshWorkspace}
-        />
-      ) : null}
 
       {activeSection === 'corrections' ? (
         <div className="w-full" id="corrections">
