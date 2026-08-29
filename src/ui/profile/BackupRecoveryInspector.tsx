@@ -1,3 +1,4 @@
+import { Upload } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -5,6 +6,13 @@ import {
   type ProfileBackup,
 } from '../../application/profile/profile-backup';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
+import {
+  Button,
+  FilePicker,
+  Section,
+  SectionHeader,
+  StatusMessage,
+} from '../design-system/primitives';
 
 type BackupRecoveryInspectorProps = {
   repository: ProfileRepository;
@@ -45,37 +53,33 @@ export function BackupRecoveryInspector({
   }
 
   return (
-    <section
-      className="profile-section"
-      aria-labelledby="backup-inspector-title"
-    >
-      <div className="jobflow-section-heading">
-        <div>
-          <p className="eyebrow">Recovery</p>
-          <h2 id="backup-inspector-title">Backup diagnostics</h2>
-        </div>
-      </div>
-      <p className="muted">
-        Inspect a backup before restoring it. Validation never modifies your
-        current profile, and encrypted vault values are not part of normal
-        profile backups.
-      </p>
-      <label>
-        Inspect backup file
-        <input
-          type="file"
+    <Section aria-labelledby="backup-inspector-title">
+      <SectionHeader
+        eyebrow="Recovery"
+        title={<span id="backup-inspector-title">Backup diagnostics</span>}
+        description="Inspect a backup before restoring it. Validation never modifies your current profile, and encrypted vault values are not part of normal profile backups."
+      />
+
+      <div>
+        <FilePicker
           accept="application/json,.json"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file !== undefined) void inspect(file);
-          }}
+          inputLabel="Inspect backup file"
+          onFile={inspect}
+          label={
+            <>
+              <Upload aria-hidden="true" size={16} />
+              Inspect backup file
+            </>
+          }
         />
-      </label>
+      </div>
 
       {backup !== null ? (
-        <div className="record-card">
-          <strong>Validated backup</strong>
-          <p className="muted">
+        <div className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4">
+          <strong className="text-sm font-semibold text-app-ink">
+            Validated backup
+          </strong>
+          <p className="m-0 text-xs leading-5 text-app-text">
             Exported{' '}
             {new Date(backup.exportedAt).toLocaleDateString('en-GB', {
               day: '2-digit',
@@ -84,18 +88,19 @@ export function BackupRecoveryInspector({
             })}
             . Restore only if this is the profile snapshot you intend to use.
           </p>
-          <button
-            className="jobflow-button"
-            type="button"
+          <Button
+            className="justify-self-start"
             disabled={restoring}
             onClick={() => void restore()}
           >
             {restoring ? 'Restoring…' : 'Restore validated backup'}
-          </button>
+          </Button>
         </div>
       ) : null}
 
-      {message !== null ? <p role="status">{message}</p> : null}
-    </section>
+      {message !== null ? (
+        <StatusMessage role="status">{message}</StatusMessage>
+      ) : null}
+    </Section>
   );
 }
