@@ -14,7 +14,10 @@ export function CareerRecordsSection({
       <SectionHeader title="Languages, certifications, and projects" />
       <div className="grid gap-6">
         <LanguagesSection changeProfile={changeProfile} profile={profile} />
-        <CertificationsSection changeProfile={changeProfile} profile={profile} />
+        <CertificationsSection
+          changeProfile={changeProfile}
+          profile={profile}
+        />
         <ProjectsSection changeProfile={changeProfile} profile={profile} />
       </div>
     </Section>
