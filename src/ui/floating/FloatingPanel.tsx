@@ -305,7 +305,9 @@ export function FloatingPanel({
                     <strong>{label}</strong>
                     <div className="jobflow-panel__review-actions">
                       {item.match.candidates.map((candidate) => {
-                        const candidateLabel = canonicalFieldLabel(candidate.field);
+                        const candidateLabel = canonicalFieldLabel(
+                          candidate.field,
+                        );
                         return (
                           <button
                             className="jobflow-panel__action--secondary"
