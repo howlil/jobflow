@@ -77,7 +77,7 @@ export const FLOATING_STYLES = `
   min-width: 20px;
   height: 20px;
   place-items: center;
-  padding: 0 5px;
+  padding: 0 4px;
   border: 2px solid #ffffff;
   border-radius: 999px;
   background: var(--jobflow-text);
@@ -100,7 +100,7 @@ export const FLOATING_STYLES = `
   border-left: 1px solid var(--jobflow-border);
   border-radius: 0;
   background: var(--jobflow-surface);
-  box-shadow: -18px 0 48px rgba(23, 23, 23, .12);
+  box-shadow: -16px 0 48px rgba(23, 23, 23, .12);
   scrollbar-width: thin;
   animation: jobflow-panel-in 160ms cubic-bezier(.2, .8, .2, 1);
 }
@@ -119,7 +119,7 @@ export const FLOATING_STYLES = `
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 16px 14px 18px;
+  padding: 16px;
   border-bottom: 1px solid var(--jobflow-border);
   background: rgba(255, 255, 255, .96);
   backdrop-filter: blur(14px);
@@ -128,7 +128,7 @@ export const FLOATING_STYLES = `
 .jobflow-panel__header > div {
   display: grid;
   min-width: 0;
-  gap: 1px;
+  gap: 4px;
 }
 
 .jobflow-panel__header strong {
@@ -160,8 +160,8 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__icon-button {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
@@ -191,12 +191,12 @@ export const FLOATING_STYLES = `
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 18px 16px;
+  padding: 24px 16px 16px;
 }
 
 .jobflow-panel__summary > div {
   display: grid;
-  gap: 3px;
+  gap: 4px;
 }
 
 .jobflow-panel__summary strong {
@@ -212,7 +212,7 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__summary small {
-  padding-bottom: 3px;
+  padding-bottom: 4px;
   text-align: right;
 }
 
@@ -222,8 +222,8 @@ export const FLOATING_STYLES = `
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 0 18px 18px;
-  padding: 10px 14px;
+  margin: 0 16px 16px;
+  padding: 12px 16px;
   border: 1px solid var(--jobflow-text);
   border-radius: 8px;
   background: var(--jobflow-text);
@@ -252,8 +252,8 @@ export const FLOATING_STYLES = `
 .jobflow-panel__section-heading {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 14px 18px 8px;
+  gap: 8px;
+  padding: 16px 16px 8px;
 }
 
 .jobflow-panel__document {
@@ -261,7 +261,7 @@ export const FLOATING_STYLES = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 11px 18px;
+  padding: 12px 16px;
 }
 
 .jobflow-panel__document + .jobflow-panel__document {
@@ -271,7 +271,7 @@ export const FLOATING_STYLES = `
 .jobflow-panel__document-copy {
   display: grid;
   min-width: 0;
-  gap: 2px;
+  gap: 4px;
 }
 
 .jobflow-panel__document-copy strong {
@@ -297,7 +297,7 @@ export const FLOATING_STYLES = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: 0;
   border-top: 1px solid var(--jobflow-border);
   background: var(--jobflow-surface);
@@ -332,11 +332,11 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__open-profile {
   display: flex;
-  min-height: 50px;
+  min-height: 48px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: 0;
   border-top: 1px solid var(--jobflow-border);
   background: var(--jobflow-surface);
@@ -348,12 +348,12 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__detail {
   display: grid;
-  gap: 12px;
-  padding: 16px 18px 24px;
+  gap: 16px;
+  padding: 16px 16px 24px;
 }
 
 .jobflow-panel__detail h2 {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
   font-size: 18px;
   font-weight: 720;
   letter-spacing: -.025em;
@@ -362,13 +362,13 @@ export const FLOATING_STYLES = `
 .jobflow-panel__back {
   display: inline-flex;
   width: max-content;
-  min-height: 34px;
+  min-height: 36px;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-left: -8px;
-  padding: 6px 8px;
+  padding: 8px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   background: transparent;
   color: var(--jobflow-muted);
   cursor: pointer;
@@ -379,7 +379,7 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__helper {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--jobflow-muted);
   font-size: 12px;
   line-height: 1.45;
@@ -387,7 +387,7 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__review {
   display: grid;
-  gap: 9px;
+  gap: 8px;
   padding: 12px 0;
   border-top: 1px solid var(--jobflow-border);
 }
@@ -399,7 +399,7 @@ export const FLOATING_STYLES = `
 .jobflow-panel__review-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .jobflow-panel__action,
@@ -408,13 +408,13 @@ export const FLOATING_STYLES = `
   min-height: 36px;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  border-radius: 7px;
+  gap: 8px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .jobflow-panel__action--secondary {
-  padding: 6px 9px;
+  padding: 8px 12px;
   border: 1px solid var(--jobflow-border-strong);
   background: var(--jobflow-surface);
   color: var(--jobflow-text);
@@ -432,7 +432,7 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__sensitive-list li {
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--jobflow-border);
   color: var(--jobflow-muted);
 }
@@ -442,9 +442,9 @@ export const FLOATING_STYLES = `
   align-items: flex-start;
   gap: 8px;
   margin: 0;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid color-mix(in srgb, var(--jobflow-danger) 28%, transparent);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--jobflow-danger-bg);
   color: var(--jobflow-danger);
 }
@@ -456,7 +456,7 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__unlock label {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   color: var(--jobflow-muted);
   font-size: 11px;
   font-weight: 650;
@@ -464,20 +464,20 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__unlock input {
   width: 100%;
-  min-height: 42px;
-  padding: 9px 10px;
+  min-height: 40px;
+  padding: 8px 12px;
   border: 1px solid var(--jobflow-border-strong);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--jobflow-surface);
   color: var(--jobflow-text);
 }
 
 .jobflow-panel__action--primary {
   width: 100%;
-  min-height: 42px;
-  padding: 9px 12px;
+  min-height: 40px;
+  padding: 8px 12px;
   border: 1px solid var(--jobflow-text);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--jobflow-text);
   color: #ffffff;
   font-weight: 700;
