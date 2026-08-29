@@ -10,9 +10,7 @@ import {
   type TextareaHTMLAttributes,
 } from 'react';
 
-function classes(
-  ...values: Array<string | false | null | undefined>
-): string {
+function classes(...values: Array<string | false | null | undefined>): string {
   return values.filter(Boolean).join(' ');
 }
 
@@ -179,15 +177,7 @@ type SelectFieldProps = Omit<
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   function SelectField(
-    {
-      label,
-      hint,
-      error,
-      className,
-      selectClassName,
-      children,
-      ...props
-    },
+    { label, hint, error, className, selectClassName, children, ...props },
     ref,
   ) {
     return (
@@ -242,9 +232,7 @@ export function FieldGrid({
     <div
       className={classes(
         'grid grid-cols-1 gap-4',
-        columns === 3
-          ? 'sm:grid-cols-2 lg:grid-cols-3'
-          : 'sm:grid-cols-2',
+        columns === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2',
         className,
       )}
       {...props}
@@ -252,10 +240,7 @@ export function FieldGrid({
   );
 }
 
-export function Section({
-  className,
-  ...props
-}: HTMLAttributes<HTMLElement>) {
+export function Section({ className, ...props }: HTMLAttributes<HTMLElement>) {
   return (
     <section
       className={classes(
@@ -357,7 +342,8 @@ export function Chip({
     <span
       className={classes(
         'inline-flex min-h-6 items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text',
-        strong && 'border-app-border-strong bg-white font-semibold text-app-ink',
+        strong &&
+          'border-app-border-strong bg-white font-semibold text-app-ink',
         className,
       )}
       {...props}
