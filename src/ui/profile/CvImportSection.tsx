@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { CvImportWorkflow } from '../../application/profile/cv-import-workflow';
 import type {
@@ -10,6 +10,15 @@ import type {
   DocumentMetadata,
   StoredProfileEnvelope,
 } from '../../domain/profile/profile-schema';
+import {
+  ActionRow,
+  Button,
+  Chip,
+  EmptyState,
+  FilePicker,
+  SectionHeader,
+  StatusMessage,
+} from '../design-system/primitives';
 
 const ACCEPTED_FILES =
   '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
@@ -48,7 +57,6 @@ export function CvImportSection({
   workflow,
   onProfileChanged,
 }: CvImportSectionProps) {
-  const fileInput = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<StoredProfileEnvelope | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [draft, setDraft] = useState<CvImportDraft | null>(null);
@@ -218,32 +226,26 @@ export function CvImportSection({
       id="cv-import"
       aria-labelledby="cv-import-title"
     >
-      <div className="workspace-tool-section__header">
-        <div>
-          <p className="workspace-kicker">Documents</p>
-          <h2 id="cv-import-title">Resumes</h2>
-        </div>
-        <p>
-          Resume entries represent files stored locally by Job Flow. They can be
-          selected by application variants and attached only after you approve
-          the action.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Documents"
+        title={<span id="cv-import-title">Resumes</span>}
+        description="Resume entries represent files stored locally by Job Flow. They can be selected by application variants and attached only after you approve the action."
+      />
 
       <div className="workspace-card">
-        <div className="jobflow-section-heading">
-          <div>
-            <strong>Stored resumes</strong>
-            <p className="muted" style={{ margin: '4px 0 0' }}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="grid gap-1">
+            <strong className="text-sm font-semibold text-app-ink">
+              Stored resumes
+            </strong>
+            <p className="m-0 text-xs leading-5 text-app-text">
               Files remain on this browser in extension-owned IndexedDB.
             </p>
           </div>
-          <span className="jobflow-chip jobflow-chip-strong">
-            {resumes.length}
-          </span>
+          <Chip strong>{resumes.length}</Chip>
         </div>
         {resumes.length === 0 ? (
-          <div className="jobflow-empty-row">No CV stored yet.</div>
+          <EmptyState>No CV stored yet.</EmptyState>
         ) : (
           <div className="document-list">
             {resumes.map((document) => {
@@ -260,14 +262,13 @@ export function CvImportSection({
                       </span>
                     ) : null}
                   </div>
-                  <button
-                    className="jobflow-button jobflow-button-danger"
-                    type="button"
+                  <Button
+                    variant="danger"
                     disabled={busy}
                     onClick={() => void removeResume(document)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               );
             })}
@@ -275,15 +276,15 @@ export function CvImportSection({
         )}
       </div>
 
-      <div className="jobflow-section-heading">
-        <div>
-          <h3>Add or import CV</h3>
-          <p className="muted">
-            PDF and DOCX extraction runs locally. Choosing a file never
-            overwrites your profile; conflicting values stay unselected until
-            you approve them.
-          </p>
-        </div>
+      <div className="grid gap-2">
+        <h3 className="m-0 text-sm font-semibold text-app-ink">
+          Add or import CV
+        </h3>
+        <p className="m-0 max-w-3xl text-xs leading-5 text-app-text">
+          PDF and DOCX extraction runs locally. Choosing a file never overwrites
+          your profile; conflicting values stay unselected until you approve
+          them.
+        </p>
       </div>
 
       <div className="cv-dropzone">
@@ -297,73 +298,59 @@ export function CvImportSection({
               ? `${fileSize(file.size)} · ${file.type || 'document'}`
               : 'Text-based PDF, DOCX, or TXT. Scanned PDFs stay unsupported rather than guessed.'}
           </p>
-          <input
-            ref={fileInput}
-            className="jobflow-visually-hidden"
-            type="file"
-            accept={ACCEPTED_FILES}
-            aria-label="Choose CV"
-            onChange={(event) => {
-              const nextFile = event.target.files?.[0];
-              if (nextFile) void chooseFile(nextFile);
-            }}
-          />
-          <button
-            className="jobflow-button jobflow-button-primary"
-            type="button"
-            disabled={busy}
-            onClick={() => fileInput.current?.click()}
-          >
-            {file ? 'Choose another CV' : 'Choose CV'}
-          </button>
-          {file ? (
-            <button
-              className="jobflow-button"
-              type="button"
-              disabled={busy || profile === null}
-              onClick={() => void saveCvToLibrary()}
-            >
-              Save CV locally
-            </button>
-          ) : null}
+          <ActionRow className="justify-center">
+            <FilePicker
+              accept={ACCEPTED_FILES}
+              disabled={busy}
+              inputLabel="Choose CV"
+              onFile={chooseFile}
+              label={file ? 'Choose another CV' : 'Choose CV'}
+            />
+            {file ? (
+              <Button
+                disabled={busy || profile === null}
+                onClick={() => void saveCvToLibrary()}
+              >
+                Save CV locally
+              </Button>
+            ) : null}
+          </ActionRow>
         </div>
       </div>
 
       <div className="workspace-card">
-        <div className="jobflow-section-heading">
-          <div>
-            <strong>Review extracted data</strong>
-            <p className="muted" style={{ margin: '4px 0 0' }}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="grid gap-1">
+            <strong className="text-sm font-semibold text-app-ink">
+              Review extracted data
+            </strong>
+            <p className="m-0 text-xs leading-5 text-app-text">
               {conflicts > 0
                 ? `${conflicts} conflicts require an explicit choice.`
                 : 'New values are selected automatically; existing values are preserved.'}
             </p>
           </div>
           {preview.length > 0 ? (
-            <span className="jobflow-chip jobflow-chip-strong">
-              {selectedCount} selected
-            </span>
+            <Chip strong>{selectedCount} selected</Chip>
           ) : null}
         </div>
 
         {busy && draft === null ? (
-          <p className="muted">Extracting locally…</p>
+          <p className="m-0 text-xs leading-5 text-app-text">
+            Extracting locally…
+          </p>
         ) : null}
         {error ? (
-          <p className="jobflow-status jobflow-status-danger" role="alert">
+          <StatusMessage tone="danger" role="alert">
             {error}
-          </p>
+          </StatusMessage>
         ) : null}
         {message ? (
-          <p className="jobflow-status" role="status">
-            {message}
-          </p>
+          <StatusMessage role="status">{message}</StatusMessage>
         ) : null}
 
         {preview.length === 0 && !busy ? (
-          <div className="jobflow-empty-row">
-            Choose a CV to preview extracted profile data.
-          </div>
+          <EmptyState>Choose a CV to preview extracted profile data.</EmptyState>
         ) : (
           <div className="cv-preview">
             {preview.map((item) => (
@@ -376,18 +363,12 @@ export function CvImportSection({
                 <span className="cv-preview__label">
                   {item.label}
                   {item.status === 'conflict' ? (
-                    <span className="cv-preview__conflict"> · conflict</span>
+                    <span className="text-amber-700"> · conflict</span>
                   ) : null}
                 </span>
                 <span className="cv-preview__value">
                   {item.extracted}
-                  <small
-                    style={{
-                      display: 'block',
-                      marginTop: 4,
-                      color: 'var(--jobflow-color-muted)',
-                    }}
-                  >
+                  <small className="mt-1 block text-[11px] leading-4 text-app-subtle">
                     {item.evidence}
                     {item.status === 'conflict' && item.current
                       ? ` · current: ${item.current}`
@@ -400,32 +381,28 @@ export function CvImportSection({
         )}
 
         {preview.length > 0 ? (
-          <div className="button-row" style={{ marginTop: 16 }}>
-            <button
-              className="jobflow-button jobflow-button-accent"
-              type="button"
+          <ActionRow>
+            <Button
+              variant="primary"
               disabled={busy || selected.size === 0 || file === null}
               onClick={() => void importSelectedAndSaveCv()}
             >
               Import data and save CV
-            </button>
-            <button
-              className="jobflow-button"
-              type="button"
+            </Button>
+            <Button
               disabled={busy || selected.size === 0}
               onClick={() => void applySelected()}
             >
               Import selected data
-            </button>
-            <button
-              className="jobflow-button jobflow-button-ghost"
-              type="button"
+            </Button>
+            <Button
+              variant="ghost"
               disabled={busy}
               onClick={() => setSelected(new Set())}
             >
               Clear selection
-            </button>
-          </div>
+            </Button>
+          </ActionRow>
         ) : null}
       </div>
     </section>
