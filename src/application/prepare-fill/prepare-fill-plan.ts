@@ -1,6 +1,6 @@
 import type { FieldContext } from '../../domain/forms/field-context';
+import type { CanonicalField } from '../../domain/matching/canonical-fields';
 import type { CorrectionAwareMatchResult } from '../../domain/matching/match-field-with-corrections';
-import type { CanonicalField } from '../../domain/matching/match-field';
 import type { SensitiveCanonicalField } from '../../domain/matching/sensitive-fields';
 import type { BaseProfile } from '../../domain/profile/profile-schema';
 
