@@ -152,7 +152,10 @@ export function ProfilePage({
   }, []);
 
   useEffect(() => {
-    onSaveStatusChange?.({ state: saveState, text: saveStateText(saveState) });
+    onSaveStatusChange?.({
+      state: saveState,
+      text: saveStateText(saveState),
+    });
   }, [onSaveStatusChange, saveState]);
 
   useEffect(() => {
@@ -266,11 +269,7 @@ export function ProfilePage({
         data-state={saveState}
         aria-hidden="true"
       />
-      <p
-        className="jobflow-visually-hidden"
-        role="status"
-        aria-live="polite"
-      >
+      <p className="jobflow-visually-hidden" role="status" aria-live="polite">
         {statusText}
       </p>
 
