@@ -4,7 +4,6 @@ import type { PageAnalysisSummary } from '../../application/forms/analyze-field-
 import type {
   PageDocumentFieldSummary,
   PageVariantOption,
-  RecommendedDocumentSummary,
 } from '../../application/forms/page-messages';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
 import { calculateProfileReadiness } from '../../application/profile/profile-readiness';
@@ -19,8 +18,6 @@ type PopupPageProps = {
   variantRecommendation?: VariantRecommendation | null;
   activeVariantId?: string | null;
   variantOptions?: PageVariantOption[];
-  fileInputCount?: number;
-  recommendedResume?: RecommendedDocumentSummary | null;
   documentFields?: PageDocumentFieldSummary[];
   onSelectVariant?: (variantId: string | null) => void | Promise<void>;
 };
@@ -98,8 +95,6 @@ export function PopupPage({
   variantRecommendation,
   activeVariantId,
   variantOptions = [],
-  fileInputCount = 0,
-  recommendedResume,
   documentFields = [],
   onSelectVariant,
 }: PopupPageProps) {
@@ -159,20 +154,7 @@ export function PopupPage({
       : (profile.variants.find(
           (variant) => variant.id === variantRecommendation.variantId,
         ) ?? null);
-  const legacyDocumentFields: PageDocumentFieldSummary[] =
-    documentFields.length === 0 && fileInputCount > 0
-      ? [
-          {
-            fieldFingerprint: 'legacy-file-upload',
-            fieldLabel: 'File upload',
-            intent: recommendedResume === null ? 'unknown' : 'resume',
-            evidence: [],
-            recommendedDocument: recommendedResume ?? null,
-          },
-        ]
-      : [];
-  const visibleDocumentFields =
-    documentFields.length > 0 ? documentFields : legacyDocumentFields;
+  const fileInputCount = documentFields.length;
 
   return (
     <PopupShell>
@@ -311,43 +293,37 @@ export function PopupPage({
             detected. Stored files are attached only when you click Attach in
             the page launcher.
           </p>
-          {visibleDocumentFields.length > 0 ? (
-            <ul className="mb-0 mt-2 grid gap-2 border-t border-app-border pt-2 pl-[18px] text-[13px]">
-              {visibleDocumentFields.map((field, index) => (
-                <li key={`${field.fieldFingerprint}-${index}`}>
-                  <strong>{field.fieldLabel}</strong>
-                  <div className="text-app-text">
-                    {DOCUMENT_INTENT_LABELS[field.intent]}
+          <ul className="mb-0 mt-2 grid gap-2 border-t border-app-border pt-2 pl-[18px] text-[13px]">
+            {documentFields.map((field, index) => (
+              <li key={`${field.fieldFingerprint}-${index}`}>
+                <strong>{field.fieldLabel}</strong>
+                <div className="text-app-text">
+                  {DOCUMENT_INTENT_LABELS[field.intent]}
+                </div>
+                {field.recommendedDocument !== null ? (
+                  <div>
+                    Ready to attach:{' '}
+                    <strong>
+                      {field.recommendedDocument.label ||
+                        field.recommendedDocument.fileName}
+                    </strong>
+                    {field.recommendedDocument.fileName
+                      ? ` — ${field.recommendedDocument.fileName}`
+                      : ''}
                   </div>
-                  {field.recommendedDocument !== null ? (
-                    <div>
-                      Ready to attach:{' '}
-                      <strong>
-                        {field.recommendedDocument.label ||
-                          field.recommendedDocument.fileName}
-                      </strong>
-                      {field.recommendedDocument.fileName
-                        ? ` — ${field.recommendedDocument.fileName}`
-                        : ''}
-                    </div>
-                  ) : field.intent === 'unknown' ? (
-                    <div className="text-app-text">
-                      Unknown document type; choose the file manually after
-                      checking the site label.
-                    </div>
-                  ) : (
-                    <div className="text-app-text">
-                      No matching stored document is configured.
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={`${mutedClass} mt-2`}>
-              Store a CV in the career workspace for deterministic guidance.
-            </p>
-          )}
+                ) : field.intent === 'unknown' ? (
+                  <div className="text-app-text">
+                    Unknown document type; choose the file manually after
+                    checking the site label.
+                  </div>
+                ) : (
+                  <div className="text-app-text">
+                    No matching stored document is configured.
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
