@@ -123,7 +123,9 @@ export function PopupPage({
       <PopupShell>
         <h1 className="m-0 text-xl font-semibold tracking-tight">Job Flow</h1>
         <p className={mutedClass}>Could not load your career profile.</p>
-        <Button onClick={() => void openOptions()}>Open profile settings</Button>
+        <Button onClick={() => void openOptions()}>
+          Open profile settings
+        </Button>
       </PopupShell>
     );
   }
