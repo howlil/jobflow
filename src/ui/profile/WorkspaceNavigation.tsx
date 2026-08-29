@@ -11,6 +11,7 @@ import {
   UserRound,
 } from 'lucide-react';
 
+import { SelectField } from '../design-system/primitives';
 import type { WorkspaceSection } from './workspace-sections';
 
 const groups = [
@@ -55,24 +56,23 @@ export function WorkspaceNavigation({
 }: WorkspaceNavigationProps) {
   return (
     <div>
-      <label className="block text-xs font-medium text-app-text md:hidden">
-        Section
-        <select
-          className="mt-1.5 min-h-10 w-full rounded-control border border-app-border bg-white px-3 py-2 text-sm text-app-ink outline-none transition focus:border-app-ink focus:ring-2 focus:ring-app-border"
-          value={activeSection}
-          onChange={(event) => onChange(event.target.value as WorkspaceSection)}
-        >
-          {groups.map((group) => (
-            <optgroup label={group.label} key={group.label}>
-              {group.items.map((item) => (
-                <option value={item.id} key={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
+      <SelectField
+        className="md:hidden"
+        label="Section"
+        selectClassName="text-sm"
+        value={activeSection}
+        onChange={(event) => onChange(event.target.value as WorkspaceSection)}
+      >
+        {groups.map((group) => (
+          <optgroup label={group.label} key={group.label}>
+            {group.items.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </SelectField>
 
       <nav
         className="hidden space-y-5 md:block"
