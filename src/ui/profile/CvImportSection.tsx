@@ -31,10 +31,13 @@ async function readResumeAvailability(
   profile: StoredProfileEnvelope,
 ): Promise<Record<string, boolean>> {
   const entries = await Promise.all(
-    profile.baseProfile.documents.resumes.map(async (document) => [
-      document.id,
-      await workflow.hasStoredResume(document.id),
-    ] as const),
+    profile.baseProfile.documents.resumes.map(
+      async (document) =>
+        [
+          document.id,
+          await workflow.hasStoredResume(document.id),
+        ] as const,
+    ),
   );
   return Object.fromEntries(entries);
 }
