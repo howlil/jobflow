@@ -1,22 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  CheckCircle2,
-  ExternalLink,
-  FileText,
-  HelpCircle,
-  LockKeyhole,
-  PanelRightClose,
-  ShieldCheck,
-} from 'lucide-react';
+import { PanelRightClose } from 'lucide-react';
 
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
 import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
-import type { CanonicalField } from '../../domain/matching/canonical-fields';
+import {
+  AssistantHomeView,
+  AssistantReviewView,
+  AssistantSensitiveView,
+} from './FloatingViews';
 
 export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
 export type DocumentAttachStatus = 'attached' | 'missing' | 'unsupported';
@@ -42,50 +36,6 @@ type FloatingPanelProps = {
     documentId: string,
   ) => Promise<DocumentAttachStatus>;
 };
-
-const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
-  'personal.legalName.first': 'First name',
-  'personal.legalName.middle': 'Middle name',
-  'personal.legalName.last': 'Last name',
-  'personal.preferredName': 'Preferred name',
-  'contact.email.primary': 'Primary email',
-  'contact.phone.primary': 'Primary phone',
-  'contact.whatsapp': 'WhatsApp',
-  'contact.address.city': 'City',
-  'contact.address.state': 'State / province',
-  'contact.address.country': 'Country',
-  'contact.address.postalCode': 'Postal code',
-  'links.linkedin': 'LinkedIn',
-  'links.github': 'GitHub',
-  'links.portfolio': 'Portfolio',
-  'professional.headline': 'Professional headline',
-  'jobPreferences.willingToRelocate': 'Willing to relocate',
-  'jobPreferences.willingToTravel': 'Willing to travel',
-  'jobPreferences.availabilityDate': 'Availability date',
-};
-
-function fieldLabel(context: FieldContext): string {
-  return (
-    context.label ||
-    context.ariaLabel ||
-    context.placeholder ||
-    context.name ||
-    'Unlabeled field'
-  );
-}
-
-function canonicalFieldLabel(field: CanonicalField): string {
-  return CANONICAL_FIELD_LABELS[field];
-}
-
-function intentLabel(intent: PageDocumentFieldSummary['intent']): string {
-  if (intent === 'cover_letter') return 'Cover letter';
-  if (intent === 'resume') return 'Resume';
-  if (intent === 'transcript') return 'Transcript';
-  if (intent === 'certificate') return 'Certificate';
-  if (intent === 'portfolio') return 'Portfolio';
-  return 'File upload';
-}
 
 export function FloatingPanel({
   summary,
@@ -114,10 +64,6 @@ export function FloatingPanel({
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
   );
-  const fillLabel =
-    summary.ready === 0
-      ? 'No safe fields ready to fill yet'
-      : `Fill ${summary.ready} ready ${summary.ready === 1 ? 'field' : 'fields'}`;
 
   useEffect(() => {
     if (!isOpen) setView('home');
@@ -172,246 +118,39 @@ export function FloatingPanel({
           </header>
 
           {view === 'home' ? (
-            <div className="jobflow-panel__body">
-              <div
-                className="jobflow-panel__summary"
-                aria-label="Form analysis summary"
-              >
-                <div>
-                  <strong>{summary.ready} ready</strong>
-                  <span>
-                    {summary.needsReview} review · {summary.sensitive} sensitive
-                  </span>
-                </div>
-                {summary.unknown > 0 ? (
-                  <small>{summary.unknown} unrecognized</small>
-                ) : null}
-              </div>
-
-              <button
-                className="jobflow-panel__fill"
-                type="button"
-                disabled={summary.ready === 0}
-                onClick={onFill}
-              >
-                <CheckCircle2 aria-hidden="true" size={16} />
-                {fillLabel}
-              </button>
-
-              {attachableDocuments.length > 0 ? (
-                <section
-                  className="jobflow-panel__section"
-                  aria-label="Detected document fields"
-                >
-                  <div className="jobflow-panel__section-heading">
-                    <FileText aria-hidden="true" size={14} />
-                    <span>Documents</span>
-                  </div>
-                  {attachableDocuments.map((item) => (
-                    <div
-                      className="jobflow-panel__document"
-                      key={item.fieldFingerprint}
-                    >
-                      <div className="jobflow-panel__document-copy">
-                        <strong>{intentLabel(item.intent)}</strong>
-                        <span>{item.recommendedDocument?.fileName}</span>
-                        {documentStatus[item.fieldFingerprint] ? (
-                          <small role="status">
-                            {documentStatus[item.fieldFingerprint]}
-                          </small>
-                        ) : null}
-                      </div>
-                      <button
-                        className="jobflow-panel__action--secondary"
-                        type="button"
-                        onClick={() => void attachDocument(item)}
-                      >
-                        Attach
-                      </button>
-                    </div>
-                  ))}
-                </section>
-              ) : null}
-
-              {summary.needsReview > 0 || summary.sensitive > 0 ? (
-                <section className="jobflow-panel__section">
-                  <div className="jobflow-panel__section-heading">
-                    <span>Needs attention</span>
-                  </div>
-                  <div className="jobflow-panel__menu">
-                    {summary.needsReview > 0 ? (
-                      <button type="button" onClick={() => setView('review')}>
-                        <span>
-                          <HelpCircle aria-hidden="true" size={15} />
-                          Review ambiguous fields
-                        </span>
-                        <strong>{summary.needsReview}</strong>
-                      </button>
-                    ) : null}
-                    {summary.sensitive > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => setView('sensitive')}
-                      >
-                        <span>
-                          <ShieldCheck aria-hidden="true" size={15} />
-                          Sensitive fields
-                        </span>
-                        <strong>{summary.sensitive}</strong>
-                      </button>
-                    ) : null}
-                  </div>
-                </section>
-              ) : null}
-
-              {onOpenOptions !== undefined ? (
-                <button
-                  className="jobflow-panel__open-profile"
-                  type="button"
-                  onClick={onOpenOptions}
-                >
-                  Open profile workspace
-                  <ExternalLink aria-hidden="true" size={15} />
-                </button>
-              ) : null}
-            </div>
+            <AssistantHomeView
+              summary={summary}
+              attachableDocuments={attachableDocuments}
+              documentStatus={documentStatus}
+              onAttachDocument={attachDocument}
+              onFill={onFill}
+              onOpenOptions={onOpenOptions}
+              onOpenReview={() => setView('review')}
+              onOpenSensitive={() => setView('sensitive')}
+            />
           ) : null}
 
           {view === 'review' ? (
-            <section
-              className="jobflow-panel__detail"
-              aria-label="Fields needing review"
-            >
-              <button
-                className="jobflow-panel__back"
-                type="button"
-                onClick={() => setView('home')}
-              >
-                <ArrowLeft aria-hidden="true" size={15} />
-                Back
-              </button>
-              <div>
-                <p className="jobflow-panel__section-label">Review</p>
-                <h2>Resolve ambiguous fields</h2>
-              </div>
-              {reviewItems.map((item) => {
-                if (item.match.status !== 'review') return null;
-                const label = fieldLabel(item.context);
-                return (
-                  <div
-                    className="jobflow-panel__review"
-                    key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
-                  >
-                    <strong>{label}</strong>
-                    <div className="jobflow-panel__review-actions">
-                      {item.match.candidates.map((candidate) => {
-                        const candidateLabel = canonicalFieldLabel(
-                          candidate.field,
-                        );
-                        return (
-                          <button
-                            className="jobflow-panel__action--secondary"
-                            type="button"
-                            key={candidate.field}
-                            aria-label={`Use ${candidateLabel} for ${label}`}
-                            onClick={() =>
-                              onRemember?.(item.context, candidate.field)
-                            }
-                          >
-                            {candidateLabel}
-                          </button>
-                        );
-                      })}
-                      <button
-                        className="jobflow-panel__action--secondary"
-                        type="button"
-                        aria-label={`Ignore ${label}`}
-                        onClick={() => onRemember?.(item.context, 'ignore')}
-                      >
-                        Ignore
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </section>
+            <AssistantReviewView
+              reviewItems={reviewItems}
+              onBack={() => setView('home')}
+              onRemember={onRemember}
+            />
           ) : null}
 
           {view === 'sensitive' ? (
-            <section
-              className="jobflow-panel__detail"
-              aria-label="Sensitive fields requiring approval"
-            >
-              <button
-                className="jobflow-panel__back"
-                type="button"
-                onClick={() => setView('home')}
-              >
-                <ArrowLeft aria-hidden="true" size={15} />
-                Back
-              </button>
-              <div>
-                <p className="jobflow-panel__section-label">Sensitive</p>
-                <h2>Sensitive fields detected</h2>
-                <p className="jobflow-panel__helper">
-                  Review the detected fields first. Unlocking the vault does not
-                  fill anything until you approve this site.
-                </p>
-              </div>
-              <ul className="jobflow-panel__sensitive-list">
-                {sensitiveItems.map((item) => (
-                  <li
-                    key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
-                  >
-                    {fieldLabel(item.context)}
-                  </li>
-                ))}
-              </ul>
-              {sensitiveError !== null ? (
-                <p className="jobflow-panel__sensitive-error" role="alert">
-                  <AlertTriangle aria-hidden="true" size={15} />
-                  {sensitiveError}
-                </p>
-              ) : null}
-              {vaultStatus === 'not-configured' ? (
-                <button
-                  className="jobflow-panel__action jobflow-panel__action--primary"
-                  type="button"
-                  onClick={onOpenOptions}
-                >
-                  <LockKeyhole aria-hidden="true" size={16} />
-                  Set up vault
-                </button>
-              ) : vaultStatus === 'locked' ? (
-                <div className="jobflow-panel__unlock">
-                  <label>
-                    Vault passphrase
-                    <input
-                      type="password"
-                      value={passphrase}
-                      onChange={(event) => setPassphrase(event.target.value)}
-                    />
-                  </label>
-                  <button
-                    className="jobflow-panel__action jobflow-panel__action--primary"
-                    type="button"
-                    onClick={() => onUnlockSensitive?.(passphrase)}
-                  >
-                    <LockKeyhole aria-hidden="true" size={16} />
-                    Unlock vault
-                  </button>
-                </div>
-              ) : vaultStatus === 'unlocked' ? (
-                <button
-                  className="jobflow-panel__action jobflow-panel__action--primary"
-                  type="button"
-                  onClick={onFillSensitive}
-                >
-                  <ShieldCheck aria-hidden="true" size={16} />
-                  Fill sensitive fields on {siteHost}
-                </button>
-              ) : null}
-            </section>
+            <AssistantSensitiveView
+              sensitiveItems={sensitiveItems}
+              sensitiveError={sensitiveError}
+              vaultStatus={vaultStatus}
+              passphrase={passphrase}
+              siteHost={siteHost}
+              onBack={() => setView('home')}
+              onOpenOptions={onOpenOptions}
+              onPassphraseChange={setPassphrase}
+              onUnlockSensitive={onUnlockSensitive}
+              onFillSensitive={onFillSensitive}
+            />
           ) : null}
         </section>
       ) : null}
