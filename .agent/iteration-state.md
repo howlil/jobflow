@@ -23,8 +23,10 @@ None. Current work is bounded codebase-quality refactoring inside the existing p
 - testing policy is risk/signal/cost based; TDD is optional rather than ceremonial
 - CV import orchestration is owned by the application layer rather than React/infrastructure coupling
 - content-script semantic page analysis is owned by the application layer while the content entrypoint remains the browser/runtime shell
+- page-context document analysis uses `documentFields` as the single source of truth for detected upload fields and recommendations
 - `ProfileFormSections.tsx` is composition-only; profile editing surfaces are separated into cohesive owner modules
 - career records preserve one experience surface while languages, certifications, and projects have independent UI ownership
+- normal canonical autofill fields are defined once in `canonical-fields.ts`; runtime validation and compile-time consumers share that source
 
 ## Uncommitted candidate context
 
