@@ -49,8 +49,8 @@ export function PersonalDetailsSection({
   const hidden = !isPersonalSurface(activeSection);
 
   return (
-    <div className="grid gap-8" hidden={hidden}>
-      <Section id="basic-info">
+    <div className="grid gap-8">
+      <Section id="basic-info" hidden={hidden}>
         <SectionHeader title="Basic information" />
         <FieldGrid columns={3}>
           <TextField
@@ -111,7 +111,7 @@ export function PersonalDetailsSection({
         />
       </Section>
 
-      <Section>
+      <Section hidden={hidden}>
         <SectionHeader title="Contact" />
         <FieldGrid>
           <TextField
@@ -197,7 +197,7 @@ export function PersonalDetailsSection({
         </FieldGrid>
       </Section>
 
-      <Section>
+      <Section hidden={hidden}>
         <SectionHeader title="Links" />
         <FieldGrid columns={3}>
           <TextField
