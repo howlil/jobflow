@@ -32,7 +32,7 @@ export function ProfileFormSections({
   const sectionProps = { activeSection, changeProfile, profile };
 
   return (
-    <>
+    <div className="grid gap-8">
       <PersonalDetailsSection {...sectionProps} />
       <ExperienceSection {...sectionProps} />
       <CareerRecordsSection {...sectionProps} />
@@ -49,6 +49,6 @@ export function ProfileFormSections({
         exportProfile={exportProfile}
         importProfile={importProfile}
       />
-    </>
+    </div>
   );
 }
