@@ -454,7 +454,8 @@ export const FLOATING_STYLES = `
   gap: 8px;
 }
 
-.jobflow-panel__unlock label {
+.jobflow-panel__unlock label,
+.jobflow-panel__form label {
   display: grid;
   gap: 8px;
   color: var(--jobflow-muted);
@@ -462,7 +463,14 @@ export const FLOATING_STYLES = `
   font-weight: 650;
 }
 
-.jobflow-panel__unlock input {
+.jobflow-panel__form {
+  display: grid;
+  gap: 10px;
+}
+
+.jobflow-panel__unlock input,
+.jobflow-panel__form input,
+.jobflow-panel__form select {
   width: 100%;
   min-height: 40px;
   padding: 8px 12px;
@@ -470,6 +478,16 @@ export const FLOATING_STYLES = `
   border-radius: 8px;
   background: var(--jobflow-surface);
   color: var(--jobflow-text);
+}
+
+.jobflow-panel__status {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--jobflow-border);
+  border-radius: 8px;
+  background: var(--jobflow-surface-subtle);
+  color: var(--jobflow-muted);
+  font-size: 12px;
 }
 
 .jobflow-panel__action--primary {

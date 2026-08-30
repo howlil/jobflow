@@ -8,6 +8,16 @@ vi.mock('../../src/infrastructure/storage/chrome-profile-repository', () => ({
   },
 }));
 
+vi.mock(
+  '../../src/infrastructure/storage/chrome-application-repository',
+  () => ({
+    ChromeApplicationRepository: class {
+      load = vi.fn().mockResolvedValue(null);
+      save = vi.fn().mockResolvedValue(undefined);
+    },
+  }),
+);
+
 vi.mock('../../src/ui/corrections/CorrectionMemorySection', () => ({
   CorrectionMemorySection: () => <div>Correction memory</div>,
 }));

@@ -8,6 +8,7 @@ import {
   type AnalyzedPageContext,
   toPageContextResponse,
 } from '../src/application/forms/analyze-page-context';
+import { createApplicationService } from '../src/application/applications/application-service';
 import {
   isGetPageAnalysisMessage,
   isGetPageContextMessage,
@@ -29,6 +30,7 @@ import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-
 import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
 import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
+import { ChromeApplicationRepository } from '../src/infrastructure/storage/chrome-application-repository';
 import {
   ChromeProfileRepository,
   PROFILE_STORAGE_KEY,
@@ -117,6 +119,9 @@ export default defineContentScript({
       applyProfileEnvelope(envelope);
 
       const correctionRepository = new ChromeCorrectionRepository();
+      const applicationService = createApplicationService(
+        new ChromeApplicationRepository(),
+      );
       const vaultClient = new ChromeVaultClient();
       const documentClient = new ChromeDocumentClient();
       let corrections = await correctionRepository.listForOrigin(
@@ -163,6 +168,10 @@ export default defineContentScript({
             sensitiveError={sensitiveError}
             siteHost={location.host}
             variantName={variantName}
+            applicationDraft={applicationService.createDraftFromPageCapture({
+              url: location.href,
+              signals: collectPageSignals(document),
+            })}
             onFill={() => {
               if (currentContext === null) return;
               applyFillInstructions(
@@ -173,6 +182,9 @@ export default defineContentScript({
             }}
             onOpenOptions={() => {
               void browser.runtime.sendMessage({ type: OPEN_WORKSPACE });
+            }}
+            onSaveApplication={async (draft) => {
+              await applicationService.create(draft);
             }}
             onUnlockSensitive={(passphrase) => {
               void unlockSensitive(passphrase);

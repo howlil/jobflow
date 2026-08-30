@@ -95,4 +95,48 @@ describe('FloatingPanel', () => {
 
     expect(attach).toHaveBeenCalledWith('resume-field', 'resume-1');
   });
+
+  it('requires review before saving the current page to the pipeline', async () => {
+    const saveApplication = vi.fn().mockResolvedValue(undefined);
+    render(
+      <FloatingPanel
+        summary={{
+          ready: 1,
+          needsReview: 0,
+          sensitive: 0,
+          unknown: 0,
+          total: 1,
+        }}
+        applicationDraft={{
+          company: 'Acme',
+          role: 'Senior Engineer',
+          jobUrl: 'https://jobs.example/acme',
+          stage: 'saved',
+        }}
+        onFill={vi.fn()}
+        onSaveApplication={saveApplication}
+      />,
+    );
+
+    expect(saveApplication).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Review and save this job' }),
+    );
+
+    expect(screen.getByLabelText<HTMLInputElement>('Company').value).toBe(
+      'Acme',
+    );
+    fireEvent.change(screen.getByLabelText('Company'), {
+      target: { value: 'Acme Careers' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save to pipeline' }));
+
+    expect(saveApplication).toHaveBeenCalledWith({
+      company: 'Acme Careers',
+      role: 'Senior Engineer',
+      jobUrl: 'https://jobs.example/acme',
+      stage: 'saved',
+    });
+  });
 });

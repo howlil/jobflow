@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
+import { createApplicationService } from '../../src/application/applications/application-service';
 import { createCvImportWorkflow } from '../../src/application/profile/cv-import-workflow';
 import { extractCvText } from '../../src/infrastructure/documents/extract-cv-text';
 import { ChromeVaultClient } from '../../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../../src/infrastructure/storage/chrome-correction-repository';
+import { ChromeApplicationRepository } from '../../src/infrastructure/storage/chrome-application-repository';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { IndexedDbDocumentRepository } from '../../src/infrastructure/storage/indexeddb-document-repository';
 import { CorrectionMemorySection } from '../../src/ui/corrections/CorrectionMemorySection';
+import { ApplicationsWorkspace } from '../../src/ui/applications/ApplicationsWorkspace';
 import { WorkspaceFrame } from '../../src/ui/design-system/WorkspaceFrame';
 import { BackupRecoveryInspector } from '../../src/ui/profile/BackupRecoveryInspector';
 import { CvImportSection } from '../../src/ui/profile/CvImportSection';
@@ -22,6 +25,7 @@ import {
 } from '../../src/ui/profile/workspace-sections';
 
 const profileRepository = new ChromeProfileRepository();
+const applicationRepository = new ChromeApplicationRepository();
 const correctionRepository = new ChromeCorrectionRepository();
 const documentRepository = new IndexedDbDocumentRepository();
 const vaultClient = new ChromeVaultClient();
@@ -30,6 +34,7 @@ const cvImportWorkflow = createCvImportWorkflow({
   documentRepository,
   extractText: extractCvText,
 });
+const applicationService = createApplicationService(applicationRepository);
 
 const saveIndicatorTone: Record<ProfileSaveState, string> = {
   clean: 'bg-app-border-strong',
@@ -57,7 +62,9 @@ export default function App() {
   );
 
   const hideProfileSurface =
-    activeSection === 'corrections' || activeSection === 'backup';
+    activeSection === 'applications' ||
+    activeSection === 'corrections' ||
+    activeSection === 'backup';
 
   const workspaceMeta = hideProfileSurface ? (
     'Stored locally'
@@ -83,6 +90,12 @@ export default function App() {
             workflow={cvImportWorkflow}
             onProfileChanged={refreshWorkspace}
           />
+        ) : null}
+
+        {activeSection === 'applications' ? (
+          <div className="w-full" id="applications">
+            <ApplicationsWorkspace service={applicationService} />
+          </div>
         ) : null}
 
         <div hidden={hideProfileSurface}>

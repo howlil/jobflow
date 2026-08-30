@@ -35,9 +35,8 @@ None. Current work remains inside the existing Job Flow product contract.
 - career records preserve one experience surface while languages, certifications, and projects have independent UI ownership
 - normal canonical autofill fields are defined once in `canonical-fields.ts`; runtime validation and compile-time consumers share that source
 - the floating assistant uses the canonical neutral visual tokens and presents human-readable canonical-field labels
+- the local application pipeline stores reviewed applications in versioned local storage, supports workspace CRUD and explicit stage changes, and preserves no-backend, no-cloud-sync, and no-auto-submit boundaries
 
 ## Uncommitted candidate context
 
-An end-to-end `JobApplication` pipeline has been discussed as a possible future product direction. The current product contract still lists an application tracker as a non-goal.
-
-This candidate is **not an active requirement**. If the user explicitly chooses that direction, update `requirements.md` in the same logical change before or with implementation, then execute the canonical lifecycle.
+None.
