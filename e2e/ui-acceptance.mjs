@@ -111,11 +111,51 @@ try {
   await expect(page.getByRole('heading', { name: 'Contact' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Links' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Overview' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Skills' })).toHaveCount(0);
+
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const wideMain = await page.getByRole('main').boundingBox();
+  expect(wideMain?.width ?? 0).toBeGreaterThan(1500);
+  await capture(page, 'options-wide-1920.png', { width: 1920, height: 1080 });
+
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  const ultraWideMain = await page.getByRole('main').boundingBox();
+  expect(ultraWideMain?.width ?? 0).toBeGreaterThan(2100);
+  await capture(page, 'options-wide-2560.png', { width: 2560, height: 1440 });
+
   await capture(page, 'options-desktop.png', { width: 1440, height: 1000 });
   await capture(page, 'options-tablet.png', { width: 1024, height: 900 });
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
+  const basicInformationCard = page
+    .locator('details')
+    .filter({ has: page.getByRole('heading', { name: 'Basic information' }) })
+    .first();
+  await expect(page.getByRole('button', { name: 'About Basic information' })).toBeVisible();
+  await page.getByRole('button', { name: 'About Basic information' }).click();
+  await expect(
+    page.getByText(/canonical identity, preferred name, headline/i),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await basicInformationCard.locator('summary').click();
+  await expect(page.getByLabel('First name')).toBeHidden();
+  await basicInformationCard.locator('summary').click();
+  await expect(page.getByLabel('First name')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Experience', exact: true }).click();
+  await page.getByRole('button', { name: 'Add experience' }).click();
+  await expect(page.getByLabel('Start date')).toHaveAttribute('type', 'month');
+  await expect(page.getByLabel('End date')).toHaveAttribute('type', 'month');
+  await expect(page.getByRole('textbox', { name: 'Skills' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Skill level' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Preferences', exact: true }).click();
+  await expect(page.getByLabel('Availability date')).toHaveAttribute(
+    'type',
+    'date',
+  );
+
   await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await expect(page.getByLabel('First name')).toBeVisible();
   await capture(page, 'options-personal-desktop.png', {
