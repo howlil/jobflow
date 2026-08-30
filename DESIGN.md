@@ -5,7 +5,7 @@ This file is the visual source of truth for Job Flow. External design references
 ## Design principles
 
 1. **Utility before decoration.** Job Flow is a work tool. Prefer legibility, speed, and obvious actions over expressive SaaS styling.
-2. **Dashboard shell, editorial content.** Use a stable sidebar/topbar/main application shell; inside the main content prefer typography, whitespace, separators, and clear grouping over card soup.
+2. **Dashboard shell, structured editing.** Use a stable sidebar/topbar/main application shell. Major editable workspace sections use restrained flat bordered collapsible cards so long forms are scannable; avoid decorative or arbitrary nested card soup.
 3. **Monochrome by default.** Product actions use near-black, white, and neutral surfaces. Semantic colors are reserved for warning, success, and danger states.
 4. **Compact controls, clear hierarchy.** Form controls are dense enough for long career profiles without becoming cramped.
 5. **One workspace, not a wizard.** Career data uses non-linear section navigation with one focused category visible at a time. Users can switch categories freely without a forced sequence.
@@ -86,7 +86,7 @@ surface  8
 round    999  status-only when genuinely useful
 ```
 
-Do not round every container. Large content groups may use open layouts separated by rules.
+Use the surface radius for real section and record boundaries. Do not turn arbitrary text groups into rounded containers.
 
 ### Shadows
 
@@ -96,7 +96,7 @@ panel     subtle left-facing shadow
 record    very subtle shadow for repeated editable object cards
 ```
 
-Open workspace sections do not use shadows. A repeatable record may use a very subtle shadow together with a neutral border when the boundary helps scanning and editing. Do not turn ordinary text groups or whole pages into floating cards.
+Workspace section cards remain shadowless. A repeatable record may use a very subtle shadow together with a neutral border when the boundary helps scanning and editing.
 
 ## Surface model
 
@@ -124,8 +124,8 @@ Desktop shell:
 ┌──────────────────┬────────────────────────────────────────────┐
 │ sidebar 224px    │ sticky topbar                              │
 │                  ├────────────────────────────────────────────┤
-│ section nav      │ main content                               │
-│                  │ max-width 1280px                           │
+│ section nav      │ fluid main content                         │
+│                  │ responsive gutters                         │
 │                  │                                            │
 └──────────────────┴────────────────────────────────────────────┘
 ```
@@ -133,10 +133,13 @@ Desktop shell:
 Responsive gutters:
 
 ```text
-desktop  32px
-tablet   24px
-mobile   16px
+wide desktop  40px
+desktop       32px
+tablet        24px
+mobile        16px
 ```
+
+The main workspace does not stop expanding at an arbitrary desktop max width. On wide monitors, short-field grids may use the additional horizontal space while long text remains readable through field-level composition rather than a global page-width cap.
 
 Responsive field grids:
 
@@ -157,7 +160,6 @@ Top-level sections:
 - Personal
 - Experience
 - Education
-- Skills
 - Documents
 - Preferences
 - Variants
@@ -165,7 +167,7 @@ Top-level sections:
 - Corrections
 - Backup
 
-`Personal` contains identity, contact, and links as internal groups; Contact and Links are not separate top-level navigation items.
+`Personal` contains identity, contact, and links as internal groups; Contact and Links are not separate top-level navigation items. Skills are authored contextually from Experience and Projects rather than through a standalone navigation section.
 
 Navigation changes the active workspace category. Profile state stays mounted where needed so draft edits survive category changes.
 
@@ -179,6 +181,8 @@ src/ui/design-system/tailwind.css
                                 Tailwind directives + base + compatibility grammar
 src/ui/design-system/primitives.tsx
                                 reusable control and record contracts
+src/ui/design-system/WorkspaceSectionCard.tsx
+                                reusable section-card/help/collapse contract
 React feature components        data ownership + local composition only
 ```
 
@@ -271,21 +275,35 @@ Use the shared icon-button size contract instead of caller-specific `!h-*` / `!w
 
 Workspace controls target roughly 38–44px height. Labels sit above controls. Placeholder text is never used as a label.
 
-### Section
-
-Default workspace section is operational and restrained:
+Use native input semantics for dates:
 
 ```text
-section heading
-short supporting text only when necessary
-content
+exact calendar date  -> input type="date"
+career date range    -> input type="month"
 ```
 
-Use a bordered container when the object benefits from a real boundary, such as an experience record, CV import region, or sensitive/destructive operation. Do not wrap every text group in a card.
+Persist native edited values in ISO-compatible `YYYY-MM-DD` or `YYYY-MM` form. Legacy display formats may be normalized at the input boundary without inventing missing day precision.
+
+### Section
+
+A major editable workspace section uses one restrained section-card contract:
+
+```text
+white surface
+neutral border
+8px surface radius
+no shadow
+header: title + contextual ? help + local action + collapse affordance
+body: direct form/operational content
+```
+
+Sections are expanded by default and can be collapsed without mutating profile data. Collapse state is interface state, not persisted career-profile data. Contextual help explains what belongs in the section without permanently filling the page with helper paragraphs.
+
+Do not add an extra card around arbitrary text. Nested bordered surfaces are appropriate only when they represent a real repeated record or a distinct operational region such as CV review.
 
 ### Repeatable record
 
-Repeatable editable objects such as experience, education, skills, languages, certifications, projects, application variants, and reusable answers share one visual contract:
+Repeatable editable objects such as experience, education, languages, certifications, projects, application variants, and reusable answers share one visual contract:
 
 ```text
 white surface
@@ -301,14 +319,14 @@ Collapsible records and always-open records may differ in behavior, but not in s
 
 ### Linked skills
 
-Experience and project skill references use the same linked-skill editor pattern:
+Experience and Project are the user-facing skill-authoring sources. They use the same linked-skill editor pattern:
 
 ```text
-skill input + level + add icon
--> removable skill badges
+single skill input + autosuggest + add icon
+Enter/comma -> removable skill chip
 ```
 
-The canonical Skills section remains the owner of skill level and years-of-experience data. Linked records reference the canonical skill name instead of inventing a second skill model.
+Do not expose skill level or years-of-experience in the current workspace. The active skill inventory is the case-insensitive unique union of Experience and Project skill links. A persisted canonical skill registry may remain as an internal compatibility index for stable IDs and autosuggest, but registry-only entries are not active skills.
 
 ### Status
 
@@ -340,6 +358,8 @@ The import review distinguishes:
 - unsupported/unparsed content
 
 CV file storage is a separate explicit action from profile extraction.
+
+Standalone CV skills are not imported into the active skill inventory because Job Flow cannot safely infer which Experience or Project owns them. Skill links remain explicitly authored in their career-record context.
 
 ## Document attachment UX
 
@@ -391,6 +411,8 @@ Avoid:
 
 Representative visual widths:
 
+- 2560 wide desktop workspace tab
+- 1920 desktop workspace tab
 - 1440 desktop workspace tab
 - 1024 tablet workspace tab
 - 390 mobile workspace tab

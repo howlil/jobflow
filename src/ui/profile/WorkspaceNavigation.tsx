@@ -7,7 +7,6 @@ import {
   ListChecks,
   MapPin,
   ShieldCheck,
-  Sparkles,
   UserRound,
 } from 'lucide-react';
 
@@ -21,7 +20,6 @@ const groups = [
       { id: 'personal', label: 'Personal', icon: UserRound },
       { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
       { id: 'education', label: 'Education', icon: GraduationCap },
-      { id: 'skills', label: 'Skills', icon: Sparkles },
     ],
   },
   {

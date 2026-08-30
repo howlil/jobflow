@@ -1,12 +1,14 @@
 import type { StoredProfileEnvelope } from '../../../domain/profile/profile-schema';
 import {
   FieldGrid,
-  Section,
-  SectionHeader,
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
-import type { WorkspaceSection } from '../workspace-sections';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
+import type { WorkspaceSection as WorkspaceSectionId } from '../workspace-sections';
 import { createProfileItemId } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -33,7 +35,7 @@ function updatePrimaryContact(
   );
 }
 
-function isPersonalSurface(activeSection: WorkspaceSection): boolean {
+function isPersonalSurface(activeSection: WorkspaceSectionId): boolean {
   return (
     activeSection === 'personal' ||
     activeSection === 'contact' ||
@@ -49,9 +51,12 @@ export function PersonalDetailsSection({
   const hidden = !isPersonalSurface(activeSection);
 
   return (
-    <div className="grid gap-8">
-      <Section id="basic-info" hidden={hidden}>
-        <SectionHeader title="Basic information" />
+    <div className="grid gap-4">
+      <WorkspaceSection id="basic-info" hidden={hidden}>
+        <WorkspaceSectionHeader
+          title="Basic information"
+          description="Your canonical identity, preferred name, headline, and professional summary used across application forms."
+        />
         <FieldGrid columns={3}>
           <TextField
             label="First name"
@@ -110,10 +115,13 @@ export function PersonalDetailsSection({
             })
           }
         />
-      </Section>
+      </WorkspaceSection>
 
-      <Section hidden={hidden}>
-        <SectionHeader title="Contact" />
+      <WorkspaceSection hidden={hidden}>
+        <WorkspaceSectionHeader
+          title="Contact"
+          description="Contact details Job Flow can map to ordinary job-application fields."
+        />
         <FieldGrid>
           <TextField
             type="email"
@@ -196,10 +204,13 @@ export function PersonalDetailsSection({
             }
           />
         </FieldGrid>
-      </Section>
+      </WorkspaceSection>
 
-      <Section hidden={hidden}>
-        <SectionHeader title="Links" />
+      <WorkspaceSection hidden={hidden}>
+        <WorkspaceSectionHeader
+          title="Links"
+          description="Professional profile, source-code, and portfolio links used in applications."
+        />
         <FieldGrid columns={3}>
           <TextField
             label="LinkedIn"
@@ -229,7 +240,7 @@ export function PersonalDetailsSection({
             }
           />
         </FieldGrid>
-      </Section>
+      </WorkspaceSection>
     </div>
   );
 }

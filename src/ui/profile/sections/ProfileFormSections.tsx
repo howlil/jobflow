@@ -9,7 +9,6 @@ import { EducationSection } from './EducationSection';
 import { ExperienceSection } from './ExperienceSection';
 import { PersonalDetailsSection } from './PersonalDetailsSection';
 import { PreferencesSection } from './PreferencesSection';
-import { SkillsSection } from './SkillsSection';
 import { VariantsSection } from './VariantsSection';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -32,12 +31,11 @@ export function ProfileFormSections({
   const sectionProps = { activeSection, changeProfile, profile };
 
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-4">
       <PersonalDetailsSection {...sectionProps} />
       <ExperienceSection {...sectionProps} />
       <CareerRecordsSection {...sectionProps} />
       <EducationSection {...sectionProps} />
-      <SkillsSection {...sectionProps} />
       <PreferencesSection {...sectionProps} />
       <DocumentsSection {...sectionProps} />
       {vaultClient !== undefined && activeSection === 'sensitive' ? (

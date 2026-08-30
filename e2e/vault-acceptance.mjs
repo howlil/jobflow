@@ -120,7 +120,7 @@ try {
   await page.getByLabel('Confirm vault passphrase').fill('local-passphrase');
   await page.getByRole('button', { name: 'Set up vault' }).click();
   await expect(page.getByText('Sensitive vault is unlocked.')).toBeVisible();
-  await page.getByLabel('Birth date').fill('03/02/2001');
+  await page.getByLabel('Birth date').fill('2001-02-03');
   await page.getByLabel('National ID').fill('3174000000000001');
   await page.getByLabel('Expected salary', { exact: true }).fill('15000000');
   await page.getByLabel('Expected salary currency').fill('IDR');
@@ -132,7 +132,7 @@ try {
   const serializedVault = JSON.stringify(storedVault);
   expect(serializedVault).not.toContain('local-passphrase');
   expect(serializedVault).not.toContain('3174000000000001');
-  expect(serializedVault).not.toContain('03/02/2001');
+  expect(serializedVault).not.toContain('2001-02-03');
   expect(serializedVault).not.toContain('15000000');
 
   await page.getByRole('button', { name: 'Lock vault' }).click();
@@ -172,7 +172,7 @@ try {
   await page
     .getByRole('button', { name: `Fill sensitive fields on ${fixture.host}` })
     .click();
-  await expect(page.getByLabel('Date of birth')).toHaveValue('03/02/2001');
+  await expect(page.getByLabel('Date of birth')).toHaveValue('2001-02-03');
   await expect(page.getByLabel('NIK')).toHaveValue('3174000000000001');
   await expect(page.getByLabel('Expected salary')).toHaveValue('15000000');
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);

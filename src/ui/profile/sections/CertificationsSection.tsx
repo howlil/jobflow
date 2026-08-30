@@ -6,9 +6,9 @@ import {
   IconButton,
   RecordCard,
   RecordHeader,
-  Subsection,
   TextField,
 } from '../../design-system/primitives';
+import { WorkspaceSubsection } from '../../design-system/WorkspaceSectionCard';
 import { createProfileItemId, dateInputProps } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -22,8 +22,9 @@ export function CertificationsSection({
   profile,
 }: CertificationsSectionProps) {
   return (
-    <Subsection
+    <WorkspaceSubsection
       title="Certifications"
+      help="Add professional certifications and credential dates used by application forms."
       action={
         <IconButton
           size="sm"
@@ -144,6 +145,6 @@ export function CertificationsSection({
           )}
         </div>
       )}
-    </Subsection>
+    </WorkspaceSubsection>
   );
 }

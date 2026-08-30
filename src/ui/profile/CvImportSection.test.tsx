@@ -112,9 +112,7 @@ describe('CvImportSection', () => {
 
     const saved = vi.mocked(profileRepository.save).mock.calls[0]?.[0];
     expect(saved?.baseProfile.personal.legalName.first).toBe('Maya');
-    expect(
-      saved?.baseProfile.professional.skills.map((skill) => skill.name),
-    ).toEqual(['Go', 'PostgreSQL']);
+    expect(saved?.baseProfile.professional.skills).toEqual([]);
   });
 
   it('stores CV bytes only after Save CV locally', async () => {
@@ -175,9 +173,7 @@ describe('CvImportSection', () => {
     expect(saved?.baseProfile.contact.emails[0]?.value).toBe(
       'maya@example.com',
     );
-    expect(
-      saved?.baseProfile.professional.skills.map((skill) => skill.name),
-    ).toEqual(['Go', 'PostgreSQL']);
+    expect(saved?.baseProfile.professional.skills).toEqual([]);
     expect(saved?.baseProfile.documents.resumes[0]).toMatchObject({
       fileName: 'backend.txt',
       mimeType: 'text/plain',

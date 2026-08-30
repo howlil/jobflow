@@ -5,11 +5,13 @@ import {
   IconButton,
   RecordCard,
   RecordHeader,
-  Section,
-  SectionHeader,
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
 import {
   createProfileItemId,
   listValue,
@@ -23,8 +25,8 @@ export function DocumentsSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <Section hidden={activeSection !== 'documents'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'documents'}>
+      <WorkspaceSectionHeader
         title="Reusable answers"
         description="Keep answers you reuse across application forms. Resume files are managed above as stored documents."
         action={
@@ -115,6 +117,6 @@ export function DocumentsSection({
           ))}
         </div>
       )}
-    </Section>
+    </WorkspaceSection>
   );
 }

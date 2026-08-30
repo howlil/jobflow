@@ -45,7 +45,7 @@ export function WorkspaceFrame({
 
       <div className="min-w-0">
         <header className="sticky top-0 z-30 border-b border-app-border bg-white/95 backdrop-blur-md">
-          <div className="flex min-h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="flex min-h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 2xl:px-10">
             <div className="min-w-0 py-2">
               <p className="m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
                 {eyebrow}
@@ -62,7 +62,7 @@ export function WorkspaceFrame({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1280px] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
+        <main className="w-full px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7 2xl:px-10">
           {children}
         </main>
       </div>

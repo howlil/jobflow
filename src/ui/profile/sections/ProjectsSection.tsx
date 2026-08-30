@@ -1,21 +1,21 @@
 import { Plus, Trash2 } from 'lucide-react';
 
+import { deriveActiveSkillNames } from '../../../domain/profile/derived-skills';
 import {
   EmptyState,
   FieldGrid,
   IconButton,
-  Subsection,
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
+import { WorkspaceSubsection } from '../../design-system/WorkspaceSectionCard';
 import { LinkedSkillEditor } from '../LinkedSkillEditor';
 import {
   addLinkedSkill,
   CollapsibleRecord,
   createProfileItemId,
-  dateInputProps,
   dateRangeSummary,
-  descriptionPreview,
+  monthInputProps,
 } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -28,9 +28,15 @@ export function ProjectsSection({
   changeProfile,
   profile,
 }: ProjectsSectionProps) {
+  const skillSuggestions = [
+    ...profile.baseProfile.professional.skills.map((skill) => skill.name),
+    ...deriveActiveSkillNames(profile.baseProfile),
+  ];
+
   return (
-    <Subsection
+    <WorkspaceSubsection
       title="Projects"
+      help="Add career-relevant projects. Skills added here contribute to your unique active skill inventory."
       action={
         <IconButton
           size="sm"
@@ -123,7 +129,7 @@ export function ProjectsSection({
                   />
                   <TextField
                     label="Start date"
-                    {...dateInputProps(project.startDate)}
+                    {...monthInputProps(project.startDate)}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
@@ -135,7 +141,7 @@ export function ProjectsSection({
                   />
                   <TextField
                     label="End date"
-                    {...dateInputProps(project.endDate)}
+                    {...monthInputProps(project.endDate)}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
@@ -150,31 +156,32 @@ export function ProjectsSection({
                   editorId={project.id}
                   contextLabel={`project ${index + 1}`}
                   linkedSkills={project.skills ?? []}
-                  skills={profile.baseProfile.professional.skills}
-                  onAdd={(skillName, skillLevel) =>
+                  skills={skillSuggestions}
+                  onAdd={(skillName) =>
                     changeProfile((draft) => {
                       const item =
                         draft.baseProfile.professional.projects[index];
                       if (item === undefined) return;
 
+                      const normalizedName = skillName
+                        .trim()
+                        .replace(/\s+/g, ' ');
                       let canonicalSkill =
                         draft.baseProfile.professional.skills.find(
                           (skill) =>
                             skill.name.trim().toLowerCase() ===
-                            skillName.toLowerCase(),
+                            normalizedName.toLowerCase(),
                         );
                       if (canonicalSkill === undefined) {
                         canonicalSkill = {
                           id: createProfileItemId(),
-                          name: skillName,
-                          level: skillLevel,
+                          name: normalizedName,
+                          level: '',
                           yearsExperience: null,
                         };
                         draft.baseProfile.professional.skills.push(
                           canonicalSkill,
                         );
-                      } else if (skillLevel !== '') {
-                        canonicalSkill.level = skillLevel;
                       }
                       item.skills = addLinkedSkill(
                         item.skills,
@@ -208,12 +215,11 @@ export function ProjectsSection({
                     })
                   }
                 />
-                {descriptionPreview(project.description)}
               </div>
             </CollapsibleRecord>
           ))}
         </div>
       )}
-    </Subsection>
+    </WorkspaceSubsection>
   );
 }

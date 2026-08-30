@@ -1,3 +1,7 @@
+import {
+  deriveActiveSkillNames,
+  normalizeSkillName,
+} from '../profile/derived-skills';
 import type {
   ApplicationVariant,
   BaseProfile,
@@ -49,7 +53,9 @@ export function recommendApplicationVariant(
   }
 
   const skillNameById = profileSkillNameById(baseProfile);
-  const candidateSkills = [...skillNameById.values()];
+  const candidateSkills =
+    baseProfile === undefined ? [] : deriveActiveSkillNames(baseProfile);
+  const activeSkillKeys = new Set(candidateSkills.map(normalizeSkillName));
   const pageContext = extractJobContext(pageSignals, candidateSkills);
   const signalTokens = new Set(pageContext.tokens);
   const pageSkills = new Set(pageContext.skills);
@@ -67,7 +73,11 @@ export function recommendApplicationVariant(
 
     for (const skillId of variant.emphasizedSkillIds ?? []) {
       const skillName = skillNameById.get(skillId);
-      if (skillName === undefined) continue;
+      if (
+        skillName === undefined ||
+        !activeSkillKeys.has(normalizeSkillName(skillName))
+      )
+        continue;
       const normalizedSkill = normalizeJobText(skillName);
       if (normalizedSkill !== '' && pageSkills.has(normalizedSkill)) {
         score += 4;

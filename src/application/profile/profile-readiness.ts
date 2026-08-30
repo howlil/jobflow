@@ -1,3 +1,4 @@
+import { deriveActiveSkillNames } from '../../domain/profile/derived-skills';
 import type { BaseProfile } from '../../domain/profile/profile-schema';
 
 export type ProfileReadiness = {
@@ -41,7 +42,7 @@ export function calculateProfileReadiness(
     education: baseProfile.professional.education.some(
       (item) => hasText(item.institution) || hasText(item.degree),
     ),
-    skills: baseProfile.professional.skills.some((item) => hasText(item.name)),
+    skills: deriveActiveSkillNames(baseProfile).length > 0,
   };
 
   const total = 6 as const;

@@ -4,17 +4,18 @@ import {
   EmptyState,
   FieldGrid,
   IconButton,
-  Section,
-  SectionHeader,
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
 import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
+import {
   CollapsibleRecord,
   createProfileItemId,
-  dateInputProps,
   dateRangeSummary,
-  descriptionPreview,
+  monthInputProps,
   parseNullableNumber,
 } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
@@ -25,9 +26,10 @@ export function EducationSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <Section hidden={activeSection !== 'education'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'education'}>
+      <WorkspaceSectionHeader
         title="Education"
+        description="Add formal education history used by Job Flow when application forms ask for academic background."
         action={
           <IconButton
             size="sm"
@@ -119,7 +121,7 @@ export function EducationSection({
                     ))}
                     <TextField
                       label="Start date"
-                      {...dateInputProps(education.startDate)}
+                      {...monthInputProps(education.startDate)}
                       onChange={(event) =>
                         changeProfile((draft) => {
                           const item =
@@ -131,7 +133,7 @@ export function EducationSection({
                     />
                     <TextField
                       label="End date"
-                      {...dateInputProps(education.endDate)}
+                      {...monthInputProps(education.endDate)}
                       onChange={(event) =>
                         changeProfile((draft) => {
                           const item =
@@ -183,13 +185,12 @@ export function EducationSection({
                       })
                     }
                   />
-                  {descriptionPreview(education.description)}
                 </div>
               </CollapsibleRecord>
             ),
           )}
         </div>
       )}
-    </Section>
+    </WorkspaceSection>
   );
 }

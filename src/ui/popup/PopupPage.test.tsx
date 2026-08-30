@@ -31,6 +31,7 @@ function createCompleteProfile() {
     current: false,
     description: '',
     achievements: [],
+    skills: ['TypeScript'],
   });
   profile.baseProfile.professional.education.push({
     id: 'education-1',
@@ -95,6 +96,19 @@ describe('PopupPage', () => {
     profile.baseProfile.personal.legalName.first = 'Ulil';
     profile.baseProfile.personal.legalName.last = 'Abshar';
     profile.baseProfile.contact.whatsapp = '+628123456789';
+    profile.baseProfile.professional.experiences.push({
+      id: 'skill-source-1',
+      company: '',
+      title: '',
+      employmentType: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      current: false,
+      description: '',
+      achievements: [],
+      skills: ['TypeScript'],
+    });
     profile.baseProfile.professional.skills.push({
       id: 'skill-1',
       name: 'TypeScript',

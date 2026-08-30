@@ -1,22 +1,20 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 
 import { Chip, IconButton, TextField } from '../design-system/primitives';
-
-type SkillOption = {
-  id: string;
-  name: string;
-  level: string;
-};
 
 type LinkedSkillEditorProps = {
   editorId: string;
   contextLabel: string;
   linkedSkills: string[];
-  skills: SkillOption[];
-  onAdd: (name: string, level: string) => void;
+  skills: string[];
+  onAdd: (name: string) => void;
   onRemove: (name: string) => void;
 };
+
+function normalize(value: string): string {
+  return value.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+}
 
 export function LinkedSkillEditor({
   editorId,
@@ -27,42 +25,43 @@ export function LinkedSkillEditor({
   onRemove,
 }: LinkedSkillEditorProps) {
   const [skillName, setSkillName] = useState('');
-  const [skillLevel, setSkillLevel] = useState('');
   const datalistId = `linked-skill-options-${editorId}`;
+  const linkedKeys = useMemo(
+    () => new Set(linkedSkills.map(normalize)),
+    [linkedSkills],
+  );
+  const suggestions = useMemo(() => {
+    const byName = new Map<string, string>();
+    for (const value of skills) {
+      const name = value.trim().replace(/\s+/g, ' ');
+      const key = normalize(name);
+      if (key === '' || byName.has(key)) continue;
+      byName.set(key, name);
+    }
+    return [...byName.values()];
+  }, [skills]);
 
   function addSkill() {
-    const name = skillName.trim();
-    const level = skillLevel.trim();
+    const name = skillName.trim().replace(/\s+/g, ' ');
     if (name === '') return;
-    onAdd(name, level);
+    if (!linkedKeys.has(normalize(name))) onAdd(name);
     setSkillName('');
-    setSkillLevel('');
   }
 
   return (
     <div className="grid gap-3">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(140px,0.45fr)_auto] sm:items-end">
+      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <TextField
-          label="Skill"
+          label="Skills"
           list={datalistId}
-          placeholder="Type or choose a skill"
+          placeholder="Type a skill and press Enter"
           value={skillName}
-          onChange={(event) => {
-            const nextName = event.target.value;
-            setSkillName(nextName);
-            const existing = skills.find(
-              (skill) =>
-                skill.name.trim().toLowerCase() ===
-                nextName.trim().toLowerCase(),
-            );
-            setSkillLevel(existing?.level ?? '');
+          onChange={(event) => setSkillName(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ',') return;
+            event.preventDefault();
+            addSkill();
           }}
-        />
-        <TextField
-          label="Skill level"
-          placeholder="e.g. Advanced"
-          value={skillLevel}
-          onChange={(event) => setSkillLevel(event.target.value)}
         />
         <IconButton
           size="md"
@@ -77,38 +76,30 @@ export function LinkedSkillEditor({
       </div>
 
       <datalist id={datalistId}>
-        {skills
-          .filter((skill) => skill.name.trim() !== '')
-          .map((skill) => (
-            <option value={skill.name} key={skill.id} />
-          ))}
+        {suggestions.map((name) => (
+          <option value={name} key={normalize(name)} />
+        ))}
       </datalist>
 
       {linkedSkills.length > 0 ? (
         <div className="flex flex-wrap gap-2" aria-label="Linked skills">
-          {linkedSkills.map((linkedName) => {
-            const canonicalSkill = skills.find(
-              (skill) =>
-                skill.name.trim().toLowerCase() === linkedName.toLowerCase(),
-            );
-            const level = canonicalSkill?.level.trim() ?? '';
-            return (
-              <Chip strong className="pr-1" key={linkedName}>
-                <span>
-                  {linkedName}
-                  {level === '' ? '' : ` · ${level}`}
-                </span>
-                <button
-                  className="grid h-5 w-5 place-items-center rounded text-app-subtle transition hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink"
-                  type="button"
-                  aria-label={`Remove ${linkedName} from ${contextLabel}`}
-                  onClick={() => onRemove(linkedName)}
-                >
-                  <X aria-hidden="true" size={12} />
-                </button>
-              </Chip>
-            );
-          })}
+          {linkedSkills.map((linkedName) => (
+            <Chip
+              strong
+              className="pr-1"
+              key={`${normalize(linkedName)}:${linkedName}`}
+            >
+              <span>{linkedName}</span>
+              <button
+                className="grid h-5 w-5 place-items-center rounded text-app-subtle transition hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink"
+                type="button"
+                aria-label={`Remove ${linkedName} from ${contextLabel}`}
+                onClick={() => onRemove(linkedName)}
+              >
+                <X aria-hidden="true" size={12} />
+              </button>
+            </Chip>
+          ))}
         </div>
       ) : (
         <p className="m-0 text-[11px] leading-4 text-app-subtle">

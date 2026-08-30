@@ -116,7 +116,7 @@ try {
   });
   await expect(page.getByText(/Found .* profile candidates/i)).toBeVisible();
   await expect(page.getByText('Maya Putri')).toBeVisible();
-  await expect(page.getByText(/Go, PostgreSQL, Redis/)).toBeVisible();
+  await expect(page.getByText(/Go, PostgreSQL, Redis/)).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Import data and save CV' }).click();
   await expect(
@@ -134,15 +134,13 @@ try {
   await expect(page.getByLabel('Professional headline')).toHaveValue(
     'Backend Software Engineer',
   );
-
   await expect(page.getByLabel('Primary email')).toHaveValue(
     'maya@example.com',
   );
+  await expect(page.getByRole('button', { name: 'Skills' })).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Skills' }).click();
-  await expect(page.locator('input[value="Go"]')).toBeVisible();
-  await expect(page.locator('input[value="PostgreSQL"]')).toBeVisible();
-  await expect(page.locator('input[value="Redis"]')).toBeVisible();
+  await page.getByRole('button', { name: 'Experience' }).click();
+  await expect(page.getByText('No experience added yet.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Documents' }).click();
   await expect(
