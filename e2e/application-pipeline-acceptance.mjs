@@ -46,8 +46,12 @@ try {
   const extensionId = await getExtensionId(context);
   const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page.getByRole('button', { name: 'Applications', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Applications' })).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Applications', exact: true })
+    .click();
+  await expect(
+    page.getByRole('heading', { name: 'Applications' }),
+  ).toBeVisible();
 
   await createApplication(page, {
     company: 'Gojek',
@@ -81,19 +85,28 @@ try {
   await expect(page.getByText('Traveloka')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'All', exact: true }).click();
-  const gojekCard = page.locator('article').filter({ hasText: 'Gojek' }).first();
+  const gojekCard = page
+    .locator('article')
+    .filter({ hasText: 'Gojek' })
+    .first();
   await gojekCard.getByLabel('Move stage').selectOption('interview');
-  await expect(page.getByRole('status')).toHaveText('Application stage updated.');
+  await expect(page.getByRole('status')).toHaveText(
+    'Application stage updated.',
+  );
 
   await page.reload();
-  await page.getByRole('button', { name: 'Applications', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Applications', exact: true })
+    .click();
 
   const persistedGojekCard = page
     .locator('article')
     .filter({ hasText: 'Gojek' })
     .first();
   await expect(persistedGojekCard).toBeVisible();
-  await expect(persistedGojekCard.getByLabel('Move stage')).toHaveValue('interview');
+  await expect(persistedGojekCard.getByLabel('Move stage')).toHaveValue(
+    'interview',
+  );
   await expect(page.getByText('Traveloka')).toBeVisible();
   await expect(page.getByText('1 application needs attention.')).toBeVisible();
 } finally {
