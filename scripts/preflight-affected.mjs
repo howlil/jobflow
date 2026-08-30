@@ -156,13 +156,7 @@ write(
 );
 for (const file of changedFiles) write(`- ${file}`);
 
-run(pnpm, [
-  'exec',
-  'prettier',
-  '--write',
-  '--ignore-unknown',
-  ...changedFiles,
-]);
+run(pnpm, ['exec', 'prettier', '--write', '--ignore-unknown', ...changedFiles]);
 
 if (needsAffectedTests(changedFiles)) {
   run(pnpm, [
