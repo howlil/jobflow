@@ -8,7 +8,8 @@ import {
 } from './application-focus';
 
 function application(
-  overrides: Partial<JobApplication> & Pick<JobApplication, 'id' | 'company' | 'role'>,
+  overrides: Partial<JobApplication> &
+    Pick<JobApplication, 'id' | 'company' | 'role'>,
 ): JobApplication {
   return {
     stage: 'applied',
