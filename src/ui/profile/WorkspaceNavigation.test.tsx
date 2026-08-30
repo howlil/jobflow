@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 
 describe('WorkspaceNavigation', () => {
-  it('exposes the active category and switches without scrolling a long form', () => {
+  it('exposes the active category and keeps skills inside career records', () => {
     const onChange = vi.fn();
 
     render(
@@ -19,6 +19,7 @@ describe('WorkspaceNavigation', () => {
     expect(screen.queryByRole('button', { name: 'Overview' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Contact' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Links' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Skills' })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Experience' }));
     expect(onChange).toHaveBeenCalledWith('experience');
