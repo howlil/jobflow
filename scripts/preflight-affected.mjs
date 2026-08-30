@@ -1,17 +1,30 @@
-import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import {
+  argv,
+  cwd,
+  execPath,
+  exit,
+  platform,
+  stderr,
+  stdout,
+} from 'node:process';
 
-const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const pnpm = platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+
+function write(message = '') {
+  stdout.write(`${message}\n`);
+}
 
 function fail(message) {
-  console.error(`preflight:affected: ${message}`);
-  process.exit(1);
+  stderr.write(`preflight:affected: ${message}\n`);
+  exit(1);
 }
 
 function run(command, args) {
-  console.log(`\n> ${command} ${args.join(' ')}`);
+  write(`\n> ${command} ${args.join(' ')}`);
   const result = spawnSync(command, args, {
-    cwd: process.cwd(),
+    cwd: cwd(),
     stdio: 'inherit',
   });
 
@@ -19,40 +32,40 @@ function run(command, args) {
     fail(result.error.message);
   }
   if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+    exit(result.status ?? 1);
   }
 }
 
 function captureGit(args) {
   return spawnSync('git', args, {
-    cwd: process.cwd(),
+    cwd: cwd(),
     encoding: 'utf8',
   });
 }
 
-function parseArgs(argv) {
+function parseArgs(inputArgs) {
   let base = 'master';
   const e2e = [];
 
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
+  for (let index = 0; index < inputArgs.length; index += 1) {
+    const argument = inputArgs[index];
 
     if (argument === '--help' || argument === '-h') {
-      console.log(
+      write(
         `Usage: pnpm preflight:affected -- [--base <ref>] [--e2e <e2e/file.mjs>]\n\nRuns formatter, affected Vitest coverage, relevant type/lint checks, and optional selected browser acceptance flows for files changed from the merge-base.`,
       );
-      process.exit(0);
+      exit(0);
     }
 
     if (argument === '--base') {
-      base = argv[index + 1];
+      base = inputArgs[index + 1];
       if (!base) fail('--base requires a ref');
       index += 1;
       continue;
     }
 
     if (argument === '--e2e') {
-      const file = argv[index + 1];
+      const file = inputArgs[index + 1];
       if (!file) fail('--e2e requires an e2e/*.mjs file');
       e2e.push(file.replaceAll('\\', '/'));
       index += 1;
@@ -129,19 +142,19 @@ function validateE2eFiles(files) {
   }
 }
 
-const { base, e2e } = parseArgs(process.argv.slice(2));
+const { base, e2e } = parseArgs(argv.slice(2));
 const mergeBase = resolveMergeBase(base);
 const changedFiles = changedFilesSince(mergeBase);
 
 if (changedFiles.length === 0) {
-  console.log('preflight:affected: no changed files');
-  process.exit(0);
+  write('preflight:affected: no changed files');
+  exit(0);
 }
 
-console.log(
+write(
   `preflight:affected: ${changedFiles.length} changed file(s) from ${mergeBase.slice(0, 12)}`,
 );
-for (const file of changedFiles) console.log(`- ${file}`);
+for (const file of changedFiles) write(`- ${file}`);
 
 run(pnpm, [
   'exec',
@@ -174,8 +187,8 @@ if (lintableFiles.length > 0) {
 validateE2eFiles(e2e);
 if (e2e.length > 0) {
   run(pnpm, ['build']);
-  for (const file of e2e) run(process.execPath, [file]);
+  for (const file of e2e) run(execPath, [file]);
 }
 
 run('git', ['diff', '--check']);
-console.log('\npreflight:affected: green');
+write('\npreflight:affected: green');
