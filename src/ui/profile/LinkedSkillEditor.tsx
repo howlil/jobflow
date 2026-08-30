@@ -84,7 +84,11 @@ export function LinkedSkillEditor({
       {linkedSkills.length > 0 ? (
         <div className="flex flex-wrap gap-2" aria-label="Linked skills">
           {linkedSkills.map((linkedName) => (
-            <Chip strong className="pr-1" key={`${normalize(linkedName)}:${linkedName}`}>
+            <Chip
+              strong
+              className="pr-1"
+              key={`${normalize(linkedName)}:${linkedName}`}
+            >
               <span>{linkedName}</span>
               <button
                 className="grid h-5 w-5 place-items-center rounded text-app-subtle transition hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink"
