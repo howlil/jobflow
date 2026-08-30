@@ -18,7 +18,7 @@ export const WORKSPACE_SECTION_TITLES: Record<WorkspaceSection, string> = {
   links: 'Links',
   experience: 'Experience',
   education: 'Education',
-  applications: 'Applications',
+  applications: 'Pipeline',
   documents: 'Documents',
   preferences: 'Preferences',
   variants: 'Variants',
