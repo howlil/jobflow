@@ -101,7 +101,9 @@ function nextPipelineStage(stage: ApplicationStage): ApplicationStage | null {
   return ACTIVE_APPLICATION_STAGES[index + 1] ?? null;
 }
 
-function previousPipelineStage(stage: ApplicationStage): ApplicationStage | null {
+function previousPipelineStage(
+  stage: ApplicationStage,
+): ApplicationStage | null {
   const index = ACTIVE_APPLICATION_STAGES.findIndex((item) => item === stage);
   if (index <= 0) return null;
   return ACTIVE_APPLICATION_STAGES[index - 1] ?? null;
@@ -122,7 +124,8 @@ function PipelineCard({
   onDelete: (id: string) => void | Promise<void>;
   onChangeStage: (id: string, stage: ApplicationStage) => void | Promise<void>;
 }) {
-  const dueStatus = nextActionStatus(application, todayKey);
+  const closed = applicationIsClosed(application);
+  const dueStatus = closed ? null : nextActionStatus(application, todayKey);
   const previousStage = previousPipelineStage(application.stage);
   const nextStage = nextPipelineStage(application.stage);
   const contextualDetail = application.contactName
@@ -187,7 +190,7 @@ function PipelineCard({
         </a>
       ) : null}
 
-      {!applicationIsClosed(application) ? (
+      {!closed ? (
         <ActionRow>
           {previousStage !== null ? (
             <Button
@@ -215,7 +218,9 @@ function stageActionLabel(
   currentStage: ApplicationStage,
   nextStage: ApplicationStage,
 ): string {
-  if (currentStage === 'offer' && nextStage === 'accepted') return 'Mark accepted';
+  if (currentStage === 'offer' && nextStage === 'accepted') {
+    return 'Mark accepted';
+  }
   return `${STAGE_LABELS[nextStage]} →`;
 }
 
@@ -332,6 +337,8 @@ export function ApplicationsWorkspace({
   const actionableCount = applications.filter((application) =>
     applicationNeedsAction(application, todayKey),
   ).length;
+  const opportunityLabel =
+    activeCount === 1 ? 'opportunity' : 'opportunities';
   const visibleApplications = focusApplications(applications, {
     query,
     view: applicationView,
@@ -375,7 +382,8 @@ export function ApplicationsWorkspace({
               {editingId === null ? 'Add job' : 'Edit job'}
             </h3>
             <p className="m-0 text-xs text-app-subtle">
-              Keep the board focused; job details live here only while you add or edit an opportunity.
+              Keep the board focused; job details live here only while you add
+              or edit an opportunity.
             </p>
           </div>
           <FieldGrid>
@@ -491,8 +499,7 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {activeCount === 1 ? 'opportunity' : 'opportunities'} ·{' '}
-          {actionableCount} need action
+          {activeCount} active {opportunityLabel} · {actionableCount} need action
         </p>
       </div>
 
