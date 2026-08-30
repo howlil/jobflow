@@ -168,6 +168,7 @@ describe('ApplicationsWorkspace', () => {
         role: 'Backend Engineer',
         stage: 'applied',
         nextActionAt: '2000-01-01',
+        notes: 'Follow up with recruiter.',
         createdAt: '2026-08-30T00:00:00.000Z',
         updatedAt: '2026-08-30T03:00:00.000Z',
       },
@@ -205,10 +206,12 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByText('Backend Engineer')).not.toBeNull();
     expect(screen.getByText('Platform Engineer')).not.toBeNull();
     expect(screen.queryByText('Software Engineer')).toBeNull();
+    expect(screen.queryByText('Follow up with recruiter.')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
 
     expect(screen.getByText('Backend Engineer')).not.toBeNull();
+    expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
     expect(screen.queryByText('Platform Engineer')).toBeNull();
   });
 });
