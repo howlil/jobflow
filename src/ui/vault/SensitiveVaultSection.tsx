@@ -229,7 +229,10 @@ export function SensitiveVaultSection({
         </>
       ) : vaultStatus.unlocked ? (
         <>
-          <SensitiveProfileFields profile={profile} onChange={changeProfile} />
+          <SensitiveProfileFields
+            profile={profile}
+            onChange={changeProfile}
+          />
           <ActionRow>
             <Button variant="primary" onClick={() => void saveVault()}>
               <Save aria-hidden="true" size={16} />
@@ -343,7 +346,9 @@ function SensitiveProfileFields({
         value={expectedAmount(profile)}
         onChange={(event) =>
           onChange((draft) => {
-            draft.compensation.expected.amount = numberOrNull(event.target.value);
+            draft.compensation.expected.amount = numberOrNull(
+              event.target.value,
+            );
           })
         }
       />
