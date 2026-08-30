@@ -80,7 +80,10 @@ export function ProjectsSection({
                 title={`Remove project ${index + 1}`}
                 onClick={() =>
                   changeProfile((draft) =>
-                    draft.baseProfile.professional.projects.splice(index, 1),
+                    draft.baseProfile.professional.projects.splice(
+                      index,
+                      1,
+                    ),
                   )
                 }
               >
@@ -188,7 +191,8 @@ export function ProjectsSection({
                       if (item === undefined) return;
                       item.skills = (item.skills ?? []).filter(
                         (value) =>
-                          value.trim().toLowerCase() !== skillName.toLowerCase(),
+                          value.trim().toLowerCase() !==
+                          skillName.toLowerCase(),
                       );
                     })
                   }
