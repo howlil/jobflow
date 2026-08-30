@@ -245,7 +245,8 @@ export function AssistantPipelineView({
         <p className="jobflow-panel__section-label">Pipeline</p>
         <h2>Review job details</h2>
         <p className="jobflow-panel__helper">
-          Confirm the company and role before saving this local application.
+          Confirm the job details and optionally set the next follow-up before
+          saving this local application.
         </p>
       </div>
       <div className="jobflow-panel__form">
@@ -300,6 +301,31 @@ export function AssistantPipelineView({
               </option>
             ))}
           </select>
+        </label>
+        <label>
+          Next action
+          <input
+            type="date"
+            value={draft.nextActionAt ?? ''}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                nextActionAt: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label>
+          Notes
+          <textarea
+            value={draft.notes ?? ''}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                notes: event.target.value,
+              }))
+            }
+          />
         </label>
       </div>
       {status !== null ? (
