@@ -23,7 +23,7 @@ async function createApplication(workspace, application) {
   await workspace.getByLabel(/^Company$/).fill(application.company);
   await workspace.getByLabel(/^Role$/).fill(application.role);
   await workspace.getByLabel(/^Job URL$/).fill(application.jobUrl);
-  await workspace.getByLabel(/^Stage$/).selectOption(application.stage);
+  await workspace.locator('select').selectOption(application.stage);
   await workspace.getByLabel(/^Source$/).fill(application.source);
   await workspace.getByLabel(/^Next action$/).fill(application.nextActionAt);
   await workspace.getByLabel(/^Notes$/).fill(application.notes);
