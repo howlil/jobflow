@@ -13,10 +13,7 @@ export function CareerRecordsSection({
   return (
     <>
       <LanguagesSection changeProfile={changeProfile} profile={profile} />
-      <CertificationsSection
-        changeProfile={changeProfile}
-        profile={profile}
-      />
+      <CertificationsSection changeProfile={changeProfile} profile={profile} />
       <ProjectsSection changeProfile={changeProfile} profile={profile} />
     </>
   );
