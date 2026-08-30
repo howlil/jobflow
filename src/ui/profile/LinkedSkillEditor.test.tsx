@@ -23,9 +23,7 @@ describe('LinkedSkillEditor', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
 
     expect(onAdd).toHaveBeenCalledWith('TypeScript');
-    expect(
-      screen.queryByRole('textbox', { name: 'Skill level' }),
-    ).toBeNull();
+    expect(screen.queryByRole('textbox', { name: 'Skill level' })).toBeNull();
   });
 
   it('does not add a case-insensitive duplicate already linked to the record', () => {
