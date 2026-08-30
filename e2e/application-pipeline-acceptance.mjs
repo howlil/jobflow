@@ -19,24 +19,16 @@ async function getExtensionId(context) {
 }
 
 async function createApplication(workspace, application) {
-  await workspace
-    .getByLabel('Company', { exact: true })
-    .fill(application.company);
-  await workspace.getByLabel('Role', { exact: true }).fill(application.role);
-  await workspace
-    .getByLabel('Job URL', { exact: true })
-    .fill(application.jobUrl);
-  await workspace.getByRole('combobox').first().selectOption(application.stage);
-  await workspace
-    .getByLabel('Source', { exact: true })
-    .fill(application.source);
-  await workspace
-    .getByLabel('Next action', { exact: true })
-    .fill(application.nextActionAt);
-  await workspace.getByLabel('Notes', { exact: true }).fill(application.notes);
-  await workspace
-    .getByRole('button', { name: 'Create application' })
-    .click();
+  const stage = workspace.getByRole('combobox').first();
+
+  await workspace.getByLabel(/^Company$/).fill(application.company);
+  await workspace.getByLabel(/^Role$/).fill(application.role);
+  await workspace.getByLabel(/^Job URL$/).fill(application.jobUrl);
+  await stage.selectOption(application.stage);
+  await workspace.getByLabel(/^Source$/).fill(application.source);
+  await workspace.getByLabel(/^Next action$/).fill(application.nextActionAt);
+  await workspace.getByLabel(/^Notes$/).fill(application.notes);
+  await workspace.getByRole('button', { name: 'Create application' }).click();
   await expect(workspace.getByRole('status')).toHaveText('Application saved.');
 }
 
@@ -86,7 +78,7 @@ try {
     workspace.getByText('1 application needs attention.'),
   ).toBeVisible();
 
-  const search = workspace.getByLabel('Search applications', { exact: true });
+  const search = workspace.getByLabel(/^Search applications$/);
   await search.fill('gojek');
   await expect(workspace.getByText('Backend Engineer')).toBeVisible();
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
