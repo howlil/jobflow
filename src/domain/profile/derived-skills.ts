@@ -7,7 +7,9 @@ export function normalizeSkillName(value: string): string {
 export function deriveActiveSkillNames(baseProfile: BaseProfile): string[] {
   const displayByKey = new Map<string, string>();
   const values = [
-    ...baseProfile.professional.experiences.flatMap((item) => item.skills ?? []),
+    ...baseProfile.professional.experiences.flatMap(
+      (item) => item.skills ?? [],
+    ),
     ...baseProfile.professional.projects.flatMap((item) => item.skills),
   ];
 
