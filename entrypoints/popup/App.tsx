@@ -9,7 +9,7 @@ import {
 } from '../../src/application/forms/page-messages';
 import { OPEN_WORKSPACE } from '../../src/application/workspace/workspace-messages';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
-import { PopupPage } from '../../src/ui/popup/PopupPage';
+import { PopupPage } from '../../src/components/popup/PopupPage';
 
 const repository = new ChromeProfileRepository();
 

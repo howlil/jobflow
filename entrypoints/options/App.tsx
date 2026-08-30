@@ -8,21 +8,21 @@ import { ChromeCorrectionRepository } from '../../src/infrastructure/storage/chr
 import { ChromeApplicationRepository } from '../../src/infrastructure/storage/chrome-application-repository';
 import { ChromeProfileRepository } from '../../src/infrastructure/storage/chrome-profile-repository';
 import { IndexedDbDocumentRepository } from '../../src/infrastructure/storage/indexeddb-document-repository';
-import { CorrectionMemorySection } from '../../src/ui/corrections/CorrectionMemorySection';
-import { ApplicationsWorkspace } from '../../src/ui/applications/ApplicationsWorkspace';
-import { WorkspaceFrame } from '../../src/ui/design-system/WorkspaceFrame';
-import { BackupRecoveryInspector } from '../../src/ui/profile/BackupRecoveryInspector';
-import { CvImportSection } from '../../src/ui/profile/CvImportSection';
+import { CorrectionMemorySection } from '../../src/components/corrections/CorrectionMemorySection';
+import { ApplicationsWorkspace } from '../../src/components/applications/ApplicationsWorkspace';
+import { WorkspaceFrame } from '../../src/components/layout';
+import { BackupRecoveryInspector } from '../../src/components/profile/BackupRecoveryInspector';
+import { CvImportSection } from '../../src/components/profile/CvImportSection';
 import {
   ProfilePage,
   type ProfileSaveState,
   type ProfileSaveStatus,
-} from '../../src/ui/profile/ProfilePage';
-import { WorkspaceNavigation } from '../../src/ui/profile/WorkspaceNavigation';
+} from '../../src/components/profile/ProfilePage';
+import { WorkspaceNavigation } from '../../src/components/profile/WorkspaceNavigation';
 import {
   WORKSPACE_SECTION_TITLES,
   type WorkspaceSection,
-} from '../../src/ui/profile/workspace-sections';
+} from '../../src/components/profile/workspace-sections';
 
 const profileRepository = new ChromeProfileRepository();
 const applicationRepository = new ChromeApplicationRepository();
@@ -84,7 +84,7 @@ export default function App() {
       title={WORKSPACE_SECTION_TITLES[activeSection]}
       meta={workspaceMeta}
     >
-      <div className="grid gap-8">
+      <div className="grid gap-5">
         {activeSection === 'documents' ? (
           <CvImportSection
             workflow={cvImportWorkflow}

@@ -42,7 +42,7 @@ Prefer semantic ownership over selector reuse. Do not reuse a class named for an
 
 ## Primitive boundary
 
-Shared workspace/popup primitives live in `src/ui/design-system/primitives.tsx`.
+Shared workspace/popup primitives live in `src/components/ui/*`. Reusable shell and section layout lives in `src/components/layout/*`.
 
 Prefer shared primitives for repeated concepts such as:
 
