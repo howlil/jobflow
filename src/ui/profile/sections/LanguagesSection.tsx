@@ -6,9 +6,9 @@ import {
   IconButton,
   RecordCard,
   RecordHeader,
-  Subsection,
   TextField,
 } from '../../design-system/primitives';
+import { WorkspaceSubsection } from '../../design-system/WorkspaceSectionCard';
 import { createProfileItemId } from './profile-section-helpers';
 import type { ProfileSectionProps } from './profile-section-types';
 
@@ -22,8 +22,9 @@ export function LanguagesSection({
   profile,
 }: LanguagesSectionProps) {
   return (
-    <Subsection
+    <WorkspaceSubsection
       title="Languages"
+      help="Add languages and proficiency information that Job Flow can use when application forms ask for it."
       action={
         <IconButton
           size="sm"
@@ -99,6 +100,6 @@ export function LanguagesSection({
           ))}
         </div>
       )}
-    </Subsection>
+    </WorkspaceSubsection>
   );
 }
