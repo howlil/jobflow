@@ -93,7 +93,7 @@ export default function App() {
         ) : null}
 
         {activeSection === 'applications' ? (
-          <div className="w-full" id="applications">
+          <div className="w-full">
             <ApplicationsWorkspace service={applicationService} />
           </div>
         ) : null}
