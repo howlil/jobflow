@@ -23,7 +23,7 @@
     "verify:compatibility": "node scripts/verify-compatibility-evidence.mjs",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "format:check": "prettier --write . && git diff --exit-code"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "lucide-react": "1.34.0",
