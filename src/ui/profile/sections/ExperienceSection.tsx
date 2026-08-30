@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 
 import {
-  Button,
   CheckboxField,
   Chip,
   EmptyState,
