@@ -53,6 +53,44 @@ describe('createApplicationService', () => {
     expect(repository.saved).toHaveBeenCalledTimes(1);
   });
 
+  it('clears explicitly emptied optional fields and keeps them cleared after reload', async () => {
+    const service = createApplicationService(memoryRepository());
+    const application = await service.create({
+      company: 'Acme',
+      role: 'Engineer',
+      jobUrl: 'https://jobs.example/acme',
+      stage: 'applied',
+      notes: 'Follow up with recruiter.',
+      source: 'LinkedIn',
+      contactName: 'Maya',
+      contactEmail: 'maya@example.com',
+      nextActionAt: '2026-09-01',
+    });
+
+    const updated = await service.update(application.id, {
+      jobUrl: '',
+      notes: '',
+      source: '',
+      contactName: '',
+      contactEmail: '',
+      nextActionAt: '',
+    });
+
+    for (const field of [
+      'jobUrl',
+      'notes',
+      'source',
+      'contactName',
+      'contactEmail',
+      'nextActionAt',
+    ] as const) {
+      expect(updated).not.toHaveProperty(field);
+    }
+
+    const [reloaded] = await service.list();
+    expect(reloaded).toEqual(updated);
+  });
+
   it('rejects empty required fields and invalid URLs', async () => {
     const service = createApplicationService(memoryRepository());
 
