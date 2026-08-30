@@ -51,7 +51,9 @@ describe('SensitiveVaultSection', () => {
     render(<SensitiveVaultSection vaultClient={createVaultClient()} />);
 
     expect(await screen.findByText('Sensitive vault')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'About Sensitive vault' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Sensitive vault' }),
+    );
     expect(
       screen.getByText(/add salary, identity, and other private answers/i),
     ).toBeTruthy();
