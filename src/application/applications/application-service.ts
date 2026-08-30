@@ -13,6 +13,11 @@ export type ApplicationDraft = {
   role: string;
   jobUrl?: string;
   stage: ApplicationStage;
+  notes?: string;
+  source?: string;
+  contactName?: string;
+  contactEmail?: string;
+  nextActionAt?: string;
 };
 
 export type PageApplicationCapture = {
@@ -39,6 +44,20 @@ function maybeUrl(value: string): string | undefined {
   if (trimmed === '') return undefined;
   if (!JobApplicationSchema.shape.jobUrl.safeParse(trimmed).success) {
     throw new Error('Invalid job URL.');
+  }
+  return trimmed;
+}
+
+function optionalText(value: string | undefined): string | undefined {
+  const trimmed = normalizeText(value ?? '');
+  return trimmed === '' ? undefined : trimmed;
+}
+
+function optionalEmail(value: string | undefined): string | undefined {
+  const trimmed = normalizeText(value ?? '');
+  if (trimmed === '') return undefined;
+  if (!JobApplicationSchema.shape.contactEmail.safeParse(trimmed).success) {
+    throw new Error('Invalid contact email.');
   }
   return trimmed;
 }
@@ -90,12 +109,22 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
   const company = normalizeText(draft.company);
   const role = normalizeText(draft.role);
   const jobUrl = maybeUrl(draft.jobUrl ?? '');
+  const notes = optionalText(draft.notes);
+  const source = optionalText(draft.source);
+  const contactName = optionalText(draft.contactName);
+  const contactEmail = optionalEmail(draft.contactEmail);
+  const nextActionAt = optionalText(draft.nextActionAt);
   const candidate = {
     id: 'draft',
     company,
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(notes === undefined ? {} : { notes }),
+    ...(source === undefined ? {} : { source }),
+    ...(contactName === undefined ? {} : { contactName }),
+    ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextActionAt === undefined ? {} : { nextActionAt }),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -105,6 +134,11 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(notes === undefined ? {} : { notes }),
+    ...(source === undefined ? {} : { source }),
+    ...(contactName === undefined ? {} : { contactName }),
+    ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextActionAt === undefined ? {} : { nextActionAt }),
   };
 }
 
@@ -121,6 +155,31 @@ function draftFromChanges(
     draft.jobUrl = changes.jobUrl;
   } else if (current.jobUrl !== undefined) {
     draft.jobUrl = current.jobUrl;
+  }
+  if (changes.notes !== undefined) {
+    draft.notes = changes.notes;
+  } else if (current.notes !== undefined) {
+    draft.notes = current.notes;
+  }
+  if (changes.source !== undefined) {
+    draft.source = changes.source;
+  } else if (current.source !== undefined) {
+    draft.source = current.source;
+  }
+  if (changes.contactName !== undefined) {
+    draft.contactName = changes.contactName;
+  } else if (current.contactName !== undefined) {
+    draft.contactName = current.contactName;
+  }
+  if (changes.contactEmail !== undefined) {
+    draft.contactEmail = changes.contactEmail;
+  } else if (current.contactEmail !== undefined) {
+    draft.contactEmail = current.contactEmail;
+  }
+  if (changes.nextActionAt !== undefined) {
+    draft.nextActionAt = changes.nextActionAt;
+  } else if (current.nextActionAt !== undefined) {
+    draft.nextActionAt = current.nextActionAt;
   }
   return draft;
 }

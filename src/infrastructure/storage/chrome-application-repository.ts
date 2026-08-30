@@ -15,7 +15,11 @@ export class ChromeApplicationRepository implements ApplicationRepository {
       return null;
     }
 
-    return parseStoredApplicationCollection(rawApplications);
+    const collection = parseStoredApplicationCollection(rawApplications);
+    if (readSchemaVersion(rawApplications) !== collection.schemaVersion) {
+      await this.save(collection);
+    }
+    return collection;
   }
 
   async save(collection: StoredApplicationCollection): Promise<void> {
@@ -25,4 +29,9 @@ export class ChromeApplicationRepository implements ApplicationRepository {
       [APPLICATION_STORAGE_KEY]: validatedCollection,
     });
   }
+}
+
+function readSchemaVersion(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  return Reflect.get(raw, 'schemaVersion');
 }

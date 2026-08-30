@@ -38,7 +38,7 @@ The codebase currently includes:
 - encrypted local Sensitive Data Vault
 - deterministic context/variant recommendation
 - local document metadata/storage, CV text extraction with review-before-import, and explicit attachment flow
-- local job application pipeline with create/read/update/delete, user-reviewed current-page capture, and explicit stage changes
+- local job application pipeline with create/read/update/delete, user-reviewed current-page capture, lightweight opportunity details, next-action tracking, and explicit stage changes
 - local backup/recovery and compatibility evidence
 - options workspace, popup, and in-page assistant surfaces
 

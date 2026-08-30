@@ -31,6 +31,11 @@ describe('createApplicationService', () => {
       role: ' Senior Backend Engineer ',
       jobUrl: 'https://jobs.example/acme-backend',
       stage: 'saved',
+      notes: ' Follow up with recruiter ',
+      source: ' LinkedIn ',
+      contactName: ' Maya ',
+      contactEmail: ' maya@example.com ',
+      nextActionAt: '2026-09-01',
     });
 
     expect(application).toMatchObject({
@@ -38,6 +43,11 @@ describe('createApplicationService', () => {
       role: 'Senior Backend Engineer',
       jobUrl: 'https://jobs.example/acme-backend',
       stage: 'saved',
+      notes: 'Follow up with recruiter',
+      source: 'LinkedIn',
+      contactName: 'Maya',
+      contactEmail: 'maya@example.com',
+      nextActionAt: '2026-09-01',
     });
     await expect(service.list()).resolves.toEqual([application]);
     expect(repository.saved).toHaveBeenCalledTimes(1);
@@ -61,19 +71,31 @@ describe('createApplicationService', () => {
         stage: 'saved',
       }),
     ).rejects.toThrow();
+    await expect(
+      service.create({
+        company: 'Acme',
+        role: 'Engineer',
+        stage: 'saved',
+        contactEmail: 'not-email',
+      }),
+    ).rejects.toThrow();
   });
 
-  it('changes stages without enforcing a strict state machine', async () => {
+  it('changes stages without enforcing a strict state machine or dropping details', async () => {
     const service = createApplicationService(memoryRepository());
     const application = await service.create({
       company: 'Acme',
       role: 'Engineer',
       stage: 'applied',
+      notes: 'Keep recruiter context.',
+      nextActionAt: '2026-09-01',
     });
 
     const next = await service.changeStage(application.id, 'offer');
 
     expect(next.stage).toBe('offer');
+    expect(next.notes).toBe('Keep recruiter context.');
+    expect(next.nextActionAt).toBe('2026-09-01');
   });
 
   it('derives a conservative review draft from page capture signals', () => {

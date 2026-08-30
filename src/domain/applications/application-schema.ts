@@ -22,6 +22,11 @@ export const JobApplicationSchema = z
     role: z.string().trim().min(1),
     jobUrl: z.string().trim().url().optional(),
     stage: ApplicationStageSchema,
+    notes: z.string().trim().optional(),
+    source: z.string().trim().optional(),
+    contactName: z.string().trim().optional(),
+    contactEmail: z.string().trim().email().optional(),
+    nextActionAt: z.string().trim().optional(),
     createdAt: z.string(),
     updatedAt: z.string(),
   })
@@ -29,7 +34,7 @@ export const JobApplicationSchema = z
 
 export const StoredApplicationCollectionSchema = z
   .object({
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
     applications: z.array(JobApplicationSchema),
     metadata: z
       .object({

@@ -23,6 +23,7 @@ import {
   SelectField,
   StatusMessage,
   TextField,
+  TextareaField,
 } from '../design-system/primitives';
 
 const STAGE_LABELS: Record<ApplicationStage, string> = {
@@ -41,6 +42,11 @@ const EMPTY_DRAFT: ApplicationDraft = {
   role: '',
   jobUrl: '',
   stage: 'saved',
+  notes: '',
+  source: '',
+  contactName: '',
+  contactEmail: '',
+  nextActionAt: '',
 };
 
 function displayDate(value: string): string {
@@ -59,7 +65,27 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
     role: application.role,
     jobUrl: application.jobUrl ?? '',
     stage: application.stage,
+    notes: application.notes ?? '',
+    source: application.source ?? '',
+    contactName: application.contactName ?? '',
+    contactEmail: application.contactEmail ?? '',
+    nextActionAt: application.nextActionAt ?? '',
   };
+}
+
+function nextActionStatus(application: JobApplication): string | null {
+  if (application.nextActionAt === undefined) return null;
+  const today = new Date();
+  const todayKey = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('-');
+  const actionKey = application.nextActionAt.slice(0, 10);
+
+  if (actionKey < todayKey) return `Overdue ${application.nextActionAt}`;
+  if (actionKey === todayKey) return 'Due today';
+  return `Next ${application.nextActionAt}`;
 }
 
 export function ApplicationsWorkspace({
@@ -208,7 +234,40 @@ export function ApplicationsWorkspace({
               </option>
             ))}
           </SelectField>
+          <TextField
+            label="Source"
+            value={draft.source ?? ''}
+            onChange={(event) => updateDraft({ source: event.target.value })}
+          />
+          <TextField
+            label="Contact name"
+            value={draft.contactName ?? ''}
+            onChange={(event) =>
+              updateDraft({ contactName: event.target.value })
+            }
+          />
+          <TextField
+            label="Contact email"
+            type="email"
+            value={draft.contactEmail ?? ''}
+            onChange={(event) =>
+              updateDraft({ contactEmail: event.target.value })
+            }
+          />
+          <TextField
+            label="Next action"
+            type="date"
+            value={draft.nextActionAt ?? ''}
+            onChange={(event) =>
+              updateDraft({ nextActionAt: event.target.value })
+            }
+          />
         </FieldGrid>
+        <TextareaField
+          label="Notes"
+          value={draft.notes ?? ''}
+          onChange={(event) => updateDraft({ notes: event.target.value })}
+        />
         <ActionRow>
           <Button variant="primary" onClick={() => void submitDraft()}>
             <Plus aria-hidden="true" size={15} />
@@ -243,69 +302,90 @@ export function ApplicationsWorkspace({
                   </EmptyState>
                 ) : (
                   <div className="grid gap-3">
-                    {items.map((application) => (
-                      <RecordCard
-                        key={application.id}
-                        action={
-                          <div className="flex gap-1">
-                            <IconButton
-                              aria-label={`Edit ${application.company} ${application.role}`}
-                              size="xs"
-                              onClick={() => {
-                                setEditingId(application.id);
-                                setDraft(draftFromApplication(application));
-                                setStatus(null);
-                                setError(null);
-                              }}
-                            >
-                              <Pencil aria-hidden="true" size={14} />
-                            </IconButton>
-                            <IconButton
-                              aria-label={`Delete ${application.company} ${application.role}`}
-                              size="xs"
-                              tone="danger"
-                              onClick={() =>
-                                void deleteApplication(application.id)
-                              }
-                            >
-                              <Trash2 aria-hidden="true" size={14} />
-                            </IconButton>
-                          </div>
-                        }
-                      >
-                        <RecordHeader
-                          title={application.role}
-                          context={application.company}
-                          meta={`Updated ${displayDate(application.updatedAt)}`}
-                        />
-                        {application.jobUrl !== undefined ? (
-                          <a
-                            className="w-max text-xs font-medium text-app-ink underline underline-offset-4"
-                            href={application.jobUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Open job
-                          </a>
-                        ) : null}
-                        <SelectField
-                          label="Move stage"
-                          value={application.stage}
-                          onChange={(event) =>
-                            void changeStage(
-                              application.id,
-                              event.target.value as ApplicationStage,
-                            )
+                    {items.map((application) => {
+                      const dueStatus = nextActionStatus(application);
+                      return (
+                        <RecordCard
+                          key={application.id}
+                          action={
+                            <div className="flex gap-1">
+                              <IconButton
+                                aria-label={`Edit ${application.company} ${application.role}`}
+                                size="xs"
+                                onClick={() => {
+                                  setEditingId(application.id);
+                                  setDraft(draftFromApplication(application));
+                                  setStatus(null);
+                                  setError(null);
+                                }}
+                              >
+                                <Pencil aria-hidden="true" size={14} />
+                              </IconButton>
+                              <IconButton
+                                aria-label={`Delete ${application.company} ${application.role}`}
+                                size="xs"
+                                tone="danger"
+                                onClick={() =>
+                                  void deleteApplication(application.id)
+                                }
+                              >
+                                <Trash2 aria-hidden="true" size={14} />
+                              </IconButton>
+                            </div>
                           }
                         >
-                          {APPLICATION_STAGES.map((nextStage) => (
-                            <option value={nextStage} key={nextStage}>
-                              {STAGE_LABELS[nextStage]}
-                            </option>
-                          ))}
-                        </SelectField>
-                      </RecordCard>
-                    ))}
+                          <RecordHeader
+                            title={application.role}
+                            context={application.company}
+                            meta={`Updated ${displayDate(application.updatedAt)}`}
+                          />
+                          {application.jobUrl !== undefined ? (
+                            <a
+                              className="w-max text-xs font-medium text-app-ink underline underline-offset-4"
+                              href={application.jobUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Open job
+                            </a>
+                          ) : null}
+                          <div className="flex flex-wrap gap-2 text-[11px] font-medium text-app-subtle">
+                            {dueStatus !== null ? (
+                              <span className="rounded-control border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">
+                                {dueStatus}
+                              </span>
+                            ) : null}
+                            {application.source !== undefined ? (
+                              <span>Source: {application.source}</span>
+                            ) : null}
+                            {application.contactName !== undefined ? (
+                              <span>Contact: {application.contactName}</span>
+                            ) : null}
+                          </div>
+                          {application.notes !== undefined ? (
+                            <p className="m-0 text-xs leading-5 text-app-text">
+                              {application.notes}
+                            </p>
+                          ) : null}
+                          <SelectField
+                            label="Move stage"
+                            value={application.stage}
+                            onChange={(event) =>
+                              void changeStage(
+                                application.id,
+                                event.target.value as ApplicationStage,
+                              )
+                            }
+                          >
+                            {APPLICATION_STAGES.map((nextStage) => (
+                              <option value={nextStage} key={nextStage}>
+                                {STAGE_LABELS[nextStage]}
+                              </option>
+                            ))}
+                          </SelectField>
+                        </RecordCard>
+                      );
+                    })}
                   </div>
                 )}
               </section>
