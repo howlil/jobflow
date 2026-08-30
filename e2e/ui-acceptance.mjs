@@ -149,7 +149,7 @@ try {
   await page.getByRole('button', { name: 'Add experience' }).click();
   await expect(page.getByLabel('Start date')).toHaveAttribute('type', 'month');
   await expect(page.getByLabel('End date')).toHaveAttribute('type', 'month');
-  await expect(page.getByRole('textbox', { name: 'Skills' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Skills' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Skill level' })).toHaveCount(
     0,
   );
