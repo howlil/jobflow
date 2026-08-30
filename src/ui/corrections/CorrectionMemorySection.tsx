@@ -12,10 +12,12 @@ import {
   IconButton,
   RecordCard,
   RecordHeader,
-  Section,
-  SectionHeader,
   StatusMessage,
 } from '../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../design-system/WorkspaceSectionCard';
 
 type CorrectionMemorySectionProps = {
   repository: CorrectionRepository;
@@ -95,8 +97,8 @@ export function CorrectionMemorySection({
   }
 
   return (
-    <Section aria-labelledby="correction-memory-title">
-      <SectionHeader
+    <WorkspaceSection aria-labelledby="correction-memory-title">
+      <WorkspaceSectionHeader
         eyebrow="Autofill memory"
         title={<span id="correction-memory-title">Learned field mappings</span>}
         description="Job Flow stores exact site/form/field corrections locally. Review stale mappings or remove anything that no longer matches the site."
@@ -199,6 +201,6 @@ export function CorrectionMemorySection({
           </div>
         )
       ) : null}
-    </Section>
+    </WorkspaceSection>
   );
 }
