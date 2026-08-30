@@ -9,11 +9,13 @@ import {
   Button,
   Chip,
   FieldGrid,
-  Section,
-  SectionHeader,
   StatusMessage,
   TextField,
 } from '../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../design-system/WorkspaceSectionCard';
 
 export type VaultClient = {
   status(): Promise<VaultResponse>;
@@ -54,6 +56,15 @@ function expectedAmount(profile: SensitiveProfile): string {
 function numberOrNull(value: string): number | null {
   const trimmed = value.trim();
   return trimmed.length === 0 ? null : Number(trimmed);
+}
+
+function nativeDateValue(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed === '') return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  const slashDate = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(trimmed);
+  if (slashDate === null) return '';
+  return `${slashDate[3]}-${slashDate[2]}-${slashDate[1]}`;
 }
 
 export function SensitiveVaultSection({
@@ -182,8 +193,8 @@ export function SensitiveVaultSection({
   const passphraseMismatch = error === 'Passphrases do not match.';
 
   return (
-    <Section id="sensitive-vault">
-      <SectionHeader
+    <WorkspaceSection id="sensitive-vault">
+      <WorkspaceSectionHeader
         title="Sensitive vault"
         description="Add salary, identity, and other private answers here only when a job form asks for them. Job Flow still asks before using them on a site."
         action={
@@ -267,7 +278,7 @@ export function SensitiveVaultSection({
           </Button>
         </>
       )}
-    </Section>
+    </WorkspaceSection>
   );
 }
 
@@ -281,11 +292,9 @@ function SensitiveProfileFields({
   return (
     <FieldGrid>
       <TextField
-        inputMode="numeric"
-        pattern="\d{2}/\d{2}/\d{4}"
-        placeholder="DD/MM/YYYY"
+        type="date"
         label="Birth date"
-        value={profile.personal.birthDate}
+        value={nativeDateValue(profile.personal.birthDate)}
         onChange={(event) =>
           onChange((draft) => {
             draft.personal.birthDate = event.target.value;
