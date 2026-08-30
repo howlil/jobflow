@@ -1,9 +1,8 @@
+import { FieldGrid, TextField } from '../../design-system/primitives';
 import {
-  FieldGrid,
-  Section,
-  SectionHeader,
-  TextField,
-} from '../../design-system/primitives';
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
 import {
   dateInputProps,
   listValue,
@@ -17,8 +16,8 @@ export function PreferencesSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <Section hidden={activeSection !== 'preferences'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'preferences'}>
+      <WorkspaceSectionHeader
         title="Job preferences"
         description="Keep application targeting preferences separate from your factual career profile."
       />
@@ -92,6 +91,6 @@ export function PreferencesSection({
           }
         />
       </FieldGrid>
-    </Section>
+    </WorkspaceSection>
   );
 }
