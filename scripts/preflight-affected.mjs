@@ -190,5 +190,5 @@ if (e2e.length > 0) {
   for (const file of e2e) run(execPath, [file]);
 }
 
-run('git', ['diff', '--check']);
+run('git', ['diff', '--check', mergeBase]);
 write('\npreflight:affected: green');
