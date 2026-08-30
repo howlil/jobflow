@@ -1,9 +1,11 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button,
   EmptyState,
   FieldGrid,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Section,
   SectionHeader,
   SelectField,
@@ -27,7 +29,10 @@ export function VariantsSection({
         title="Application variants"
         description="Keep factual data in the base profile; variants store only role-specific overrides and preferred documents."
         action={
-          <Button
+          <IconButton
+            size="sm"
+            aria-label="Add variant"
+            title="Add variant"
             onClick={() =>
               changeProfile((draft) => {
                 const id = createProfileItemId();
@@ -37,8 +42,7 @@ export function VariantsSection({
             }
           >
             <Plus aria-hidden="true" size={16} />
-            Add variant
-          </Button>
+          </IconButton>
         }
       />
 
@@ -65,12 +69,42 @@ export function VariantsSection({
       {profile.variants.length === 0 ? (
         <EmptyState>No application variants added yet.</EmptyState>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {profile.variants.map((variant, index) => (
-            <article
-              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+            <RecordCard
               key={variant.id}
+              action={
+                <IconButton
+                  size="xs"
+                  tone="danger"
+                  aria-label={`Remove variant ${index + 1}`}
+                  title={`Remove variant ${index + 1}`}
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      const removed = draft.variants[index];
+                      draft.variants.splice(index, 1);
+                      if (
+                        removed !== undefined &&
+                        draft.preferences.defaultVariantId === removed.id
+                      ) {
+                        draft.preferences.defaultVariantId =
+                          draft.variants[0]?.id ?? null;
+                      }
+                    })
+                  }
+                >
+                  <Trash2 aria-hidden="true" size={14} />
+                </IconButton>
+              }
             >
+              <RecordHeader
+                title={variant.name || `Variant ${index + 1}`}
+                context={
+                  variant.targetRoles.length > 0
+                    ? variant.targetRoles.join(' · ')
+                    : 'Application profile override'
+                }
+              />
               <FieldGrid>
                 <TextField
                   label="Variant name"
@@ -123,27 +157,7 @@ export function VariantsSection({
                   ))}
                 </SelectField>
               </FieldGrid>
-              <Button
-                className="justify-self-start"
-                variant="danger"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    const removed = draft.variants[index];
-                    draft.variants.splice(index, 1);
-                    if (
-                      removed !== undefined &&
-                      draft.preferences.defaultVariantId === removed.id
-                    ) {
-                      draft.preferences.defaultVariantId =
-                        draft.variants[0]?.id ?? null;
-                    }
-                  })
-                }
-              >
-                <Trash2 aria-hidden="true" size={16} />
-                Remove variant {index + 1}
-              </Button>
-            </article>
+            </RecordCard>
           ))}
         </div>
       )}
