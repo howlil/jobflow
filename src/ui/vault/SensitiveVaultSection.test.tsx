@@ -51,6 +51,7 @@ describe('SensitiveVaultSection', () => {
     render(<SensitiveVaultSection vaultClient={createVaultClient()} />);
 
     expect(await screen.findByText('Sensitive vault')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'About Sensitive vault' }));
     expect(
       screen.getByText(/add salary, identity, and other private answers/i),
     ).toBeTruthy();
@@ -155,7 +156,7 @@ describe('SensitiveVaultSection', () => {
     await waitFor(() => expect(client.loadProfile).toHaveBeenCalledTimes(1));
     expect(
       (await screen.findByLabelText<HTMLInputElement>('Birth date')).value,
-    ).toBe('03/02/2001');
+    ).toBe('2001-02-03');
 
     fireEvent.change(screen.getByLabelText('Expected salary'), {
       target: { value: '20000000' },
