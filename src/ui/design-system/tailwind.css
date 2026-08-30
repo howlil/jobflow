@@ -213,10 +213,13 @@
   }
 
   .record-list {
-    @apply grid gap-3;
+    @apply grid gap-4;
   }
 
-  .record-card,
+  .record-card {
+    @apply relative grid gap-4 rounded-app border border-app-border bg-white p-4 shadow-sm;
+  }
+
   .workspace-card {
     @apply grid gap-4 rounded-app border border-app-border bg-app-muted p-4;
   }
@@ -247,10 +250,6 @@
 
   .description-preview-list li {
     @apply pl-1;
-  }
-
-  .record-card > .jobflow-button {
-    @apply justify-self-start;
   }
 
   .jobflow-empty-row {

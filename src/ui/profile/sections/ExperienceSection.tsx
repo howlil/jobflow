@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 import {
   CheckboxField,
-  Chip,
   EmptyState,
   FieldGrid,
   IconButton,
@@ -12,6 +10,7 @@ import {
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
+import { LinkedSkillEditor } from '../LinkedSkillEditor';
 import {
   addLinkedSkill,
   CollapsibleRecord,
@@ -29,155 +28,6 @@ function invalidMonth(value: string): boolean {
   return value.trim() !== '' && monthInputValue(value) === '';
 }
 
-function ExperienceSkillEditor({
-  experienceId,
-  experienceIndex,
-  linkedSkills,
-  changeProfile,
-  profile,
-}: {
-  experienceId: string;
-  experienceIndex: number;
-  linkedSkills: string[];
-  changeProfile: ProfileSectionProps['changeProfile'];
-  profile: ProfileSectionProps['profile'];
-}) {
-  const [skillName, setSkillName] = useState('');
-  const [skillLevel, setSkillLevel] = useState('');
-  const canonicalSkills = profile.baseProfile.professional.skills;
-  const datalistId = `experience-skill-options-${experienceId}`;
-
-  function addSkill() {
-    const normalizedName = skillName.trim();
-    const normalizedLevel = skillLevel.trim();
-    if (normalizedName === '') return;
-
-    changeProfile((draft) => {
-      const experience =
-        draft.baseProfile.professional.experiences[experienceIndex];
-      if (experience === undefined) return;
-
-      let canonicalSkill = draft.baseProfile.professional.skills.find(
-        (skill) =>
-          skill.name.trim().toLowerCase() === normalizedName.toLowerCase(),
-      );
-
-      if (canonicalSkill === undefined) {
-        canonicalSkill = {
-          id: createProfileItemId(),
-          name: normalizedName,
-          level: normalizedLevel,
-          yearsExperience: null,
-        };
-        draft.baseProfile.professional.skills.push(canonicalSkill);
-      } else if (normalizedLevel !== '') {
-        canonicalSkill.level = normalizedLevel;
-      }
-
-      experience.skills = addLinkedSkill(
-        experience.skills,
-        canonicalSkill.name,
-      );
-    });
-
-    setSkillName('');
-    setSkillLevel('');
-  }
-
-  return (
-    <div className="grid gap-3">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(140px,0.45fr)_auto] sm:items-end">
-        <TextField
-          label="Skill"
-          list={datalistId}
-          placeholder="Type or choose a skill"
-          value={skillName}
-          onChange={(event) => {
-            const nextName = event.target.value;
-            setSkillName(nextName);
-            const existing = canonicalSkills.find(
-              (skill) =>
-                skill.name.trim().toLowerCase() ===
-                nextName.trim().toLowerCase(),
-            );
-            setSkillLevel(existing?.level ?? '');
-          }}
-        />
-        <TextField
-          label="Skill level"
-          placeholder="e.g. Advanced"
-          value={skillLevel}
-          onChange={(event) => setSkillLevel(event.target.value)}
-        />
-        <IconButton
-          className="!h-10 !w-10 self-end"
-          aria-label={`Add skill to experience ${experienceIndex + 1}`}
-          title="Add skill"
-          disabled={skillName.trim() === ''}
-          onClick={addSkill}
-        >
-          <Plus aria-hidden="true" size={16} />
-        </IconButton>
-      </div>
-
-      <datalist id={datalistId}>
-        {canonicalSkills
-          .filter((skill) => skill.name.trim() !== '')
-          .map((skill) => (
-            <option value={skill.name} key={skill.id} />
-          ))}
-      </datalist>
-
-      {linkedSkills.length > 0 ? (
-        <div className="flex flex-wrap gap-2" aria-label="Linked skills">
-          {linkedSkills.map((skillNameValue) => {
-            const canonicalSkill = canonicalSkills.find(
-              (skill) =>
-                skill.name.trim().toLowerCase() ===
-                skillNameValue.trim().toLowerCase(),
-            );
-            const level = canonicalSkill?.level.trim() ?? '';
-
-            return (
-              <Chip strong className="pr-1" key={skillNameValue}>
-                <span>
-                  {skillNameValue}
-                  {level === '' ? '' : ` · ${level}`}
-                </span>
-                <button
-                  className="grid h-5 w-5 place-items-center rounded text-app-subtle transition hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink"
-                  type="button"
-                  aria-label={`Remove ${skillNameValue} from experience ${experienceIndex + 1}`}
-                  onClick={() =>
-                    changeProfile((draft) => {
-                      const experience =
-                        draft.baseProfile.professional.experiences[
-                          experienceIndex
-                        ];
-                      if (experience === undefined) return;
-                      experience.skills = (experience.skills ?? []).filter(
-                        (value) =>
-                          value.trim().toLowerCase() !==
-                          skillNameValue.trim().toLowerCase(),
-                      );
-                    })
-                  }
-                >
-                  <X aria-hidden="true" size={12} />
-                </button>
-              </Chip>
-            );
-          })}
-        </div>
-      ) : (
-        <p className="m-0 text-[11px] leading-4 text-app-subtle">
-          No skills linked to this experience yet.
-        </p>
-      )}
-    </div>
-  );
-}
-
 export function ExperienceSection({
   activeSection,
   changeProfile,
@@ -189,7 +39,7 @@ export function ExperienceSection({
         title="Experience"
         action={
           <IconButton
-            className="!h-9 !w-9"
+            size="sm"
             aria-label="Add experience"
             title="Add experience"
             onClick={() =>
@@ -231,7 +81,6 @@ export function ExperienceSection({
 
               return (
                 <CollapsibleRecord
-                  className="relative bg-white shadow-sm"
                   key={experience.id}
                   initialOpen={
                     experience.company.trim() === '' &&
@@ -259,7 +108,9 @@ export function ExperienceSection({
                   </summary>
 
                   <IconButton
-                    className="absolute right-3 top-3 z-10 !h-8 !w-8 border-transparent bg-transparent text-app-subtle hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                    className="absolute right-3 top-3 z-10"
+                    size="xs"
+                    tone="danger"
                     aria-label={`Remove experience ${index + 1}`}
                     title={`Remove experience ${index + 1}`}
                     onClick={() =>
@@ -380,12 +231,54 @@ export function ExperienceSection({
                       }
                     />
 
-                    <ExperienceSkillEditor
-                      experienceId={experience.id}
-                      experienceIndex={index}
+                    <LinkedSkillEditor
+                      editorId={experience.id}
+                      contextLabel={`experience ${index + 1}`}
                       linkedSkills={experience.skills ?? []}
-                      changeProfile={changeProfile}
-                      profile={profile}
+                      skills={profile.baseProfile.professional.skills}
+                      onAdd={(skillName, skillLevel) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.experiences[index];
+                          if (item === undefined) return;
+
+                          let canonicalSkill =
+                            draft.baseProfile.professional.skills.find(
+                              (skill) =>
+                                skill.name.trim().toLowerCase() ===
+                                skillName.toLowerCase(),
+                            );
+                          if (canonicalSkill === undefined) {
+                            canonicalSkill = {
+                              id: createProfileItemId(),
+                              name: skillName,
+                              level: skillLevel,
+                              yearsExperience: null,
+                            };
+                            draft.baseProfile.professional.skills.push(
+                              canonicalSkill,
+                            );
+                          } else if (skillLevel !== '') {
+                            canonicalSkill.level = skillLevel;
+                          }
+                          item.skills = addLinkedSkill(
+                            item.skills,
+                            canonicalSkill.name,
+                          );
+                        })
+                      }
+                      onRemove={(skillName) =>
+                        changeProfile((draft) => {
+                          const item =
+                            draft.baseProfile.professional.experiences[index];
+                          if (item === undefined) return;
+                          item.skills = (item.skills ?? []).filter(
+                            (value) =>
+                              value.trim().toLowerCase() !==
+                              skillName.toLowerCase(),
+                          );
+                        })
+                      }
                     />
                   </div>
                 </CollapsibleRecord>

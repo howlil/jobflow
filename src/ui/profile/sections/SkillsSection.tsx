@@ -1,9 +1,11 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button,
   EmptyState,
   FieldGrid,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Section,
   SectionHeader,
   TextField,
@@ -24,7 +26,10 @@ export function SkillsSection({
       <SectionHeader
         title="Skills"
         action={
-          <Button
+          <IconButton
+            size="sm"
+            aria-label="Add skill"
+            title="Add skill"
             onClick={() =>
               changeProfile((draft) => {
                 draft.baseProfile.professional.skills.push({
@@ -37,19 +42,41 @@ export function SkillsSection({
             }
           >
             <Plus aria-hidden="true" size={16} />
-            Add skill
-          </Button>
+          </IconButton>
         }
       />
       {profile.baseProfile.professional.skills.length === 0 ? (
         <EmptyState>No skills added yet.</EmptyState>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {profile.baseProfile.professional.skills.map((skill, index) => (
-            <article
-              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+            <RecordCard
               key={skill.id}
+              action={
+                <IconButton
+                  size="xs"
+                  tone="danger"
+                  aria-label={`Remove skill ${index + 1}`}
+                  title={`Remove skill ${index + 1}`}
+                  onClick={() =>
+                    changeProfile((draft) => {
+                      draft.baseProfile.professional.skills.splice(index, 1);
+                    })
+                  }
+                >
+                  <Trash2 aria-hidden="true" size={14} />
+                </IconButton>
+              }
             >
+              <RecordHeader
+                title={skill.name || `Skill ${index + 1}`}
+                context={skill.level || 'Skill details'}
+                meta={
+                  skill.yearsExperience === null
+                    ? undefined
+                    : `${skill.yearsExperience} years`
+                }
+              />
               <FieldGrid columns={3}>
                 <TextField
                   label="Skill"
@@ -86,19 +113,7 @@ export function SkillsSection({
                   }
                 />
               </FieldGrid>
-              <Button
-                className="justify-self-start"
-                variant="danger"
-                onClick={() =>
-                  changeProfile((draft) => {
-                    draft.baseProfile.professional.skills.splice(index, 1);
-                  })
-                }
-              >
-                <Trash2 aria-hidden="true" size={16} />
-                Remove skill {index + 1}
-              </Button>
-            </article>
+            </RecordCard>
           ))}
         </div>
       )}

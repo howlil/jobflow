@@ -19,9 +19,12 @@ None. Current work remains inside the existing Job Flow product contract.
 - profile workspace streamlining and autosave are integrated
 - the options surface uses one reusable dashboard shell with sidebar, topbar, and main content
 - workspace navigation is visually grouped into profile, application, and privacy/data areas without changing section routing
-- profile content uses editorial section separators while record objects and operational tools retain explicit boundaries
+- profile content uses editorial section separators while repeatable editable records use one white bordered record surface with a very subtle shadow
+- repeatable record CRUD actions use one compact icon-button size/tone contract; section add actions and item remove actions no longer invent local button shapes
+- experience and project skill references share one linked-skill editor and continue to reference canonical skill ownership
+- the Sensitive Vault uses the same React control, section, status, and action primitives as the rest of the workspace
 - profile autosave status is surfaced in the workspace topbar instead of a separate content strip
-- options/profile layout composition uses Tailwind utilities in React; `tailwind.css` is limited to base rules and stable repeated primitives/form grammar
+- options/profile layout composition uses Tailwind utilities in React; `tailwind.css` is limited to base rules and compatibility grammar for call sites not yet expressed through React primitives
 - the obsolete `profile.css` compatibility shim is removed
 - testing policy is risk/signal/cost based; TDD is optional rather than ceremonial
 - CV import orchestration is owned by the application layer rather than React/infrastructure coupling

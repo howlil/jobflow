@@ -1,9 +1,11 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button,
   EmptyState,
   FieldGrid,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Subsection,
   TextField,
 } from '../../design-system/primitives';
@@ -23,7 +25,10 @@ export function LanguagesSection({
     <Subsection
       title="Languages"
       action={
-        <Button
+        <IconButton
+          size="sm"
+          aria-label="Add language"
+          title="Add language"
           onClick={() =>
             changeProfile((draft) =>
               draft.baseProfile.professional.languages.push({
@@ -35,19 +40,36 @@ export function LanguagesSection({
           }
         >
           <Plus aria-hidden="true" size={16} />
-          Add language
-        </Button>
+        </IconButton>
       }
     >
       {profile.baseProfile.professional.languages.length === 0 ? (
         <EmptyState>No languages added yet.</EmptyState>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {profile.baseProfile.professional.languages.map((language, index) => (
-            <article
-              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+            <RecordCard
               key={language.id}
+              action={
+                <IconButton
+                  size="xs"
+                  tone="danger"
+                  aria-label={`Remove language ${index + 1}`}
+                  title={`Remove language ${index + 1}`}
+                  onClick={() =>
+                    changeProfile((draft) =>
+                      draft.baseProfile.professional.languages.splice(index, 1),
+                    )
+                  }
+                >
+                  <Trash2 aria-hidden="true" size={14} />
+                </IconButton>
+              }
             >
+              <RecordHeader
+                title={language.name || `Language ${index + 1}`}
+                context={language.proficiency || 'Language proficiency'}
+              />
               <FieldGrid>
                 <TextField
                   label="Language"
@@ -73,19 +95,7 @@ export function LanguagesSection({
                   }
                 />
               </FieldGrid>
-              <Button
-                className="justify-self-start"
-                variant="danger"
-                onClick={() =>
-                  changeProfile((draft) =>
-                    draft.baseProfile.professional.languages.splice(index, 1),
-                  )
-                }
-              >
-                <Trash2 aria-hidden="true" size={16} />
-                Remove language
-              </Button>
-            </article>
+            </RecordCard>
           ))}
         </div>
       )}

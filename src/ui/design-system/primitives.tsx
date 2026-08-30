@@ -49,15 +49,38 @@ export function Button({
   );
 }
 
+export type IconButtonSize = 'xs' | 'sm' | 'md';
+export type IconButtonTone = 'default' | 'danger';
+
+const ICON_BUTTON_SIZE_CLASS: Record<IconButtonSize, string> = {
+  xs: 'h-8 w-8',
+  sm: 'h-9 w-9',
+  md: 'h-10 w-10',
+};
+
+const ICON_BUTTON_TONE_CLASS: Record<IconButtonTone, string> = {
+  default:
+    'border-app-border bg-white text-app-ink hover:border-app-border-strong hover:bg-app-muted',
+  danger:
+    'border-transparent bg-transparent text-app-subtle hover:border-red-200 hover:bg-red-50 hover:text-red-700',
+};
+
 export function IconButton({
   className,
   type = 'button',
+  size = 'md',
+  tone = 'default',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  size?: IconButtonSize;
+  tone?: IconButtonTone;
+}) {
   return (
     <button
       className={classes(
-        'grid h-10 w-10 shrink-0 place-items-center rounded-control border border-app-border bg-white text-app-ink transition hover:bg-app-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink',
+        'grid shrink-0 place-items-center rounded-control border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        ICON_BUTTON_SIZE_CLASS[size],
+        ICON_BUTTON_TONE_CLASS[tone],
         className,
       )}
       type={type}
@@ -318,6 +341,63 @@ export function Subsection({
       </div>
       {children}
     </section>
+  );
+}
+
+export function RecordCard({
+  action,
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLElement> & { action?: ReactNode }) {
+  return (
+    <article
+      className={classes(
+        'relative grid gap-4 rounded-app border border-app-border bg-white p-4 shadow-sm',
+        className,
+      )}
+      {...props}
+    >
+      {action ? <div className="absolute right-3 top-3">{action}</div> : null}
+      {children}
+    </article>
+  );
+}
+
+export function RecordHeader({
+  title,
+  context,
+  meta,
+  className,
+}: {
+  title: ReactNode;
+  context?: ReactNode;
+  meta?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={classes(
+        'grid min-w-0 gap-1 pr-10 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-4',
+        className,
+      )}
+    >
+      <div className="grid min-w-0 gap-1">
+        <strong className="truncate text-sm font-semibold text-app-ink">
+          {title}
+        </strong>
+        {context ? (
+          <span className="truncate text-[11px] font-medium text-app-subtle">
+            {context}
+          </span>
+        ) : null}
+      </div>
+      {meta ? (
+        <span className="text-[11px] font-medium text-app-subtle sm:text-right">
+          {meta}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
