@@ -18,9 +18,12 @@ import {
   EmptyState,
   FilePicker,
   IconButton,
-  SectionHeader,
   StatusMessage,
 } from '../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../design-system/WorkspaceSectionCard';
 
 const ACCEPTED_FILES =
   '.pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
@@ -223,12 +226,8 @@ export function CvImportSection({
   }
 
   return (
-    <section
-      className="workspace-tool-section"
-      id="cv-import"
-      aria-labelledby="cv-import-title"
-    >
-      <SectionHeader
+    <WorkspaceSection id="cv-import" aria-labelledby="cv-import-title">
+      <WorkspaceSectionHeader
         eyebrow="Documents"
         title={<span id="cv-import-title">Resumes</span>}
         description="Resume entries represent files stored locally by Job Flow. They can be selected by application variants and attached only after you approve the action."
@@ -412,6 +411,6 @@ export function CvImportSection({
           </ActionRow>
         ) : null}
       </div>
-    </section>
+    </WorkspaceSection>
   );
 }
