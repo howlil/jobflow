@@ -316,9 +316,6 @@ export function parseCvText(text: string): CvImportDraft {
       'education section + date ranges',
     );
   }
-  if (skills.length > 0) {
-    addValue(values, 'skills', 'Skills', skills.join(', '), 'skills section');
-  }
 
   return {
     values,
@@ -373,9 +370,7 @@ export function createCvImportPreview(
     const current = currentValue(profile, value.key);
     const normalizedCurrent = compact(current).toLowerCase();
     const normalizedExtracted = compact(value.value).toLowerCase();
-    const structured = ['experiences', 'education', 'skills'].includes(
-      value.key,
-    );
+    const structured = ['experiences', 'education'].includes(value.key);
     return {
       key: value.key,
       label: value.label,
@@ -468,6 +463,7 @@ export function applyCvImport(
         current: item.current,
         description: item.description,
         achievements: [],
+        skills: [],
       }),
     );
   }
@@ -484,15 +480,6 @@ export function applyCvImport(
       gpa: null,
       maxGpa: null,
       description: item.description,
-    }));
-  }
-
-  if (selected.has('skills')) {
-    next.baseProfile.professional.skills = draft.skills.map((name) => ({
-      id: idFactory(),
-      name,
-      level: '',
-      yearsExperience: null,
     }));
   }
 
