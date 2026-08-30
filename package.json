@@ -18,7 +18,7 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:e2e:smoke": "node e2e/extension-smoke.mjs",
-    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/autofill-acceptance.mjs && node e2e/vault-acceptance.mjs && node e2e/ui-acceptance.mjs && node e2e/workspace-cv-acceptance.mjs",
+    "test:e2e": "node e2e/extension-smoke.mjs && node e2e/autofill-acceptance.mjs && node e2e/vault-acceptance.mjs && node e2e/ui-acceptance.mjs && node e2e/workspace-cv-acceptance.mjs && node e2e/application-pipeline-acceptance.mjs",
     "verify:manifest": "node scripts/verify-manifest.mjs",
     "verify:compatibility": "node scripts/verify-compatibility-evidence.mjs",
     "lint": "eslint . --max-warnings=0",
