@@ -1,9 +1,11 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button,
   EmptyState,
   FieldGrid,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Subsection,
   TextField,
 } from '../../design-system/primitives';
@@ -23,7 +25,10 @@ export function CertificationsSection({
     <Subsection
       title="Certifications"
       action={
-        <Button
+        <IconButton
+          size="sm"
+          aria-label="Add certification"
+          title="Add certification"
           onClick={() =>
             changeProfile((draft) =>
               draft.baseProfile.professional.certifications.push({
@@ -39,20 +44,40 @@ export function CertificationsSection({
           }
         >
           <Plus aria-hidden="true" size={16} />
-          Add certification
-        </Button>
+        </IconButton>
       }
     >
       {profile.baseProfile.professional.certifications.length === 0 ? (
         <EmptyState>No certifications added yet.</EmptyState>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {profile.baseProfile.professional.certifications.map(
             (certification, index) => (
-              <article
-                className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+              <RecordCard
                 key={certification.id}
+                action={
+                  <IconButton
+                    size="xs"
+                    tone="danger"
+                    aria-label={`Remove certification ${index + 1}`}
+                    title={`Remove certification ${index + 1}`}
+                    onClick={() =>
+                      changeProfile((draft) =>
+                        draft.baseProfile.professional.certifications.splice(
+                          index,
+                          1,
+                        ),
+                      )
+                    }
+                  >
+                    <Trash2 aria-hidden="true" size={14} />
+                  </IconButton>
+                }
               >
+                <RecordHeader
+                  title={certification.name || `Certification ${index + 1}`}
+                  context={certification.issuer || 'Certification details'}
+                />
                 <FieldGrid columns={3}>
                   <TextField
                     label="Certification"
@@ -114,22 +139,7 @@ export function CertificationsSection({
                     }
                   />
                 </FieldGrid>
-                <Button
-                  className="justify-self-start"
-                  variant="danger"
-                  onClick={() =>
-                    changeProfile((draft) =>
-                      draft.baseProfile.professional.certifications.splice(
-                        index,
-                        1,
-                      ),
-                    )
-                  }
-                >
-                  <Trash2 aria-hidden="true" size={16} />
-                  Remove certification
-                </Button>
-              </article>
+              </RecordCard>
             ),
           )}
         </div>
