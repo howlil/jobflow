@@ -86,7 +86,10 @@ export function EducationSection({
                   title={`Remove education ${index + 1}`}
                   onClick={() =>
                     changeProfile((draft) => {
-                      draft.baseProfile.professional.education.splice(index, 1);
+                      draft.baseProfile.professional.education.splice(
+                        index,
+                        1,
+                      );
                     })
                   }
                 >
