@@ -189,7 +189,8 @@ export function ProjectsSection({
                       if (item === undefined) return;
                       item.skills = (item.skills ?? []).filter(
                         (value) =>
-                          value.trim().toLowerCase() !== skillName.toLowerCase(),
+                          value.trim().toLowerCase() !==
+                          skillName.toLowerCase(),
                       );
                     })
                   }
