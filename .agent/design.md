@@ -9,7 +9,7 @@ Maintain **one canonical styling system per UI surface**. When a styling system 
 For React extension surfaces:
 
 - define shared theme values in `tailwind.config.ts`
-- keep `src/ui/design-system/tailwind.css` limited to Tailwind directives, base rules, and stable repeated primitives/form grammar
+- keep `src/components/ui/tailwind.css` limited to Tailwind directives, base rules, and stable repeated primitives/form grammar
 - compose page shells, navigation, spacing, and responsive layout with Tailwind utilities in React components
 - prefer reusable React components over hiding one-off layout behind new `@apply` classes
 

@@ -18,15 +18,15 @@ vi.mock(
   }),
 );
 
-vi.mock('../../src/ui/corrections/CorrectionMemorySection', () => ({
+vi.mock('../../src/components/corrections/CorrectionMemorySection', () => ({
   CorrectionMemorySection: () => <div>Correction memory</div>,
 }));
 
-vi.mock('../../src/ui/profile/CvImportSection', () => ({
+vi.mock('../../src/components/profile/CvImportSection', () => ({
   CvImportSection: () => <div>CV import</div>,
 }));
 
-vi.mock('../../src/ui/profile/BackupRecoveryInspector', () => ({
+vi.mock('../../src/components/profile/BackupRecoveryInspector', () => ({
   BackupRecoveryInspector: () => <div>Backup recovery</div>,
 }));
 

@@ -8,6 +8,7 @@ export default {
         app: {
           bg: '#fafafa',
           surface: '#ffffff',
+          'surface-glass': 'rgb(255 255 255 / 0.82)',
           muted: '#f7f7f7',
           border: '#e5e5e5',
           'border-strong': '#d4d4d4',
@@ -32,7 +33,13 @@ export default {
         ],
       },
       boxShadow: {
-        overlay: '0 12px 28px rgb(0 0 0 / 0.14)',
+        overlay: '0 10px 24px rgb(0 0 0 / 0.13)',
+        topbar: '0 1px 12px rgb(23 23 23 / 0.045)',
+        section:
+          '0 1px 0 rgb(255 255 255 / 0.72) inset, 0 6px 18px rgb(23 23 23 / 0.035)',
+        record:
+          '0 1px 0 rgb(255 255 255 / 0.78) inset, 0 4px 14px rgb(23 23 23 / 0.04)',
+        popover: '0 12px 28px rgb(23 23 23 / 0.11)',
       },
     },
   },

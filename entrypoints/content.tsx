@@ -39,8 +39,8 @@ import {
   FloatingPanel,
   type DocumentAttachStatus,
   type SensitiveVaultStatus,
-} from '../src/ui/floating/FloatingPanel';
-import { FLOATING_STYLES } from '../src/ui/floating/floating-styles';
+} from '../src/components/floating/FloatingPanel';
+import { FLOATING_STYLES } from '../src/components/floating/floating-styles';
 
 function collectPageSignals(document: Document): string[] {
   const metaDescription = document.querySelector<HTMLMetaElement>(
