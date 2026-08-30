@@ -3,16 +3,11 @@ import { Plus, X } from 'lucide-react';
 
 import { Chip, IconButton, TextField } from '../design-system/primitives';
 
-type SkillOption = {
-  id: string;
-  name: string;
-};
-
 type LinkedSkillEditorProps = {
   editorId: string;
   contextLabel: string;
   linkedSkills: string[];
-  skills: SkillOption[];
+  skills: string[];
   onAdd: (name: string) => void;
   onRemove: (name: string) => void;
 };
@@ -36,12 +31,12 @@ export function LinkedSkillEditor({
     [linkedSkills],
   );
   const suggestions = useMemo(() => {
-    const byName = new Map<string, SkillOption>();
-    for (const skill of skills) {
-      const name = skill.name.trim().replace(/\s+/g, ' ');
+    const byName = new Map<string, string>();
+    for (const value of skills) {
+      const name = value.trim().replace(/\s+/g, ' ');
       const key = normalize(name);
       if (key === '' || byName.has(key)) continue;
-      byName.set(key, { id: skill.id, name });
+      byName.set(key, name);
     }
     return [...byName.values()];
   }, [skills]);
@@ -81,8 +76,8 @@ export function LinkedSkillEditor({
       </div>
 
       <datalist id={datalistId}>
-        {suggestions.map((skill) => (
-          <option value={skill.name} key={skill.id} />
+        {suggestions.map((name) => (
+          <option value={name} key={normalize(name)} />
         ))}
       </datalist>
 
