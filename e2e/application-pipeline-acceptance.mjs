@@ -48,7 +48,7 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Applications', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Applications' }),
+    page.getByRole('main').getByRole('heading', { name: 'Applications' }),
   ).toBeVisible();
 
   await createApplication(page, {
