@@ -337,8 +337,7 @@ export function ApplicationsWorkspace({
   const actionableCount = applications.filter((application) =>
     applicationNeedsAction(application, todayKey),
   ).length;
-  const opportunityLabel =
-    activeCount === 1 ? 'opportunity' : 'opportunities';
+  const opportunityLabel = activeCount === 1 ? 'opportunity' : 'opportunities';
   const visibleApplications = focusApplications(applications, {
     query,
     view: applicationView,
@@ -499,7 +498,8 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {opportunityLabel} · {actionableCount} need action
+          {activeCount} active {opportunityLabel} · {actionableCount} need
+          action
         </p>
       </div>
 
