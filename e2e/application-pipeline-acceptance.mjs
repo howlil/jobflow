@@ -94,12 +94,14 @@ try {
   await search.fill('gojek');
   let gojekCard = await expectCardVisible(workspace, 'Gojek');
   await expect(gojekCard).toContainText('Backend Engineer');
+  await expect(gojekCard).not.toContainText('Follow up with recruiter.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
   await search.fill('');
   await workspace.getByRole('button', { name: 'Needs action 1' }).click();
   gojekCard = await expectCardVisible(workspace, 'Gojek');
   await expect(gojekCard).toContainText('Backend Engineer');
+  await expect(gojekCard).toContainText('Follow up with recruiter.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
   await workspace.getByRole('button', { name: 'Board', exact: true }).click();

@@ -113,6 +113,7 @@ function PipelineCard({
   application,
   todayKey,
   showStage,
+  showFollowUpNote,
   onEdit,
   onDelete,
   onChangeStage,
@@ -120,6 +121,7 @@ function PipelineCard({
   application: JobApplication;
   todayKey: string;
   showStage: boolean;
+  showFollowUpNote: boolean;
   onEdit: (application: JobApplication) => void;
   onDelete: (id: string) => void | Promise<void>;
   onChangeStage: (id: string, stage: ApplicationStage) => void | Promise<void>;
@@ -133,6 +135,7 @@ function PipelineCard({
     : application.source
       ? `Source: ${application.source}`
       : null;
+  const followUpNote = application.notes?.trim();
 
   return (
     <RecordCard
@@ -174,6 +177,12 @@ function PipelineCard({
           </span>
         ) : null}
       </div>
+
+      {showFollowUpNote && followUpNote ? (
+        <p className="m-0 whitespace-pre-wrap text-xs leading-5 text-app-text">
+          {followUpNote}
+        </p>
+      ) : null}
 
       {contextualDetail !== null ? (
         <p className="m-0 text-xs text-app-subtle">{contextualDetail}</p>
@@ -381,7 +390,7 @@ export function ApplicationsWorkspace({
               {editingId === null ? 'Add job' : 'Edit job'}
             </h3>
             <p className="m-0 text-xs text-app-subtle">
-              Keep the board focused; job details live here only while you add
+              Keep the board focused; full job details live here while you add
               or edit an opportunity.
             </p>
           </div>
@@ -539,6 +548,7 @@ export function ApplicationsWorkspace({
                           application={application}
                           todayKey={todayKey}
                           showStage={false}
+                          showFollowUpNote={false}
                           onEdit={openEditForm}
                           onDelete={deleteApplication}
                           onChangeStage={changeStage}
@@ -559,6 +569,7 @@ export function ApplicationsWorkspace({
               application={application}
               todayKey={todayKey}
               showStage
+              showFollowUpNote
               onEdit={openEditForm}
               onDelete={deleteApplication}
               onChangeStage={changeStage}
@@ -594,6 +605,7 @@ export function ApplicationsWorkspace({
                         application={application}
                         todayKey={todayKey}
                         showStage={false}
+                        showFollowUpNote={false}
                         onEdit={openEditForm}
                         onDelete={deleteApplication}
                         onChangeStage={changeStage}
