@@ -343,7 +343,9 @@ function SensitiveProfileFields({
         value={expectedAmount(profile)}
         onChange={(event) =>
           onChange((draft) => {
-            draft.compensation.expected.amount = numberOrNull(event.target.value);
+            draft.compensation.expected.amount = numberOrNull(
+              event.target.value,
+            );
           })
         }
       />
