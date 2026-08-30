@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import { KeyRound, Lock, Save, ShieldCheck, Trash2 } from 'lucide-react';
 
+import type { VaultResponse } from '../../application/vault/vault-messages';
 import { createEmptySensitiveProfile } from '../../domain/profile/create-empty-sensitive-profile';
 import type { SensitiveProfile } from '../../domain/profile/profile-schema';
-import type { VaultResponse } from '../../application/vault/vault-messages';
+import {
+  ActionRow,
+  Button,
+  Chip,
+  FieldGrid,
+  Section,
+  SectionHeader,
+  StatusMessage,
+  TextField,
+} from '../design-system/primitives';
 
 export type VaultClient = {
   status(): Promise<VaultResponse>;
@@ -172,124 +182,92 @@ export function SensitiveVaultSection({
   const passphraseMismatch = error === 'Passphrases do not match.';
 
   return (
-    <section className="profile-section vault-section" id="sensitive-vault">
-      <div className="section-heading jobflow-section-heading">
-        <div>
-          <h2>Sensitive vault</h2>
-          <p className="muted">
-            Add salary, identity, and other private answers here only when a job
-            form asks for them. Job Flow still asks before using them on a site.
-          </p>
-        </div>
-        <strong className="jobflow-chip jobflow-chip-strong">
-          <ShieldCheck aria-hidden="true" size={14} />
-          {vaultStatus.configured ? 'Vault set up' : 'Vault not set up'}
-        </strong>
-      </div>
+    <Section id="sensitive-vault">
+      <SectionHeader
+        title="Sensitive vault"
+        description="Add salary, identity, and other private answers here only when a job form asks for them. Job Flow still asks before using them on a site."
+        action={
+          <Chip strong>
+            <ShieldCheck aria-hidden="true" size={14} />
+            {vaultStatus.configured ? 'Vault set up' : 'Vault not set up'}
+          </Chip>
+        }
+      />
 
       {error !== null ? (
-        <p className="jobflow-status jobflow-status-danger" role="alert">
+        <StatusMessage tone="danger" role="alert">
           {error}
-        </p>
+        </StatusMessage>
       ) : null}
       {message !== null ? (
-        <p className="jobflow-status jobflow-status-success" role="status">
+        <StatusMessage tone="success" role="status">
           {message}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {!vaultStatus.configured ? (
         <>
-          <div className="form-grid">
-            <label>
-              New vault passphrase
-              <input
-                type="password"
-                value={passphrase}
-                onChange={(event) => setPassphrase(event.target.value)}
-              />
-            </label>
-            <label>
-              Confirm vault passphrase
-              <input
-                type="password"
-                value={confirmPassphrase}
-                aria-invalid={passphraseMismatch}
-                onChange={(event) => setConfirmPassphrase(event.target.value)}
-              />
-            </label>
-          </div>
-          <button
-            className="jobflow-button jobflow-button-primary"
-            type="button"
-            onClick={() => void setupVault()}
-          >
+          <FieldGrid>
+            <TextField
+              type="password"
+              label="New vault passphrase"
+              value={passphrase}
+              onChange={(event) => setPassphrase(event.target.value)}
+            />
+            <TextField
+              type="password"
+              label="Confirm vault passphrase"
+              value={confirmPassphrase}
+              aria-invalid={passphraseMismatch}
+              onChange={(event) => setConfirmPassphrase(event.target.value)}
+            />
+          </FieldGrid>
+          <Button variant="primary" onClick={() => void setupVault()}>
             <KeyRound aria-hidden="true" size={16} />
             Set up vault
-          </button>
+          </Button>
         </>
       ) : vaultStatus.unlocked ? (
         <>
           <SensitiveProfileFields profile={profile} onChange={changeProfile} />
-          <div className="button-row vault-actions">
-            <button
-              className="jobflow-button jobflow-button-primary"
-              type="button"
-              onClick={() => void saveVault()}
-            >
+          <ActionRow>
+            <Button variant="primary" onClick={() => void saveVault()}>
               <Save aria-hidden="true" size={16} />
               Save sensitive data
-            </button>
-            <button
-              className="jobflow-button jobflow-button-secondary"
-              type="button"
-              onClick={() => void lockVault()}
-            >
+            </Button>
+            <Button onClick={() => void lockVault()}>
               <Lock aria-hidden="true" size={16} />
               Lock vault
-            </button>
+            </Button>
             {confirmReset ? (
-              <button
-                className="jobflow-button jobflow-button-danger"
-                type="button"
-                onClick={() => void resetVault()}
-              >
+              <Button variant="danger" onClick={() => void resetVault()}>
                 <Trash2 aria-hidden="true" size={16} />
                 Delete encrypted vault
-              </button>
+              </Button>
             ) : (
-              <button
-                className="jobflow-button"
-                type="button"
-                onClick={() => setConfirmReset(true)}
-              >
+              <Button onClick={() => setConfirmReset(true)}>
                 <Trash2 aria-hidden="true" size={16} />
                 Reset vault
-              </button>
+              </Button>
             )}
-          </div>
+          </ActionRow>
         </>
       ) : (
         <>
-          <label className="default-variant vault-unlock-field">
-            Vault passphrase
-            <input
-              type="password"
-              value={passphrase}
-              onChange={(event) => setPassphrase(event.target.value)}
-            />
-          </label>
-          <button
-            className="jobflow-button jobflow-button-primary"
-            type="button"
-            onClick={() => void unlockVault()}
-          >
+          <TextField
+            className="max-w-md"
+            type="password"
+            label="Vault passphrase"
+            value={passphrase}
+            onChange={(event) => setPassphrase(event.target.value)}
+          />
+          <Button variant="primary" onClick={() => void unlockVault()}>
             <KeyRound aria-hidden="true" size={16} />
             Unlock vault
-          </button>
+          </Button>
         </>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -301,101 +279,83 @@ function SensitiveProfileFields({
   onChange: (mutate: (draft: SensitiveProfile) => void) => void;
 }) {
   return (
-    <div className="form-grid">
-      <label>
-        Birth date
-        <input
-          inputMode="numeric"
-          pattern="\d{2}/\d{2}/\d{4}"
-          placeholder="DD/MM/YYYY"
-          value={profile.personal.birthDate}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.personal.birthDate = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        Birth place
-        <input
-          value={profile.personal.birthPlace}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.personal.birthPlace = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        Gender
-        <input
-          value={profile.personal.gender}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.personal.gender = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        National ID
-        <input
-          value={profile.identity.nationalId}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.identity.nationalId = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        Passport
-        <input
-          value={profile.identity.passport}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.identity.passport = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        Tax ID
-        <input
-          value={profile.identity.taxId}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.identity.taxId = event.target.value;
-            })
-          }
-        />
-      </label>
-      <label>
-        Expected salary
-        <input
-          inputMode="numeric"
-          value={expectedAmount(profile)}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.compensation.expected.amount = numberOrNull(
-                event.target.value,
-              );
-            })
-          }
-        />
-      </label>
-      <label>
-        Expected salary currency
-        <input
-          value={profile.compensation.expected.currency}
-          onChange={(event) =>
-            onChange((draft) => {
-              draft.compensation.expected.currency = event.target.value;
-            })
-          }
-        />
-      </label>
-    </div>
+    <FieldGrid>
+      <TextField
+        inputMode="numeric"
+        pattern="\d{2}/\d{2}/\d{4}"
+        placeholder="DD/MM/YYYY"
+        label="Birth date"
+        value={profile.personal.birthDate}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.personal.birthDate = event.target.value;
+          })
+        }
+      />
+      <TextField
+        label="Birth place"
+        value={profile.personal.birthPlace}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.personal.birthPlace = event.target.value;
+          })
+        }
+      />
+      <TextField
+        label="Gender"
+        value={profile.personal.gender}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.personal.gender = event.target.value;
+          })
+        }
+      />
+      <TextField
+        label="National ID"
+        value={profile.identity.nationalId}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.identity.nationalId = event.target.value;
+          })
+        }
+      />
+      <TextField
+        label="Passport"
+        value={profile.identity.passport}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.identity.passport = event.target.value;
+          })
+        }
+      />
+      <TextField
+        label="Tax ID"
+        value={profile.identity.taxId}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.identity.taxId = event.target.value;
+          })
+        }
+      />
+      <TextField
+        inputMode="numeric"
+        label="Expected salary"
+        value={expectedAmount(profile)}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.compensation.expected.amount = numberOrNull(event.target.value);
+          })
+        }
+      />
+      <TextField
+        label="Expected salary currency"
+        value={profile.compensation.expected.currency}
+        onChange={(event) =>
+          onChange((draft) => {
+            draft.compensation.expected.currency = event.target.value;
+          })
+        }
+      />
+    </FieldGrid>
   );
 }
