@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PanelRightClose } from 'lucide-react';
 
+import type { ApplicationDraft } from '../../application/applications/application-service';
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
@@ -8,6 +9,7 @@ import type { CorrectionTarget } from '../../domain/corrections/correction-schem
 import type { FieldContext } from '../../domain/forms/field-context';
 import {
   AssistantHomeView,
+  AssistantPipelineView,
   AssistantReviewView,
   AssistantSensitiveView,
 } from './FloatingViews';
@@ -15,7 +17,7 @@ import {
 export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
 export type DocumentAttachStatus = 'attached' | 'missing' | 'unsupported';
 
-type AssistantView = 'home' | 'review' | 'sensitive';
+type AssistantView = 'home' | 'pipeline' | 'review' | 'sensitive';
 
 type FloatingPanelProps = {
   summary: PageAnalysisSummary;
@@ -26,7 +28,9 @@ type FloatingPanelProps = {
   sensitiveError?: string | null;
   siteHost?: string;
   variantName?: string | null;
+  applicationDraft?: ApplicationDraft | null;
   onFill: () => void;
+  onSaveApplication?: (draft: ApplicationDraft) => Promise<void>;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
   onOpenOptions?: () => void;
   onUnlockSensitive?: (passphrase: string) => void;
@@ -46,7 +50,9 @@ export function FloatingPanel({
   sensitiveError = null,
   siteHost = 'this site',
   variantName = null,
+  applicationDraft = null,
   onFill,
+  onSaveApplication,
   onRemember,
   onOpenOptions,
   onUnlockSensitive,
@@ -58,6 +64,9 @@ export function FloatingPanel({
   const [passphrase, setPassphrase] = useState('');
   const [documentStatus, setDocumentStatus] = useState<Record<string, string>>(
     {},
+  );
+  const [applicationStatus, setApplicationStatus] = useState<string | null>(
+    null,
   );
   const attentionCount = summary.needsReview + summary.sensitive;
   const attachableDocuments = useMemo(
@@ -126,7 +135,31 @@ export function FloatingPanel({
               onFill={onFill}
               onOpenReview={() => setView('review')}
               onOpenSensitive={() => setView('sensitive')}
+              {...(applicationDraft === null || onSaveApplication === undefined
+                ? {}
+                : { onOpenPipeline: () => setView('pipeline') })}
               {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
+            />
+          ) : null}
+
+          {view === 'pipeline' &&
+          applicationDraft !== null &&
+          onSaveApplication !== undefined ? (
+            <AssistantPipelineView
+              initialDraft={applicationDraft}
+              status={applicationStatus}
+              onBack={() => setView('home')}
+              onSave={async (draft) => {
+                setApplicationStatus('Saving...');
+                try {
+                  await onSaveApplication(draft);
+                  setApplicationStatus('Saved to pipeline.');
+                } catch {
+                  setApplicationStatus(
+                    'Company, role, and a valid URL are required.',
+                  );
+                }
+              }}
             />
           ) : null}
 

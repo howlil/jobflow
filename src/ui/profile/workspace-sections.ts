@@ -4,6 +4,7 @@ export type WorkspaceSection =
   | 'links'
   | 'experience'
   | 'education'
+  | 'applications'
   | 'documents'
   | 'preferences'
   | 'variants'
@@ -17,6 +18,7 @@ export const WORKSPACE_SECTION_TITLES: Record<WorkspaceSection, string> = {
   links: 'Links',
   experience: 'Experience',
   education: 'Education',
+  applications: 'Applications',
   documents: 'Documents',
   preferences: 'Preferences',
   variants: 'Variants',

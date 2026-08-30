@@ -8,7 +8,13 @@ import {
   LockKeyhole,
   ShieldCheck,
 } from 'lucide-react';
+import { useState } from 'react';
 
+import {
+  APPLICATION_STAGES,
+  type ApplicationStage,
+} from '../../domain/applications/application-schema';
+import type { ApplicationDraft } from '../../application/applications/application-service';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
@@ -57,6 +63,17 @@ function intentLabel(intent: PageDocumentFieldSummary['intent']): string {
   return 'File upload';
 }
 
+const STAGE_LABELS: Record<ApplicationStage, string> = {
+  saved: 'Saved',
+  applied: 'Applied',
+  assessment: 'Assessment',
+  interview: 'Interview',
+  offer: 'Offer',
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  withdrawn: 'Withdrawn',
+};
+
 export function AssistantHomeView({
   summary,
   attachableDocuments,
@@ -64,6 +81,7 @@ export function AssistantHomeView({
   onAttachDocument,
   onFill,
   onOpenOptions,
+  onOpenPipeline,
   onOpenReview,
   onOpenSensitive,
 }: {
@@ -73,6 +91,7 @@ export function AssistantHomeView({
   onAttachDocument: (item: PageDocumentFieldSummary) => void | Promise<void>;
   onFill: () => void;
   onOpenOptions?: () => void;
+  onOpenPipeline?: () => void;
   onOpenReview: () => void;
   onOpenSensitive: () => void;
 }) {
@@ -143,6 +162,21 @@ export function AssistantHomeView({
         </section>
       ) : null}
 
+      {onOpenPipeline !== undefined ? (
+        <section className="jobflow-panel__section">
+          <div className="jobflow-panel__section-heading">
+            <span>Pipeline</span>
+          </div>
+          <button
+            className="jobflow-panel__open-profile"
+            type="button"
+            onClick={onOpenPipeline}
+          >
+            Review and save this job
+          </button>
+        </section>
+      ) : null}
+
       {summary.needsReview > 0 || summary.sensitive > 0 ? (
         <section className="jobflow-panel__section">
           <div className="jobflow-panel__section-heading">
@@ -182,6 +216,105 @@ export function AssistantHomeView({
         </button>
       ) : null}
     </div>
+  );
+}
+
+export function AssistantPipelineView({
+  initialDraft,
+  status,
+  onBack,
+  onSave,
+}: {
+  initialDraft: ApplicationDraft;
+  status: string | null;
+  onBack: () => void;
+  onSave: (draft: ApplicationDraft) => void | Promise<void>;
+}) {
+  const [draft, setDraft] = useState<ApplicationDraft>(initialDraft);
+
+  return (
+    <section
+      className="jobflow-panel__detail"
+      aria-label="Save job to pipeline"
+    >
+      <button className="jobflow-panel__back" type="button" onClick={onBack}>
+        <ArrowLeft aria-hidden="true" size={15} />
+        Back
+      </button>
+      <div>
+        <p className="jobflow-panel__section-label">Pipeline</p>
+        <h2>Review job details</h2>
+        <p className="jobflow-panel__helper">
+          Confirm the company and role before saving this local application.
+        </p>
+      </div>
+      <div className="jobflow-panel__form">
+        <label>
+          Company
+          <input
+            value={draft.company}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                company: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label>
+          Role
+          <input
+            value={draft.role}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, role: event.target.value }))
+            }
+          />
+        </label>
+        <label>
+          Job URL
+          <input
+            type="url"
+            value={draft.jobUrl ?? ''}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                jobUrl: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label>
+          Stage
+          <select
+            value={draft.stage}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                stage: event.target.value as ApplicationStage,
+              }))
+            }
+          >
+            {APPLICATION_STAGES.map((stage) => (
+              <option value={stage} key={stage}>
+                {STAGE_LABELS[stage]}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {status !== null ? (
+        <p className="jobflow-panel__status" role="status">
+          {status}
+        </p>
+      ) : null}
+      <button
+        className="jobflow-panel__action jobflow-panel__action--primary"
+        type="button"
+        onClick={() => void onSave(draft)}
+      >
+        Save to pipeline
+      </button>
+    </section>
   );
 }
 
