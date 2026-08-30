@@ -19,13 +19,15 @@ async function getExtensionId(context) {
 }
 
 async function createApplication(page, application) {
-  await page.getByLabel('Company').fill(application.company);
-  await page.getByLabel('Role').fill(application.role);
-  await page.getByLabel('Job URL').fill(application.jobUrl);
-  await page.getByLabel('Stage').selectOption(application.stage);
-  await page.getByLabel('Source').fill(application.source);
-  await page.getByLabel('Next action').fill(application.nextActionAt);
-  await page.getByLabel('Notes').fill(application.notes);
+  await page.getByLabel('Company', { exact: true }).fill(application.company);
+  await page.getByLabel('Role', { exact: true }).fill(application.role);
+  await page.getByLabel('Job URL', { exact: true }).fill(application.jobUrl);
+  await page.getByLabel('Stage', { exact: true }).selectOption(application.stage);
+  await page.getByLabel('Source', { exact: true }).fill(application.source);
+  await page
+    .getByLabel('Next action', { exact: true })
+    .fill(application.nextActionAt);
+  await page.getByLabel('Notes', { exact: true }).fill(application.notes);
   await page.getByRole('button', { name: 'Create application' }).click();
   await expect(page.getByRole('status')).toHaveText('Application saved.');
 }
@@ -72,7 +74,7 @@ try {
 
   await expect(page.getByText('1 application needs attention.')).toBeVisible();
 
-  const search = page.getByLabel('Search applications');
+  const search = page.getByLabel('Search applications', { exact: true });
   await search.fill('gojek');
   await expect(page.getByText('Backend Engineer')).toBeVisible();
   await expect(page.getByText('Traveloka')).toHaveCount(0);
@@ -87,7 +89,9 @@ try {
     .locator('article')
     .filter({ hasText: 'Gojek' })
     .first();
-  await gojekCard.getByLabel('Move stage').selectOption('interview');
+  await gojekCard
+    .getByLabel('Move stage', { exact: true })
+    .selectOption('interview');
   await expect(page.getByRole('status')).toHaveText(
     'Application stage updated.',
   );
@@ -100,9 +104,9 @@ try {
     .filter({ hasText: 'Gojek' })
     .first();
   await expect(persistedGojekCard).toBeVisible();
-  await expect(persistedGojekCard.getByLabel('Move stage')).toHaveValue(
-    'interview',
-  );
+  await expect(
+    persistedGojekCard.getByLabel('Move stage', { exact: true }),
+  ).toHaveValue('interview');
   await expect(page.getByText('Traveloka')).toBeVisible();
   await expect(page.getByText('1 application needs attention.')).toBeVisible();
 } finally {
