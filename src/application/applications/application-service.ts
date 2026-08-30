@@ -212,8 +212,9 @@ export function createApplicationService(repository: ApplicationRepository) {
     const cleanDraft = validateDraft(draftFromChanges(current, changes));
     const now = new Date().toISOString();
     const next = JobApplicationSchema.parse({
-      ...current,
+      id: current.id,
       ...cleanDraft,
+      createdAt: current.createdAt,
       updatedAt: now,
     });
     const applications = [...collection.applications];
