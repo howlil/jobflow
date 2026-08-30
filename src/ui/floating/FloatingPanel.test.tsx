@@ -96,7 +96,7 @@ describe('FloatingPanel', () => {
     expect(attach).toHaveBeenCalledWith('resume-field', 'resume-1');
   });
 
-  it('requires review before saving the current page to the pipeline', async () => {
+  it('requires review and captures follow-up details before saving the current page', async () => {
     const saveApplication = vi.fn().mockResolvedValue(undefined);
     render(
       <FloatingPanel
@@ -112,6 +112,8 @@ describe('FloatingPanel', () => {
           role: 'Senior Engineer',
           jobUrl: 'https://jobs.example/acme',
           stage: 'saved',
+          nextActionAt: '2026-09-01',
+          notes: 'Review the role before following up.',
         }}
         onFill={vi.fn()}
         onSaveApplication={saveApplication}
@@ -127,8 +129,21 @@ describe('FloatingPanel', () => {
     expect(screen.getByLabelText<HTMLInputElement>('Company').value).toBe(
       'Acme',
     );
+    const nextAction = screen.getByLabelText<HTMLInputElement>('Next action');
+    expect(nextAction.type).toBe('date');
+    expect(nextAction.value).toBe('2026-09-01');
+    expect(screen.getByLabelText<HTMLTextAreaElement>('Notes').value).toBe(
+      'Review the role before following up.',
+    );
+
     fireEvent.change(screen.getByLabelText('Company'), {
       target: { value: 'Acme Careers' },
+    });
+    fireEvent.change(nextAction, {
+      target: { value: '2026-09-03' },
+    });
+    fireEvent.change(screen.getByLabelText('Notes'), {
+      target: { value: 'Follow up with the recruiter.' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save to pipeline' }));
 
@@ -137,6 +152,8 @@ describe('FloatingPanel', () => {
       role: 'Senior Engineer',
       jobUrl: 'https://jobs.example/acme',
       stage: 'saved',
+      nextActionAt: '2026-09-03',
+      notes: 'Follow up with the recruiter.',
     });
   });
 });
