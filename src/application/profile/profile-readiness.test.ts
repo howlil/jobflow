@@ -22,7 +22,7 @@ describe('calculateProfileReadiness', () => {
     });
   });
 
-  it('counts only useful completed sections', () => {
+  it('does not count an orphan compatibility-registry skill as active', () => {
     const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
     const base = profile.baseProfile;
 
@@ -42,16 +42,16 @@ describe('calculateProfileReadiness', () => {
     });
 
     expect(calculateProfileReadiness(base)).toMatchObject({
-      completed: 3,
+      completed: 2,
       total: 6,
-      percentage: 50,
+      percentage: 33,
       sections: {
         identity: true,
         contact: true,
         links: false,
         experience: false,
         education: false,
-        skills: true,
+        skills: false,
       },
     });
   });
@@ -75,6 +75,7 @@ describe('calculateProfileReadiness', () => {
       current: true,
       description: '',
       achievements: [],
+      skills: ['TypeScript'],
     });
     base.professional.education.push({
       id: 'education-1',
@@ -87,12 +88,6 @@ describe('calculateProfileReadiness', () => {
       gpa: null,
       maxGpa: null,
       description: '',
-    });
-    base.professional.skills.push({
-      id: 'skill-1',
-      name: 'TypeScript',
-      level: '',
-      yearsExperience: null,
     });
 
     expect(calculateProfileReadiness(base).percentage).toBe(100);
