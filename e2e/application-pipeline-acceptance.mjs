@@ -22,7 +22,9 @@ async function createApplication(page, application) {
   await page.getByLabel('Company', { exact: true }).fill(application.company);
   await page.getByLabel('Role', { exact: true }).fill(application.role);
   await page.getByLabel('Job URL', { exact: true }).fill(application.jobUrl);
-  await page.getByLabel('Stage', { exact: true }).selectOption(application.stage);
+  await page
+    .getByLabel('Stage', { exact: true })
+    .selectOption(application.stage);
   await page.getByLabel('Source', { exact: true }).fill(application.source);
   await page
     .getByLabel('Next action', { exact: true })
