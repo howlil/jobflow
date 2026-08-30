@@ -93,12 +93,13 @@ try {
   const search = workspace.getByLabel(/^Search jobs$/);
   await search.fill('gojek');
   let gojekCard = await expectCardVisible(workspace, 'Gojek');
-  await expect(gojekCard.getByText('Backend Engineer')).toBeVisible();
+  await expect(gojekCard).toContainText('Backend Engineer');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
   await search.fill('');
   await workspace.getByRole('button', { name: 'Needs action 1' }).click();
   gojekCard = await expectCardVisible(workspace, 'Gojek');
+  await expect(gojekCard).toContainText('Backend Engineer');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
   await workspace.getByRole('button', { name: 'Board', exact: true }).click();
@@ -123,8 +124,9 @@ try {
     }),
   });
   await interviewColumn.scrollIntoViewIfNeeded();
-  await expect(interviewColumn.getByText('Gojek')).toBeVisible();
-  await expect(interviewColumn.getByText('Traveloka')).toBeVisible();
+  await expect(interviewColumn).toBeVisible();
+  await expect(interviewColumn).toContainText('Gojek');
+  await expect(interviewColumn).toContainText('Traveloka');
   await expect(
     persistedWorkspace.getByText('2 active opportunities · 1 need action'),
   ).toBeVisible();
