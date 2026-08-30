@@ -1,8 +1,10 @@
 import { Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button,
   EmptyState,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Section,
   SectionHeader,
   TextareaField,
@@ -26,7 +28,10 @@ export function DocumentsSection({
         title="Reusable answers"
         description="Keep answers you reuse across application forms. Resume files are managed above as stored documents."
         action={
-          <Button
+          <IconButton
+            size="sm"
+            aria-label="Add answer"
+            title="Add answer"
             onClick={() =>
               changeProfile((draft) =>
                 draft.baseProfile.customAnswers.push({
@@ -40,20 +45,41 @@ export function DocumentsSection({
             }
           >
             <Plus aria-hidden="true" size={16} />
-            Add answer
-          </Button>
+          </IconButton>
         }
       />
 
       {profile.baseProfile.customAnswers.length === 0 ? (
         <EmptyState>No reusable answers added yet.</EmptyState>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {profile.baseProfile.customAnswers.map((answer, index) => (
-            <article
-              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+            <RecordCard
               key={answer.id}
+              action={
+                <IconButton
+                  size="xs"
+                  tone="danger"
+                  aria-label={`Remove answer ${index + 1}`}
+                  title={`Remove answer ${index + 1}`}
+                  onClick={() =>
+                    changeProfile((draft) =>
+                      draft.baseProfile.customAnswers.splice(index, 1),
+                    )
+                  }
+                >
+                  <Trash2 aria-hidden="true" size={14} />
+                </IconButton>
+              }
             >
+              <RecordHeader
+                title={answer.question || `Reusable answer ${index + 1}`}
+                context={
+                  answer.tags.length > 0
+                    ? answer.tags.join(' · ')
+                    : 'Reusable application response'
+                }
+              />
               <TextField
                 label="Question"
                 value={answer.question}
@@ -85,19 +111,7 @@ export function DocumentsSection({
                   })
                 }
               />
-              <Button
-                className="justify-self-start"
-                variant="danger"
-                onClick={() =>
-                  changeProfile((draft) =>
-                    draft.baseProfile.customAnswers.splice(index, 1),
-                  )
-                }
-              >
-                <Trash2 aria-hidden="true" size={16} />
-                Remove answer
-              </Button>
-            </article>
+            </RecordCard>
           ))}
         </div>
       )}
