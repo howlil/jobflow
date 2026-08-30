@@ -323,7 +323,8 @@ export function ExperienceSection({
                         {...monthInputProps(experience.endDate)}
                         disabled={experience.current}
                         error={
-                          !experience.current && invalidMonth(experience.endDate)
+                          !experience.current &&
+                          invalidMonth(experience.endDate)
                             ? 'Stored value is not a valid month. Choose a month to replace it.'
                             : undefined
                         }
