@@ -19,7 +19,7 @@ function createService(
 }
 
 describe('ApplicationsWorkspace', () => {
-  it('uses the active hiring funnel as the primary workspace and separates closed jobs', async () => {
+  it('shows the active funnel and separates closed jobs', async () => {
     const applications: JobApplication[] = [
       {
         id: 'active',
@@ -41,7 +41,9 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={createService(applications)} />);
 
     expect(await screen.findByText('Backend Engineer')).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Job pipeline' })).not.toBeNull();
+    expect(
+      screen.getByRole('heading', { name: 'Job pipeline' }),
+    ).not.toBeNull();
     expect(screen.getByRole('heading', { name: 'Saved' })).not.toBeNull();
     expect(screen.getByRole('heading', { name: 'Applied' })).not.toBeNull();
     expect(screen.getByRole('heading', { name: 'Assessment' })).not.toBeNull();
@@ -59,7 +61,7 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByRole('heading', { name: 'Withdrawn' })).not.toBeNull();
   });
 
-  it('opens job creation only on demand and creates through the shared service', async () => {
+  it('creates jobs from an on-demand form', async () => {
     const service = createService();
     render(<ApplicationsWorkspace service={service} />);
 
@@ -192,7 +194,9 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={service} />);
 
     await screen.findByText('Backend Engineer');
-    expect(screen.getByText('3 active opportunities · 2 need action')).not.toBeNull();
+    expect(
+      screen.getByText('3 active opportunities · 2 need action'),
+    ).not.toBeNull();
 
     fireEvent.change(screen.getByLabelText('Search jobs'), {
       target: { value: 'gojek' },
