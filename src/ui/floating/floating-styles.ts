@@ -58,7 +58,8 @@ export const FLOATING_STYLES = `
 
 .jobflow-launcher:focus-visible,
 .jobflow-panel button:focus-visible,
-.jobflow-panel input:focus-visible {
+.jobflow-panel input:focus-visible,
+.jobflow-panel textarea:focus-visible {
   outline: 2px solid var(--jobflow-text);
   outline-offset: 3px;
 }
@@ -106,7 +107,8 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel button,
-.jobflow-panel input {
+.jobflow-panel input,
+.jobflow-panel textarea {
   font: inherit;
 }
 
@@ -470,7 +472,8 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__unlock input,
 .jobflow-panel__form input,
-.jobflow-panel__form select {
+.jobflow-panel__form select,
+.jobflow-panel__form textarea {
   width: 100%;
   min-height: 40px;
   padding: 8px 12px;
@@ -478,6 +481,11 @@ export const FLOATING_STYLES = `
   border-radius: 8px;
   background: var(--jobflow-surface);
   color: var(--jobflow-text);
+}
+
+.jobflow-panel__form textarea {
+  min-height: 88px;
+  resize: vertical;
 }
 
 .jobflow-panel__status {
