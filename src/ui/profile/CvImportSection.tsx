@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Trash2 } from 'lucide-react';
 
 import type { CvImportWorkflow } from '../../application/profile/cv-import-workflow';
 import type {
@@ -16,6 +17,7 @@ import {
   Chip,
   EmptyState,
   FilePicker,
+  IconButton,
   SectionHeader,
   StatusMessage,
 } from '../design-system/primitives';
@@ -262,13 +264,16 @@ export function CvImportSection({
                       </span>
                     ) : null}
                   </div>
-                  <Button
-                    variant="danger"
+                  <IconButton
+                    size="xs"
+                    tone="danger"
+                    aria-label={`Remove ${document.fileName}`}
+                    title={`Remove ${document.fileName}`}
                     disabled={busy}
                     onClick={() => void removeResume(document)}
                   >
-                    Remove
-                  </Button>
+                    <Trash2 aria-hidden="true" size={14} />
+                  </IconButton>
                 </div>
               );
             })}
