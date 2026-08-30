@@ -122,7 +122,9 @@ try {
     exact: true,
   });
   await expect(interviewHeading).toBeAttached();
-  const interviewColumn = interviewHeading.locator('xpath=ancestor::section[1]');
+  const interviewColumn = interviewHeading.locator(
+    'xpath=ancestor::section[1]',
+  );
   await interviewColumn.scrollIntoViewIfNeeded();
   await expect(interviewColumn).toBeVisible();
   await expect(interviewColumn).toContainText('Gojek');
