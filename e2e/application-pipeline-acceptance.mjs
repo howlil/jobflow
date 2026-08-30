@@ -51,7 +51,7 @@ try {
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
-  const workspace = page.locator('#applications');
+  const workspace = page.locator('#applications:visible');
   await expect(
     workspace.getByRole('heading', { name: 'Job pipeline' }),
   ).toBeVisible();
@@ -106,7 +106,7 @@ try {
   await page.reload();
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
-  const persistedWorkspace = page.locator('#applications');
+  const persistedWorkspace = page.locator('#applications:visible');
   const interviewColumn = persistedWorkspace.locator('section').filter({
     has: persistedWorkspace.getByRole('heading', {
       name: 'Interview',
