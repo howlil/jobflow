@@ -46,9 +46,7 @@ try {
   const extensionId = await getExtensionId(context);
   const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page
-    .getByRole('button', { name: 'Applications', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Applications', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Applications' }),
   ).toBeVisible();
@@ -95,9 +93,7 @@ try {
   );
 
   await page.reload();
-  await page
-    .getByRole('button', { name: 'Applications', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Applications', exact: true }).click();
 
   const persistedGojekCard = page
     .locator('article')
