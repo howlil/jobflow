@@ -18,7 +18,7 @@ describe('LinkedSkillEditor', () => {
       />,
     );
 
-    const input = screen.getByRole('textbox', { name: 'Skills' });
+    const input = screen.getByRole('combobox', { name: 'Skills' });
     fireEvent.change(input, { target: { value: 'TypeScript' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
@@ -40,7 +40,7 @@ describe('LinkedSkillEditor', () => {
       />,
     );
 
-    const input = screen.getByRole('textbox', { name: 'Skills' });
+    const input = screen.getByRole('combobox', { name: 'Skills' });
     fireEvent.change(input, { target: { value: ' postgresql ' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
