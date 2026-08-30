@@ -25,6 +25,12 @@ import {
   TextField,
   TextareaField,
 } from '../design-system/primitives';
+import {
+  applicationNeedsAction,
+  focusApplications,
+  localDateKey,
+  type ApplicationView,
+} from './application-focus';
 
 const STAGE_LABELS: Record<ApplicationStage, string> = {
   saved: 'Saved',
@@ -73,14 +79,11 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
   };
 }
 
-function nextActionStatus(application: JobApplication): string | null {
+function nextActionStatus(
+  application: JobApplication,
+  todayKey: string,
+): string | null {
   if (application.nextActionAt === undefined) return null;
-  const today = new Date();
-  const todayKey = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0'),
-  ].join('-');
   const actionKey = application.nextActionAt.slice(0, 10);
 
   if (actionKey < todayKey) return `Overdue ${application.nextActionAt}`;
@@ -99,6 +102,9 @@ export function ApplicationsWorkspace({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [applicationView, setApplicationView] =
+    useState<ApplicationView>('all');
 
   async function reload(active = true) {
     try {
@@ -170,6 +176,15 @@ export function ApplicationsWorkspace({
 
   const submitLabel =
     editingId === null ? 'Create application' : 'Save changes';
+  const todayKey = localDateKey(new Date());
+  const actionableCount = applications.filter((application) =>
+    applicationNeedsAction(application, todayKey),
+  ).length;
+  const visibleApplications = focusApplications(applications, {
+    query,
+    view: applicationView,
+    todayKey,
+  });
 
   return (
     <Section id="applications">
@@ -276,14 +291,56 @@ export function ApplicationsWorkspace({
         </ActionRow>
       </div>
 
+      <div className="grid gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <TextField
+            className="min-w-0 flex-1"
+            label="Search applications"
+            placeholder="Company or role"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          <div
+            aria-label="Application view"
+            className="flex shrink-0 gap-2"
+            role="group"
+          >
+            <Button
+              aria-pressed={applicationView === 'all'}
+              variant={applicationView === 'all' ? 'primary' : 'default'}
+              onClick={() => setApplicationView('all')}
+            >
+              All
+            </Button>
+            <Button
+              aria-pressed={applicationView === 'needs-action'}
+              variant={
+                applicationView === 'needs-action' ? 'primary' : 'default'
+              }
+              onClick={() => setApplicationView('needs-action')}
+            >
+              Needs action
+            </Button>
+          </div>
+        </div>
+        <p className="m-0 text-xs text-app-subtle">
+          {actionableCount === 1
+            ? '1 application needs attention.'
+            : `${actionableCount} applications need attention.`}
+        </p>
+      </div>
+
       {loading ? (
         <p className="m-0 text-xs text-app-text">Loading applications...</p>
       ) : applications.length === 0 ? (
         <EmptyState>No applications saved yet.</EmptyState>
+      ) : visibleApplications.length === 0 ? (
+        <EmptyState>No applications match this view.</EmptyState>
       ) : (
         <div className="grid gap-6">
           {APPLICATION_STAGES.map((stage) => {
-            const items = applications.filter(
+            const items = visibleApplications.filter(
               (application) => application.stage === stage,
             );
             return (
@@ -303,7 +360,7 @@ export function ApplicationsWorkspace({
                 ) : (
                   <div className="grid gap-3">
                     {items.map((application) => {
-                      const dueStatus = nextActionStatus(application);
+                      const dueStatus = nextActionStatus(application, todayKey);
                       return (
                         <RecordCard
                           key={application.id}
