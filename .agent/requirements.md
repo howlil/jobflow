@@ -43,6 +43,14 @@ The codebase currently includes:
 
 This section describes current capability, not a promise to preserve every current implementation detail.
 
+## Career skill ownership
+
+- Skills are authored through Experience and Projects; there is no standalone Skills workspace.
+- The active skill inventory is the case-insensitive unique union of `Experience.skills` and `Project.skills`.
+- Skill proficiency/level and years-of-experience are not part of the current user-facing skill model.
+- The persisted professional skill registry may remain as a compatibility index for stable internal IDs, but an unlinked registry entry is not an active career skill.
+- CV import must not create standalone active skills or fabricate skill-to-experience/project relationships.
+
 ## Requirement discipline
 
 Specify only what is needed to remove ambiguity for the current logical change.
