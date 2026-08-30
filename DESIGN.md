@@ -91,11 +91,12 @@ Do not round every container. Large content groups may use open layouts separate
 ### Shadows
 
 ```text
-launcher  subtle floating shadow only
-panel     subtle left-facing shadow only
+launcher  subtle floating shadow
+panel     subtle left-facing shadow
+record    very subtle shadow for repeated editable object cards
 ```
 
-Ordinary workspace sections have no shadow.
+Open workspace sections do not use shadows. A repeatable record may use a very subtle shadow together with a neutral border when the boundary helps scanning and editing. Do not turn ordinary text groups or whole pages into floating cards.
 
 ## Surface model
 
@@ -175,11 +176,15 @@ For the options/profile surface:
 ```text
 tailwind.config.ts              shared tokens
 src/ui/design-system/tailwind.css
-                                Tailwind directives + base + stable repeated primitives/form grammar
-React components                layout, spacing, responsive composition, local presentation
+                                Tailwind directives + base + compatibility grammar
+src/ui/design-system/primitives.tsx
+                                reusable control and record contracts
+React feature components        data ownership + local composition only
 ```
 
-Do not use `@apply` to recreate a parallel BEM stylesheet for page shells or navigation. Prefer direct utilities for local composition and reusable React components for repeated structural patterns.
+Do not use `@apply` to recreate a parallel BEM component library for page shells or navigation. Prefer shared React primitives for repeated controls and object patterns, and direct utilities only for feature-specific composition.
+
+When a repeated concept already has a primitive or record contract, callers must reuse it instead of reproducing its border, radius, spacing, action placement, or focus behavior locally.
 
 ### 2. Job-page assistant — fixed right slide panel
 
@@ -251,6 +256,17 @@ Secondary: white/transparent with a clear border.
 Ghost: transparent for navigation or low-emphasis controls.
 Danger: semantic danger styling only for destructive actions.
 
+### Icon actions
+
+CRUD actions for repeatable records use compact icon buttons:
+
+```text
+section-level add      + icon, accessible label/title required
+record-level remove    trash icon, danger tone on hover/focus
+```
+
+Use the shared icon-button size contract instead of caller-specific `!h-*` / `!w-*` overrides. Text danger buttons remain appropriate for broader destructive workflows such as resetting all learned mappings or deleting the encrypted vault, where explicit wording reduces risk.
+
 ### Input
 
 Workspace controls target roughly 38–44px height. Labels sit above controls. Placeholder text is never used as a label.
@@ -266,6 +282,33 @@ content
 ```
 
 Use a bordered container when the object benefits from a real boundary, such as an experience record, CV import region, or sensitive/destructive operation. Do not wrap every text group in a card.
+
+### Repeatable record
+
+Repeatable editable objects such as experience, education, skills, languages, certifications, projects, application variants, and reusable answers share one visual contract:
+
+```text
+white surface
+neutral border
+8px surface radius
+very subtle shadow
+16px internal spacing
+summary/context at top when useful
+local remove action in the top-right
+```
+
+Collapsible records and always-open records may differ in behavior, but not in surface grammar or CRUD action placement.
+
+### Linked skills
+
+Experience and project skill references use the same linked-skill editor pattern:
+
+```text
+skill input + level + add icon
+-> removable skill badges
+```
+
+The canonical Skills section remains the owner of skill level and years-of-experience data. Linked records reference the canonical skill name instead of inventing a second skill model.
 
 ### Status
 
