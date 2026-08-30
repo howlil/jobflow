@@ -14,7 +14,7 @@ import { ProfilePage } from './ProfilePage';
 function visibleInputByLabel(label: string): HTMLInputElement {
   const input = screen
     .getAllByLabelText<HTMLInputElement>(label)
-    .find((element) => element.closest('section')?.hidden === false);
+    .find((element) => element.closest('details[hidden]') === null);
 
   if (input === undefined) {
     throw new Error(`Could not find visible input for ${label}`);
@@ -183,11 +183,11 @@ describe('ProfilePage', () => {
 
     expect(await screen.findByLabelText('First name')).not.toBeNull();
     expect(
-      screen.getByLabelText('Primary email').closest('section')?.hidden,
-    ).toBe(false);
-    expect(screen.getByLabelText('LinkedIn').closest('section')?.hidden).toBe(
-      false,
-    );
+      screen.getByLabelText('Primary email').closest('details[hidden]'),
+    ).toBeNull();
+    expect(
+      screen.getByLabelText('LinkedIn').closest('details[hidden]'),
+    ).toBeNull();
     expect(
       screen.getByRole('button', { name: 'Add experience', hidden: true }),
     ).not.toBeNull();
@@ -196,12 +196,12 @@ describe('ProfilePage', () => {
       <ProfilePage repository={repository} activeSection="experience" />,
     );
 
-    expect(screen.getByLabelText('First name').closest('section')?.hidden).toBe(
-      true,
-    );
     expect(
-      screen.getByLabelText('Primary email').closest('section')?.hidden,
-    ).toBe(true);
+      screen.getByLabelText('First name').closest('details[hidden]'),
+    ).not.toBeNull();
+    expect(
+      screen.getByLabelText('Primary email').closest('details[hidden]'),
+    ).not.toBeNull();
     expect(
       screen.getByRole('button', { name: 'Add experience' }),
     ).not.toBeNull();
