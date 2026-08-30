@@ -117,12 +117,12 @@ try {
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
   const persistedWorkspace = page.locator('#applications');
-  const interviewColumn = persistedWorkspace.locator('section').filter({
-    has: persistedWorkspace.getByRole('heading', {
-      name: 'Interview',
-      exact: true,
-    }),
+  const interviewHeading = persistedWorkspace.getByRole('heading', {
+    name: 'Interview',
+    exact: true,
   });
+  await expect(interviewHeading).toBeAttached();
+  const interviewColumn = interviewHeading.locator('xpath=ancestor::section[1]');
   await interviewColumn.scrollIntoViewIfNeeded();
   await expect(interviewColumn).toBeVisible();
   await expect(interviewColumn).toContainText('Gojek');
