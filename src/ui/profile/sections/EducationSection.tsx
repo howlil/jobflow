@@ -86,10 +86,7 @@ export function EducationSection({
                   title={`Remove education ${index + 1}`}
                   onClick={() =>
                     changeProfile((draft) => {
-                      draft.baseProfile.professional.education.splice(
-                        index,
-                        1,
-                      );
+                      draft.baseProfile.professional.education.splice(index, 1);
                     })
                   }
                 >
@@ -166,7 +163,9 @@ export function EducationSection({
                           const item =
                             draft.baseProfile.professional.education[index];
                           if (item !== undefined)
-                            item.maxGpa = parseNullableNumber(event.target.value);
+                            item.maxGpa = parseNullableNumber(
+                              event.target.value,
+                            );
                         })
                       }
                     />
