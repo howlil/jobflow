@@ -1,16 +1,14 @@
 import { Download, Upload } from 'lucide-react';
 
+import { ActionRow, Button, FilePicker } from '../../design-system/primitives';
 import {
-  ActionRow,
-  Button,
-  FilePicker,
-  Section,
-  SectionHeader,
-} from '../../design-system/primitives';
-import type { WorkspaceSection } from '../workspace-sections';
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
+import type { WorkspaceSection as WorkspaceSectionId } from '../workspace-sections';
 
 type BackupSectionProps = {
-  activeSection: WorkspaceSection;
+  activeSection: WorkspaceSectionId;
   exportProfile: () => void;
   importProfile: (file: File) => void;
 };
@@ -21,8 +19,8 @@ export function BackupSection({
   importProfile,
 }: BackupSectionProps) {
   return (
-    <Section hidden={activeSection !== 'backup'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'backup'}>
+      <WorkspaceSectionHeader
         title="Backup and recovery"
         description="Export contains the normal versioned profile and variants. Sensitive vault values are not exported as plaintext."
       />
@@ -43,6 +41,6 @@ export function BackupSection({
           }
         />
       </ActionRow>
-    </Section>
+    </WorkspaceSection>
   );
 }
