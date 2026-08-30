@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Trash2 } from 'lucide-react';
 
 import type { CorrectionRepository } from '../../application/corrections/correction-repository';
 import type { FieldCorrection } from '../../domain/corrections/correction-schema';
@@ -8,6 +9,9 @@ import {
   Button,
   Chip,
   EmptyState,
+  IconButton,
+  RecordCard,
+  RecordHeader,
   Section,
   SectionHeader,
   StatusMessage,
@@ -113,38 +117,34 @@ export function CorrectionMemorySection({
         <EmptyState>No learned mappings yet.</EmptyState>
       ) : null}
 
-      <div className="grid gap-3">
+      <div className="grid gap-4">
         {groups.map(([origin, siteEntries]) => {
           const label = originLabel(origin);
           return (
-            <article
-              className="grid gap-4 rounded-app border border-app-border bg-app-muted p-4"
+            <RecordCard
               key={origin}
-            >
-              <div className="flex items-start justify-between gap-4 max-sm:flex-col max-sm:items-stretch">
-                <div className="grid min-w-0 gap-1">
-                  <strong className="text-sm font-semibold text-app-ink">
-                    {label}
-                  </strong>
-                  <p className="m-0 break-all text-xs leading-5 text-app-text">
-                    {origin}
-                  </p>
-                </div>
+              action={
                 <Button
-                  className="shrink-0"
+                  className="min-h-8 px-2 py-1"
                   aria-label={`Reset ${label}`}
                   onClick={() => void resetOrigin(origin)}
                 >
                   Reset site
                 </Button>
-              </div>
+              }
+            >
+              <RecordHeader
+                title={label}
+                context={origin}
+                meta={`${siteEntries.length} mapping${siteEntries.length === 1 ? '' : 's'}`}
+              />
 
-              <ul className="m-0 grid list-none p-0">
+              <ul className="m-0 grid list-none border-t border-app-border p-0">
                 {siteEntries.map((entry) => {
                   const stale = isCorrectionStale(entry, now);
                   return (
                     <li
-                      className="flex items-start justify-between gap-4 border-t border-app-border py-3 first:border-t-0 first:pt-0 last:pb-0 max-sm:flex-col"
+                      className="flex items-start justify-between gap-4 border-b border-app-border py-3 last:border-b-0 last:pb-0 max-sm:flex-col"
                       key={`${entry.formFingerprint}:${entry.fieldFingerprint}`}
                     >
                       <div className="grid min-w-0 gap-1.5">
@@ -159,18 +159,21 @@ export function CorrectionMemorySection({
                           {entry.fieldFingerprint}
                         </div>
                       </div>
-                      <Button
+                      <IconButton
                         className="shrink-0"
-                        variant="danger"
+                        size="xs"
+                        tone="danger"
+                        aria-label={`Delete mapping ${entry.target}`}
+                        title={`Delete mapping ${entry.target}`}
                         onClick={() => void remove(entry)}
                       >
-                        Delete mapping
-                      </Button>
+                        <Trash2 aria-hidden="true" size={14} />
+                      </IconButton>
                     </li>
                   );
                 })}
               </ul>
-            </article>
+            </RecordCard>
           );
         })}
       </div>
