@@ -27,7 +27,7 @@ const groups = [
     label: 'Application',
     items: [
       { id: 'documents', label: 'Documents', icon: FileText },
-      { id: 'applications', label: 'Applications', icon: ClipboardList },
+      { id: 'applications', label: 'Pipeline', icon: ClipboardList },
       { id: 'preferences', label: 'Preferences', icon: MapPin },
       { id: 'variants', label: 'Variants', icon: ListChecks },
     ],

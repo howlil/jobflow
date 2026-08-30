@@ -19,9 +19,54 @@ function createService(
 }
 
 describe('ApplicationsWorkspace', () => {
-  it('creates a local application through the shared service', async () => {
+  it('shows the active funnel and separates closed jobs', async () => {
+    const applications: JobApplication[] = [
+      {
+        id: 'active',
+        company: 'Gojek',
+        role: 'Backend Engineer',
+        stage: 'applied',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T03:00:00.000Z',
+      },
+      {
+        id: 'closed',
+        company: 'Traveloka',
+        role: 'Platform Engineer',
+        stage: 'rejected',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T02:00:00.000Z',
+      },
+    ];
+    render(<ApplicationsWorkspace service={createService(applications)} />);
+
+    expect(await screen.findByText('Backend Engineer')).not.toBeNull();
+    expect(
+      screen.getByRole('heading', { name: 'Job pipeline' }),
+    ).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Saved' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Applied' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Assessment' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Interview' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Offer' })).not.toBeNull();
+    expect(screen.queryByText('Platform Engineer')).toBeNull();
+    expect(screen.queryByLabelText('Company')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Closed 1' }));
+
+    expect(screen.getByText('Platform Engineer')).not.toBeNull();
+    expect(screen.queryByText('Backend Engineer')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Accepted' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Rejected' })).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Withdrawn' })).not.toBeNull();
+  });
+
+  it('creates jobs from an on-demand form', async () => {
     const service = createService();
     render(<ApplicationsWorkspace service={service} />);
+
+    expect(screen.queryByLabelText('Company')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Add job' }));
 
     fireEvent.change(screen.getByLabelText('Company'), {
       target: { value: 'Acme' },
@@ -32,7 +77,7 @@ describe('ApplicationsWorkspace', () => {
     fireEvent.change(screen.getByLabelText('Job URL'), {
       target: { value: 'https://jobs.example/acme' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Create application' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to pipeline' }));
 
     await waitFor(() =>
       expect(service.create).toHaveBeenCalledWith({
@@ -47,17 +92,15 @@ describe('ApplicationsWorkspace', () => {
         nextActionAt: '',
       }),
     );
+    expect(screen.queryByLabelText('Company')).toBeNull();
   });
 
-  it('moves an application between stages without drag and drop', async () => {
+  it('moves an active job directly to the next pipeline stage', async () => {
     const application: JobApplication = {
       id: 'app-1',
       company: 'Acme',
       role: 'Engineer',
       stage: 'applied',
-      notes: 'Schedule hiring manager follow-up.',
-      source: 'Referral',
-      contactName: 'Maya',
       nextActionAt: '2000-01-01',
       createdAt: '2026-08-30T00:00:00.000Z',
       updatedAt: '2026-08-30T00:00:00.000Z',
@@ -66,23 +109,16 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={service} />);
 
     await screen.findByText('Engineer');
-    expect(
-      screen.getByText('Schedule hiring manager follow-up.'),
-    ).not.toBeNull();
-    expect(screen.getByText('Source: Referral')).not.toBeNull();
-    expect(screen.getByText('Contact: Maya')).not.toBeNull();
     expect(screen.getByText('Overdue 2000-01-01')).not.toBeNull();
 
-    fireEvent.change(screen.getByLabelText('Move stage'), {
-      target: { value: 'interview' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'Assessment →' }));
 
     await waitFor(() =>
-      expect(service.changeStage).toHaveBeenCalledWith('app-1', 'interview'),
+      expect(service.changeStage).toHaveBeenCalledWith('app-1', 'assessment'),
     );
   });
 
-  it('opens application details for editing', async () => {
+  it('opens full job details only for editing', async () => {
     const application: JobApplication = {
       id: 'app-1',
       company: 'Acme',
@@ -100,7 +136,10 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={service} />);
 
     await screen.findByText('Engineer');
+    expect(screen.queryByText('Initial note.')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Edit Acme Engineer' }));
+
+    expect(screen.getByDisplayValue('Initial note.')).not.toBeNull();
     fireEvent.change(screen.getByLabelText('Notes'), {
       target: { value: 'Updated note.' },
     });
@@ -121,7 +160,7 @@ describe('ApplicationsWorkspace', () => {
     );
   });
 
-  it('combines company search with the needs-action view', async () => {
+  it('combines search with the needs-action work queue', async () => {
     const applications: JobApplication[] = [
       {
         id: 'gojek-due',
@@ -155,9 +194,11 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={service} />);
 
     await screen.findByText('Backend Engineer');
-    expect(screen.getByText('2 applications need attention.')).not.toBeNull();
+    expect(
+      screen.getByText('3 active opportunities · 2 need action'),
+    ).not.toBeNull();
 
-    fireEvent.change(screen.getByLabelText('Search applications'), {
+    fireEvent.change(screen.getByLabelText('Search jobs'), {
       target: { value: 'gojek' },
     });
 
@@ -165,7 +206,7 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByText('Platform Engineer')).not.toBeNull();
     expect(screen.queryByText('Software Engineer')).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Needs action' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
 
     expect(screen.getByText('Backend Engineer')).not.toBeNull();
     expect(screen.queryByText('Platform Engineer')).toBeNull();

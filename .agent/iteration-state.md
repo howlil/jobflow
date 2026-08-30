@@ -40,6 +40,7 @@ None. Current work remains inside the existing Job Flow product contract.
 - normal canonical autofill fields are defined once in `canonical-fields.ts`; runtime validation and compile-time consumers share that source
 - the floating assistant uses the canonical neutral visual tokens and presents human-readable canonical-field labels
 - the local application pipeline stores reviewed applications in versioned local storage, supports workspace CRUD, lightweight opportunity details, next-action tracking, and explicit stage changes while preserving no-backend, no-cloud-sync, and no-auto-submit boundaries
+- the application workspace is presented as Pipeline: active opportunities use a horizontal Saved → Applied → Assessment → Interview → Offer board, due work has a dedicated Needs action view, terminal Accepted/Rejected/Withdrawn outcomes live in Closed, and add/edit details are contextual rather than permanently occupying the primary surface
 
 ## Uncommitted candidate context
 

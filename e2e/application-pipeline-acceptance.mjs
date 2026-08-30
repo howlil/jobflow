@@ -19,17 +19,29 @@ async function getExtensionId(context) {
 }
 
 async function createApplication(workspace, application) {
-  const stage = workspace.getByRole('combobox').first();
-
+  await workspace.getByRole('button', { name: 'Add job' }).click();
   await workspace.getByLabel(/^Company$/).fill(application.company);
   await workspace.getByLabel(/^Role$/).fill(application.role);
   await workspace.getByLabel(/^Job URL$/).fill(application.jobUrl);
-  await stage.selectOption(application.stage);
+  await workspace.locator('select').selectOption(application.stage);
   await workspace.getByLabel(/^Source$/).fill(application.source);
   await workspace.getByLabel(/^Next action$/).fill(application.nextActionAt);
   await workspace.getByLabel(/^Notes$/).fill(application.notes);
-  await workspace.getByRole('button', { name: 'Create application' }).click();
-  await expect(workspace.getByRole('status')).toHaveText('Application saved.');
+  await workspace.getByRole('button', { name: 'Add to pipeline' }).click();
+  await expect(workspace.getByRole('status')).toHaveText(
+    'Job added to pipeline.',
+  );
+}
+
+function applicationCard(workspace, company) {
+  return workspace.locator('article').filter({ hasText: company }).first();
+}
+
+async function expectCardVisible(workspace, company) {
+  const card = applicationCard(workspace, company);
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeVisible();
+  return card;
 }
 
 const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-applications-'));
@@ -48,11 +60,11 @@ try {
   const extensionId = await getExtensionId(context);
   const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page.getByRole('button', { name: 'Applications', exact: true }).click();
+  await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
   const workspace = page.locator('#applications');
   await expect(
-    workspace.getByRole('heading', { name: 'Applications' }),
+    workspace.getByRole('heading', { name: 'Job pipeline' }),
   ).toBeVisible();
 
   await createApplication(workspace, {
@@ -75,43 +87,50 @@ try {
   });
 
   await expect(
-    workspace.getByText('1 application needs attention.'),
+    workspace.getByText('2 active opportunities · 1 need action'),
   ).toBeVisible();
 
-  const search = workspace.getByLabel(/^Search applications$/);
+  const search = workspace.getByLabel(/^Search jobs$/);
   await search.fill('gojek');
-  await expect(workspace.getByText('Backend Engineer')).toBeVisible();
+  let gojekCard = await expectCardVisible(workspace, 'Gojek');
+  await expect(gojekCard).toContainText('Backend Engineer');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
   await search.fill('');
-  await workspace.getByRole('button', { name: 'Needs action' }).click();
-  await expect(workspace.getByText('Gojek')).toBeVisible();
+  await workspace.getByRole('button', { name: 'Needs action 1' }).click();
+  gojekCard = await expectCardVisible(workspace, 'Gojek');
+  await expect(gojekCard).toContainText('Backend Engineer');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
-  await workspace.getByRole('button', { name: 'All', exact: true }).click();
-  const gojekCard = workspace
-    .locator('article')
-    .filter({ hasText: 'Gojek' })
-    .first();
-  await gojekCard.getByRole('combobox').selectOption('interview');
+  await workspace.getByRole('button', { name: 'Board', exact: true }).click();
+  gojekCard = await expectCardVisible(workspace, 'Gojek');
+  await gojekCard.getByRole('button', { name: 'Assessment →' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
-    'Application stage updated.',
+    'Moved to Assessment.',
   );
+
+  gojekCard = await expectCardVisible(workspace, 'Gojek');
+  await gojekCard.getByRole('button', { name: 'Interview →' }).click();
+  await expect(workspace.getByRole('status')).toHaveText('Moved to Interview.');
 
   await page.reload();
-  await page.getByRole('button', { name: 'Applications', exact: true }).click();
+  await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
-  const persistedGojekCard = workspace
-    .locator('article')
-    .filter({ hasText: 'Gojek' })
-    .first();
-  await expect(persistedGojekCard).toBeVisible();
-  await expect(persistedGojekCard.getByRole('combobox')).toHaveValue(
-    'interview',
+  const persistedWorkspace = page.locator('#applications');
+  const interviewHeading = persistedWorkspace.getByRole('heading', {
+    name: 'Interview',
+    exact: true,
+  });
+  await expect(interviewHeading).toBeAttached();
+  const interviewColumn = interviewHeading.locator(
+    'xpath=ancestor::section[1]',
   );
-  await expect(workspace.getByText('Traveloka')).toBeVisible();
+  await interviewColumn.scrollIntoViewIfNeeded();
+  await expect(interviewColumn).toBeVisible();
+  await expect(interviewColumn).toContainText('Gojek');
+  await expect(interviewColumn).toContainText('Traveloka');
   await expect(
-    workspace.getByText('1 application needs attention.'),
+    persistedWorkspace.getByText('2 active opportunities · 1 need action'),
   ).toBeVisible();
 } finally {
   await context?.close();

@@ -19,7 +19,7 @@ function application(
   };
 }
 
-describe('application follow-up focus', () => {
+describe('application pipeline focus', () => {
   const todayKey = '2026-08-30';
 
   it('matches company and role without case sensitivity', () => {
@@ -34,7 +34,7 @@ describe('application follow-up focus', () => {
     expect(applicationMatchesQuery(item, 'frontend')).toBe(false);
   });
 
-  it('treats overdue and due-today applications as needing action', () => {
+  it('treats only active overdue and due-today applications as needing action', () => {
     expect(
       applicationNeedsAction(
         application({
@@ -70,13 +70,19 @@ describe('application follow-up focus', () => {
     ).toBe(false);
     expect(
       applicationNeedsAction(
-        application({ id: 'none', company: 'D', role: 'Engineer' }),
+        application({
+          id: 'closed',
+          company: 'D',
+          role: 'Engineer',
+          stage: 'rejected',
+          nextActionAt: '2026-08-28',
+        }),
         todayKey,
       ),
     ).toBe(false);
   });
 
-  it('filters and sorts by action urgency, date, then recency', () => {
+  it('separates active board, needs-action, and closed views', () => {
     const items = [
       application({
         id: 'none',
@@ -91,54 +97,94 @@ describe('application follow-up focus', () => {
         nextActionAt: '2026-09-01',
       }),
       application({
-        id: 'today-old',
-        company: 'Today Old',
+        id: 'today',
+        company: 'Today',
         role: 'Engineer',
         nextActionAt: '2026-08-30',
-        updatedAt: '2026-08-30T01:00:00.000Z',
+        updatedAt: '2026-08-30T03:00:00.000Z',
       }),
       application({
-        id: 'overdue-newer-date',
-        company: 'Overdue Two',
-        role: 'Engineer',
-        nextActionAt: '2026-08-29',
-      }),
-      application({
-        id: 'overdue-older-date',
-        company: 'Overdue One',
+        id: 'overdue',
+        company: 'Overdue',
         role: 'Engineer',
         nextActionAt: '2026-08-28',
       }),
       application({
-        id: 'today-new',
-        company: 'Today New',
+        id: 'accepted',
+        company: 'Accepted Co',
         role: 'Engineer',
-        nextActionAt: '2026-08-30',
-        updatedAt: '2026-08-30T03:00:00.000Z',
+        stage: 'accepted',
+        updatedAt: '2026-08-30T05:00:00.000Z',
+      }),
+      application({
+        id: 'rejected',
+        company: 'Rejected Co',
+        role: 'Engineer',
+        stage: 'rejected',
+        nextActionAt: '2026-08-20',
       }),
     ];
 
     expect(
       focusApplications(items, {
         query: '',
-        view: 'all',
+        view: 'board',
         todayKey,
       }).map((item) => item.id),
-    ).toEqual([
-      'overdue-older-date',
-      'overdue-newer-date',
-      'today-new',
-      'today-old',
-      'future',
-      'none',
-    ]);
+    ).toEqual(['overdue', 'today', 'future', 'none']);
 
     expect(
       focusApplications(items, {
-        query: 'today',
+        query: '',
         view: 'needs-action',
         todayKey,
       }).map((item) => item.id),
-    ).toEqual(['today-new', 'today-old']);
+    ).toEqual(['overdue', 'today']);
+
+    expect(
+      focusApplications(items, {
+        query: '',
+        view: 'closed',
+        todayKey,
+      }).map((item) => item.id),
+    ).toEqual(['rejected', 'accepted']);
+  });
+
+  it('combines search with the selected pipeline view', () => {
+    const items = [
+      application({
+        id: 'gojek-active',
+        company: 'Gojek',
+        role: 'Backend Engineer',
+        nextActionAt: '2026-08-30',
+      }),
+      application({
+        id: 'gojek-closed',
+        company: 'Gojek',
+        role: 'Platform Engineer',
+        stage: 'rejected',
+      }),
+      application({
+        id: 'traveloka-active',
+        company: 'Traveloka',
+        role: 'Backend Engineer',
+      }),
+    ];
+
+    expect(
+      focusApplications(items, {
+        query: 'gojek',
+        view: 'board',
+        todayKey,
+      }).map((item) => item.id),
+    ).toEqual(['gojek-active']);
+
+    expect(
+      focusApplications(items, {
+        query: 'gojek',
+        view: 'closed',
+        todayKey,
+      }).map((item) => item.id),
+    ).toEqual(['gojek-closed']);
   });
 });

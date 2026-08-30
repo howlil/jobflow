@@ -1,6 +1,20 @@
 import type { JobApplication } from '../../domain/applications/application-schema';
 
-export type ApplicationView = 'all' | 'needs-action';
+export const ACTIVE_APPLICATION_STAGES = [
+  'saved',
+  'applied',
+  'assessment',
+  'interview',
+  'offer',
+] as const;
+
+export const CLOSED_APPLICATION_STAGES = [
+  'accepted',
+  'rejected',
+  'withdrawn',
+] as const;
+
+export type ApplicationView = 'board' | 'needs-action' | 'closed';
 
 export function localDateKey(date: Date): string {
   return [
@@ -15,10 +29,15 @@ function actionDateKey(application: JobApplication): string | null {
   return value === undefined || value === '' ? null : value;
 }
 
+export function applicationIsClosed(application: JobApplication): boolean {
+  return CLOSED_APPLICATION_STAGES.some((stage) => stage === application.stage);
+}
+
 export function applicationNeedsAction(
   application: JobApplication,
   todayKey: string,
 ): boolean {
+  if (applicationIsClosed(application)) return false;
   const actionKey = actionDateKey(application);
   return actionKey !== null && actionKey <= todayKey;
 }
@@ -77,11 +96,14 @@ export function focusApplications(
     .filter((application) =>
       applicationMatchesQuery(application, options.query),
     )
-    .filter(
-      (application) =>
-        options.view === 'all' ||
-        applicationNeedsAction(application, options.todayKey),
-    )
+    .filter((application) => {
+      if (options.view === 'closed') return applicationIsClosed(application);
+      if (applicationIsClosed(application)) return false;
+      if (options.view === 'needs-action') {
+        return applicationNeedsAction(application, options.todayKey);
+      }
+      return true;
+    })
     .sort((left, right) =>
       compareApplicationsByAction(left, right, options.todayKey),
     );
