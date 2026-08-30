@@ -26,7 +26,7 @@ describe('recommendApplicationVariant', () => {
     expect(result.evidence).toContain('backend');
   });
 
-  it('uses emphasized profile skills as stronger evidence than generic role overlap', () => {
+  it('uses emphasized active skills as stronger evidence than generic role overlap', () => {
     const stored = createEmptyStoredProfile();
     stored.baseProfile.professional.skills = [
       { id: 'go', name: 'Go', level: '', yearsExperience: null },
@@ -37,6 +37,16 @@ describe('recommendApplicationVariant', () => {
         yearsExperience: null,
       },
     ];
+    stored.baseProfile.professional.projects.push({
+      id: 'platform-project',
+      name: 'Platform project',
+      role: '',
+      description: '',
+      url: '',
+      startDate: '',
+      endDate: '',
+      skills: ['Kubernetes'],
+    });
     const roleVariants: ApplicationVariant[] = [
       {
         id: 'backend-go',
@@ -61,6 +71,41 @@ describe('recommendApplicationVariant', () => {
 
     expect(result.variantId).toBe('platform-k8s');
     expect(result.evidence).toContain('skill:kubernetes');
+  });
+
+  it('ignores emphasized compatibility-registry skills that are not linked to career records', () => {
+    const stored = createEmptyStoredProfile();
+    stored.baseProfile.professional.skills = [
+      {
+        id: 'kubernetes',
+        name: 'Kubernetes',
+        level: 'Advanced',
+        yearsExperience: 5,
+      },
+    ];
+    const roleVariants: ApplicationVariant[] = [
+      {
+        id: 'default',
+        name: 'Software Engineer',
+        targetRoles: ['Software Engineer'],
+      },
+      {
+        id: 'platform',
+        name: 'Software Engineer',
+        targetRoles: ['Software Engineer'],
+        emphasizedSkillIds: ['kubernetes'],
+      },
+    ];
+
+    const result = recommendApplicationVariant(
+      roleVariants,
+      ['Software Engineer', 'Kubernetes infrastructure'],
+      'default',
+      stored.baseProfile,
+    );
+
+    expect(result.variantId).toBe('default');
+    expect(result.evidence).not.toContain('skill:kubernetes');
   });
 
   it('uses seniority evidence to break otherwise identical role matches', () => {
