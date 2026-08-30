@@ -6,11 +6,13 @@ import {
   IconButton,
   RecordCard,
   RecordHeader,
-  Section,
-  SectionHeader,
   SelectField,
   TextField,
 } from '../../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
 import {
   createProfileItemId,
   listValue,
@@ -24,8 +26,8 @@ export function VariantsSection({
   profile,
 }: ProfileSectionProps) {
   return (
-    <Section hidden={activeSection !== 'variants'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'variants'}>
+      <WorkspaceSectionHeader
         title="Application variants"
         description="Keep factual data in the base profile; variants store only role-specific overrides and preferred documents."
         action={
@@ -161,6 +163,6 @@ export function VariantsSection({
           ))}
         </div>
       )}
-    </Section>
+    </WorkspaceSection>
   );
 }
