@@ -224,9 +224,6 @@ describe('ProfilePage', () => {
     expect(
       screen.getByRole('button', { name: /add education/i }),
     ).not.toBeNull();
-    rerender(<ProfilePage repository={repository} activeSection="skills" />);
-    expect(screen.getByText('No skills added yet.')).not.toBeNull();
-    expect(screen.getByRole('button', { name: /add skill/i })).not.toBeNull();
     rerender(<ProfilePage repository={repository} activeSection="variants" />);
     expect(
       screen.getByText('No application variants added yet.'),
@@ -304,24 +301,12 @@ describe('ProfilePage', () => {
         target: { value: '- Built internal tooling\n- Reduced manual work' },
       });
 
-      fireEvent.change(visibleInputByLabel('Skill'), {
-        target: { value: 'TypeScript' },
-      });
-      fireEvent.change(screen.getByLabelText('Skill level'), {
-        target: { value: 'Advanced' },
-      });
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Add skill to experience 1' }),
-      );
-      fireEvent.change(visibleInputByLabel('Skill'), {
-        target: { value: 'React' },
-      });
-      fireEvent.change(screen.getByLabelText('Skill level'), {
-        target: { value: 'Intermediate' },
-      });
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Add skill to experience 1' }),
-      );
+      const skillInput = visibleInputByLabel('Skills');
+      fireEvent.change(skillInput, { target: { value: 'TypeScript' } });
+      fireEvent.keyDown(skillInput, { key: 'Enter', code: 'Enter' });
+      fireEvent.change(skillInput, { target: { value: 'React' } });
+      fireEvent.keyDown(skillInput, { key: 'Enter', code: 'Enter' });
+      expect(screen.queryByLabelText('Skill level')).toBeNull();
 
       rerender(
         <ProfilePage repository={repository} activeSection="education" />,
@@ -334,12 +319,8 @@ describe('ProfilePage', () => {
         target: { value: 'Bachelor' },
       });
       fireEvent.change(visibleInputByLabel('Start date'), {
-        target: { value: '01/09/2018' },
+        target: { value: '2018-09' },
       });
-
-      rerender(<ProfilePage repository={repository} activeSection="skills" />);
-      expect(screen.getByDisplayValue('TypeScript')).not.toBeNull();
-      expect(screen.getByDisplayValue('Advanced')).not.toBeNull();
 
       rerender(
         <ProfilePage repository={repository} activeSection="preferences" />,
@@ -395,13 +376,13 @@ describe('ProfilePage', () => {
     });
     expect(saved?.baseProfile.professional.education).toHaveLength(1);
     expect(saved?.baseProfile.professional.education[0]?.startDate).toBe(
-      '01/09/2018',
+      '2018-09',
     );
     expect(saved?.baseProfile.professional.skills).toHaveLength(2);
     expect(saved?.baseProfile.professional.skills).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'TypeScript', level: 'Advanced' }),
-        expect.objectContaining({ name: 'React', level: 'Intermediate' }),
+        expect.objectContaining({ name: 'TypeScript', level: '' }),
+        expect.objectContaining({ name: 'React', level: '' }),
       ]),
     );
     expect(saved?.baseProfile.jobPreferences.desiredRoles).toEqual([
@@ -422,7 +403,7 @@ describe('ProfilePage', () => {
     expect(saved?.preferences.defaultVariantId).toBe(saved?.variants[0]?.id);
   });
 
-  it('keeps saved career records collapsed and previews multiline descriptions as lists', async () => {
+  it('keeps saved career records collapsed without duplicate description previews', async () => {
     const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
     profile.baseProfile.professional.experiences.push({
       id: 'experience-1',
@@ -479,8 +460,13 @@ describe('ProfilePage', () => {
     const experienceStartDate = visibleInputByLabel('Start date');
     expect(experienceStartDate.type).toBe('month');
     expect(experienceStartDate.value).toBe('2024-02');
-    expect(screen.getByText('TypeScript · Advanced')).not.toBeNull();
-    expect(screen.getByText('Reduced manual work')).not.toBeNull();
+    expect(
+      screen.getByRole('button', {
+        name: 'Remove TypeScript from experience 1',
+      }),
+    ).not.toBeNull();
+    expect(screen.queryByText('TypeScript · Advanced')).toBeNull();
+    expect(screen.queryByText('Reduced manual work')).toBeNull();
     expect(screen.getByText('Hiring Portal')).not.toBeNull();
 
     rerender(<ProfilePage repository={repository} activeSection="education" />);
@@ -490,8 +476,10 @@ describe('ProfilePage', () => {
 
     fireEvent.click(educationSummary);
     expect(educationDetails?.open).toBe(true);
-    expect(screen.getByDisplayValue('01/09/2018')).not.toBeNull();
-    expect(screen.getByText('Led final project')).not.toBeNull();
+    const educationStartDate = visibleInputByLabel('Start date');
+    expect(educationStartDate.type).toBe('month');
+    expect(educationStartDate.value).toBe('2018-09');
+    expect(screen.queryByText('Led final project')).toBeNull();
   });
 
   it('rehydrates a persisted profile', async () => {
