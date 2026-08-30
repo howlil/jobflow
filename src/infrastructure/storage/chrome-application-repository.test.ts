@@ -28,6 +28,11 @@ describe('ChromeApplicationRepository', () => {
       role: 'Engineer',
       jobUrl: 'https://jobs.example/acme',
       stage: 'interview',
+      notes: 'Follow up after panel.',
+      source: 'Referral',
+      contactName: 'Maya',
+      contactEmail: 'maya@example.com',
+      nextActionAt: '2026-09-01',
       createdAt: '2026-08-30T00:00:00.000Z',
       updatedAt: '2026-08-30T00:00:00.000Z',
     });
@@ -39,6 +44,38 @@ describe('ChromeApplicationRepository', () => {
       browser.storage.local.get(APPLICATION_STORAGE_KEY),
     ).resolves.toEqual({
       [APPLICATION_STORAGE_KEY]: collection,
+    });
+  });
+
+  it('persists a migrated v1 application collection on load', async () => {
+    const repository = new ChromeApplicationRepository();
+    await browser.storage.local.set({
+      [APPLICATION_STORAGE_KEY]: {
+        schemaVersion: 1,
+        applications: [
+          {
+            id: 'app-1',
+            company: 'Acme',
+            role: 'Engineer',
+            stage: 'applied',
+            createdAt: '2026-08-30T00:00:00.000Z',
+            updatedAt: '2026-08-30T00:00:00.000Z',
+          },
+        ],
+        metadata: {
+          createdAt: '2026-08-30T00:00:00.000Z',
+          updatedAt: '2026-08-30T00:00:00.000Z',
+        },
+      },
+    });
+
+    const result = await repository.load();
+
+    expect(result?.schemaVersion).toBe(2);
+    await expect(
+      browser.storage.local.get(APPLICATION_STORAGE_KEY),
+    ).resolves.toMatchObject({
+      [APPLICATION_STORAGE_KEY]: { schemaVersion: 2 },
     });
   });
 
