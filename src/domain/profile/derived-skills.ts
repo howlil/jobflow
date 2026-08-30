@@ -21,7 +21,10 @@ export function deriveActiveSkillNames(baseProfile: BaseProfile): string[] {
   return [...displayByKey.values()];
 }
 
-export function isActiveSkillName(baseProfile: BaseProfile, name: string): boolean {
+export function isActiveSkillName(
+  baseProfile: BaseProfile,
+  name: string,
+): boolean {
   const key = normalizeSkillName(name);
   if (key === '') return false;
   return deriveActiveSkillNames(baseProfile).some(
