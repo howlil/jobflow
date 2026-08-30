@@ -1,22 +1,24 @@
 import { Plus, Trash2 } from 'lucide-react';
 
+import { deriveActiveSkillNames } from '../../../domain/profile/derived-skills';
 import {
   CheckboxField,
   EmptyState,
   FieldGrid,
   IconButton,
-  Section,
-  SectionHeader,
   TextareaField,
   TextField,
 } from '../../design-system/primitives';
+import {
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../../design-system/WorkspaceSectionCard';
 import { LinkedSkillEditor } from '../LinkedSkillEditor';
 import {
   addLinkedSkill,
   CollapsibleRecord,
   createProfileItemId,
   dateRangeSummary,
-  descriptionPreview,
   listValue,
   monthInputProps,
   monthInputValue,
@@ -33,10 +35,16 @@ export function ExperienceSection({
   changeProfile,
   profile,
 }: ProfileSectionProps) {
+  const skillSuggestions = [
+    ...profile.baseProfile.professional.skills.map((skill) => skill.name),
+    ...deriveActiveSkillNames(profile.baseProfile),
+  ];
+
   return (
-    <Section hidden={activeSection !== 'experience'}>
-      <SectionHeader
+    <WorkspaceSection hidden={activeSection !== 'experience'}>
+      <WorkspaceSectionHeader
         title="Experience"
+        description="Add work, internship, freelance, or organization experience. Skills added here contribute to your unique active skill inventory."
         action={
           <IconButton
             size="sm"
@@ -216,7 +224,6 @@ export function ExperienceSection({
                         })
                       }
                     />
-                    {descriptionPreview(experience.description)}
 
                     <TextField
                       label="Achievements, comma separated"
@@ -235,31 +242,32 @@ export function ExperienceSection({
                       editorId={experience.id}
                       contextLabel={`experience ${index + 1}`}
                       linkedSkills={experience.skills ?? []}
-                      skills={profile.baseProfile.professional.skills}
-                      onAdd={(skillName, skillLevel) =>
+                      skills={skillSuggestions}
+                      onAdd={(skillName) =>
                         changeProfile((draft) => {
                           const item =
                             draft.baseProfile.professional.experiences[index];
                           if (item === undefined) return;
 
+                          const normalizedName = skillName
+                            .trim()
+                            .replace(/\s+/g, ' ');
                           let canonicalSkill =
                             draft.baseProfile.professional.skills.find(
                               (skill) =>
                                 skill.name.trim().toLowerCase() ===
-                                skillName.toLowerCase(),
+                                normalizedName.toLowerCase(),
                             );
                           if (canonicalSkill === undefined) {
                             canonicalSkill = {
                               id: createProfileItemId(),
-                              name: skillName,
-                              level: skillLevel,
+                              name: normalizedName,
+                              level: '',
                               yearsExperience: null,
                             };
                             draft.baseProfile.professional.skills.push(
                               canonicalSkill,
                             );
-                          } else if (skillLevel !== '') {
-                            canonicalSkill.level = skillLevel;
                           }
                           item.skills = addLinkedSkill(
                             item.skills,
@@ -287,6 +295,6 @@ export function ExperienceSection({
           )}
         </div>
       )}
-    </Section>
+    </WorkspaceSection>
   );
 }
