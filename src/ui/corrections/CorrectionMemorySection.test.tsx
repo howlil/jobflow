@@ -81,7 +81,9 @@ describe('CorrectionMemorySection', () => {
     render(<CorrectionMemorySection repository={repo} />);
 
     fireEvent.click(
-      await screen.findByRole('button', { name: 'Delete mapping' }),
+      await screen.findByRole('button', {
+        name: 'Delete mapping links.github',
+      }),
     );
 
     await waitFor(() => expect(repo.remove).toHaveBeenCalledTimes(1));
