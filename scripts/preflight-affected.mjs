@@ -38,7 +38,9 @@ function parseArgs(argv) {
     const argument = argv[index];
 
     if (argument === '--help' || argument === '-h') {
-      console.log(`Usage: pnpm preflight:affected -- [--base <ref>] [--e2e <e2e/file.mjs>]\n\nRuns formatter, affected Vitest coverage, relevant type/lint checks, and optional selected browser acceptance flows for files changed from the merge-base.`);
+      console.log(
+        `Usage: pnpm preflight:affected -- [--base <ref>] [--e2e <e2e/file.mjs>]\n\nRuns formatter, affected Vitest coverage, relevant type/lint checks, and optional selected browser acceptance flows for files changed from the merge-base.`,
+      );
       process.exit(0);
     }
 
@@ -74,7 +76,9 @@ function resolveMergeBase(base) {
     }
   }
 
-  fail(`cannot resolve merge-base for ${base}; fetch or create the base ref first`);
+  fail(
+    `cannot resolve merge-base for ${base}; fetch or create the base ref first`,
+  );
 }
 
 function changedFilesSince(mergeBase) {
@@ -119,7 +123,9 @@ function validateE2eFiles(files) {
     if (!file.startsWith('e2e/') || !file.endsWith('.mjs')) {
       fail(`browser acceptance must be an e2e/*.mjs file: ${file}`);
     }
-    if (!existsSync(file)) fail(`browser acceptance file does not exist: ${file}`);
+    if (!existsSync(file)) {
+      fail(`browser acceptance file does not exist: ${file}`);
+    }
   }
 }
 
@@ -132,10 +138,18 @@ if (changedFiles.length === 0) {
   process.exit(0);
 }
 
-console.log(`preflight:affected: ${changedFiles.length} changed file(s) from ${mergeBase.slice(0, 12)}`);
+console.log(
+  `preflight:affected: ${changedFiles.length} changed file(s) from ${mergeBase.slice(0, 12)}`,
+);
 for (const file of changedFiles) console.log(`- ${file}`);
 
-run(pnpm, ['exec', 'prettier', '--write', '--ignore-unknown', ...changedFiles]);
+run(pnpm, [
+  'exec',
+  'prettier',
+  '--write',
+  '--ignore-unknown',
+  ...changedFiles,
+]);
 
 if (needsAffectedTests(changedFiles)) {
   run(pnpm, [
