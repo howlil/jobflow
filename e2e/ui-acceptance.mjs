@@ -132,7 +132,9 @@ try {
     .locator('details')
     .filter({ has: page.getByRole('heading', { name: 'Basic information' }) })
     .first();
-  await expect(page.getByRole('button', { name: 'About Basic information' })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'About Basic information' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'About Basic information' }).click();
   await expect(
     page.getByText(/canonical identity, preferred name, headline/i),
@@ -148,7 +150,9 @@ try {
   await expect(page.getByLabel('Start date')).toHaveAttribute('type', 'month');
   await expect(page.getByLabel('End date')).toHaveAttribute('type', 'month');
   await expect(page.getByRole('textbox', { name: 'Skills' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Skill level' })).toHaveCount(0);
+  await expect(page.getByRole('textbox', { name: 'Skill level' })).toHaveCount(
+    0,
+  );
 
   await page.getByRole('button', { name: 'Preferences', exact: true }).click();
   await expect(page.getByLabel('Availability date')).toHaveAttribute(
