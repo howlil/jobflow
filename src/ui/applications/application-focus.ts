@@ -30,9 +30,7 @@ function actionDateKey(application: JobApplication): string | null {
 }
 
 export function applicationIsClosed(application: JobApplication): boolean {
-  return CLOSED_APPLICATION_STAGES.some(
-    (stage) => stage === application.stage,
-  );
+  return CLOSED_APPLICATION_STAGES.some((stage) => stage === application.stage);
 }
 
 export function applicationNeedsAction(
