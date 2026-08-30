@@ -6,13 +6,11 @@ import {
   type ProfileBackup,
 } from '../../application/profile/profile-backup';
 import type { ProfileRepository } from '../../application/profile/profile-repository';
+import { Button, FilePicker, StatusMessage } from '../design-system/primitives';
 import {
-  Button,
-  FilePicker,
-  Section,
-  SectionHeader,
-  StatusMessage,
-} from '../design-system/primitives';
+  WorkspaceSection,
+  WorkspaceSectionHeader,
+} from '../design-system/WorkspaceSectionCard';
 
 type BackupRecoveryInspectorProps = {
   repository: ProfileRepository;
@@ -53,8 +51,8 @@ export function BackupRecoveryInspector({
   }
 
   return (
-    <Section aria-labelledby="backup-inspector-title">
-      <SectionHeader
+    <WorkspaceSection aria-labelledby="backup-inspector-title">
+      <WorkspaceSectionHeader
         eyebrow="Recovery"
         title={<span id="backup-inspector-title">Backup diagnostics</span>}
         description="Inspect a backup before restoring it. Validation never modifies your current profile, and encrypted vault values are not part of normal profile backups."
@@ -101,6 +99,6 @@ export function BackupRecoveryInspector({
       {message !== null ? (
         <StatusMessage role="status">{message}</StatusMessage>
       ) : null}
-    </Section>
+    </WorkspaceSection>
   );
 }
