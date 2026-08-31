@@ -207,11 +207,21 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByText('Platform Engineer')).not.toBeNull();
     expect(screen.queryByText('Software Engineer')).toBeNull();
     expect(screen.queryByText('Follow up with recruiter.')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Mark done' })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
 
     expect(screen.getByText('Backend Engineer')).not.toBeNull();
     expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
     expect(screen.queryByText('Platform Engineer')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark done' }));
+
+    await waitFor(() =>
+      expect(service.update).toHaveBeenCalledWith('gojek-due', {
+        nextActionAt: '',
+      }),
+    );
+    expect(screen.getByText('Follow-up completed.')).not.toBeNull();
   });
 });

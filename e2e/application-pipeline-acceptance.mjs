@@ -104,6 +104,15 @@ try {
   await expect(gojekCard).toContainText('Follow up with recruiter.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
+  await gojekCard.getByRole('button', { name: 'Mark done' }).click();
+  await expect(workspace.getByRole('status')).toHaveText(
+    'Follow-up completed.',
+  );
+  await expect(
+    workspace.getByRole('button', { name: 'Needs action 0' }),
+  ).toBeVisible();
+  await expect(workspace.getByText('No jobs match this view.')).toBeVisible();
+
   await workspace.getByRole('button', { name: 'Board', exact: true }).click();
   gojekCard = await expectCardVisible(workspace, 'Gojek');
   await gojekCard.getByRole('button', { name: 'Assessment →' }).click();
@@ -132,7 +141,7 @@ try {
   await expect(interviewColumn).toContainText('Gojek');
   await expect(interviewColumn).toContainText('Traveloka');
   await expect(
-    persistedWorkspace.getByText('2 active opportunities · 1 need action'),
+    persistedWorkspace.getByText('2 active opportunities · 0 need action'),
   ).toBeVisible();
 } finally {
   await context?.close();
