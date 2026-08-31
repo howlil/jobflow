@@ -22,7 +22,7 @@ function application(
 describe('application pipeline focus', () => {
   const todayKey = '2026-08-30';
 
-  it('matches company, role, source, and contact context without case sensitivity', () => {
+  it('matches multi-term company, role, source, and contact context without order or case sensitivity', () => {
     const item = application({
       id: 'app-1',
       company: 'Gojek',
@@ -37,6 +37,9 @@ describe('application pipeline focus', () => {
     expect(applicationMatchesQuery(item, 'linkedin')).toBe(true);
     expect(applicationMatchesQuery(item, 'MAYA PUTRI')).toBe(true);
     expect(applicationMatchesQuery(item, 'example.com')).toBe(true);
+    expect(applicationMatchesQuery(item, 'backend gojek')).toBe(true);
+    expect(applicationMatchesQuery(item, 'linkedin maya')).toBe(true);
+    expect(applicationMatchesQuery(item, 'gojek frontend')).toBe(false);
     expect(applicationMatchesQuery(item, 'frontend')).toBe(false);
   });
 
@@ -179,7 +182,7 @@ describe('application pipeline focus', () => {
 
     expect(
       focusApplications(items, {
-        query: 'gojek',
+        query: 'backend gojek',
         view: 'board',
         todayKey,
       }).map((item) => item.id),
@@ -187,7 +190,7 @@ describe('application pipeline focus', () => {
 
     expect(
       focusApplications(items, {
-        query: 'gojek',
+        query: 'platform gojek',
         view: 'closed',
         todayKey,
       }).map((item) => item.id),
