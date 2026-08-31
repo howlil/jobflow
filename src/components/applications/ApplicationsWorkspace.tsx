@@ -114,17 +114,21 @@ function PipelineCard({
   todayKey,
   showStage,
   showFollowUpNote,
+  showCompleteFollowUp,
   onEdit,
   onDelete,
   onChangeStage,
+  onCompleteFollowUp,
 }: {
   application: JobApplication;
   todayKey: string;
   showStage: boolean;
   showFollowUpNote: boolean;
+  showCompleteFollowUp: boolean;
   onEdit: (application: JobApplication) => void;
   onDelete: (id: string) => void | Promise<void>;
   onChangeStage: (id: string, stage: ApplicationStage) => void | Promise<void>;
+  onCompleteFollowUp: (id: string) => void | Promise<void>;
 }) {
   const closed = applicationIsClosed(application);
   const dueStatus = closed ? null : nextActionStatus(application, todayKey);
@@ -201,6 +205,14 @@ function PipelineCard({
 
       {!closed ? (
         <ActionRow>
+          {showCompleteFollowUp && dueStatus !== null ? (
+            <Button
+              variant="primary"
+              onClick={() => void onCompleteFollowUp(application.id)}
+            >
+              Mark done
+            </Button>
+          ) : null}
           {previousStage !== null ? (
             <Button
               variant="ghost"
@@ -324,6 +336,16 @@ export function ApplicationsWorkspace({
       await reload();
     } catch {
       setError('Could not update this job stage.');
+    }
+  }
+
+  async function completeFollowUp(id: string) {
+    try {
+      await service.update(id, { nextActionAt: '' });
+      setStatus('Follow-up completed.');
+      await reload();
+    } catch {
+      setError('Could not complete this follow-up.');
     }
   }
 
@@ -549,9 +571,11 @@ export function ApplicationsWorkspace({
                           todayKey={todayKey}
                           showStage={false}
                           showFollowUpNote={false}
+                          showCompleteFollowUp={false}
                           onEdit={openEditForm}
                           onDelete={deleteApplication}
                           onChangeStage={changeStage}
+                          onCompleteFollowUp={completeFollowUp}
                         />
                       ))}
                     </div>
@@ -570,9 +594,11 @@ export function ApplicationsWorkspace({
               todayKey={todayKey}
               showStage
               showFollowUpNote
+              showCompleteFollowUp
               onEdit={openEditForm}
               onDelete={deleteApplication}
               onChangeStage={changeStage}
+              onCompleteFollowUp={completeFollowUp}
             />
           ))}
         </div>
@@ -606,9 +632,11 @@ export function ApplicationsWorkspace({
                         todayKey={todayKey}
                         showStage={false}
                         showFollowUpNote={false}
+                        showCompleteFollowUp={false}
                         onEdit={openEditForm}
                         onDelete={deleteApplication}
                         onChangeStage={changeStage}
+                        onCompleteFollowUp={completeFollowUp}
                       />
                     ))}
                   </div>
