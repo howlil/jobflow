@@ -22,15 +22,21 @@ function application(
 describe('application pipeline focus', () => {
   const todayKey = '2026-08-30';
 
-  it('matches company and role without case sensitivity', () => {
+  it('matches company, role, source, and contact context without case sensitivity', () => {
     const item = application({
       id: 'app-1',
       company: 'Gojek',
       role: 'Backend Engineer',
+      source: 'LinkedIn',
+      contactName: 'Maya Putri',
+      contactEmail: 'maya@example.com',
     });
 
     expect(applicationMatchesQuery(item, 'gojek')).toBe(true);
     expect(applicationMatchesQuery(item, 'BACKEND')).toBe(true);
+    expect(applicationMatchesQuery(item, 'linkedin')).toBe(true);
+    expect(applicationMatchesQuery(item, 'MAYA PUTRI')).toBe(true);
+    expect(applicationMatchesQuery(item, 'example.com')).toBe(true);
     expect(applicationMatchesQuery(item, 'frontend')).toBe(false);
   });
 
