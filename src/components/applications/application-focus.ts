@@ -49,7 +49,7 @@ export function applicationMatchesQuery(
   const normalizedQuery = query.trim().toLocaleLowerCase();
   if (normalizedQuery === '') return true;
 
-  return [
+  const searchableText = [
     application.company,
     application.role,
     application.source ?? '',
@@ -57,8 +57,11 @@ export function applicationMatchesQuery(
     application.contactEmail ?? '',
   ]
     .join(' ')
-    .toLocaleLowerCase()
-    .includes(normalizedQuery);
+    .toLocaleLowerCase();
+
+  return normalizedQuery
+    .split(/\s+/)
+    .every((term) => searchableText.includes(term));
 }
 
 function actionPriority(application: JobApplication, todayKey: string): number {
