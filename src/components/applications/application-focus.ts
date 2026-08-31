@@ -49,7 +49,14 @@ export function applicationMatchesQuery(
   const normalizedQuery = query.trim().toLocaleLowerCase();
   if (normalizedQuery === '') return true;
 
-  return `${application.company} ${application.role}`
+  return [
+    application.company,
+    application.role,
+    application.source ?? '',
+    application.contactName ?? '',
+    application.contactEmail ?? '',
+  ]
+    .join(' ')
     .toLocaleLowerCase()
     .includes(normalizedQuery);
 }
