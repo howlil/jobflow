@@ -165,9 +165,8 @@ export function ApplicationsWorkspace({
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [draft, setDraft] = useState<ApplicationDraft>(EMPTY_DRAFT);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedApplicationId, setSelectedApplicationId] = useState<
-    string | null
-  >(null);
+  const [selectedApplicationId, setSelectedApplicationId] =
+    useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -378,7 +377,9 @@ export function ApplicationsWorkspace({
           label="Next action"
           placeholder="Tailor resume, follow up, prepare interview..."
           value={draft.nextAction ?? ''}
-          onChange={(event) => updateDraft({ nextAction: event.target.value })}
+          onChange={(event) =>
+            updateDraft({ nextAction: event.target.value })
+          }
         />
         <TextField
           label="Next action date"
@@ -392,7 +393,9 @@ export function ApplicationsWorkspace({
           label="Application deadline"
           type="date"
           value={draft.deadline ?? ''}
-          onChange={(event) => updateDraft({ deadline: event.target.value })}
+          onChange={(event) =>
+            updateDraft({ deadline: event.target.value })
+          }
         />
         <TextField
           label="Source"
@@ -545,7 +548,8 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {opportunityLabel} · {actionableCount} need action
+          {activeCount} active {opportunityLabel} · {actionableCount} need
+          action
         </p>
       </div>
 
