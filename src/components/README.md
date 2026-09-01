@@ -4,7 +4,8 @@ The options/career workspace and popup use **React + Tailwind**. The in-page ass
 
 ## Source of truth
 
-- `tailwind.config.ts` — design tokens and theme values.
+- `.agents/DESIGN.md` — canonical visual and interaction authority.
+- `tailwind.config.ts` — runtime design tokens and theme values.
 - `src/components/ui/*` — stable repeated React primitives for controls, fields, status, spacing, surfaces, records, and file selection.
 - `src/components/layout/*` — reusable workspace shell and section layout components.
 - `src/components/ui/tailwind.css` — Tailwind directives, base rules, and compatibility grammar for call sites that have not yet moved to React primitives.
@@ -64,7 +65,7 @@ major surface groups     32px
 
 Do not introduce 14px/18px layout gaps when an existing 4px-grid step expresses the relationship.
 
-For the current `DESIGN.md` direction, use:
+For the current `.agents/DESIGN.md` direction, use:
 
 ```text
 section gap       16px compact default, 24px for major separation
