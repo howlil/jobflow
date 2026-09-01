@@ -46,7 +46,7 @@ const saveIndicatorTone: Record<ProfileSaveState, string> = {
 
 export default function App() {
   const [activeSection, setActiveSection] =
-    useState<WorkspaceSection>('personal');
+    useState<WorkspaceSection>('applications');
   const [profileRevision, setProfileRevision] = useState(0);
   const [saveStatus, setSaveStatus] = useState<ProfileSaveStatus>({
     state: 'clean',

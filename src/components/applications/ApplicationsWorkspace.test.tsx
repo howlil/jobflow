@@ -26,6 +26,9 @@ describe('ApplicationsWorkspace', () => {
         company: 'Gojek',
         role: 'Backend Engineer',
         stage: 'applied',
+        priority: 'p0',
+        nextAction: 'Follow up recruiter',
+        deadline: '2026-09-05',
         createdAt: '2026-08-30T00:00:00.000Z',
         updatedAt: '2026-08-30T03:00:00.000Z',
       },
@@ -41,6 +44,8 @@ describe('ApplicationsWorkspace', () => {
     render(<ApplicationsWorkspace service={createService(applications)} />);
 
     expect(await screen.findByText('Backend Engineer')).not.toBeNull();
+    expect(screen.getByText('P0 · Apply ASAP')).not.toBeNull();
+    expect(screen.getByText('Next: Follow up recruiter')).not.toBeNull();
     expect(
       screen.getByRole('heading', { name: 'Job pipeline' }),
     ).not.toBeNull();
@@ -77,6 +82,15 @@ describe('ApplicationsWorkspace', () => {
     fireEvent.change(screen.getByLabelText('Job URL'), {
       target: { value: 'https://jobs.example/acme' },
     });
+    fireEvent.change(screen.getByLabelText('Priority'), {
+      target: { value: 'p1' },
+    });
+    fireEvent.change(screen.getByLabelText('Next action'), {
+      target: { value: 'Tailor resume' },
+    });
+    fireEvent.change(screen.getByLabelText('Application deadline'), {
+      target: { value: '2026-09-05' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Add to pipeline' }));
 
     await waitFor(() =>
@@ -85,11 +99,14 @@ describe('ApplicationsWorkspace', () => {
         role: 'Engineer',
         jobUrl: 'https://jobs.example/acme',
         stage: 'saved',
+        priority: 'p1',
         notes: '',
         source: '',
         contactName: '',
         contactEmail: '',
+        nextAction: 'Tailor resume',
         nextActionAt: '',
+        deadline: '2026-09-05',
       }),
     );
     expect(screen.queryByLabelText('Company')).toBeNull();
@@ -124,11 +141,14 @@ describe('ApplicationsWorkspace', () => {
       company: 'Acme',
       role: 'Engineer',
       stage: 'saved',
+      priority: 'p1',
       notes: 'Initial note.',
       source: 'LinkedIn',
       contactName: 'Maya',
       contactEmail: 'maya@example.com',
+      nextAction: 'Tailor resume',
       nextActionAt: '2026-09-01',
+      deadline: '2026-09-05',
       createdAt: '2026-08-30T00:00:00.000Z',
       updatedAt: '2026-08-30T00:00:00.000Z',
     };
@@ -151,11 +171,14 @@ describe('ApplicationsWorkspace', () => {
         role: 'Engineer',
         jobUrl: '',
         stage: 'saved',
+        priority: 'p1',
         notes: 'Updated note.',
         source: 'LinkedIn',
         contactName: 'Maya',
         contactEmail: 'maya@example.com',
+        nextAction: 'Tailor resume',
         nextActionAt: '2026-09-01',
+        deadline: '2026-09-05',
       }),
     );
   });
@@ -167,6 +190,7 @@ describe('ApplicationsWorkspace', () => {
         company: 'Gojek',
         role: 'Backend Engineer',
         stage: 'applied',
+        nextAction: 'Follow up recruiter',
         nextActionAt: '2000-01-01',
         notes: 'Follow up with recruiter.',
         createdAt: '2026-08-30T00:00:00.000Z',
@@ -219,6 +243,7 @@ describe('ApplicationsWorkspace', () => {
 
     await waitFor(() =>
       expect(service.update).toHaveBeenCalledWith('gojek-due', {
+        nextAction: '',
         nextActionAt: '',
       }),
     );

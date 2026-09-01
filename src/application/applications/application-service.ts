@@ -1,6 +1,7 @@
 import {
   APPLICATION_STAGES,
   JobApplicationSchema,
+  type ApplicationPriority,
   type ApplicationStage,
   type JobApplication,
   type StoredApplicationCollection,
@@ -13,11 +14,14 @@ export type ApplicationDraft = {
   role: string;
   jobUrl?: string;
   stage: ApplicationStage;
+  priority?: ApplicationPriority | undefined;
   notes?: string;
   source?: string;
   contactName?: string;
   contactEmail?: string;
+  nextAction?: string;
   nextActionAt?: string;
+  deadline?: string;
 };
 
 export type PageApplicationCapture = {
@@ -113,18 +117,23 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
   const source = optionalText(draft.source);
   const contactName = optionalText(draft.contactName);
   const contactEmail = optionalEmail(draft.contactEmail);
+  const nextAction = optionalText(draft.nextAction);
   const nextActionAt = optionalText(draft.nextActionAt);
+  const deadline = optionalText(draft.deadline);
   const candidate = {
     id: 'draft',
     company,
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
     ...(contactName === undefined ? {} : { contactName }),
     ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
+    ...(deadline === undefined ? {} : { deadline }),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -134,11 +143,14 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
     ...(contactName === undefined ? {} : { contactName }),
     ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
+    ...(deadline === undefined ? {} : { deadline }),
   };
 }
 
@@ -151,6 +163,11 @@ function draftFromChanges(
     role: changes.role ?? current.role,
     stage: changes.stage ?? current.stage,
   };
+  if ('priority' in changes) {
+    draft.priority = changes.priority;
+  } else if (current.priority !== undefined) {
+    draft.priority = current.priority;
+  }
   if (changes.jobUrl !== undefined) {
     draft.jobUrl = changes.jobUrl;
   } else if (current.jobUrl !== undefined) {
@@ -176,10 +193,20 @@ function draftFromChanges(
   } else if (current.contactEmail !== undefined) {
     draft.contactEmail = current.contactEmail;
   }
+  if (changes.nextAction !== undefined) {
+    draft.nextAction = changes.nextAction;
+  } else if (current.nextAction !== undefined) {
+    draft.nextAction = current.nextAction;
+  }
   if (changes.nextActionAt !== undefined) {
     draft.nextActionAt = changes.nextActionAt;
   } else if (current.nextActionAt !== undefined) {
     draft.nextActionAt = current.nextActionAt;
+  }
+  if (changes.deadline !== undefined) {
+    draft.deadline = changes.deadline;
+  } else if (current.deadline !== undefined) {
+    draft.deadline = current.deadline;
   }
   return draft;
 }

@@ -33,7 +33,7 @@ vi.mock('../../src/components/profile/BackupRecoveryInspector', () => ({
 import App from './App';
 
 describe('options App', () => {
-  it('renders the dashboard shell and updates the topbar with navigation', () => {
+  it('opens on the operational pipeline and updates the topbar with navigation', () => {
     render(<App />);
 
     expect(
@@ -42,7 +42,7 @@ describe('options App', () => {
     expect(screen.getByRole('banner')).not.toBeNull();
     expect(screen.getByRole('main')).not.toBeNull();
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Personal' }),
+      screen.getByRole('heading', { level: 1, name: 'Pipeline' }),
     ).not.toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Corrections' }));

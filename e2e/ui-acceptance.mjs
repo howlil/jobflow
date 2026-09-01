@@ -103,13 +103,11 @@ try {
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(page.getByRole('main')).toBeVisible();
   await expect(
-    page.getByRole('heading', { level: 1, name: 'Personal' }),
+    page.getByRole('heading', { level: 1, name: 'Pipeline' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Basic information' }),
+    page.getByRole('heading', { name: 'Job pipeline' }),
   ).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Contact' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Links' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Overview' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Skills' })).toHaveCount(0);
 
@@ -128,6 +126,16 @@ try {
   await capture(page, 'options-mobile.png', { width: 390, height: 844 });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('button', { name: 'Personal', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Personal' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Basic information' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Contact' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Links' })).toBeVisible();
+
   const basicInformationCard = page
     .locator('details')
     .filter({ has: page.getByRole('heading', { name: 'Basic information' }) })
@@ -196,7 +204,7 @@ try {
     workspacePage.getByRole('complementary', { name: 'Job Flow sidebar' }),
   ).toBeVisible();
   await expect(
-    workspacePage.getByRole('heading', { level: 1, name: 'Personal' }),
+    workspacePage.getByRole('heading', { level: 1, name: 'Pipeline' }),
   ).toBeVisible();
   await workspacePage.close();
 
