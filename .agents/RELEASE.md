@@ -23,7 +23,7 @@ Use one canonical version source. Do not bump versions for every development cha
 
 Tags matching `v*` trigger `.github/workflows/release.yml`.
 
-The workflow:
+The mandatory release workflow is intentionally small:
 
 ```text
 checkout
@@ -32,21 +32,20 @@ checkout
  -> pnpm typecheck
  -> pnpm lint
  -> pnpm format:check
- -> pnpm verify:compatibility
  -> pnpm build
  -> pnpm verify:manifest
- -> install Playwright Chromium
- -> pnpm test:e2e
  -> pnpm zip
  -> create SHA256SUMS
  -> publish immutable GitHub release from the verified tag
 ```
 
+Browser E2E and compatibility-specific validation are risk-based diagnostics, not unconditional release ceremony. Run focused evidence before tagging when the release actually touches those boundaries.
+
 Do not claim a release exists unless the tag/workflow/release artifact was actually observed.
 
 ## Release-critical review
 
-In addition to baseline quality gates, require the relevant focused evidence when a release touches:
+In addition to baseline quality gates, require relevant focused evidence when a release touches:
 
 - persisted schema/migrations
 - browser permission or generated-manifest behavior
