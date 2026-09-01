@@ -19,7 +19,7 @@ function createService(
 }
 
 describe('ApplicationsWorkspace', () => {
-  it('shows the active funnel and separates closed jobs', async () => {
+  it('shows the active funnel and opens closed opportunities in the same detail surface', async () => {
     const applications: JobApplication[] = [
       {
         id: 'active',
@@ -37,6 +37,7 @@ describe('ApplicationsWorkspace', () => {
         company: 'Traveloka',
         role: 'Platform Engineer',
         stage: 'rejected',
+        notes: 'Role closed after final review.',
         createdAt: '2026-08-30T00:00:00.000Z',
         updatedAt: '2026-08-30T02:00:00.000Z',
       },
@@ -49,24 +50,24 @@ describe('ApplicationsWorkspace', () => {
     expect(
       screen.getByRole('heading', { name: 'Job pipeline' }),
     ).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Saved' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Applied' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Assessment' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Interview' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Offer' })).not.toBeNull();
-    expect(screen.queryByText('Platform Engineer')).toBeNull();
     expect(screen.queryByLabelText('Company')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Closed 1' }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'View Traveloka Platform Engineer details',
+      }),
+    );
 
-    expect(screen.getByText('Platform Engineer')).not.toBeNull();
-    expect(screen.queryByText('Backend Engineer')).toBeNull();
-    expect(screen.getByRole('heading', { name: 'Accepted' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Rejected' })).not.toBeNull();
-    expect(screen.getByRole('heading', { name: 'Withdrawn' })).not.toBeNull();
+    expect(screen.getByText('Role closed after final review.')).not.toBeNull();
+    expect(
+      screen.getByText('This opportunity is closed as Rejected.'),
+    ).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Back to pipeline' })).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Mark done' })).toBeNull();
   });
 
-  it('creates jobs from an on-demand form', async () => {
+  it('creates jobs from an on-demand pipeline form', async () => {
     const service = createService();
     render(<ApplicationsWorkspace service={service} />);
 
@@ -112,7 +113,7 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.queryByLabelText('Company')).toBeNull();
   });
 
-  it('moves an active job directly to the next pipeline stage', async () => {
+  it('moves an active job from application detail', async () => {
     const application: JobApplication = {
       id: 'app-1',
       company: 'Acme',
@@ -127,15 +128,20 @@ describe('ApplicationsWorkspace', () => {
 
     await screen.findByText('Engineer');
     expect(screen.getByText('Overdue 2000-01-01')).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Assessment →' })).toBeNull();
 
+    fireEvent.click(
+      screen.getByRole('button', { name: 'View Acme Engineer details' }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Assessment →' }));
 
     await waitFor(() =>
       expect(service.changeStage).toHaveBeenCalledWith('app-1', 'assessment'),
     );
+    expect(screen.getByText('Moved to Assessment.')).not.toBeNull();
   });
 
-  it('opens full job details only for editing', async () => {
+  it('edits an existing job contextually from application detail', async () => {
     const application: JobApplication = {
       id: 'app-1',
       company: 'Acme',
@@ -157,7 +163,13 @@ describe('ApplicationsWorkspace', () => {
 
     await screen.findByText('Engineer');
     expect(screen.queryByText('Initial note.')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Acme Engineer' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'View Acme Engineer details' }),
+    );
+
+    expect(screen.getByText('Initial note.')).not.toBeNull();
+    expect(screen.getByText('Maya · maya@example.com')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit details' }));
 
     expect(screen.getByDisplayValue('Initial note.')).not.toBeNull();
     fireEvent.change(screen.getByLabelText('Notes'), {
@@ -181,9 +193,10 @@ describe('ApplicationsWorkspace', () => {
         deadline: '2026-09-05',
       }),
     );
+    expect(screen.getByText('Job updated.')).not.toBeNull();
   });
 
-  it('combines search with the needs-action work queue', async () => {
+  it('preserves the needs-action view and search after returning from detail', async () => {
     const applications: JobApplication[] = [
       {
         id: 'gojek-due',
@@ -215,30 +228,64 @@ describe('ApplicationsWorkspace', () => {
         updatedAt: '2026-08-30T01:00:00.000Z',
       },
     ];
-    const service = createService(applications);
-    render(<ApplicationsWorkspace service={service} />);
+    render(<ApplicationsWorkspace service={createService(applications)} />);
 
     await screen.findByText('Backend Engineer');
-    expect(
-      screen.getByText('3 active opportunities · 2 need action'),
-    ).not.toBeNull();
-
     fireEvent.change(screen.getByLabelText('Search jobs'), {
       target: { value: 'gojek' },
     });
-
-    expect(screen.getByText('Backend Engineer')).not.toBeNull();
-    expect(screen.getByText('Platform Engineer')).not.toBeNull();
-    expect(screen.queryByText('Software Engineer')).toBeNull();
-    expect(screen.queryByText('Follow up with recruiter.')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Mark done' })).toBeNull();
-
     fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'View Gojek Backend Engineer details',
+      }),
+    );
 
-    expect(screen.getByText('Backend Engineer')).not.toBeNull();
     expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
-    expect(screen.queryByText('Platform Engineer')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Back to pipeline' }));
 
+    expect(screen.getByLabelText('Search jobs')).toHaveValue('gojek');
+    expect(
+      screen.getByRole('button', { name: 'Needs action 2' }).getAttribute(
+        'aria-pressed',
+      ),
+    ).toBe('true');
+    expect(screen.getByText('Backend Engineer')).not.toBeNull();
+    expect(screen.queryByText('Software Engineer')).toBeNull();
+    expect(screen.queryByText('Platform Engineer')).toBeNull();
+  });
+
+  it('completes the explicit next action from application detail', async () => {
+    const application: JobApplication = {
+      id: 'gojek-due',
+      company: 'Gojek',
+      role: 'Backend Engineer',
+      stage: 'applied',
+      nextAction: 'Follow up recruiter',
+      nextActionAt: '2000-01-01',
+      createdAt: '2026-08-30T00:00:00.000Z',
+      updatedAt: '2026-08-30T03:00:00.000Z',
+    };
+    const completedApplication: JobApplication = {
+      id: application.id,
+      company: application.company,
+      role: application.role,
+      stage: application.stage,
+      createdAt: application.createdAt,
+      updatedAt: '2026-09-01T00:00:00.000Z',
+    };
+    const service = createService([application]);
+    vi.mocked(service.list)
+      .mockResolvedValueOnce([application])
+      .mockResolvedValue([completedApplication]);
+    render(<ApplicationsWorkspace service={service} />);
+
+    await screen.findByText('Backend Engineer');
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'View Gojek Backend Engineer details',
+      }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Mark done' }));
 
     await waitFor(() =>
@@ -248,5 +295,6 @@ describe('ApplicationsWorkspace', () => {
       }),
     );
     expect(screen.getByText('Follow-up completed.')).not.toBeNull();
+    expect(screen.getByText('No next action set.')).not.toBeNull();
   });
 });
