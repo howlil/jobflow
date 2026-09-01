@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import { ArrowLeft, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 
-import type {
-  ApplicationStage,
-  JobApplication,
+import {
+  APPLICATION_SUBSTAGES_BY_STAGE,
+  type ApplicationStage,
+  type ApplicationSubstage,
+  type JobApplication,
 } from '../../domain/applications/application-schema';
-import { ActionRow, Button, SectionHeader } from '../ui';
+import { ActionRow, Button, SectionHeader, SelectField } from '../ui';
 import {
   ACTIVE_APPLICATION_STAGES,
   applicationIsClosed,
@@ -13,11 +15,13 @@ import {
 import {
   PRIORITY_LABELS,
   STAGE_LABELS,
+  SUBSTAGE_LABELS,
   applicationHasCompletableAction,
   displayDate,
   nextActionStatus,
   nextPipelineStage,
   previousPipelineStage,
+  recommendedLifecycleAction,
   stageActionLabel,
 } from './application-display';
 
@@ -54,9 +58,12 @@ function DetailValue({
 }
 
 function ProgressTrack({ application }: { application: JobApplication }) {
-  const activeStageIndex = ACTIVE_APPLICATION_STAGES.findIndex(
-    (stage) => stage === application.stage,
-  );
+  const closed = applicationIsClosed(application);
+  const activeStageIndex = closed
+    ? ACTIVE_APPLICATION_STAGES.length - 1
+    : ACTIVE_APPLICATION_STAGES.findIndex(
+        (stage) => stage === application.stage,
+      );
 
   return (
     <div className="grid gap-3">
@@ -83,13 +90,25 @@ function ProgressTrack({ application }: { application: JobApplication }) {
           );
         })}
       </div>
-      {applicationIsClosed(application) ? (
+      {closed ? (
         <p className="m-0 text-xs text-app-subtle">
-          This opportunity is closed as {STAGE_LABELS[application.stage]}.
+          This opportunity is closed
+          {application.substage === undefined
+            ? '.'
+            : ` as ${SUBSTAGE_LABELS[application.substage]}.`}
         </p>
       ) : null}
     </div>
   );
+}
+
+function defaultSubstageForStage(
+  stage: ApplicationStage,
+): ApplicationSubstage | undefined {
+  if (stage === 'applying') return 'preparing_application';
+  if (stage === 'applied') return 'submitted';
+  if (stage === 'offer') return 'offer_received';
+  return undefined;
 }
 
 export function ApplicationDetail({
@@ -99,6 +118,7 @@ export function ApplicationDetail({
   onEdit,
   onDelete,
   onChangeStage,
+  onChangeSubstage,
   onCompleteAction,
 }: {
   application: JobApplication;
@@ -106,16 +126,29 @@ export function ApplicationDetail({
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void | Promise<void>;
-  onChangeStage: (stage: ApplicationStage) => void | Promise<void>;
+  onChangeStage: (
+    stage: ApplicationStage,
+    substage?: ApplicationSubstage,
+  ) => void | Promise<void>;
+  onChangeSubstage: (
+    substage: ApplicationSubstage | undefined,
+  ) => void | Promise<void>;
   onCompleteAction: () => void | Promise<void>;
 }) {
   const closed = applicationIsClosed(application);
   const previousStage = previousPipelineStage(application.stage);
   const nextStage = nextPipelineStage(application.stage);
   const dueStatus = closed ? null : nextActionStatus(application, todayKey);
+  const suggestedAction = recommendedLifecycleAction(application);
+  const substages = APPLICATION_SUBSTAGES_BY_STAGE[application.stage];
   const contact = [application.contactName, application.contactEmail]
     .filter(Boolean)
     .join(' · ');
+  const hasImportantDates =
+    application.appliedAt !== undefined ||
+    application.interviewAt !== undefined ||
+    application.offerAt !== undefined ||
+    application.closedAt !== undefined;
 
   return (
     <div
@@ -144,6 +177,11 @@ export function ApplicationDetail({
         <span className="rounded-control border border-app-border px-2 py-1 text-app-ink">
           {STAGE_LABELS[application.stage]}
         </span>
+        {application.substage !== undefined ? (
+          <span className="rounded-control border border-app-border px-2 py-1 text-app-text">
+            {SUBSTAGE_LABELS[application.substage]}
+          </span>
+        ) : null}
         {application.priority !== undefined ? (
           <span className="rounded-control border border-app-border px-2 py-1 text-app-text">
             {PRIORITY_LABELS[application.priority]}
@@ -161,8 +199,17 @@ export function ApplicationDetail({
               <p className="m-0 text-base font-semibold text-app-ink">
                 {application.nextAction}
               </p>
+            ) : suggestedAction !== null ? (
+              <div className="grid gap-1">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-app-subtle">
+                  Suggested next
+                </span>
+                <p className="m-0 text-sm font-medium text-app-text">
+                  {suggestedAction}
+                </p>
+              </div>
             ) : (
-              <p className="m-0 text-sm text-app-subtle">No next action set.</p>
+              <p className="m-0 text-sm text-app-subtle">Lifecycle complete.</p>
             )}
             <div className="flex flex-wrap items-center gap-2 text-xs text-app-subtle">
               {dueStatus !== null ? (
@@ -190,26 +237,103 @@ export function ApplicationDetail({
 
           <DetailBlock title="Progress">
             <ProgressTrack application={application} />
-            {!closed ? (
-              <ActionRow>
-                {previousStage !== null ? (
-                  <Button
-                    variant="ghost"
-                    onClick={() => void onChangeStage(previousStage)}
-                  >
-                    ← {STAGE_LABELS[previousStage]}
-                  </Button>
-                ) : null}
-                {nextStage !== null ? (
-                  <Button
-                    variant="default"
-                    onClick={() => void onChangeStage(nextStage)}
-                  >
-                    {stageActionLabel(application.stage, nextStage)}
-                  </Button>
-                ) : null}
-              </ActionRow>
+
+            {substages.length > 0 ? (
+              <SelectField
+                label="Lifecycle detail"
+                value={application.substage ?? ''}
+                onChange={(event) =>
+                  void onChangeSubstage(
+                    event.target.value === ''
+                      ? undefined
+                      : (event.target.value as ApplicationSubstage),
+                  )
+                }
+              >
+                {!closed ? <option value="">No lifecycle detail</option> : null}
+                {substages.map((substage) => (
+                  <option value={substage} key={substage}>
+                    {SUBSTAGE_LABELS[substage]}
+                  </option>
+                ))}
+              </SelectField>
             ) : null}
+
+            {!closed ? (
+              <>
+                <ActionRow>
+                  {previousStage !== null ? (
+                    <Button
+                      variant="ghost"
+                      onClick={() => void onChangeStage(previousStage)}
+                    >
+                      ← {STAGE_LABELS[previousStage]}
+                    </Button>
+                  ) : null}
+                  {nextStage !== null ? (
+                    <Button
+                      variant="default"
+                      onClick={() =>
+                        void onChangeStage(
+                          nextStage,
+                          defaultSubstageForStage(nextStage),
+                        )
+                      }
+                    >
+                      {stageActionLabel(nextStage)}
+                    </Button>
+                  ) : null}
+                </ActionRow>
+
+                <div className="grid gap-2 border-t border-app-border pt-3">
+                  <span className="text-[11px] font-medium text-app-subtle">
+                    Close opportunity
+                  </span>
+                  <ActionRow>
+                    {application.stage === 'offer' ? (
+                      <Button
+                        variant="default"
+                        onClick={() => void onChangeStage('closed', 'accepted')}
+                      >
+                        Mark accepted
+                      </Button>
+                    ) : null}
+                    <Button
+                      variant="ghost"
+                      onClick={() => void onChangeStage('closed', 'rejected')}
+                    >
+                      Mark rejected
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => void onChangeStage('closed', 'withdrawn')}
+                    >
+                      Withdraw
+                    </Button>
+                  </ActionRow>
+                </div>
+              </>
+            ) : null}
+          </DetailBlock>
+
+          <DetailBlock title="Timeline">
+            <ol className="m-0 grid list-none gap-3 p-0">
+              {[...application.stageHistory].reverse().map((entry, index) => (
+                <li
+                  className="grid gap-1 border-l-2 border-app-border pl-3"
+                  key={`${entry.enteredAt}-${entry.stage}-${index}`}
+                >
+                  <span className="text-sm font-medium text-app-ink">
+                    {entry.substage === undefined
+                      ? STAGE_LABELS[entry.stage]
+                      : SUBSTAGE_LABELS[entry.substage]}
+                  </span>
+                  <span className="text-xs text-app-subtle">
+                    {STAGE_LABELS[entry.stage]} · {displayDate(entry.enteredAt)}
+                  </span>
+                </li>
+              ))}
+            </ol>
           </DetailBlock>
 
           <DetailBlock title="Notes">
@@ -224,6 +348,37 @@ export function ApplicationDetail({
         </div>
 
         <div className="grid content-start gap-4">
+          <DetailBlock title="Important dates">
+            {hasImportantDates ? (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                {application.appliedAt !== undefined ? (
+                  <DetailValue label="Applied">
+                    {displayDate(application.appliedAt)}
+                  </DetailValue>
+                ) : null}
+                {application.interviewAt !== undefined ? (
+                  <DetailValue label="Interview">
+                    {displayDate(application.interviewAt)}
+                  </DetailValue>
+                ) : null}
+                {application.offerAt !== undefined ? (
+                  <DetailValue label="Offer">
+                    {displayDate(application.offerAt)}
+                  </DetailValue>
+                ) : null}
+                {application.closedAt !== undefined ? (
+                  <DetailValue label="Closed">
+                    {displayDate(application.closedAt)}
+                  </DetailValue>
+                ) : null}
+              </div>
+            ) : (
+              <p className="m-0 text-sm text-app-subtle">
+                Dates are captured as this opportunity advances.
+              </p>
+            )}
+          </DetailBlock>
+
           <DetailBlock title="Job context">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
               {application.source !== undefined ? (
@@ -260,6 +415,11 @@ export function ApplicationDetail({
               <DetailValue label="Stage">
                 {STAGE_LABELS[application.stage]}
               </DetailValue>
+              {application.substage !== undefined ? (
+                <DetailValue label="Lifecycle detail">
+                  {SUBSTAGE_LABELS[application.substage]}
+                </DetailValue>
+              ) : null}
               {application.priority !== undefined ? (
                 <DetailValue label="Priority">
                   {PRIORITY_LABELS[application.priority]}

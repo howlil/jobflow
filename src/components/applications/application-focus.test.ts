@@ -11,8 +11,18 @@ function application(
   overrides: Partial<JobApplication> &
     Pick<JobApplication, 'id' | 'company' | 'role'>,
 ): JobApplication {
+  const stage = overrides.stage ?? 'applied';
+  const substage = overrides.substage;
   return {
-    stage: 'applied',
+    stage,
+    ...(substage === undefined ? {} : { substage }),
+    stageHistory: [
+      {
+        stage,
+        ...(substage === undefined ? {} : { substage }),
+        enteredAt: '2026-08-30T00:00:00.000Z',
+      },
+    ],
     createdAt: '2026-08-30T00:00:00.000Z',
     updatedAt: '2026-08-30T00:00:00.000Z',
     ...overrides,
@@ -22,7 +32,7 @@ function application(
 describe('application pipeline focus', () => {
   const todayKey = '2026-08-30';
 
-  it('matches multi-term company, role, source, and contact context without order or case sensitivity', () => {
+  it('matches multi-term company, role, source, contact, and lifecycle context without order or case sensitivity', () => {
     const item = application({
       id: 'app-1',
       company: 'Gojek',
@@ -30,6 +40,7 @@ describe('application pipeline focus', () => {
       source: 'LinkedIn',
       contactName: 'Maya Putri',
       contactEmail: 'maya@example.com',
+      substage: 'recruiter_review',
     });
 
     expect(applicationMatchesQuery(item, 'gojek')).toBe(true);
@@ -37,6 +48,7 @@ describe('application pipeline focus', () => {
     expect(applicationMatchesQuery(item, 'linkedin')).toBe(true);
     expect(applicationMatchesQuery(item, 'MAYA PUTRI')).toBe(true);
     expect(applicationMatchesQuery(item, 'example.com')).toBe(true);
+    expect(applicationMatchesQuery(item, 'recruiter_review')).toBe(true);
     expect(applicationMatchesQuery(item, 'backend gojek')).toBe(true);
     expect(applicationMatchesQuery(item, 'linkedin maya')).toBe(true);
     expect(applicationMatchesQuery(item, 'gojek frontend')).toBe(false);
@@ -83,7 +95,8 @@ describe('application pipeline focus', () => {
           id: 'closed',
           company: 'D',
           role: 'Engineer',
-          stage: 'rejected',
+          stage: 'closed',
+          substage: 'rejected',
           nextActionAt: '2026-08-28',
         }),
         todayKey,
@@ -122,14 +135,16 @@ describe('application pipeline focus', () => {
         id: 'accepted',
         company: 'Accepted Co',
         role: 'Engineer',
-        stage: 'accepted',
+        stage: 'closed',
+        substage: 'accepted',
         updatedAt: '2026-08-30T05:00:00.000Z',
       }),
       application({
         id: 'rejected',
         company: 'Rejected Co',
         role: 'Engineer',
-        stage: 'rejected',
+        stage: 'closed',
+        substage: 'rejected',
         nextActionAt: '2026-08-20',
       }),
     ];
@@ -171,7 +186,8 @@ describe('application pipeline focus', () => {
         id: 'gojek-closed',
         company: 'Gojek',
         role: 'Platform Engineer',
-        stage: 'rejected',
+        stage: 'closed',
+        substage: 'rejected',
       }),
       application({
         id: 'traveloka-active',

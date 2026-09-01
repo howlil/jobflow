@@ -4,7 +4,7 @@ export function createEmptyApplicationCollection(
   now = new Date().toISOString(),
 ): StoredApplicationCollection {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     applications: [],
     metadata: {
       createdAt: now,

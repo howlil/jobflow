@@ -1,6 +1,6 @@
 # Current Milestone
 
-**Status:** Active — Rich Application Lifecycle implementation is complete. Before lifecycle integration and the next product milestone, an explicitly authorized repository-cleanup logical change is removing verification/process ceremony that does not provide proportional evidence.
+**Status:** Active — Rich Application Lifecycle is integration-ready on top of the cleaned repository baseline.
 
 **Goal:** Rich Application Lifecycle
 
@@ -16,26 +16,24 @@
 
 **Position:**
 
-- Application Detail is integrated on `master`.
-- Schema v3, v1/v2 migration, lifecycle history, stage-date semantics, primary/substage UI, deterministic guidance, and focused unit/storage/workspace coverage are implemented on `application-lifecycle`.
-- PR #54 has already passed the lean mandatory CI gate after browser black-box E2E became opt-in.
-- PR #56 now owns the independent pre-next-milestone cleanup: remove browser E2E from mandatory gates, remove synthetic compatibility-status gating, remove the custom affected-preflight wrapper, remove duplicate WXT preparation, and remove duplicate/stale documentation.
+- Repository cleanup PR #56 is integrated on `master`.
+- Popup simplification PR #57 is integrated on `master`.
+- Lifecycle implementation exists in PR #54 and is being reapplied on top of the cleaned `master` baseline without restoring removed CI/process ceremony.
 
 **Delta:**
 
-- Finish the bounded repository-cleanup change and observe its mandatory CI gate on the exact head.
-- Integrate the cleanup policy so `master`, release workflow, and canonical docs agree.
-- Rebase/update lifecycle integration only if required by the cleanup merge, then integrate the exact green lifecycle head.
+- Verify the lifecycle implementation against the current cleaned `master`.
+- Integrate the exact green lifecycle head.
+- Close this milestone before activating another product milestone.
 
 **Next Move:**
 
-- Complete and verify PR #56 cleanup; integrate it before starting another product milestone.
+- Run the mandatory repository gate on the clean lifecycle integration head, merge it when green, then close Rich Application Lifecycle.
 
 ## Scope
 
 ### In
 
-Lifecycle milestone:
 - primary lifecycle state model
 - substages / terminal outcomes
 - schema v3 with explicit v1/v2 migration
@@ -43,14 +41,6 @@ Lifecycle milestone:
 - deterministic next-action guidance
 - Pipeline/Application Detail lifecycle presentation
 - focused lifecycle verification
-
-Authorized cleanup before next milestone:
-- browser E2E remains opt-in rather than mandatory
-- remove custom affected-preflight orchestration
-- remove metadata-only compatibility verification from CI/release gates
-- keep compatibility validation risk-based and evidence-backed
-- remove duplicate WXT preparation script
-- remove stale/duplicate documentation whose authority already lives in `.agents/*`
 
 ### Out
 
@@ -62,8 +52,7 @@ Authorized cleanup before next milestone:
 - analytics dashboard
 - unrelated architecture refactors
 - deleting supported persistence migrations
-- deleting Playwright/E2E diagnostics entirely
-- changing observable product UX as part of repository cleanup
+- reintroducing removed CI/process ceremony
 
 ## Slices
 
@@ -72,9 +61,11 @@ Authorized cleanup before next milestone:
 - [x] Lifecycle schema/model and v1/v2 migration implemented.
 - [x] Lifecycle history, stage dates, substages/outcomes, and deterministic guidance implemented.
 - [x] Focused lifecycle verification implemented.
-- [ ] Integrate lean quality/cleanup policy in PR #56. ← ACTIVE
-- [ ] Integrate exact green lifecycle head from PR #54.
-- [ ] Close Rich Application Lifecycle milestone and activate the next approved milestone.
+- [x] Lean repository cleanup integrated.
+- [x] Popup product ceremony cleanup integrated.
+- [ ] Verify lifecycle on current cleaned `master`. ← ACTIVE
+- [ ] Integrate exact green lifecycle head.
+- [ ] Close Rich Application Lifecycle milestone.
 
 ## Current Decisions
 
@@ -85,6 +76,7 @@ Authorized cleanup before next milestone:
 - Closed opportunities remain grouped by Accepted / Rejected / Withdrawn outcome.
 - Playwright browser E2E is an opt-in diagnostic, not a mandatory CI/release blocker.
 - Mandatory repository gates are direct executable checks; metadata/status bookkeeping is not treated as runtime verification.
+- Popup remains a compact current-page entry surface; lifecycle changes must not restore its removed dashboard ceremony.
 
 ## Verification / Evidence
 
@@ -103,10 +95,9 @@ Risk-specific evidence remains required when a change touches persistence, permi
 
 ## Blockers / Risks
 
-- PR #56 must pass the mandatory gate on its final exact cleanup head before integration.
 - Persisted application migration remains the highest-risk lifecycle surface and must remain supported; migration code is not cleanup debt.
-- Cleanup must not silently remove runtime behavior or widen product/architecture scope.
+- Lifecycle integration must preserve the cleaned CI/release policy and compact popup behavior already on `master`.
 
 ## Next Action
 
-Finish the bounded cleanup in PR #56, observe the exact-head mandatory gate, integrate the cleanup, then integrate PR #54 before activating the next product milestone.
+Verify the clean lifecycle integration head against current `master`, merge it when the required gate is green, then close Rich Application Lifecycle before planning the next milestone.

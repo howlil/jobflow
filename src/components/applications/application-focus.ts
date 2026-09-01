@@ -2,13 +2,13 @@ import type { JobApplication } from '../../domain/applications/application-schem
 
 export const ACTIVE_APPLICATION_STAGES = [
   'saved',
+  'applying',
   'applied',
-  'assessment',
   'interview',
   'offer',
 ] as const;
 
-export const CLOSED_APPLICATION_STAGES = [
+export const CLOSED_APPLICATION_SUBSTAGES = [
   'accepted',
   'rejected',
   'withdrawn',
@@ -30,7 +30,7 @@ function actionDateKey(application: JobApplication): string | null {
 }
 
 export function applicationIsClosed(application: JobApplication): boolean {
-  return CLOSED_APPLICATION_STAGES.some((stage) => stage === application.stage);
+  return application.stage === 'closed';
 }
 
 export function applicationNeedsAction(
@@ -55,6 +55,7 @@ export function applicationMatchesQuery(
     application.source ?? '',
     application.contactName ?? '',
     application.contactEmail ?? '',
+    application.substage ?? '',
   ]
     .join(' ')
     .toLocaleLowerCase();

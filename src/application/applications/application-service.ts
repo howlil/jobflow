@@ -1,8 +1,10 @@
 import {
   APPLICATION_STAGES,
   JobApplicationSchema,
+  applicationSubstageMatchesStage,
   type ApplicationPriority,
   type ApplicationStage,
+  type ApplicationSubstage,
   type JobApplication,
   type StoredApplicationCollection,
 } from '../../domain/applications/application-schema';
@@ -14,6 +16,7 @@ export type ApplicationDraft = {
   role: string;
   jobUrl?: string;
   stage: ApplicationStage;
+  substage?: ApplicationSubstage | undefined;
   priority?: ApplicationPriority | undefined;
   notes?: string;
   source?: string;
@@ -22,6 +25,10 @@ export type ApplicationDraft = {
   nextAction?: string;
   nextActionAt?: string;
   deadline?: string;
+  appliedAt?: string;
+  interviewAt?: string;
+  offerAt?: string;
+  closedAt?: string;
 };
 
 export type PageApplicationCapture = {
@@ -120,12 +127,23 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
   const nextAction = optionalText(draft.nextAction);
   const nextActionAt = optionalText(draft.nextActionAt);
   const deadline = optionalText(draft.deadline);
+  const appliedAt = optionalText(draft.appliedAt);
+  const interviewAt = optionalText(draft.interviewAt);
+  const offerAt = optionalText(draft.offerAt);
+  const closedAt = optionalText(draft.closedAt);
+
+  if (!applicationSubstageMatchesStage(draft.stage, draft.substage)) {
+    throw new Error('Invalid lifecycle detail for this stage.');
+  }
+
   const candidate = {
     id: 'draft',
     company,
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.substage === undefined ? {} : { substage: draft.substage }),
+    stageHistory: [],
     ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
@@ -134,15 +152,21 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
     ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
     ...(deadline === undefined ? {} : { deadline }),
+    ...(appliedAt === undefined ? {} : { appliedAt }),
+    ...(interviewAt === undefined ? {} : { interviewAt }),
+    ...(offerAt === undefined ? {} : { offerAt }),
+    ...(closedAt === undefined ? {} : { closedAt }),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   JobApplicationSchema.parse(candidate);
+
   return {
     company,
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.substage === undefined ? {} : { substage: draft.substage }),
     ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
@@ -151,6 +175,10 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
     ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
     ...(deadline === undefined ? {} : { deadline }),
+    ...(appliedAt === undefined ? {} : { appliedAt }),
+    ...(interviewAt === undefined ? {} : { interviewAt }),
+    ...(offerAt === undefined ? {} : { offerAt }),
+    ...(closedAt === undefined ? {} : { closedAt }),
   };
 }
 
@@ -158,11 +186,19 @@ function draftFromChanges(
   current: JobApplication,
   changes: Partial<ApplicationDraft>,
 ): ApplicationDraft {
+  const nextStage = changes.stage ?? current.stage;
+  const stageChanged = nextStage !== current.stage;
   const draft: ApplicationDraft = {
     company: changes.company ?? current.company,
     role: changes.role ?? current.role,
-    stage: changes.stage ?? current.stage,
+    stage: nextStage,
   };
+
+  if ('substage' in changes) {
+    draft.substage = changes.substage;
+  } else if (!stageChanged && current.substage !== undefined) {
+    draft.substage = current.substage;
+  }
   if ('priority' in changes) {
     draft.priority = changes.priority;
   } else if (current.priority !== undefined) {
@@ -208,6 +244,48 @@ function draftFromChanges(
   } else if (current.deadline !== undefined) {
     draft.deadline = current.deadline;
   }
+  if (changes.appliedAt !== undefined) {
+    draft.appliedAt = changes.appliedAt;
+  } else if (current.appliedAt !== undefined) {
+    draft.appliedAt = current.appliedAt;
+  }
+  if (changes.interviewAt !== undefined) {
+    draft.interviewAt = changes.interviewAt;
+  } else if (current.interviewAt !== undefined) {
+    draft.interviewAt = current.interviewAt;
+  }
+  if (changes.offerAt !== undefined) {
+    draft.offerAt = changes.offerAt;
+  } else if (current.offerAt !== undefined) {
+    draft.offerAt = current.offerAt;
+  }
+  if (changes.closedAt !== undefined) {
+    draft.closedAt = changes.closedAt;
+  } else if (current.closedAt !== undefined) {
+    draft.closedAt = current.closedAt;
+  }
+  return draft;
+}
+
+function withTransitionDate(
+  draft: ApplicationDraft,
+  current: JobApplication,
+  now: string,
+): ApplicationDraft {
+  if (draft.stage === current.stage) return draft;
+
+  if (draft.stage === 'applied' && draft.appliedAt === undefined) {
+    return { ...draft, appliedAt: now };
+  }
+  if (draft.stage === 'interview' && draft.interviewAt === undefined) {
+    return { ...draft, interviewAt: now };
+  }
+  if (draft.stage === 'offer' && draft.offerAt === undefined) {
+    return { ...draft, offerAt: now };
+  }
+  if (draft.stage === 'closed' && draft.closedAt === undefined) {
+    return { ...draft, closedAt: now };
+  }
   return draft;
 }
 
@@ -236,11 +314,29 @@ export function createApplicationService(repository: ApplicationRepository) {
     const current = collection.applications[index];
     if (current === undefined) throw new Error('Application not found.');
 
-    const cleanDraft = validateDraft(draftFromChanges(current, changes));
     const now = new Date().toISOString();
+    const cleanDraft = validateDraft(
+      withTransitionDate(draftFromChanges(current, changes), current, now),
+    );
+    const lifecycleChanged =
+      cleanDraft.stage !== current.stage ||
+      cleanDraft.substage !== current.substage;
+    const stageHistory = lifecycleChanged
+      ? [
+          ...current.stageHistory,
+          {
+            stage: cleanDraft.stage,
+            ...(cleanDraft.substage === undefined
+              ? {}
+              : { substage: cleanDraft.substage }),
+            enteredAt: now,
+          },
+        ]
+      : current.stageHistory;
     const next = JobApplicationSchema.parse({
       id: current.id,
       ...cleanDraft,
+      stageHistory,
       createdAt: current.createdAt,
       updatedAt: now,
     });
@@ -277,6 +373,15 @@ export function createApplicationService(repository: ApplicationRepository) {
       const application = JobApplicationSchema.parse({
         id: createApplicationId(),
         ...cleanDraft,
+        stageHistory: [
+          {
+            stage: cleanDraft.stage,
+            ...(cleanDraft.substage === undefined
+              ? {}
+              : { substage: cleanDraft.substage }),
+            enteredAt: now,
+          },
+        ],
         createdAt: now,
         updatedAt: now,
       });
@@ -298,8 +403,9 @@ export function createApplicationService(repository: ApplicationRepository) {
     async changeStage(
       id: string,
       stage: ApplicationStage,
+      substage?: ApplicationSubstage,
     ): Promise<JobApplication> {
-      return updateApplication(id, { stage });
+      return updateApplication(id, { stage, substage });
     },
 
     async delete(id: string): Promise<void> {

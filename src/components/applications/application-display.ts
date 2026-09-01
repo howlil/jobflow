@@ -1,6 +1,7 @@
 import type {
   ApplicationPriority,
   ApplicationStage,
+  ApplicationSubstage,
   JobApplication,
 } from '../../domain/applications/application-schema';
 import {
@@ -10,10 +11,27 @@ import {
 
 export const STAGE_LABELS: Record<ApplicationStage, string> = {
   saved: 'Saved',
+  applying: 'Applying',
   applied: 'Applied',
-  assessment: 'Assessment',
   interview: 'Interview',
   offer: 'Offer',
+  closed: 'Closed',
+};
+
+export const SUBSTAGE_LABELS: Record<ApplicationSubstage, string> = {
+  preparing_application: 'Preparing application',
+  ready_to_apply: 'Ready to apply',
+  submitted: 'Submitted',
+  recruiter_review: 'Recruiter review',
+  hiring_manager_review: 'Hiring manager review',
+  assessment: 'Assessment',
+  recruiter_screen: 'Recruiter screen',
+  technical_interview: 'Technical interview',
+  system_design: 'System design',
+  behavioral_interview: 'Behavioral interview',
+  final_interview: 'Final interview',
+  offer_received: 'Offer received',
+  offer_negotiation: 'Offer negotiation',
   accepted: 'Accepted',
   rejected: 'Rejected',
   withdrawn: 'Withdrawn',
@@ -48,12 +66,61 @@ export function nextActionStatus(
   return `Next ${application.nextActionAt}`;
 }
 
+export function displayLifecycleLabel(application: JobApplication): string {
+  if (application.substage !== undefined) {
+    return SUBSTAGE_LABELS[application.substage];
+  }
+  return STAGE_LABELS[application.stage];
+}
+
+export function recommendedLifecycleAction(
+  application: JobApplication,
+): string | null {
+  if (application.stage === 'closed') return null;
+
+  switch (application.substage) {
+    case 'preparing_application':
+      return 'Finish tailoring the application.';
+    case 'ready_to_apply':
+      return 'Submit the application.';
+    case 'submitted':
+    case 'recruiter_review':
+    case 'hiring_manager_review':
+      return 'Follow up if there is no response.';
+    case 'assessment':
+      return 'Complete the assessment and record the result.';
+    case 'recruiter_screen':
+    case 'technical_interview':
+    case 'system_design':
+    case 'behavioral_interview':
+    case 'final_interview':
+      return 'Prepare for the next interview step.';
+    case 'offer_received':
+    case 'offer_negotiation':
+      return 'Review the offer and decide the next move.';
+    default:
+      break;
+  }
+
+  switch (application.stage) {
+    case 'saved':
+      return 'Review the role and decide whether to apply.';
+    case 'applying':
+      return 'Prepare the application for submission.';
+    case 'applied':
+      return 'Track the response and keep the next follow-up explicit.';
+    case 'interview':
+      return 'Prepare for the next interview step.';
+    case 'offer':
+      return 'Review the offer and decide the next move.';
+  }
+}
+
 export function nextPipelineStage(
   stage: ApplicationStage,
 ): ApplicationStage | null {
   const index = ACTIVE_APPLICATION_STAGES.findIndex((item) => item === stage);
   if (index < 0) return null;
-  if (stage === 'offer') return 'accepted';
   return ACTIVE_APPLICATION_STAGES[index + 1] ?? null;
 }
 
@@ -65,13 +132,7 @@ export function previousPipelineStage(
   return ACTIVE_APPLICATION_STAGES[index - 1] ?? null;
 }
 
-export function stageActionLabel(
-  currentStage: ApplicationStage,
-  nextStage: ApplicationStage,
-): string {
-  if (currentStage === 'offer' && nextStage === 'accepted') {
-    return 'Mark accepted';
-  }
+export function stageActionLabel(nextStage: ApplicationStage): string {
   return `${STAGE_LABELS[nextStage]} →`;
 }
 

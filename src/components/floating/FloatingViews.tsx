@@ -65,13 +65,11 @@ function intentLabel(intent: PageDocumentFieldSummary['intent']): string {
 
 const STAGE_LABELS: Record<ApplicationStage, string> = {
   saved: 'Saved',
+  applying: 'Applying',
   applied: 'Applied',
-  assessment: 'Assessment',
   interview: 'Interview',
   offer: 'Offer',
-  accepted: 'Accepted',
-  rejected: 'Rejected',
-  withdrawn: 'Withdrawn',
+  closed: 'Closed',
 };
 
 export function AssistantHomeView({
@@ -292,14 +290,17 @@ export function AssistantPipelineView({
               setDraft((current) => ({
                 ...current,
                 stage: event.target.value as ApplicationStage,
+                substage: undefined,
               }))
             }
           >
-            {APPLICATION_STAGES.map((stage) => (
-              <option value={stage} key={stage}>
-                {STAGE_LABELS[stage]}
-              </option>
-            ))}
+            {APPLICATION_STAGES.filter((stage) => stage !== 'closed').map(
+              (stage) => (
+                <option value={stage} key={stage}>
+                  {STAGE_LABELS[stage]}
+                </option>
+              ),
+            )}
           </select>
         </label>
         <label>
