@@ -14,7 +14,7 @@ export type ApplicationDraft = {
   role: string;
   jobUrl?: string;
   stage: ApplicationStage;
-  priority?: ApplicationPriority;
+  priority?: ApplicationPriority | undefined;
   notes?: string;
   source?: string;
   contactName?: string;
@@ -163,7 +163,7 @@ function draftFromChanges(
     role: changes.role ?? current.role,
     stage: changes.stage ?? current.stage,
   };
-  if (changes.priority !== undefined) draft.priority = changes.priority;
+  if ('priority' in changes) draft.priority = changes.priority;
   else if (current.priority !== undefined) draft.priority = current.priority;
   if (changes.jobUrl !== undefined) draft.jobUrl = changes.jobUrl;
   else if (current.jobUrl !== undefined) draft.jobUrl = current.jobUrl;
