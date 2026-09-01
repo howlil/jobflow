@@ -16,26 +16,24 @@ import type { WorkspaceSection } from './workspace-sections';
 
 const groups = [
   {
-    label: 'Profile',
+    label: 'Work',
+    items: [{ id: 'applications', label: 'Pipeline', icon: ClipboardList }],
+  },
+  {
+    label: 'Career kit',
     items: [
       { id: 'personal', label: 'Personal', icon: UserRound },
       { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
       { id: 'education', label: 'Education', icon: GraduationCap },
-    ],
-  },
-  {
-    label: 'Application',
-    items: [
       { id: 'documents', label: 'Documents', icon: FileText },
-      { id: 'applications', label: 'Pipeline', icon: ClipboardList },
       { id: 'preferences', label: 'Preferences', icon: MapPin },
       { id: 'variants', label: 'Variants', icon: ListChecks },
     ],
   },
   {
-    label: 'Privacy & data',
+    label: 'Data & privacy',
     items: [
-      { id: 'sensitive', label: 'Sensitive', icon: ShieldCheck },
+      { id: 'sensitive', label: 'Sensitive data', icon: ShieldCheck },
       { id: 'corrections', label: 'Corrections', icon: History },
       { id: 'backup', label: 'Backup', icon: FileArchive },
     ],
