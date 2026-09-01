@@ -79,7 +79,6 @@ export default function App() {
       variantRecommendation={pageContext.variantRecommendation}
       activeVariantId={pageContext.activeVariantId}
       variantOptions={pageContext.variantOptions}
-      documentFields={pageContext.documentFields}
       onSelectVariant={selectPageVariant}
     />
   );

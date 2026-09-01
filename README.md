@@ -10,7 +10,7 @@ Job Flow is a local-first Chromium extension for career-form autofill. It keeps 
 - CV/document binaries are stored separately in extension-origin IndexedDB; `chrome.storage.local` keeps structured profile/document metadata only.
 - Base profile plus lightweight application variants.
 - Deterministic current-page application-variant recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
-- Toolbar popup with profile readiness, current-page form summary, and recommended application profile.
+- Compact toolbar popup with current-page form status, application-profile selection, and one workspace entry action; detailed document/fill operations stay in the in-page assistant.
 - In-page 48px floating launcher for detected forms. The detailed assistant opens only after a user click and becomes viewport-safe on narrow pages.
 - Ready / Needs review / Sensitive / Unknown field classification.
 - Explicit normal-field fill only; no automatic fill on scan.

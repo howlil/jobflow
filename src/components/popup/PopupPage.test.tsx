@@ -14,48 +14,25 @@ function createRepository(
   };
 }
 
-function createCompleteProfile() {
+function createProfileWithVariants() {
   const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
-  profile.baseProfile.personal.legalName.first = 'Ulil';
-  profile.baseProfile.personal.legalName.last = 'Abshar';
-  profile.baseProfile.contact.whatsapp = '+628123456789';
-  profile.baseProfile.links.github = 'https://github.com/ulil';
-  profile.baseProfile.professional.experiences.push({
-    id: 'experience-1',
-    company: 'Job Flow',
-    title: 'Engineer',
-    employmentType: '',
-    location: '',
-    startDate: '',
-    endDate: '',
-    current: false,
-    description: '',
-    achievements: [],
-    skills: ['TypeScript'],
-  });
-  profile.baseProfile.professional.education.push({
-    id: 'education-1',
-    institution: 'Job Flow University',
-    degree: '',
-    fieldOfStudy: '',
-    location: '',
-    startDate: '',
-    endDate: '',
-    gpa: null,
-    maxGpa: null,
-    description: '',
-  });
-  profile.baseProfile.professional.skills.push({
-    id: 'skill-1',
-    name: 'TypeScript',
-    level: '',
-    yearsExperience: null,
-  });
+  profile.variants.push(
+    {
+      id: 'backend',
+      name: 'Backend Engineer',
+      targetRoles: ['Backend Engineer'],
+    },
+    {
+      id: 'devops',
+      name: 'DevOps Engineer',
+      targetRoles: ['DevOps Engineer'],
+    },
+  );
   return profile;
 }
 
 describe('PopupPage', () => {
-  it('shows empty readiness and opens profile settings', async () => {
+  it('stays a compact entry surface and opens the workspace', async () => {
     const openOptions = vi.fn().mockResolvedValue(undefined);
 
     render(
@@ -66,19 +43,20 @@ describe('PopupPage', () => {
     );
 
     expect(
-      await screen.findByText('0 of 6 profile sections ready'),
+      await screen.findByRole('heading', { name: 'Current application' }),
     ).toBeTruthy();
-    expect(screen.getByText('0 application variants')).toBeTruthy();
+    expect(screen.getByText('Using your base career profile.')).toBeTruthy();
+    expect(screen.queryByText(/% ready/i)).toBeNull();
+    expect(screen.queryByText(/missing essentials/i)).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Complete profile' }));
-
+    fireEvent.click(screen.getByRole('button', { name: 'Open workspace' }));
     await waitFor(() => expect(openOptions).toHaveBeenCalledTimes(1));
   });
 
   it('guides people to open a job application form when none is detected', async () => {
     render(
       <PopupPage
-        repository={createRepository(createCompleteProfile())}
+        repository={createRepository(createEmptyStoredProfile())}
         openOptions={vi.fn()}
       />,
     );
@@ -86,60 +64,6 @@ describe('PopupPage', () => {
     expect(
       await screen.findByText(/open a job application form/i),
     ).toBeTruthy();
-    expect(
-      screen.getByRole('button', { name: /open profile settings/i }),
-    ).toBeTruthy();
-  });
-
-  it('shows readiness and variant count from persisted profile data', async () => {
-    const profile = createEmptyStoredProfile('2026-08-13T00:00:00.000Z');
-    profile.baseProfile.personal.legalName.first = 'Ulil';
-    profile.baseProfile.personal.legalName.last = 'Abshar';
-    profile.baseProfile.contact.whatsapp = '+628123456789';
-    profile.baseProfile.professional.experiences.push({
-      id: 'skill-source-1',
-      company: '',
-      title: '',
-      employmentType: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      current: false,
-      description: '',
-      achievements: [],
-      skills: ['TypeScript'],
-    });
-    profile.baseProfile.professional.skills.push({
-      id: 'skill-1',
-      name: 'TypeScript',
-      level: '',
-      yearsExperience: null,
-    });
-    profile.variants.push({
-      id: 'backend',
-      name: 'Backend Engineer',
-      targetRoles: ['Backend Engineer'],
-    });
-
-    render(
-      <PopupPage
-        repository={createRepository(profile)}
-        openOptions={vi.fn()}
-      />,
-    );
-
-    expect(await screen.findByText('50% ready')).toBeTruthy();
-    expect(screen.getByText('1 application variant')).toBeTruthy();
-    expect(screen.getByText('Backend Engineer')).toBeTruthy();
-  });
-
-  it('limits incomplete-profile essentials to the next three items', async () => {
-    render(
-      <PopupPage repository={createRepository(null)} openOptions={vi.fn()} />,
-    );
-
-    expect(await screen.findByText('Missing essentials')).toBeTruthy();
-    expect(screen.getAllByRole('listitem').length).toBeLessThanOrEqual(3);
   });
 
   it('shows the current page form analysis summary', async () => {
@@ -167,19 +91,7 @@ describe('PopupPage', () => {
   });
 
   it('allows an explicit per-page variant override and reset to automatic', async () => {
-    const profile = createCompleteProfile();
-    profile.variants.push(
-      {
-        id: 'backend',
-        name: 'Backend Engineer',
-        targetRoles: ['Backend Engineer'],
-      },
-      {
-        id: 'devops',
-        name: 'DevOps Engineer',
-        targetRoles: ['DevOps Engineer'],
-      },
-    );
+    const profile = createProfileWithVariants();
     const onSelectVariant = vi.fn().mockResolvedValue(undefined);
 
     render(
@@ -200,8 +112,11 @@ describe('PopupPage', () => {
       />,
     );
 
+    expect(await screen.findByText('Recommended')).toBeTruthy();
+    expect(screen.getAllByText('Backend Engineer').length).toBeGreaterThan(0);
+
     const selector =
-      await screen.findByLabelText<HTMLSelectElement>('Use for this page');
+      screen.getByLabelText<HTMLSelectElement>('Use for this page');
     fireEvent.change(selector, { target: { value: 'devops' } });
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith('devops'));
 
@@ -209,61 +124,6 @@ describe('PopupPage', () => {
       screen.getByRole('button', { name: 'Use automatic recommendation' }),
     );
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith(null));
-  });
-
-  it('shows explicit deterministic guidance for each document field', async () => {
-    render(
-      <PopupPage
-        repository={createRepository(createCompleteProfile())}
-        openOptions={vi.fn()}
-        documentFields={[
-          {
-            fieldFingerprint: 'resume-field',
-            fieldLabel: 'Resume / CV',
-            intent: 'resume',
-            evidence: ['label:resume'],
-            recommendedDocument: {
-              id: 'resume-1',
-              label: 'Backend resume',
-              fileName: 'backend.pdf',
-            },
-          },
-          {
-            fieldFingerprint: 'cover-field',
-            fieldLabel: 'Cover letter',
-            intent: 'cover_letter',
-            evidence: ['label:cover letter'],
-            recommendedDocument: {
-              id: 'cover-1',
-              label: 'Backend cover',
-              fileName: 'backend-cover.pdf',
-            },
-          },
-          {
-            fieldFingerprint: 'unknown-file',
-            fieldLabel: 'Supporting attachment',
-            intent: 'unknown',
-            evidence: [],
-            recommendedDocument: null,
-          },
-        ]}
-      />,
-    );
-
-    expect(
-      await screen.findByRole('heading', { name: 'Document upload' }),
-    ).toBeTruthy();
-    expect(
-      screen.getByText(/attached only when you click Attach/i),
-    ).toBeTruthy();
-    expect(screen.getByText('Resume / CV')).toBeTruthy();
-    expect(screen.getByText(/backend resume/i)).toBeTruthy();
-    expect(screen.getAllByText('Cover letter')).toHaveLength(2);
-    expect(screen.getByText(/backend cover/i)).toBeTruthy();
-    expect(screen.getByText('Supporting attachment')).toBeTruthy();
-    expect(
-      screen.getAllByText(/unknown document type/i).length,
-    ).toBeGreaterThan(0);
   });
 
   it.each([
@@ -276,7 +136,7 @@ describe('PopupPage', () => {
         unknown: 0,
         total: 2,
       },
-      expectedLabel: 'Prepare fields in settings',
+      expectedLabel: 'Prepare fields in workspace',
     },
     {
       name: 'review fields',
@@ -287,7 +147,7 @@ describe('PopupPage', () => {
         unknown: 0,
         total: 2,
       },
-      expectedLabel: 'Prepare fields in settings',
+      expectedLabel: 'Prepare fields in workspace',
     },
     {
       name: 'sensitive fields',
@@ -298,14 +158,14 @@ describe('PopupPage', () => {
         unknown: 0,
         total: 2,
       },
-      expectedLabel: 'Manage vault in settings',
+      expectedLabel: 'Manage vault in workspace',
     },
   ])(
-    'uses a truthful settings CTA when $name are detected',
+    'uses a truthful workspace CTA when $name are detected',
     async ({ pageSummary, expectedLabel }) => {
       render(
         <PopupPage
-          repository={createRepository(createCompleteProfile())}
+          repository={createRepository(createEmptyStoredProfile())}
           openOptions={vi.fn()}
           pageSummary={pageSummary}
         />,
@@ -314,15 +174,6 @@ describe('PopupPage', () => {
       expect(
         await screen.findByRole('button', { name: expectedLabel }),
       ).toBeTruthy();
-      expect(
-        screen.queryByRole('button', { name: /fill safe fields/i }),
-      ).toBeNull();
-      expect(
-        screen.queryByRole('button', { name: /review fields/i }),
-      ).toBeNull();
-      expect(
-        screen.queryByRole('button', { name: /open vault settings/i }),
-      ).toBeNull();
     },
   );
 });
