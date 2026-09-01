@@ -28,6 +28,14 @@ describe('ChromeApplicationRepository', () => {
       role: 'Engineer',
       jobUrl: 'https://jobs.example/acme',
       stage: 'interview',
+      substage: 'technical_interview',
+      stageHistory: [
+        {
+          stage: 'interview',
+          substage: 'technical_interview',
+          enteredAt: '2026-08-30T00:00:00.000Z',
+        },
+      ],
       notes: 'Follow up after panel.',
       source: 'Referral',
       contactName: 'Maya',
@@ -71,11 +79,20 @@ describe('ChromeApplicationRepository', () => {
 
     const result = await repository.load();
 
-    expect(result?.schemaVersion).toBe(2);
+    expect(result).toMatchObject({
+      schemaVersion: 3,
+      applications: [
+        {
+          stage: 'applied',
+          substage: 'submitted',
+          stageHistory: [{ stage: 'applied', substage: 'submitted' }],
+        },
+      ],
+    });
     await expect(
       browser.storage.local.get(APPLICATION_STORAGE_KEY),
     ).resolves.toMatchObject({
-      [APPLICATION_STORAGE_KEY]: { schemaVersion: 2 },
+      [APPLICATION_STORAGE_KEY]: { schemaVersion: 3 },
     });
   });
 

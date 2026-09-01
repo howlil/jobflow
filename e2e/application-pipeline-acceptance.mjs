@@ -24,6 +24,11 @@ async function createApplication(workspace, application) {
   await workspace.getByLabel(/^Role$/).fill(application.role);
   await workspace.getByLabel(/^Job URL$/).fill(application.jobUrl);
   await workspace.getByLabel(/^Stage/).selectOption(application.stage);
+  if (application.substage) {
+    await workspace
+      .getByLabel(/^Lifecycle detail/)
+      .selectOption(application.substage);
+  }
   await workspace.getByLabel(/^Source$/).fill(application.source);
   await workspace.getByLabel(/^Next action$/).fill(application.nextAction);
   await workspace
@@ -79,12 +84,16 @@ try {
   await expect(
     workspace.getByRole('heading', { name: 'Job pipeline' }),
   ).toBeVisible();
+  await expect(
+    workspace.getByRole('heading', { name: 'Applying', exact: true }),
+  ).toBeVisible();
 
   await createApplication(workspace, {
     company: 'Gojek',
     role: 'Backend Engineer',
     jobUrl: 'https://example.com/gojek-backend',
     stage: 'applied',
+    substage: 'recruiter_review',
     source: 'LinkedIn',
     nextAction: 'Follow up recruiter',
     nextActionAt: '2020-01-01',
@@ -95,6 +104,7 @@ try {
     role: 'Platform Engineer',
     jobUrl: 'https://example.com/traveloka-platform',
     stage: 'interview',
+    substage: 'system_design',
     source: 'Careers page',
     nextAction: 'Prepare system design',
     nextActionAt: '2099-01-01',
@@ -109,6 +119,7 @@ try {
   await search.fill('gojek');
   let gojekCard = await expectCardVisible(workspace, 'Gojek');
   await expect(gojekCard).toContainText('Backend Engineer');
+  await expect(gojekCard).toContainText('Recruiter review');
   await expect(gojekCard).not.toContainText('Follow up with recruiter.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
@@ -119,6 +130,8 @@ try {
   );
   await expect(detail).toContainText('Follow up recruiter');
   await expect(detail).toContainText('Follow up with recruiter.');
+  await expect(detail).toContainText('Recruiter review');
+  await expect(detail).toContainText('Timeline');
   await expect(detail).toContainText('LinkedIn');
 
   await detail.getByRole('button', { name: 'Edit details' }).click();
@@ -144,7 +157,8 @@ try {
   await expect(workspace.getByRole('status')).toHaveText(
     'Follow-up completed.',
   );
-  await expect(detail).toContainText('No next action set.');
+  await expect(detail).toContainText('Suggested next');
+  await expect(detail).toContainText('Follow up if there is no response.');
   await detail.getByRole('button', { name: 'Back to pipeline' }).click();
 
   await expect(
@@ -154,13 +168,22 @@ try {
 
   await workspace.getByRole('button', { name: 'Board', exact: true }).click();
   detail = await openApplicationDetail(workspace, 'Gojek', 'Backend Engineer');
-  await detail.getByRole('button', { name: 'Assessment →' }).click();
+  await detail.getByLabel(/^Lifecycle detail/).selectOption('assessment');
   await expect(workspace.getByRole('status')).toHaveText(
-    'Moved to Assessment.',
+    'Lifecycle detail: Assessment.',
   );
+  await expect(detail).toContainText('Assessment');
 
   await detail.getByRole('button', { name: 'Interview →' }).click();
   await expect(workspace.getByRole('status')).toHaveText('Moved to Interview.');
+  await detail
+    .getByLabel(/^Lifecycle detail/)
+    .selectOption('technical_interview');
+  await expect(workspace.getByRole('status')).toHaveText(
+    'Lifecycle detail: Technical interview.',
+  );
+  await expect(detail).toContainText('Technical interview');
+  await expect(detail).toContainText('Assessment');
   await detail.getByRole('button', { name: 'Back to pipeline' }).click();
 
   await page.reload();
@@ -178,9 +201,32 @@ try {
   await interviewColumn.scrollIntoViewIfNeeded();
   await expect(interviewColumn).toBeVisible();
   await expect(interviewColumn).toContainText('Gojek');
+  await expect(interviewColumn).toContainText('Technical interview');
   await expect(interviewColumn).toContainText('Traveloka');
   await expect(
     persistedWorkspace.getByText('2 active opportunities · 0 need action'),
+  ).toBeVisible();
+
+  detail = await openApplicationDetail(
+    persistedWorkspace,
+    'Traveloka',
+    'Platform Engineer',
+  );
+  await detail.getByRole('button', { name: 'Mark rejected' }).click();
+  await expect(persistedWorkspace.getByRole('status')).toHaveText(
+    'Closed as Rejected.',
+  );
+  await detail.getByRole('button', { name: 'Back to pipeline' }).click();
+  await persistedWorkspace.getByRole('button', { name: 'Closed 1' }).click();
+  const rejectedHeading = persistedWorkspace.getByRole('heading', {
+    name: 'Rejected',
+    exact: true,
+  });
+  const rejectedColumn = rejectedHeading.locator('xpath=ancestor::section[1]');
+  await rejectedColumn.scrollIntoViewIfNeeded();
+  await expect(rejectedColumn).toContainText('Traveloka');
+  await expect(
+    persistedWorkspace.getByText('1 active opportunity · 0 need action'),
   ).toBeVisible();
 } finally {
   await context?.close();

@@ -4,8 +4,10 @@ import { Plus } from 'lucide-react';
 import {
   APPLICATION_PRIORITIES,
   APPLICATION_STAGES,
+  APPLICATION_SUBSTAGES_BY_STAGE,
   type ApplicationPriority,
   type ApplicationStage,
+  type ApplicationSubstage,
   type JobApplication,
 } from '../../domain/applications/application-schema';
 import type {
@@ -29,7 +31,7 @@ import {
 import { ApplicationDetail } from './ApplicationDetail';
 import {
   ACTIVE_APPLICATION_STAGES,
-  CLOSED_APPLICATION_STAGES,
+  CLOSED_APPLICATION_SUBSTAGES,
   applicationIsClosed,
   applicationNeedsAction,
   focusApplications,
@@ -39,6 +41,7 @@ import {
 import {
   PRIORITY_LABELS,
   STAGE_LABELS,
+  SUBSTAGE_LABELS,
   displayDate,
   nextActionStatus,
 } from './application-display';
@@ -55,6 +58,10 @@ const EMPTY_DRAFT: ApplicationDraft = {
   nextAction: '',
   nextActionAt: '',
   deadline: '',
+  appliedAt: '',
+  interviewAt: '',
+  offerAt: '',
+  closedAt: '',
 };
 
 function draftFromApplication(application: JobApplication): ApplicationDraft {
@@ -63,6 +70,7 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
     role: application.role,
     jobUrl: application.jobUrl ?? '',
     stage: application.stage,
+    substage: application.substage,
     priority: application.priority,
     notes: application.notes ?? '',
     source: application.source ?? '',
@@ -71,6 +79,10 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
     nextAction: application.nextAction ?? '',
     nextActionAt: application.nextActionAt ?? '',
     deadline: application.deadline ?? '',
+    appliedAt: application.appliedAt ?? '',
+    interviewAt: application.interviewAt ?? '',
+    offerAt: application.offerAt ?? '',
+    closedAt: application.closedAt ?? '',
   };
 }
 
@@ -113,6 +125,11 @@ function PipelineCard({
         {showStage ? (
           <span className="rounded-control border border-app-border px-2 py-1 text-app-text">
             {STAGE_LABELS[application.stage]}
+          </span>
+        ) : null}
+        {application.substage !== undefined ? (
+          <span className="rounded-control border border-app-border px-2 py-1 text-app-text">
+            {SUBSTAGE_LABELS[application.substage]}
           </span>
         ) : null}
         {dueStatus !== null ? (
@@ -258,17 +275,44 @@ export function ApplicationsWorkspace({
       setFormOpen(false);
       await reload();
     } catch {
-      setError('Company, role, and a valid URL are required before saving.');
+      setError(
+        'Company, role, a valid URL, and a compatible lifecycle state are required before saving.',
+      );
     }
   }
 
-  async function changeStage(id: string, stage: ApplicationStage) {
+  async function changeStage(
+    id: string,
+    stage: ApplicationStage,
+    substage?: ApplicationSubstage,
+  ) {
     try {
-      await service.changeStage(id, stage);
-      setStatus(`Moved to ${STAGE_LABELS[stage]}.`);
+      await service.changeStage(id, stage, substage);
+      setStatus(
+        stage === 'closed' && substage !== undefined
+          ? `Closed as ${SUBSTAGE_LABELS[substage]}.`
+          : `Moved to ${STAGE_LABELS[stage]}.`,
+      );
       await reload();
     } catch {
-      setError('Could not update this job stage.');
+      setError('Could not update this job lifecycle.');
+    }
+  }
+
+  async function changeSubstage(
+    id: string,
+    substage: ApplicationSubstage | undefined,
+  ) {
+    try {
+      await service.update(id, { substage });
+      setStatus(
+        substage === undefined
+          ? 'Lifecycle detail cleared.'
+          : `Lifecycle detail: ${SUBSTAGE_LABELS[substage]}.`,
+      );
+      await reload();
+    } catch {
+      setError('Could not update this lifecycle detail.');
     }
   }
 
@@ -314,6 +358,7 @@ export function ApplicationsWorkspace({
       : (applications.find(
           (application) => application.id === selectedApplicationId,
         ) ?? null);
+  const substageOptions = APPLICATION_SUBSTAGES_BY_STAGE[draft.stage];
 
   const form = formOpen ? (
     <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
@@ -346,7 +391,10 @@ export function ApplicationsWorkspace({
           label="Stage"
           value={draft.stage}
           onChange={(event) =>
-            updateDraft({ stage: event.target.value as ApplicationStage })
+            updateDraft({
+              stage: event.target.value as ApplicationStage,
+              substage: undefined,
+            })
           }
         >
           {APPLICATION_STAGES.map((stage) => (
@@ -355,6 +403,33 @@ export function ApplicationsWorkspace({
             </option>
           ))}
         </SelectField>
+        {substageOptions.length > 0 ? (
+          <SelectField
+            label="Lifecycle detail"
+            value={draft.substage ?? ''}
+            onChange={(event) =>
+              updateDraft({
+                substage:
+                  event.target.value === ''
+                    ? undefined
+                    : (event.target.value as ApplicationSubstage),
+              })
+            }
+          >
+            {draft.stage !== 'closed' ? (
+              <option value="">No lifecycle detail</option>
+            ) : (
+              <option value="" disabled>
+                Choose outcome
+              </option>
+            )}
+            {substageOptions.map((substage) => (
+              <option value={substage} key={substage}>
+                {SUBSTAGE_LABELS[substage]}
+              </option>
+            ))}
+          </SelectField>
+        ) : null}
         <SelectField
           label="Priority"
           value={draft.priority ?? ''}
@@ -393,6 +468,30 @@ export function ApplicationsWorkspace({
           type="date"
           value={draft.deadline ?? ''}
           onChange={(event) => updateDraft({ deadline: event.target.value })}
+        />
+        <TextField
+          label="Applied date"
+          type="date"
+          value={draft.appliedAt ?? ''}
+          onChange={(event) => updateDraft({ appliedAt: event.target.value })}
+        />
+        <TextField
+          label="Interview date"
+          type="date"
+          value={draft.interviewAt ?? ''}
+          onChange={(event) => updateDraft({ interviewAt: event.target.value })}
+        />
+        <TextField
+          label="Offer date"
+          type="date"
+          value={draft.offerAt ?? ''}
+          onChange={(event) => updateDraft({ offerAt: event.target.value })}
+        />
+        <TextField
+          label="Closed date"
+          type="date"
+          value={draft.closedAt ?? ''}
+          onChange={(event) => updateDraft({ closedAt: event.target.value })}
         />
         <TextField
           label="Source"
@@ -473,7 +572,12 @@ export function ApplicationsWorkspace({
           onBack={backToPipeline}
           onEdit={() => openEditForm(selectedApplication)}
           onDelete={() => deleteApplication(selectedApplication.id)}
-          onChangeStage={(stage) => changeStage(selectedApplication.id, stage)}
+          onChangeStage={(stage, substage) =>
+            changeStage(selectedApplication.id, stage, substage)
+          }
+          onChangeSubstage={(substage) =>
+            changeSubstage(selectedApplication.id, substage)
+          }
           onCompleteAction={() => completeFollowUp(selectedApplication.id)}
         />
       </Section>
@@ -610,18 +714,18 @@ export function ApplicationsWorkspace({
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-3">
-          {CLOSED_APPLICATION_STAGES.map((stage) => {
+          {CLOSED_APPLICATION_SUBSTAGES.map((substage) => {
             const items = visibleApplications.filter(
-              (application) => application.stage === stage,
+              (application) => application.substage === substage,
             );
             return (
               <section
                 className="grid content-start gap-3 rounded-lg border border-app-border bg-app-muted/30 p-3"
-                key={stage}
+                key={substage}
               >
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="m-0 text-xs font-semibold uppercase tracking-[0.05em] text-app-ink">
-                    {STAGE_LABELS[stage]}
+                    {SUBSTAGE_LABELS[substage]}
                   </h3>
                   <span className="text-[11px] font-medium text-app-subtle">
                     {items.length}
