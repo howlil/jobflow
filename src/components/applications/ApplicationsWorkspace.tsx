@@ -165,8 +165,9 @@ export function ApplicationsWorkspace({
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [draft, setDraft] = useState<ApplicationDraft>(EMPTY_DRAFT);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedApplicationId, setSelectedApplicationId] =
-    useState<string | null>(null);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<
+    string | null
+  >(null);
   const [formOpen, setFormOpen] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -310,9 +311,9 @@ export function ApplicationsWorkspace({
   const selectedApplication =
     selectedApplicationId === null
       ? null
-      : applications.find(
+      : (applications.find(
           (application) => application.id === selectedApplicationId,
-        ) ?? null;
+        ) ?? null);
 
   const form = formOpen ? (
     <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
@@ -321,8 +322,7 @@ export function ApplicationsWorkspace({
           {editingId === null ? 'Add job' : 'Edit job'}
         </h3>
         <p className="m-0 text-xs text-app-subtle">
-          Capture only the context needed to decide and execute the next
-          move.
+          Capture only the context needed to decide and execute the next move.
         </p>
       </div>
       <FieldGrid>
@@ -378,9 +378,7 @@ export function ApplicationsWorkspace({
           label="Next action"
           placeholder="Tailor resume, follow up, prepare interview..."
           value={draft.nextAction ?? ''}
-          onChange={(event) =>
-            updateDraft({ nextAction: event.target.value })
-          }
+          onChange={(event) => updateDraft({ nextAction: event.target.value })}
         />
         <TextField
           label="Next action date"
@@ -394,9 +392,7 @@ export function ApplicationsWorkspace({
           label="Application deadline"
           type="date"
           value={draft.deadline ?? ''}
-          onChange={(event) =>
-            updateDraft({ deadline: event.target.value })
-          }
+          onChange={(event) => updateDraft({ deadline: event.target.value })}
         />
         <TextField
           label="Source"
@@ -406,9 +402,7 @@ export function ApplicationsWorkspace({
         <TextField
           label="Contact name"
           value={draft.contactName ?? ''}
-          onChange={(event) =>
-            updateDraft({ contactName: event.target.value })
-          }
+          onChange={(event) => updateDraft({ contactName: event.target.value })}
         />
         <TextField
           label="Contact email"
