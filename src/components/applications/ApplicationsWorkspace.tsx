@@ -479,12 +479,8 @@ export function ApplicationsWorkspace({
           onBack={backToPipeline}
           onEdit={() => openEditForm(selectedApplication)}
           onDelete={() => deleteApplication(selectedApplication.id)}
-          onChangeStage={(stage) =>
-            changeStage(selectedApplication.id, stage)
-          }
-          onCompleteAction={() =>
-            completeFollowUp(selectedApplication.id)
-          }
+          onChangeStage={(stage) => changeStage(selectedApplication.id, stage)}
+          onCompleteAction={() => completeFollowUp(selectedApplication.id)}
         />
       </Section>
     );
