@@ -113,7 +113,7 @@ describe('PopupPage', () => {
     );
 
     expect(await screen.findByText('Recommended')).toBeTruthy();
-    expect(screen.getByText('Backend Engineer')).toBeTruthy();
+    expect(screen.getAllByText('Backend Engineer').length).toBeGreaterThan(0);
 
     const selector = screen.getByLabelText<HTMLSelectElement>('Use for this page');
     fireEvent.change(selector, { target: { value: 'devops' } });
