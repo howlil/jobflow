@@ -25,7 +25,10 @@ async function createApplication(workspace, application) {
   await workspace.getByLabel(/^Job URL$/).fill(application.jobUrl);
   await workspace.locator('select').selectOption(application.stage);
   await workspace.getByLabel(/^Source$/).fill(application.source);
-  await workspace.getByLabel(/^Next action$/).fill(application.nextActionAt);
+  await workspace.getByLabel(/^Next action$/).fill(application.nextAction);
+  await workspace
+    .getByLabel(/^Next action date$/)
+    .fill(application.nextActionAt);
   await workspace.getByLabel(/^Notes$/).fill(application.notes);
   await workspace.getByRole('button', { name: 'Add to pipeline' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
@@ -73,6 +76,7 @@ try {
     jobUrl: 'https://example.com/gojek-backend',
     stage: 'applied',
     source: 'LinkedIn',
+    nextAction: 'Follow up recruiter',
     nextActionAt: '2020-01-01',
     notes: 'Follow up with recruiter.',
   });
@@ -82,6 +86,7 @@ try {
     jobUrl: 'https://example.com/traveloka-platform',
     stage: 'interview',
     source: 'Careers page',
+    nextAction: 'Prepare system design',
     nextActionAt: '2099-01-01',
     notes: 'Prepare system design examples.',
   });
