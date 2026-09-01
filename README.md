@@ -21,7 +21,7 @@ Job Flow is a local-first Chromium extension for career-form autofill. It keeps 
 - Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
 - A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
 - Versioned normal-profile backup export/import validated through the same persisted-schema parser, plus backup diagnostics before recovery. Sensitive vault values are never exported as plaintext.
-- Machine-checked compatibility evidence state and a privacy-safe live ATS validation/feedback workflow.
+- Compatibility fixtures and a privacy-safe live ATS validation/feedback workflow are maintained as targeted evidence rather than a synthetic CI status gate.
 - No auto-submit, auto-next, backend, cloud sync, analytics, or AI dependency.
 
 ## Local Development
@@ -30,7 +30,7 @@ Requirements:
 
 - Node.js `>=22.13.0`
 - pnpm `11.21.0`
-- Chromium/Chrome for browser acceptance testing
+- Chromium/Chrome only when browser diagnostics are needed
 
 Install dependencies:
 
@@ -71,28 +71,24 @@ Text-based PDF and DOCX are supported for extraction. Image-only/scanned PDF ext
 
 ## Verification
 
-Run the complete local gates:
+Required repository gates are direct and deterministic:
 
 ```powershell
 pnpm test
 pnpm typecheck
 pnpm lint
 pnpm format:check
-pnpm verify:compatibility
 pnpm build
 pnpm verify:manifest
-pnpm test:e2e
-pnpm zip
-git diff --check
 ```
 
-CI runs the same core verification plus Chromium installation for browser E2E. Browser acceptance includes the launcher-first UI and an explicit CV attachment journey. Tagged `v*` releases use a separate fail-closed workflow that reruns required verification, packages the extension, generates a SHA-256 checksum, and only then creates the GitHub Release.
+Use `pnpm test:e2e` or `pnpm test:e2e:smoke` only when browser-runtime evidence is useful for the change. Tagged `v*` releases rerun the required gate, package the extension, generate a SHA-256 checksum, and then create the GitHub Release.
 
 ## Compatibility Strategy
 
 Job Flow prioritizes a generic form engine over ATS-specific production branches. The maintained compatibility corpus includes native and ATS-shaped field contexts, English/Indonesian labels, sensitive fields, file inputs, dynamic forms, and ambiguous questions. A vendor adapter is justified only after a reproducible generic-engine failure cannot be solved cleanly at the generic extraction/matching/filling layer.
 
-`docs/compatibility-evidence.json` keeps fixture and live evidence separate. CI rejects unsupported live-verification claims and refuses adapter candidate/implemented status without a documented reproducible failure.
+Compatibility documentation may record fixture/live evidence, but runtime compatibility claims must be supported by the relevant focused fixture or live validation rather than metadata alone.
 
 See `docs/compatibility.md` and `docs/ats-live-validation.md` for the evidence model, live validation protocol, and adapter gate.
 
