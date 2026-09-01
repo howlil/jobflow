@@ -1,6 +1,6 @@
 # Current Milestone
 
-**Status:** Active — implementation complete on `application-lifecycle`; browser acceptance is failing and integration is blocked.
+**Status:** Active — Rich Application Lifecycle implementation is complete. Before lifecycle integration and the next product milestone, an explicitly authorized repository-cleanup logical change is removing verification/process ceremony that does not provide proportional evidence.
 
 **Goal:** Rich Application Lifecycle
 
@@ -16,36 +16,41 @@
 
 **Position:**
 
-- Application Detail is already integrated on `master`.
-- Schema v3, v1/v2 migration, lifecycle history, stage-date semantics, primary/substage UI, deterministic guidance, and updated unit/browser acceptance are implemented on branch `application-lifecycle`.
-- PR #54 head `75deaea8823226e2d1f65f1d0ee3da8a70a95f89` completed CI run 634 with unit tests, typecheck, lint, format, compatibility, build, and generated-manifest verification green.
-- The same exact head failed browser acceptance in `e2e/application-pipeline-acceptance.mjs:89`: the test expected an `Applying` heading, while the rendered Pipeline reported `0 active opportunities` and `No jobs in your pipeline yet.`
-- The lifecycle logical change is therefore not integration-ready.
+- Application Detail is integrated on `master`.
+- Schema v3, v1/v2 migration, lifecycle history, stage-date semantics, primary/substage UI, deterministic guidance, and focused unit/storage/workspace coverage are implemented on `application-lifecycle`.
+- PR #54 has already passed the lean mandatory CI gate after browser black-box E2E became opt-in.
+- PR #56 now owns the independent pre-next-milestone cleanup: remove browser E2E from mandatory gates, remove synthetic compatibility-status gating, remove the custom affected-preflight wrapper, remove duplicate WXT preparation, and remove duplicate/stale documentation.
 
 **Delta:**
 
-- Determine why the lifecycle browser journey reaches the board without its expected application fixture/state.
-- Fix only the evidence-backed setup, persistence, or product behavior responsible for the empty Pipeline.
-- Re-run the required gate and integrate only the exact green head.
+- Finish the bounded repository-cleanup change and observe its mandatory CI gate on the exact head.
+- Integrate the cleanup policy so `master`, release workflow, and canonical docs agree.
+- Rebase/update lifecycle integration only if required by the cleanup merge, then integrate the exact green lifecycle head.
 
 **Next Move:**
 
-- Reproduce the PR #54 empty-Pipeline browser failure and identify whether fixture creation/persistence or lifecycle rendering owns the defect.
+- Complete and verify PR #56 cleanup; integrate it before starting another product milestone.
 
 ## Scope
 
 ### In
 
+Lifecycle milestone:
 - primary lifecycle state model
 - substages / terminal outcomes
 - schema v3 with explicit v1/v2 migration
-- lifecycle history
-- stage-date capture
+- lifecycle history and stage dates
 - deterministic next-action guidance
-- Pipeline/Application Detail presentation required for that lifecycle
-- compatibility update for floating job capture
-- focused unit, migration, workspace, and browser acceptance coverage
-- evidence-backed fix required to make the approved lifecycle slice pass its existing browser acceptance
+- Pipeline/Application Detail lifecycle presentation
+- focused lifecycle verification
+
+Authorized cleanup before next milestone:
+- browser E2E remains opt-in rather than mandatory
+- remove custom affected-preflight orchestration
+- remove metadata-only compatibility verification from CI/release gates
+- keep compatibility validation risk-based and evidence-backed
+- remove duplicate WXT preparation script
+- remove stale/duplicate documentation whose authority already lives in `.agents/*`
 
 ### Out
 
@@ -55,19 +60,21 @@
 - interview log
 - fit score
 - analytics dashboard
-- unrelated module refactors
-- unrelated product or architecture changes
+- unrelated architecture refactors
+- deleting supported persistence migrations
+- deleting Playwright/E2E diagnostics entirely
+- changing observable product UX as part of repository cleanup
 
 ## Slices
 
 - [x] Pipeline operational home integrated on `master`.
 - [x] Application Detail integrated on `master`.
-- [x] Lifecycle schema/model and v1/v2 migration implemented on `application-lifecycle`.
+- [x] Lifecycle schema/model and v1/v2 migration implemented.
 - [x] Lifecycle history, stage dates, substages/outcomes, and deterministic guidance implemented.
-- [x] Unit/storage/workspace/browser acceptance coverage updated for the lifecycle behavior.
-- [ ] Diagnose and fix the browser journey reaching an empty Pipeline before its `Applying` assertion. ← ACTIVE
-- [ ] Re-run full repository quality gate on the resulting exact head.
-- [ ] Squash-merge the exact green lifecycle head.
+- [x] Focused lifecycle verification implemented.
+- [ ] Integrate lean quality/cleanup policy in PR #56. ← ACTIVE
+- [ ] Integrate exact green lifecycle head from PR #54.
+- [ ] Close Rich Application Lifecycle milestone and activate the next approved milestone.
 
 ## Current Decisions
 
@@ -76,55 +83,30 @@
 - Existing persisted application data must migrate without dropping job context.
 - Explicit user-entered next actions take precedence over deterministic guidance.
 - Closed opportunities remain grouped by Accepted / Rejected / Withdrawn outcome.
-
-These are current milestone decisions. Promote only durable material rationale to `DECISIONS.md` after integration when it remains useful beyond this milestone.
+- Playwright browser E2E is an opt-in diagnostic, not a mandatory CI/release blocker.
+- Mandatory repository gates are direct executable checks; metadata/status bookkeeping is not treated as runtime verification.
 
 ## Verification / Evidence
 
-Implemented branch evidence currently includes changes to:
-
-- application schema and migrations
-- application service behavior/tests
-- `ApplicationDetail`
-- `ApplicationsWorkspace`
-- application display/focus helpers
-- storage migration coverage
-- application pipeline browser acceptance
-- floating job-capture compatibility
-
-Observed on PR #54 head `75deaea8823226e2d1f65f1d0ee3da8a70a95f89`, CI run 634:
+Mandatory integration gate:
 
 ```text
-pnpm test                 PASS
-pnpm typecheck            PASS
-pnpm lint                 PASS
-pnpm format:check         PASS
-pnpm verify:compatibility PASS
-pnpm build                PASS
-pnpm verify:manifest      PASS
-pnpm test:e2e             FAIL
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm build
+pnpm verify:manifest
 ```
 
-Browser failure evidence:
-
-```text
-e2e/application-pipeline-acceptance.mjs:89
-expected: heading "Applying" is visible
-actual:   Pipeline has 0 active opportunities
-          "No jobs in your pipeline yet."
-```
-
-The failure proves the browser journey does not have the expected application state at the first lifecycle-board assertion; it does not yet prove whether the defect is fixture creation, persistence, or rendering.
-
-Integration requires the complete gate to pass on the exact head that will be merged.
+Risk-specific evidence remains required when a change touches persistence, permissions, privacy/security, autofill compatibility, or browser-runtime behavior. Browser E2E and live compatibility validation are selective diagnostics rather than unconditional ceremony.
 
 ## Blockers / Risks
 
-- Current blocker: PR #54 browser acceptance reaches an empty Pipeline before the expected `Applying` assertion.
-- Persisted application migration is the highest-risk part of the logical change; data integrity and backward compatibility must remain green.
-- Stage/substage semantics affect several UI and compatibility consumers; failures must be fixed at the owning boundary rather than patched with parallel mappings.
-- The `.agents` normalization is an independent repository-maintenance logical change and must not silently expand the lifecycle product scope.
+- PR #56 must pass the mandatory gate on its final exact cleanup head before integration.
+- Persisted application migration remains the highest-risk lifecycle surface and must remain supported; migration code is not cleanup debt.
+- Cleanup must not silently remove runtime behavior or widen product/architecture scope.
 
 ## Next Action
 
-Reproduce the PR #54 empty-Pipeline browser failure, determine whether fixture creation/persistence or lifecycle rendering owns it, make the smallest evidence-backed fix, then re-run the full required gate and squash-merge only the exact green lifecycle head.
+Finish the bounded cleanup in PR #56, observe the exact-head mandatory gate, integrate the cleanup, then integrate PR #54 before activating the next product milestone.
