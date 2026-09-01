@@ -113,7 +113,9 @@ try {
   await page.getByLabel('Primary email').fill('vault@example.com');
   await expect(page.getByRole('status')).toHaveText('Changes pending.');
   await expect(page.getByRole('status')).toHaveText('Profile saved.');
-  await page.getByRole('button', { name: 'Sensitive', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Sensitive data', exact: true })
+    .click();
   await expect(page.getByText('Vault not set up')).toBeVisible();
   await expect(page.getByLabel('Birth date')).toHaveCount(0);
   await page.getByLabel('New vault passphrase').fill('local-passphrase');
@@ -178,7 +180,9 @@ try {
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page.getByRole('button', { name: 'Sensitive', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Sensitive data', exact: true })
+    .click();
   await expect(page.getByRole('button', { name: 'Reset vault' })).toBeVisible();
   await page.getByRole('button', { name: 'Reset vault' }).click();
   await page.getByRole('button', { name: 'Delete encrypted vault' }).click();
