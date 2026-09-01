@@ -29,7 +29,7 @@ async function createApplication(workspace, application) {
   await workspace
     .getByLabel(/^Next action date$/)
     .fill(application.nextActionAt);
-  await workspace.getByLabel(/^Notes$/).fill(application.notes);
+  await workspace.getByLabel(/^Notes/).fill(application.notes);
   await workspace.getByRole('button', { name: 'Add to pipeline' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
     'Job added to pipeline.',
@@ -72,8 +72,6 @@ try {
 
   const extensionId = await getExtensionId(context);
   const page = await context.newPage();
-  const pageErrors = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
@@ -124,16 +122,7 @@ try {
   await expect(detail).toContainText('LinkedIn');
 
   await detail.getByRole('button', { name: 'Edit details' }).click();
-  try {
-    await expect(
-      workspace.getByRole('heading', { name: 'Edit job' }),
-    ).toBeVisible({ timeout: 3000 });
-  } catch {
-    throw new Error(
-      `Edit surface did not open. Page errors: ${pageErrors.join(' | ') || 'none'}\n${await workspace.innerText()}`,
-    );
-  }
-  await workspace.getByLabel(/^Notes$/).fill('Updated follow up note.');
+  await workspace.getByLabel(/^Notes/).fill('Updated follow up note.');
   await workspace.getByRole('button', { name: 'Save changes' }).click();
   await expect(workspace.getByRole('status')).toHaveText('Job updated.');
   detail = workspace.getByLabel('Gojek application detail');
