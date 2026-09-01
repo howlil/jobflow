@@ -118,7 +118,7 @@ See `docs/privacy.md` for the beta privacy disclosure.
 
 ## Design Source Of Truth
 
-`DESIGN.md` owns the visual system and interaction rules. `.agent/system-design.md` owns runtime/software architecture. UI features must consume the shared design tokens rather than inventing per-screen colors and spacing.
+`.agents/DESIGN.md` owns the visual system and interaction rules. `.agents/ARCHITECTURE.md` owns runtime/software architecture. UI features must consume the shared design tokens rather than inventing per-screen colors and spacing.
 
 ## Release
 
