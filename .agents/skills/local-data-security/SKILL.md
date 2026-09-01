@@ -1,60 +1,54 @@
 ---
 name: local-data-security
-description: Use when changing sensitive profile fields, vault setup/unlock/reset, encryption, key/session handling, sensitive disclosure, storage of private data, logging, or extension privacy behavior.
+description: Use when implementing or verifying sensitive profile fields, vault setup/unlock/reset, encryption, key/session handling, sensitive disclosure, storage of private data, logging, or extension privacy behavior.
 ---
 
 # Local Data Security
 
-## Core principle
+Read `.agents/SECURITY.md` first. That file owns the security/privacy contract; this skill is only recurring implementation guidance for work inside that approved boundary.
 
-Sensitive career data is opt-in, encrypted at rest, minimally exposed at runtime, and disclosed only with explicit user intent. Security boundaries must survive extension-context restarts.
+## Implementation principle
 
-## Vault boundary
+Keep sensitive-data handling narrow and explicit:
 
-Normal career profile and sensitive vault are separate storage concerns.
+```text
+untrusted input
+ -> validate at boundary
+ -> minimal application/domain decision
+ -> explicit unlock/disclosure authorization when required
+ -> minimum-value runtime transfer
+ -> side effect
+```
 
-Vault requirements:
+Do not widen permissions, network/data flows, cryptographic formats, sensitive-data ownership, or disclosure semantics from this skill. Those are material decisions governed by `SECURITY.md` and user authority.
 
-- disabled until the user enables it
-- passphrase never persisted
-- encrypted payload stored locally
-- inactivity auto-lock according to the implemented vault policy
-- browser restart returns vault to locked
-- reset is destructive when recovery is unavailable
+## Vault implementation
 
-## Cryptography
+- Normal profile and vault storage stay separate.
+- Passphrases are never persisted.
+- Use Web Crypto rather than custom cryptography or reversible encoding.
+- Treat Manifest V3 worker module state as ephemeral.
+- Temporary unlock/session material stays outside content-script reach and is removed on lock.
+- The current default vault idle timeout is 30 minutes of intentional vault inactivity; unrelated extension activity must not refresh it.
 
-Use Web Crypto only. The existing envelope uses versioned KDF/cipher parameters, random salt, authenticated AES-GCM encryption, and a fresh unique IV for each encryption under a key.
-
-Never invent custom encryption, obfuscation, or reversible encoding.
-
-## Unlock state
-
-Manifest V3 workers are ephemeral. Do not rely only on a background module variable for unlock state. Temporary key/session material must remain outside content-script reach and be removable on lock.
-
-## Disclosure
+## Disclosure implementation
 
 ```text
 match sensitive field
+ -> expose category/field context only
  -> unlock if needed
- -> show current origin + sensitive category/field context
- -> user approves current fill operation
+ -> show current origin + intended disclosure
+ -> explicit user approval
  -> resolve only approved values
  -> fill
 ```
 
-Never send the entire decrypted vault into the page/content-script context.
+Never send the whole decrypted vault to a page/content script, and never treat unlock as blanket disclosure consent.
 
-## Logging
+## Diagnostics
 
-Never log passphrases, key material, decrypted vault payloads, national/passport/tax identifiers, compensation values, family/reference details, or sensitive document contents.
-
-Diagnostics should use event/type/fingerprint identifiers rather than user values.
-
-## Privacy boundary
-
-Any new network call, telemetry, sync, analytics, or remote-AI feature that can receive career/page data requires an explicit product/privacy/data-flow decision before implementation.
+Never log sensitive values or key material. Prefer event/type/fingerprint identifiers and structural state.
 
 ## Verification
 
-When the vault/crypto boundary changes, protect the relevant risks: round trip, wrong passphrase, tampering/authentication failure, version/parameter handling, unique IV behavior, lock lifecycle, and no disclosure while locked/unapproved. Do not mock away the crypto primitive when the test is intended to establish cryptographic correctness.
+Choose focused evidence for the changed boundary. When relevant, protect round trip, wrong passphrase, tampering/authentication failure, version handling, unique IV behavior, idle-lock lifecycle, restart behavior, and no disclosure while locked/unapproved. Use `.agents/QUALITY.md` for repository integration gates.
