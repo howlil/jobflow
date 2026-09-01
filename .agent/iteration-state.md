@@ -39,11 +39,12 @@ Logical-change boundary:
 
 Current position:
 - Operational Home is integrated on `master`
-- `ApplicationDetail.tsx` and application display/progress helpers exist on the active branch
-- workspace selection/wiring, tests, browser acceptance, and quality gates remain incomplete
+- Application Detail, shared display/progress helpers, workspace selection/wiring, contextual edit/actions, and return-state behavior are implemented on the active branch
+- unit and browser acceptance coverage are updated for the observable detail workflow
+- quality gates and integration remain pending
 
 Single next meaningful action:
-- wire pipeline cards to Application Detail, preserve pipeline view/search on return, then verify the complete observable flow
+- run the full quality gate for the Application Detail logical change and fix only evidence-backed failures before integration
 
 Milestone exit gate:
 - Application Detail acceptance behavior is complete
