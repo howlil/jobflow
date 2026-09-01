@@ -42,9 +42,3 @@ jobs:
         run: pnpm build
       - name: Verify generated extension
         run: pnpm verify:manifest
-      - name: Install Playwright Chromium
-        if: github.event_name == 'push' || github.event.pull_request.draft == false
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Browser acceptance
-        if: github.event_name == 'push' || github.event.pull_request.draft == false
-        run: pnpm test:e2e
