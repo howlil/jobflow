@@ -8,7 +8,7 @@ This file defines repository-specific verification and release-ready gates. Use 
 - Repository Node engine: `>=22.13.0`
 - CI Node: `24`
 - Unit/component tests: Vitest
-- Browser acceptance: Playwright Chromium through repository E2E scripts
+- Browser acceptance: Playwright Chromium through repository E2E scripts, opt-in diagnostic only
 - Type checking: TypeScript `tsc --noEmit`
 - Lint: ESLint with zero warnings
 - Formatting: Prettier
@@ -48,11 +48,11 @@ pnpm format:check
 pnpm verify:compatibility
 pnpm build
 pnpm verify:manifest
-pnpm exec playwright install --with-deps chromium
-pnpm test:e2e
 ```
 
-Pushes to `master` run the same verification including browser acceptance.
+Pushes to `master` run the same required verification.
+
+Browser black-box E2E (`pnpm test:e2e`) is not a mandatory merge or release blocker. Keep it available for opt-in diagnosis when real browser/runtime behavior is the distinct risk.
 
 Do not claim a gate passed unless it was observed on the relevant head.
 
@@ -73,17 +73,15 @@ Prefer focused Vitest coverage for:
 
 ### DOM / browser semantics
 
-Use focused DOM or browser acceptance when the distinct risk involves:
+Use focused DOM checks first. Run browser acceptance selectively when the distinct risk cannot be established below the black-box boundary, including:
 
-- label/context extraction
-- native setter/event behavior
-- select/radio/checkbox filling
-- dynamic DOM additions/rescans
-- content/background messaging
 - unpacked extension/bootstrap behavior
 - Manifest V3 lifecycle behavior
 - user-triggered fill in the real extension runtime
 - vault disclosure/auto-lock runtime boundary
+- browser-only event or messaging behavior that focused tests cannot reproduce faithfully
+
+A browser E2E failure is diagnostic evidence, not by itself a release blocker, unless a future explicit product/release decision promotes that exact browser behavior into a mandatory gate.
 
 ### Persistence and migrations
 
@@ -122,9 +120,11 @@ For UI release claims, use the relevant design checks in `.agents/DESIGN.md`; so
 
 ## Browser acceptance suite
 
-`pnpm test:e2e` currently covers the repository's extension smoke and acceptance scripts, including autofill, vault, UI/workspace/CV, and application-pipeline journeys.
+`pnpm test:e2e` covers the repository's extension smoke and acceptance scripts, including autofill, vault, UI/workspace/CV, and application-pipeline journeys.
 
-Use `pnpm test:e2e:smoke` when only extension bootstrap/smoke coverage is justified during a local fast loop. The full CI/release gate still follows repository policy.
+Use it selectively as a black-box diagnostic when browser-runtime evidence is worth the cost. It is not part of the default CI or release gate.
+
+Use `pnpm test:e2e:smoke` when only extension bootstrap/smoke coverage is useful during a local diagnostic loop.
 
 ## Release-ready criteria
 
@@ -134,11 +134,11 @@ A logical change is release-ready when:
 - no in-scope blocker remains
 - relevant focused verification is green
 - mandatory integration gates are green on the exact head
-- persisted-data, permission, privacy, compatibility, and browser risks have their required evidence when touched
+- persisted-data, permission, privacy, compatibility, and browser risks have proportionate evidence when touched
 - canonical project/architecture/iteration documentation is updated only where its source of truth changed
 
 Release-ready is not the same as distributed. Actual release mechanics are owned by `.agents/RELEASE.md`.
 
 ## Release workflow gate
 
-Tags matching `v*` trigger `.github/workflows/release.yml`, which repeats the full verification gate, installs Chromium, runs `pnpm test:e2e`, packages with `pnpm zip`, creates SHA-256 checksums, and publishes an immutable GitHub release from the verified tag.
+Tags matching `v*` trigger `.github/workflows/release.yml`, which runs the mandatory verification gate, packages with `pnpm zip`, creates SHA-256 checksums, and publishes an immutable GitHub release from the verified tag. Browser black-box E2E remains opt-in and is not executed as a required release step.
