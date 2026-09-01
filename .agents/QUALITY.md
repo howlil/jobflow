@@ -1,6 +1,6 @@
 # Jobflow Quality
 
-This file defines repository-specific verification and release-ready gates. Use risk-based verification; do not mechanically add tests or run expensive layers when they do not protect a realistic regression.
+This file defines repository-specific verification and release-ready gates. Verification is risk-based: use the cheapest deterministic evidence that protects a realistic regression, and do not add process layers merely because they can be automated.
 
 ## Toolchain baseline
 
@@ -8,36 +8,30 @@ This file defines repository-specific verification and release-ready gates. Use 
 - Repository Node engine: `>=22.13.0`
 - CI Node: `24`
 - Unit/component tests: Vitest
-- Browser acceptance: Playwright Chromium through repository E2E scripts, opt-in diagnostic only
+- Browser acceptance: Playwright Chromium, opt-in diagnostic only
 - Type checking: TypeScript `tsc --noEmit`
 - Lint: ESLint with zero warnings
 - Formatting: Prettier
 - Build/package: WXT
 
-## Fast affected preflight
+## Local verification
 
-Use the smallest deterministic checks that cover the changed surface before relying on remote CI as the first debugger.
-
-Repository helper:
-
-```bash
-pnpm preflight:affected
-```
-
-When more explicit checks are useful:
+Run the smallest direct checks justified by the changed surface. Common commands:
 
 ```bash
 pnpm test
 pnpm typecheck
 pnpm lint
 pnpm format:check
+pnpm build
+pnpm verify:manifest
 ```
 
-Use `pnpm format` to apply repository formatting rather than approximating it manually.
+Use `pnpm format` to apply repository formatting. Avoid wrapper scripts that infer affected checks when the underlying commands are already cheap and explicit in this single-package repository.
 
 ## Mandatory CI integration gate
 
-For non-draft pull requests to `master`, `.github/workflows/ci.yml` runs:
+For non-draft pull requests to `master`, and pushes to `master`, `.github/workflows/ci.yml` runs:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -45,14 +39,11 @@ pnpm test
 pnpm typecheck
 pnpm lint
 pnpm format:check
-pnpm verify:compatibility
 pnpm build
 pnpm verify:manifest
 ```
 
-Pushes to `master` run the same required verification.
-
-Browser black-box E2E (`pnpm test:e2e`) is not a mandatory merge or release blocker. Keep it available for opt-in diagnosis when real browser/runtime behavior is the distinct risk.
+Browser black-box E2E (`pnpm test:e2e`) is not a mandatory merge or release blocker. Compatibility documentation is also not a synthetic CI gate; compatibility claims require evidence from the relevant implementation tests, fixtures, or targeted runtime validation.
 
 Do not claim a gate passed unless it was observed on the relevant head.
 
@@ -81,11 +72,11 @@ Use focused DOM checks first. Run browser acceptance selectively when the distin
 - vault disclosure/auto-lock runtime boundary
 - browser-only event or messaging behavior that focused tests cannot reproduce faithfully
 
-A browser E2E failure is diagnostic evidence, not by itself a release blocker, unless a future explicit product/release decision promotes that exact browser behavior into a mandatory gate.
+A browser E2E failure is diagnostic evidence, not by itself a release blocker, unless an explicit future product/release decision promotes that exact behavior into a mandatory gate.
 
 ### Persistence and migrations
 
-Persisted-schema changes require evidence that supported historical data migrates without loss or invalid state. Verify failure/compatibility paths proportionally to the changed schema.
+Persisted-schema changes require evidence that supported historical data migrates without loss or invalid state. Migration code is compatibility code, not cleanup debt, while supported persisted versions still depend on it.
 
 ### Permissions / generated manifest
 
@@ -96,35 +87,27 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Permission expansion is also a product/security boundary and requires the appropriate approval before implementation.
+Permission expansion is a product/security boundary and requires the appropriate approval before implementation.
 
 ### Autofill compatibility
 
-Changes to shared field scanning, canonical aliases, matching/confidence behavior, fill policy, corrections, or compatibility fixtures require:
-
-```bash
-pnpm verify:compatibility
-```
-
-plus the smallest focused regression cases that protect the intended behavior/collision risk.
+Changes to field scanning, aliases, matching/confidence behavior, fill policy, corrections, or compatibility fixtures require the smallest focused regression cases that protect the intended behavior or collision risk. Use real fixture/runtime evidence for compatibility claims; do not treat status metadata as proof of runtime compatibility.
 
 ### Sensitive data / vault
 
-Vault, crypto, disclosure, or privacy-boundary changes require strong positive and negative evidence as applicable, including wrong-passphrase/tamper/lock/unapproved-disclosure behavior. Do not mock away the cryptographic primitive when the test is intended to establish vault correctness.
+Vault, crypto, disclosure, or privacy-boundary changes require strong positive and negative evidence as applicable, including wrong-passphrase, tamper, lock, and unapproved-disclosure behavior. Do not mock away the cryptographic primitive when the test is intended to establish vault correctness.
 
 ### UI / design
 
-Presentation-only styling, layout, static markup, and copy do not require new unit/E2E tests merely because React files changed. Verify the affected interaction and representative viewport(s) when visual/runtime risk exists.
+Presentation-only styling, layout, static markup, and copy do not require new unit/E2E tests merely because React files changed. Verify affected interaction and representative viewport states when visual/runtime risk exists.
 
-For UI release claims, use the relevant design checks in `.agents/DESIGN.md`; source inspection alone is not visual-release evidence.
+For UI release claims, use `.agents/DESIGN.md`; source inspection alone is not visual-release evidence.
 
-## Browser acceptance suite
+## Browser diagnostics
 
-`pnpm test:e2e` covers the repository's extension smoke and acceptance scripts, including autofill, vault, UI/workspace/CV, and application-pipeline journeys.
+`pnpm test:e2e` keeps the repository's extension smoke and acceptance journeys available for targeted diagnosis. `pnpm test:e2e:smoke` is the cheaper bootstrap-only path.
 
-Use it selectively as a black-box diagnostic when browser-runtime evidence is worth the cost. It is not part of the default CI or release gate.
-
-Use `pnpm test:e2e:smoke` when only extension bootstrap/smoke coverage is useful during a local diagnostic loop.
+These commands are opt-in. Use them only when browser-runtime evidence is worth the cost.
 
 ## Release-ready criteria
 
@@ -141,4 +124,4 @@ Release-ready is not the same as distributed. Actual release mechanics are owned
 
 ## Release workflow gate
 
-Tags matching `v*` trigger `.github/workflows/release.yml`, which runs the mandatory verification gate, packages with `pnpm zip`, creates SHA-256 checksums, and publishes an immutable GitHub release from the verified tag. Browser black-box E2E remains opt-in and is not executed as a required release step.
+Tags matching `v*` trigger `.github/workflows/release.yml`, which repeats the mandatory deterministic gate, packages with `pnpm zip`, creates SHA-256 checksums, and publishes an immutable GitHub release from the verified tag. Browser black-box E2E remains opt-in.
