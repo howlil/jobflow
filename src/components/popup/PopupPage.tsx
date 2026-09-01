@@ -27,7 +27,8 @@ const mutedClass = 'm-0 text-[13px] leading-[1.45] text-app-text';
 function getPrimaryActionLabel(
   pageSummary: PageAnalysisSummary | null | undefined,
 ): string {
-  if (pageSummary === null || pageSummary === undefined) return 'Open workspace';
+  if (pageSummary === null || pageSummary === undefined)
+    return 'Open workspace';
   if (pageSummary.ready > 0 || pageSummary.needsReview > 0) {
     return 'Prepare fields in workspace';
   }
@@ -148,7 +149,9 @@ export function PopupPage({
             </p>
           </div>
         ) : variantOptions.length === 0 ? (
-          <p className={`${mutedClass} mt-2`}>Using your base career profile.</p>
+          <p className={`${mutedClass} mt-2`}>
+            Using your base career profile.
+          </p>
         ) : null}
 
         {variantOptions.length > 0 && onSelectVariant !== undefined ? (
