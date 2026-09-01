@@ -1,6 +1,7 @@
 import {
   APPLICATION_STAGES,
   JobApplicationSchema,
+  type ApplicationPriority,
   type ApplicationStage,
   type JobApplication,
   type StoredApplicationCollection,
@@ -13,11 +14,14 @@ export type ApplicationDraft = {
   role: string;
   jobUrl?: string;
   stage: ApplicationStage;
+  priority?: ApplicationPriority;
   notes?: string;
   source?: string;
   contactName?: string;
   contactEmail?: string;
+  nextAction?: string;
   nextActionAt?: string;
+  deadline?: string;
 };
 
 export type PageApplicationCapture = {
@@ -113,18 +117,23 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
   const source = optionalText(draft.source);
   const contactName = optionalText(draft.contactName);
   const contactEmail = optionalEmail(draft.contactEmail);
+  const nextAction = optionalText(draft.nextAction);
   const nextActionAt = optionalText(draft.nextActionAt);
+  const deadline = optionalText(draft.deadline);
   const candidate = {
     id: 'draft',
     company,
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
     ...(contactName === undefined ? {} : { contactName }),
     ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
+    ...(deadline === undefined ? {} : { deadline }),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -134,11 +143,14 @@ function validateDraft(draft: ApplicationDraft): ApplicationDraft {
     role,
     ...(jobUrl === undefined ? {} : { jobUrl }),
     stage: draft.stage,
+    ...(draft.priority === undefined ? {} : { priority: draft.priority }),
     ...(notes === undefined ? {} : { notes }),
     ...(source === undefined ? {} : { source }),
     ...(contactName === undefined ? {} : { contactName }),
     ...(contactEmail === undefined ? {} : { contactEmail }),
+    ...(nextAction === undefined ? {} : { nextAction }),
     ...(nextActionAt === undefined ? {} : { nextActionAt }),
+    ...(deadline === undefined ? {} : { deadline }),
   };
 }
 
@@ -151,36 +163,24 @@ function draftFromChanges(
     role: changes.role ?? current.role,
     stage: changes.stage ?? current.stage,
   };
-  if (changes.jobUrl !== undefined) {
-    draft.jobUrl = changes.jobUrl;
-  } else if (current.jobUrl !== undefined) {
-    draft.jobUrl = current.jobUrl;
-  }
-  if (changes.notes !== undefined) {
-    draft.notes = changes.notes;
-  } else if (current.notes !== undefined) {
-    draft.notes = current.notes;
-  }
-  if (changes.source !== undefined) {
-    draft.source = changes.source;
-  } else if (current.source !== undefined) {
-    draft.source = current.source;
-  }
-  if (changes.contactName !== undefined) {
-    draft.contactName = changes.contactName;
-  } else if (current.contactName !== undefined) {
-    draft.contactName = current.contactName;
-  }
-  if (changes.contactEmail !== undefined) {
-    draft.contactEmail = changes.contactEmail;
-  } else if (current.contactEmail !== undefined) {
-    draft.contactEmail = current.contactEmail;
-  }
-  if (changes.nextActionAt !== undefined) {
-    draft.nextActionAt = changes.nextActionAt;
-  } else if (current.nextActionAt !== undefined) {
-    draft.nextActionAt = current.nextActionAt;
-  }
+  if (changes.priority !== undefined) draft.priority = changes.priority;
+  else if (current.priority !== undefined) draft.priority = current.priority;
+  if (changes.jobUrl !== undefined) draft.jobUrl = changes.jobUrl;
+  else if (current.jobUrl !== undefined) draft.jobUrl = current.jobUrl;
+  if (changes.notes !== undefined) draft.notes = changes.notes;
+  else if (current.notes !== undefined) draft.notes = current.notes;
+  if (changes.source !== undefined) draft.source = changes.source;
+  else if (current.source !== undefined) draft.source = current.source;
+  if (changes.contactName !== undefined) draft.contactName = changes.contactName;
+  else if (current.contactName !== undefined) draft.contactName = current.contactName;
+  if (changes.contactEmail !== undefined) draft.contactEmail = changes.contactEmail;
+  else if (current.contactEmail !== undefined) draft.contactEmail = current.contactEmail;
+  if (changes.nextAction !== undefined) draft.nextAction = changes.nextAction;
+  else if (current.nextAction !== undefined) draft.nextAction = current.nextAction;
+  if (changes.nextActionAt !== undefined) draft.nextActionAt = changes.nextActionAt;
+  else if (current.nextActionAt !== undefined) draft.nextActionAt = current.nextActionAt;
+  if (changes.deadline !== undefined) draft.deadline = changes.deadline;
+  else if (current.deadline !== undefined) draft.deadline = current.deadline;
   return draft;
 }
 
