@@ -29,7 +29,7 @@ async function createApplication(workspace, application) {
   await workspace
     .getByLabel(/^Next action date$/)
     .fill(application.nextActionAt);
-  await workspace.getByLabel(/^Notes$/).fill(application.notes);
+  await workspace.getByLabel(/^Notes/).fill(application.notes);
   await workspace.getByRole('button', { name: 'Add to pipeline' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
     'Job added to pipeline.',
@@ -45,6 +45,16 @@ async function expectCardVisible(workspace, company) {
   await card.scrollIntoViewIfNeeded();
   await expect(card).toBeVisible();
   return card;
+}
+
+async function openApplicationDetail(workspace, company, role) {
+  const card = await expectCardVisible(workspace, company);
+  await card
+    .getByRole('button', { name: `View ${company} ${role} details` })
+    .click();
+  const detail = workspace.getByLabel(`${company} application detail`);
+  await expect(detail).toBeVisible();
+  return detail;
 }
 
 const dataDir = await mkdtemp(join(tmpdir(), 'jobflow-applications-'));
@@ -102,32 +112,56 @@ try {
   await expect(gojekCard).not.toContainText('Follow up with recruiter.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
+  let detail = await openApplicationDetail(
+    workspace,
+    'Gojek',
+    'Backend Engineer',
+  );
+  await expect(detail).toContainText('Follow up recruiter');
+  await expect(detail).toContainText('Follow up with recruiter.');
+  await expect(detail).toContainText('LinkedIn');
+
+  await detail.getByRole('button', { name: 'Edit details' }).click();
+  await workspace.getByLabel(/^Notes/).fill('Updated follow up note.');
+  await workspace.getByRole('button', { name: 'Save changes' }).click();
+  await expect(workspace.getByRole('status')).toHaveText('Job updated.');
+  detail = workspace.getByLabel('Gojek application detail');
+  await expect(detail).toContainText('Updated follow up note.');
+
+  await detail.getByRole('button', { name: 'Back to pipeline' }).click();
+  await expect(search).toHaveValue('gojek');
+  await expect(workspace.getByText('Traveloka')).toHaveCount(0);
+
   await search.fill('');
   await workspace.getByRole('button', { name: 'Needs action 1' }).click();
   gojekCard = await expectCardVisible(workspace, 'Gojek');
   await expect(gojekCard).toContainText('Backend Engineer');
-  await expect(gojekCard).toContainText('Follow up with recruiter.');
+  await expect(gojekCard).toContainText('Updated follow up note.');
   await expect(workspace.getByText('Traveloka')).toHaveCount(0);
 
-  await gojekCard.getByRole('button', { name: 'Mark done' }).click();
+  detail = await openApplicationDetail(workspace, 'Gojek', 'Backend Engineer');
+  await detail.getByRole('button', { name: 'Mark done' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
     'Follow-up completed.',
   );
+  await expect(detail).toContainText('No next action set.');
+  await detail.getByRole('button', { name: 'Back to pipeline' }).click();
+
   await expect(
     workspace.getByRole('button', { name: 'Needs action 0' }),
   ).toBeVisible();
   await expect(workspace.getByText('No jobs match this view.')).toBeVisible();
 
   await workspace.getByRole('button', { name: 'Board', exact: true }).click();
-  gojekCard = await expectCardVisible(workspace, 'Gojek');
-  await gojekCard.getByRole('button', { name: 'Assessment →' }).click();
+  detail = await openApplicationDetail(workspace, 'Gojek', 'Backend Engineer');
+  await detail.getByRole('button', { name: 'Assessment →' }).click();
   await expect(workspace.getByRole('status')).toHaveText(
     'Moved to Assessment.',
   );
 
-  gojekCard = await expectCardVisible(workspace, 'Gojek');
-  await gojekCard.getByRole('button', { name: 'Interview →' }).click();
+  await detail.getByRole('button', { name: 'Interview →' }).click();
   await expect(workspace.getByRole('status')).toHaveText('Moved to Interview.');
+  await detail.getByRole('button', { name: 'Back to pipeline' }).click();
 
   await page.reload();
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
