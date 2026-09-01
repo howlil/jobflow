@@ -244,7 +244,9 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Back to pipeline' }));
 
-    expect(screen.getByLabelText('Search jobs')).toHaveValue('gojek');
+    expect(
+      (screen.getByLabelText('Search jobs') as HTMLInputElement).value,
+    ).toBe('gojek');
     expect(
       screen.getByRole('button', { name: 'Needs action 2' }).getAttribute(
         'aria-pressed',
