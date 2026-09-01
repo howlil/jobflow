@@ -1,16 +1,15 @@
 # Compatibility Evidence
 
-Job Flow treats compatibility as an engineering property of the generic form engine, not as a count of hard-coded ATS integrations.
+Job Flow treats compatibility as an engineering property of the generic form engine, not as a count of hard-coded ATS integrations or a manually maintained status matrix.
 
-## Sources of truth
+## Evidence sources
 
 - `src/domain/forms/form-corpus.test.ts` executes the maintained labeled compatibility corpus.
-- `docs/compatibility-evidence.json` records fixture/live evidence state by ATS family.
-- `pnpm verify:compatibility` rejects unsupported live-verification or adapter claims.
-- `docs/ats-live-validation.md` defines the privacy-safe live browser protocol.
-- `.github/ISSUE_TEMPLATE/compatibility-report.yml` turns beta failures into structured evidence.
+- Focused regression tests/fixtures prove reproducible generic-engine behavior.
+- `docs/ats-live-validation.md` defines the privacy-safe live browser protocol when real runtime evidence is needed.
+- `.github/ISSUE_TEMPLATE/compatibility-report.yml` turns beta failures into structured, redacted reproduction evidence.
 
-Fixture-shaped evidence is not a claim that an ATS has been live-verified. Live status remains `pending` until an actual reproducible browser journey is recorded.
+ATS-shaped fixture coverage is not a claim that an ATS has been live-verified. Do not maintain a parallel status ledger merely to restate what tests, issues, and observed validation already show.
 
 ## Compatibility layers
 
@@ -24,7 +23,7 @@ Fixture-shaped evidence is not a claim that an ATS has been live-verified. Live 
 
 ## Maintained corpus
 
-The automated corpus covers at minimum:
+The automated corpus covers representative risks such as:
 
 - ordinary semantic HTML forms
 - controlled React-style fields
@@ -38,33 +37,29 @@ The automated corpus covers at minimum:
 
 Vendor-like fixtures are structural compatibility fixtures, not claims of official support.
 
-## Evidence reported per release
+## Evidence for compatibility changes
 
-For each meaningful compatibility release, record:
+When changing shared extraction, matching, fill planning, DOM filling, corrections, or dynamic-page behavior, record only evidence relevant to the changed risk. Useful evidence can include:
 
-- number of maintained forms/fixtures
-- total classified controls
-- Ready mappings that match the expected canonical field
-- Review and Unknown counts
-- sensitive/file controls incorrectly promoted to Ready: must be zero
+- focused labeled fixtures
+- Ready mappings matching expected canonical fields
+- Review/Unknown collision cases
+- zero sensitive/file controls incorrectly promoted to Ready
 - successful fill operations for supported controls
 - dynamic rescan regressions
-- automatic Next/Submit/Apply count: must be zero
-- fixture status and live status for each maintained ATS family
-- any reproducible generic-engine failure that could justify an adapter
+- zero automatic Next/Submit/Apply behavior
+- a reproducible live failure or validation record when browser behavior is the distinct risk
 
-Do not publish a fake confidence percentage. Metrics are meaningful only against the maintained labeled corpus.
+Do not publish a fake confidence percentage. Metrics are meaningful only against a defined labeled corpus.
 
 ## ATS adapter gate
 
 A site-specific adapter is justified only when all are true:
 
-1. a reproducible fixture demonstrates a real generic-engine failure;
-2. the failure cannot be fixed generically without creating broader regressions or unreasonable complexity;
+1. a reproducible fixture or live record demonstrates a real generic-engine failure;
+2. the failure cannot be fixed generically without broader regressions or unreasonable complexity;
 3. the adapter boundary is narrow and independently tested;
 4. safety invariants remain identical to the generic path;
-5. the reason and removal conditions are documented.
-
-The evidence verifier refuses `candidate` or `implemented` adapter status without a non-empty `reproducibleFailure` entry.
+5. the reason and removal conditions are documented with the change.
 
 Prefer improving extraction, context normalization, events, fingerprinting, or deterministic intent classification generically before adding vendor branches.
