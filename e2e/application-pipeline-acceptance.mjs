@@ -72,9 +72,8 @@ try {
 
   const extensionId = await getExtensionId(context);
   const page = await context.newPage();
-  page.on('pageerror', (error) =>
-    console.error(`APPLICATION_PAGE_ERROR: ${error.message}`),
-  );
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
   await page.getByRole('button', { name: 'Pipeline', exact: true }).click();
 
@@ -125,7 +124,15 @@ try {
   await expect(detail).toContainText('LinkedIn');
 
   await detail.getByRole('button', { name: 'Edit details' }).click();
-  console.log(`APPLICATION_EDIT_SURFACE:\n${await workspace.innerText()}`);
+  try {
+    await expect(
+      workspace.getByRole('heading', { name: 'Edit job' }),
+    ).toBeVisible({ timeout: 3000 });
+  } catch {
+    throw new Error(
+      `Edit surface did not open. Page errors: ${pageErrors.join(' | ') || 'none'}\n${await workspace.innerText()}`,
+    );
+  }
   await workspace.getByLabel(/^Notes$/).fill('Updated follow up note.');
   await workspace.getByRole('button', { name: 'Save changes' }).click();
   await expect(workspace.getByRole('status')).toHaveText('Job updated.');
