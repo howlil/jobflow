@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import {
   APPLICATION_PRIORITIES,
@@ -17,7 +17,6 @@ import {
   Button,
   EmptyState,
   FieldGrid,
-  IconButton,
   RecordCard,
   RecordHeader,
   Section,
@@ -27,6 +26,7 @@ import {
   TextField,
   TextareaField,
 } from '../ui';
+import { ApplicationDetail } from './ApplicationDetail';
 import {
   ACTIVE_APPLICATION_STAGES,
   CLOSED_APPLICATION_STAGES,
@@ -36,24 +36,12 @@ import {
   localDateKey,
   type ApplicationView,
 } from './application-focus';
-
-const STAGE_LABELS: Record<ApplicationStage, string> = {
-  saved: 'Saved',
-  applied: 'Applied',
-  assessment: 'Assessment',
-  interview: 'Interview',
-  offer: 'Offer',
-  accepted: 'Accepted',
-  rejected: 'Rejected',
-  withdrawn: 'Withdrawn',
-};
-
-const PRIORITY_LABELS: Record<ApplicationPriority, string> = {
-  p0: 'P0 · Apply ASAP',
-  p1: 'P1 · Strong target',
-  p2: 'P2 · Consider',
-  p3: 'P3 · Low priority',
-};
+import {
+  PRIORITY_LABELS,
+  STAGE_LABELS,
+  displayDate,
+  nextActionStatus,
+} from './application-display';
 
 const EMPTY_DRAFT: ApplicationDraft = {
   company: '',
@@ -68,16 +56,6 @@ const EMPTY_DRAFT: ApplicationDraft = {
   nextActionAt: '',
   deadline: '',
 };
-
-function displayDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) return value;
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 function draftFromApplication(application: JobApplication): ApplicationDraft {
   return {
@@ -96,58 +74,21 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
   };
 }
 
-function nextActionStatus(
-  application: JobApplication,
-  todayKey: string,
-): string | null {
-  if (application.nextActionAt === undefined) return null;
-  const actionKey = application.nextActionAt.slice(0, 10);
-
-  if (actionKey < todayKey) return `Overdue ${application.nextActionAt}`;
-  if (actionKey === todayKey) return 'Due today';
-  return `Next ${application.nextActionAt}`;
-}
-
-function nextPipelineStage(stage: ApplicationStage): ApplicationStage | null {
-  const index = ACTIVE_APPLICATION_STAGES.findIndex((item) => item === stage);
-  if (index < 0) return null;
-  if (stage === 'offer') return 'accepted';
-  return ACTIVE_APPLICATION_STAGES[index + 1] ?? null;
-}
-
-function previousPipelineStage(
-  stage: ApplicationStage,
-): ApplicationStage | null {
-  const index = ACTIVE_APPLICATION_STAGES.findIndex((item) => item === stage);
-  if (index <= 0) return null;
-  return ACTIVE_APPLICATION_STAGES[index - 1] ?? null;
-}
-
 function PipelineCard({
   application,
   todayKey,
   showStage,
   showFollowUpNote,
-  showCompleteFollowUp,
-  onEdit,
-  onDelete,
-  onChangeStage,
-  onCompleteFollowUp,
+  onOpen,
 }: {
   application: JobApplication;
   todayKey: string;
   showStage: boolean;
   showFollowUpNote: boolean;
-  showCompleteFollowUp: boolean;
-  onEdit: (application: JobApplication) => void;
-  onDelete: (id: string) => void | Promise<void>;
-  onChangeStage: (id: string, stage: ApplicationStage) => void | Promise<void>;
-  onCompleteFollowUp: (id: string) => void | Promise<void>;
+  onOpen: (application: JobApplication) => void;
 }) {
   const closed = applicationIsClosed(application);
   const dueStatus = closed ? null : nextActionStatus(application, todayKey);
-  const previousStage = previousPipelineStage(application.stage);
-  const nextStage = nextPipelineStage(application.stage);
   const contextualDetail = application.contactName
     ? `Contact: ${application.contactName}`
     : application.source
@@ -156,27 +97,7 @@ function PipelineCard({
   const followUpNote = application.notes?.trim();
 
   return (
-    <RecordCard
-      action={
-        <div className="flex gap-1">
-          <IconButton
-            aria-label={`Edit ${application.company} ${application.role}`}
-            size="xs"
-            onClick={() => onEdit(application)}
-          >
-            <Pencil aria-hidden="true" size={14} />
-          </IconButton>
-          <IconButton
-            aria-label={`Delete ${application.company} ${application.role}`}
-            size="xs"
-            tone="danger"
-            onClick={() => void onDelete(application.id)}
-          >
-            <Trash2 aria-hidden="true" size={14} />
-          </IconButton>
-        </div>
-      }
-    >
+    <RecordCard>
       <RecordHeader
         title={application.role}
         context={application.company}
@@ -223,57 +144,17 @@ function PipelineCard({
         <p className="m-0 text-xs text-app-subtle">{contextualDetail}</p>
       ) : null}
 
-      {application.jobUrl !== undefined ? (
-        <a
-          className="w-max text-xs font-medium text-app-ink underline underline-offset-4"
-          href={application.jobUrl}
-          target="_blank"
-          rel="noreferrer"
+      <ActionRow>
+        <Button
+          aria-label={`View ${application.company} ${application.role} details`}
+          variant="default"
+          onClick={() => onOpen(application)}
         >
-          Open job
-        </a>
-      ) : null}
-
-      {!closed ? (
-        <ActionRow>
-          {showCompleteFollowUp && dueStatus !== null ? (
-            <Button
-              variant="primary"
-              onClick={() => void onCompleteFollowUp(application.id)}
-            >
-              Mark done
-            </Button>
-          ) : null}
-          {previousStage !== null ? (
-            <Button
-              variant="ghost"
-              onClick={() => void onChangeStage(application.id, previousStage)}
-            >
-              ← {STAGE_LABELS[previousStage]}
-            </Button>
-          ) : null}
-          {nextStage !== null ? (
-            <Button
-              variant="default"
-              onClick={() => void onChangeStage(application.id, nextStage)}
-            >
-              {stageActionLabel(application.stage, nextStage)}
-            </Button>
-          ) : null}
-        </ActionRow>
-      ) : null}
+          View details
+        </Button>
+      </ActionRow>
     </RecordCard>
   );
-}
-
-function stageActionLabel(
-  currentStage: ApplicationStage,
-  nextStage: ApplicationStage,
-): string {
-  if (currentStage === 'offer' && nextStage === 'accepted') {
-    return 'Mark accepted';
-  }
-  return `${STAGE_LABELS[nextStage]} →`;
 }
 
 export function ApplicationsWorkspace({
@@ -284,6 +165,9 @@ export function ApplicationsWorkspace({
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [draft, setDraft] = useState<ApplicationDraft>(EMPTY_DRAFT);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<
+    string | null
+  >(null);
   const [formOpen, setFormOpen] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -321,10 +205,28 @@ export function ApplicationsWorkspace({
   }
 
   function openCreateForm() {
+    setSelectedApplicationId(null);
     setEditingId(null);
     setDraft(EMPTY_DRAFT);
     setFormOpen(true);
     setStatus(null);
+    setError(null);
+  }
+
+  function openApplicationDetail(application: JobApplication) {
+    setSelectedApplicationId(application.id);
+    setEditingId(null);
+    setDraft(EMPTY_DRAFT);
+    setFormOpen(false);
+    setStatus(null);
+    setError(null);
+  }
+
+  function backToPipeline() {
+    setSelectedApplicationId(null);
+    setEditingId(null);
+    setDraft(EMPTY_DRAFT);
+    setFormOpen(false);
     setError(null);
   }
 
@@ -384,6 +286,7 @@ export function ApplicationsWorkspace({
     try {
       await service.delete(id);
       if (editingId === id) resetForm();
+      if (selectedApplicationId === id) setSelectedApplicationId(null);
       setStatus('Job deleted.');
       await reload();
     } catch {
@@ -405,6 +308,179 @@ export function ApplicationsWorkspace({
     view: applicationView,
     todayKey,
   });
+  const selectedApplication =
+    selectedApplicationId === null
+      ? null
+      : (applications.find(
+          (application) => application.id === selectedApplicationId,
+        ) ?? null);
+
+  const form = formOpen ? (
+    <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
+      <div className="grid gap-1">
+        <h3 className="m-0 text-sm font-semibold text-app-ink">
+          {editingId === null ? 'Add job' : 'Edit job'}
+        </h3>
+        <p className="m-0 text-xs text-app-subtle">
+          Capture only the context needed to decide and execute the next move.
+        </p>
+      </div>
+      <FieldGrid>
+        <TextField
+          label="Company"
+          value={draft.company}
+          onChange={(event) => updateDraft({ company: event.target.value })}
+        />
+        <TextField
+          label="Role"
+          value={draft.role}
+          onChange={(event) => updateDraft({ role: event.target.value })}
+        />
+        <TextField
+          label="Job URL"
+          type="url"
+          value={draft.jobUrl ?? ''}
+          onChange={(event) => updateDraft({ jobUrl: event.target.value })}
+        />
+        <SelectField
+          label="Stage"
+          value={draft.stage}
+          onChange={(event) =>
+            updateDraft({ stage: event.target.value as ApplicationStage })
+          }
+        >
+          {APPLICATION_STAGES.map((stage) => (
+            <option value={stage} key={stage}>
+              {STAGE_LABELS[stage]}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          label="Priority"
+          value={draft.priority ?? ''}
+          onChange={(event) =>
+            updateDraft({
+              priority:
+                event.target.value === ''
+                  ? undefined
+                  : (event.target.value as ApplicationPriority),
+            })
+          }
+        >
+          <option value="">No priority</option>
+          {APPLICATION_PRIORITIES.map((priority) => (
+            <option value={priority} key={priority}>
+              {PRIORITY_LABELS[priority]}
+            </option>
+          ))}
+        </SelectField>
+        <TextField
+          label="Next action"
+          placeholder="Tailor resume, follow up, prepare interview..."
+          value={draft.nextAction ?? ''}
+          onChange={(event) => updateDraft({ nextAction: event.target.value })}
+        />
+        <TextField
+          label="Next action date"
+          type="date"
+          value={draft.nextActionAt ?? ''}
+          onChange={(event) =>
+            updateDraft({ nextActionAt: event.target.value })
+          }
+        />
+        <TextField
+          label="Application deadline"
+          type="date"
+          value={draft.deadline ?? ''}
+          onChange={(event) => updateDraft({ deadline: event.target.value })}
+        />
+        <TextField
+          label="Source"
+          value={draft.source ?? ''}
+          onChange={(event) => updateDraft({ source: event.target.value })}
+        />
+        <TextField
+          label="Contact name"
+          value={draft.contactName ?? ''}
+          onChange={(event) =>
+            updateDraft({ contactName: event.target.value })
+          }
+        />
+        <TextField
+          label="Contact email"
+          type="email"
+          value={draft.contactEmail ?? ''}
+          onChange={(event) =>
+            updateDraft({ contactEmail: event.target.value })
+          }
+        />
+      </FieldGrid>
+      <TextareaField
+        label="Notes"
+        value={draft.notes ?? ''}
+        onChange={(event) => updateDraft({ notes: event.target.value })}
+      />
+      <ActionRow>
+        <Button variant="primary" onClick={() => void submitDraft()}>
+          {editingId === null ? 'Add to pipeline' : 'Save changes'}
+        </Button>
+      </ActionRow>
+    </div>
+  ) : null;
+
+  const feedback = (
+    <>
+      {error !== null ? (
+        <StatusMessage tone="danger" role="alert">
+          {error}
+        </StatusMessage>
+      ) : null}
+      {status !== null ? (
+        <StatusMessage tone="success" role="status">
+          {status}
+        </StatusMessage>
+      ) : null}
+    </>
+  );
+
+  if (
+    selectedApplication !== null &&
+    formOpen &&
+    editingId === selectedApplication.id
+  ) {
+    return (
+      <Section id="applications">
+        <SectionHeader
+          title="Edit job"
+          description={`${selectedApplication.company} · ${selectedApplication.role}`}
+          action={
+            <Button variant="ghost" onClick={resetForm}>
+              Cancel
+            </Button>
+          }
+        />
+        {feedback}
+        {form}
+      </Section>
+    );
+  }
+
+  if (selectedApplication !== null) {
+    return (
+      <Section id="applications">
+        {feedback}
+        <ApplicationDetail
+          application={selectedApplication}
+          todayKey={todayKey}
+          onBack={backToPipeline}
+          onEdit={() => openEditForm(selectedApplication)}
+          onDelete={() => deleteApplication(selectedApplication.id)}
+          onChangeStage={(stage) => changeStage(selectedApplication.id, stage)}
+          onCompleteAction={() => completeFollowUp(selectedApplication.id)}
+        />
+      </Section>
+    );
+  }
 
   return (
     <Section id="applications">
@@ -425,134 +501,8 @@ export function ApplicationsWorkspace({
         }
       />
 
-      {error !== null ? (
-        <StatusMessage tone="danger" role="alert">
-          {error}
-        </StatusMessage>
-      ) : null}
-      {status !== null ? (
-        <StatusMessage tone="success" role="status">
-          {status}
-        </StatusMessage>
-      ) : null}
-
-      {formOpen ? (
-        <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
-          <div className="grid gap-1">
-            <h3 className="m-0 text-sm font-semibold text-app-ink">
-              {editingId === null ? 'Add job' : 'Edit job'}
-            </h3>
-            <p className="m-0 text-xs text-app-subtle">
-              Capture only the context needed to decide and execute the next
-              move.
-            </p>
-          </div>
-          <FieldGrid>
-            <TextField
-              label="Company"
-              value={draft.company}
-              onChange={(event) => updateDraft({ company: event.target.value })}
-            />
-            <TextField
-              label="Role"
-              value={draft.role}
-              onChange={(event) => updateDraft({ role: event.target.value })}
-            />
-            <TextField
-              label="Job URL"
-              type="url"
-              value={draft.jobUrl ?? ''}
-              onChange={(event) => updateDraft({ jobUrl: event.target.value })}
-            />
-            <SelectField
-              label="Stage"
-              value={draft.stage}
-              onChange={(event) =>
-                updateDraft({ stage: event.target.value as ApplicationStage })
-              }
-            >
-              {APPLICATION_STAGES.map((stage) => (
-                <option value={stage} key={stage}>
-                  {STAGE_LABELS[stage]}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label="Priority"
-              value={draft.priority ?? ''}
-              onChange={(event) =>
-                updateDraft({
-                  priority:
-                    event.target.value === ''
-                      ? undefined
-                      : (event.target.value as ApplicationPriority),
-                })
-              }
-            >
-              <option value="">No priority</option>
-              {APPLICATION_PRIORITIES.map((priority) => (
-                <option value={priority} key={priority}>
-                  {PRIORITY_LABELS[priority]}
-                </option>
-              ))}
-            </SelectField>
-            <TextField
-              label="Next action"
-              placeholder="Tailor resume, follow up, prepare interview..."
-              value={draft.nextAction ?? ''}
-              onChange={(event) =>
-                updateDraft({ nextAction: event.target.value })
-              }
-            />
-            <TextField
-              label="Next action date"
-              type="date"
-              value={draft.nextActionAt ?? ''}
-              onChange={(event) =>
-                updateDraft({ nextActionAt: event.target.value })
-              }
-            />
-            <TextField
-              label="Application deadline"
-              type="date"
-              value={draft.deadline ?? ''}
-              onChange={(event) =>
-                updateDraft({ deadline: event.target.value })
-              }
-            />
-            <TextField
-              label="Source"
-              value={draft.source ?? ''}
-              onChange={(event) => updateDraft({ source: event.target.value })}
-            />
-            <TextField
-              label="Contact name"
-              value={draft.contactName ?? ''}
-              onChange={(event) =>
-                updateDraft({ contactName: event.target.value })
-              }
-            />
-            <TextField
-              label="Contact email"
-              type="email"
-              value={draft.contactEmail ?? ''}
-              onChange={(event) =>
-                updateDraft({ contactEmail: event.target.value })
-              }
-            />
-          </FieldGrid>
-          <TextareaField
-            label="Notes"
-            value={draft.notes ?? ''}
-            onChange={(event) => updateDraft({ notes: event.target.value })}
-          />
-          <ActionRow>
-            <Button variant="primary" onClick={() => void submitDraft()}>
-              {editingId === null ? 'Add to pipeline' : 'Save changes'}
-            </Button>
-          </ActionRow>
-        </div>
-      ) : null}
+      {feedback}
+      {form}
 
       <div className="grid gap-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -595,8 +545,7 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {opportunityLabel} · {actionableCount} need
-          action
+          {activeCount} active {opportunityLabel} · {actionableCount} need action
         </p>
       </div>
 
@@ -637,11 +586,7 @@ export function ApplicationsWorkspace({
                           todayKey={todayKey}
                           showStage={false}
                           showFollowUpNote={false}
-                          showCompleteFollowUp={false}
-                          onEdit={openEditForm}
-                          onDelete={deleteApplication}
-                          onChangeStage={changeStage}
-                          onCompleteFollowUp={completeFollowUp}
+                          onOpen={openApplicationDetail}
                         />
                       ))}
                     </div>
@@ -660,11 +605,7 @@ export function ApplicationsWorkspace({
               todayKey={todayKey}
               showStage
               showFollowUpNote
-              showCompleteFollowUp
-              onEdit={openEditForm}
-              onDelete={deleteApplication}
-              onChangeStage={changeStage}
-              onCompleteFollowUp={completeFollowUp}
+              onOpen={openApplicationDetail}
             />
           ))}
         </div>
@@ -698,11 +639,7 @@ export function ApplicationsWorkspace({
                         todayKey={todayKey}
                         showStage={false}
                         showFollowUpNote={false}
-                        showCompleteFollowUp={false}
-                        onEdit={openEditForm}
-                        onDelete={deleteApplication}
-                        onChangeStage={changeStage}
-                        onCompleteFollowUp={completeFollowUp}
+                        onOpen={openApplicationDetail}
                       />
                     ))}
                   </div>
