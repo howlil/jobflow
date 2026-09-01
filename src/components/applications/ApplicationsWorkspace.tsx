@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import {
+  APPLICATION_PRIORITIES,
   APPLICATION_STAGES,
+  type ApplicationPriority,
   type ApplicationStage,
   type JobApplication,
 } from '../../domain/applications/application-schema';
@@ -46,6 +48,13 @@ const STAGE_LABELS: Record<ApplicationStage, string> = {
   withdrawn: 'Withdrawn',
 };
 
+const PRIORITY_LABELS: Record<ApplicationPriority, string> = {
+  p0: 'P0 · Apply ASAP',
+  p1: 'P1 · Strong target',
+  p2: 'P2 · Consider',
+  p3: 'P3 · Low priority',
+};
+
 const EMPTY_DRAFT: ApplicationDraft = {
   company: '',
   role: '',
@@ -55,7 +64,9 @@ const EMPTY_DRAFT: ApplicationDraft = {
   source: '',
   contactName: '',
   contactEmail: '',
+  nextAction: '',
   nextActionAt: '',
+  deadline: '',
 };
 
 function displayDate(value: string): string {
@@ -74,11 +85,14 @@ function draftFromApplication(application: JobApplication): ApplicationDraft {
     role: application.role,
     jobUrl: application.jobUrl ?? '',
     stage: application.stage,
+    priority: application.priority,
     notes: application.notes ?? '',
     source: application.source ?? '',
     contactName: application.contactName ?? '',
     contactEmail: application.contactEmail ?? '',
+    nextAction: application.nextAction ?? '',
     nextActionAt: application.nextActionAt ?? '',
+    deadline: application.deadline ?? '',
   };
 }
 
@@ -170,6 +184,11 @@ function PipelineCard({
       />
 
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-app-subtle">
+        {application.priority !== undefined ? (
+          <span className="rounded-control border border-app-border px-2 py-1 text-app-ink">
+            {PRIORITY_LABELS[application.priority]}
+          </span>
+        ) : null}
         {showStage ? (
           <span className="rounded-control border border-app-border px-2 py-1 text-app-text">
             {STAGE_LABELS[application.stage]}
@@ -181,6 +200,18 @@ function PipelineCard({
           </span>
         ) : null}
       </div>
+
+      {application.nextAction ? (
+        <p className="m-0 text-xs font-medium text-app-text">
+          Next: {application.nextAction}
+        </p>
+      ) : null}
+
+      {application.deadline ? (
+        <p className="m-0 text-xs text-app-subtle">
+          Deadline: {displayDate(application.deadline)}
+        </p>
+      ) : null}
 
       {showFollowUpNote && followUpNote ? (
         <p className="m-0 whitespace-pre-wrap text-xs leading-5 text-app-text">
@@ -341,7 +372,7 @@ export function ApplicationsWorkspace({
 
   async function completeFollowUp(id: string) {
     try {
-      await service.update(id, { nextActionAt: '' });
+      await service.update(id, { nextAction: '', nextActionAt: '' });
       setStatus('Follow-up completed.');
       await reload();
     } catch {
@@ -379,7 +410,7 @@ export function ApplicationsWorkspace({
     <Section id="applications">
       <SectionHeader
         title="Job pipeline"
-        description="Move opportunities through the hiring funnel and keep follow-ups visible."
+        description="See what needs attention, move opportunities forward, and keep the next action explicit."
         action={
           formOpen ? (
             <Button variant="ghost" onClick={resetForm}>
@@ -412,8 +443,7 @@ export function ApplicationsWorkspace({
               {editingId === null ? 'Add job' : 'Edit job'}
             </h3>
             <p className="m-0 text-xs text-app-subtle">
-              Keep the board focused; full job details live here while you add
-              or edit an opportunity.
+              Capture only the context needed to decide and execute the next move.
             </p>
           </div>
           <FieldGrid>
@@ -446,13 +476,46 @@ export function ApplicationsWorkspace({
                 </option>
               ))}
             </SelectField>
+            <SelectField
+              label="Priority"
+              value={draft.priority ?? ''}
+              onChange={(event) =>
+                updateDraft({
+                  priority:
+                    event.target.value === ''
+                      ? undefined
+                      : (event.target.value as ApplicationPriority),
+                })
+              }
+            >
+              <option value="">No priority</option>
+              {APPLICATION_PRIORITIES.map((priority) => (
+                <option value={priority} key={priority}>
+                  {PRIORITY_LABELS[priority]}
+                </option>
+              ))}
+            </SelectField>
             <TextField
               label="Next action"
+              placeholder="Tailor resume, follow up, prepare interview..."
+              value={draft.nextAction ?? ''}
+              onChange={(event) =>
+                updateDraft({ nextAction: event.target.value })
+              }
+            />
+            <TextField
+              label="Next action date"
               type="date"
               value={draft.nextActionAt ?? ''}
               onChange={(event) =>
                 updateDraft({ nextActionAt: event.target.value })
               }
+            />
+            <TextField
+              label="Application deadline"
+              type="date"
+              value={draft.deadline ?? ''}
+              onChange={(event) => updateDraft({ deadline: event.target.value })}
             />
             <TextField
               label="Source"
@@ -529,8 +592,7 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {opportunityLabel} · {actionableCount} need
-          action
+          {activeCount} active {opportunityLabel} · {actionableCount} need action
         </p>
       </div>
 
