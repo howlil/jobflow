@@ -80,6 +80,7 @@ export function applicationHasCompletableAction(
 ): boolean {
   return (
     !applicationIsClosed(application) &&
-    (application.nextAction !== undefined || application.nextActionAt !== undefined)
+    (application.nextAction !== undefined ||
+      application.nextActionAt !== undefined)
   );
 }
