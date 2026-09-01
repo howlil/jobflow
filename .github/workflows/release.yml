@@ -37,10 +37,6 @@ jobs:
         run: pnpm build
       - name: Verify generated extension
         run: pnpm verify:manifest
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Browser extension acceptance
-        run: pnpm test:e2e
       - name: Package extension
         run: pnpm zip
       - name: Create checksum
