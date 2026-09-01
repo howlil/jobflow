@@ -163,24 +163,51 @@ function draftFromChanges(
     role: changes.role ?? current.role,
     stage: changes.stage ?? current.stage,
   };
-  if ('priority' in changes) draft.priority = changes.priority;
-  else if (current.priority !== undefined) draft.priority = current.priority;
-  if (changes.jobUrl !== undefined) draft.jobUrl = changes.jobUrl;
-  else if (current.jobUrl !== undefined) draft.jobUrl = current.jobUrl;
-  if (changes.notes !== undefined) draft.notes = changes.notes;
-  else if (current.notes !== undefined) draft.notes = current.notes;
-  if (changes.source !== undefined) draft.source = changes.source;
-  else if (current.source !== undefined) draft.source = current.source;
-  if (changes.contactName !== undefined) draft.contactName = changes.contactName;
-  else if (current.contactName !== undefined) draft.contactName = current.contactName;
-  if (changes.contactEmail !== undefined) draft.contactEmail = changes.contactEmail;
-  else if (current.contactEmail !== undefined) draft.contactEmail = current.contactEmail;
-  if (changes.nextAction !== undefined) draft.nextAction = changes.nextAction;
-  else if (current.nextAction !== undefined) draft.nextAction = current.nextAction;
-  if (changes.nextActionAt !== undefined) draft.nextActionAt = changes.nextActionAt;
-  else if (current.nextActionAt !== undefined) draft.nextActionAt = current.nextActionAt;
-  if (changes.deadline !== undefined) draft.deadline = changes.deadline;
-  else if (current.deadline !== undefined) draft.deadline = current.deadline;
+  if ('priority' in changes) {
+    draft.priority = changes.priority;
+  } else if (current.priority !== undefined) {
+    draft.priority = current.priority;
+  }
+  if (changes.jobUrl !== undefined) {
+    draft.jobUrl = changes.jobUrl;
+  } else if (current.jobUrl !== undefined) {
+    draft.jobUrl = current.jobUrl;
+  }
+  if (changes.notes !== undefined) {
+    draft.notes = changes.notes;
+  } else if (current.notes !== undefined) {
+    draft.notes = current.notes;
+  }
+  if (changes.source !== undefined) {
+    draft.source = changes.source;
+  } else if (current.source !== undefined) {
+    draft.source = current.source;
+  }
+  if (changes.contactName !== undefined) {
+    draft.contactName = changes.contactName;
+  } else if (current.contactName !== undefined) {
+    draft.contactName = current.contactName;
+  }
+  if (changes.contactEmail !== undefined) {
+    draft.contactEmail = changes.contactEmail;
+  } else if (current.contactEmail !== undefined) {
+    draft.contactEmail = current.contactEmail;
+  }
+  if (changes.nextAction !== undefined) {
+    draft.nextAction = changes.nextAction;
+  } else if (current.nextAction !== undefined) {
+    draft.nextAction = current.nextAction;
+  }
+  if (changes.nextActionAt !== undefined) {
+    draft.nextActionAt = changes.nextActionAt;
+  } else if (current.nextActionAt !== undefined) {
+    draft.nextActionAt = current.nextActionAt;
+  }
+  if (changes.deadline !== undefined) {
+    draft.deadline = changes.deadline;
+  } else if (current.deadline !== undefined) {
+    draft.deadline = current.deadline;
+  }
   return draft;
 }
 
