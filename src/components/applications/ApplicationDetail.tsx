@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ArrowLeft, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 
 import type {
@@ -5,7 +6,10 @@ import type {
   JobApplication,
 } from '../../domain/applications/application-schema';
 import { ActionRow, Button, SectionHeader } from '../ui';
-import { ACTIVE_APPLICATION_STAGES, applicationIsClosed } from './application-focus';
+import {
+  ACTIVE_APPLICATION_STAGES,
+  applicationIsClosed,
+} from './application-focus';
 import {
   PRIORITY_LABELS,
   STAGE_LABELS,
@@ -22,7 +26,7 @@ function DetailBlock({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-4">
@@ -39,7 +43,7 @@ function DetailValue({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="grid gap-1">
@@ -112,7 +116,10 @@ export function ApplicationDetail({
     .join(' · ');
 
   return (
-    <div className="grid gap-5" aria-label={`${application.company} application detail`}>
+    <div
+      className="grid gap-5"
+      aria-label={`${application.company} application detail`}
+    >
       <div>
         <Button variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" size={15} />
@@ -162,12 +169,17 @@ export function ApplicationDetail({
                 </span>
               ) : null}
               {application.deadline !== undefined ? (
-                <span>Application deadline {displayDate(application.deadline)}</span>
+                <span>
+                  Application deadline {displayDate(application.deadline)}
+                </span>
               ) : null}
             </div>
             {applicationHasCompletableAction(application) ? (
               <ActionRow>
-                <Button variant="primary" onClick={() => void onCompleteAction()}>
+                <Button
+                  variant="primary"
+                  onClick={() => void onCompleteAction()}
+                >
                   Mark done
                 </Button>
               </ActionRow>
