@@ -1,10 +1,10 @@
 # ATS Live Validation Protocol
 
-This protocol turns real application-form failures into reproducible generic-engine evidence without collecting applicant data.
+This protocol turns real application-form failures into reproducible generic-engine evidence without collecting applicant data. It is a diagnostic protocol, not a support matrix or mandatory release ritual.
 
 ## Scope
 
-Target families:
+Representative families may include:
 
 - Greenhouse
 - Lever
@@ -13,7 +13,7 @@ Target families:
 - SmartRecruiters
 - custom employer forms
 
-The presence of an ATS family in this document is not a support claim. `docs/compatibility-evidence.json` is the machine-checked source of truth for fixture and live status.
+The presence of a family here is not a support claim. Live compatibility exists only to the extent demonstrated by an observed, reproducible validation record.
 
 ## Safety rules
 
@@ -28,7 +28,7 @@ The presence of an ATS family in this document is not a support claim. `docs/com
 
 ## Validation journey
 
-For each representative form:
+For a representative form:
 
 1. Record browser version, Job Flow commit/release, hostname, and ATS family if known.
 2. Open the form with a synthetic Job Flow profile.
@@ -46,11 +46,13 @@ For each representative form:
 
 ## Recording evidence
 
-Update `docs/compatibility-evidence.json` only when evidence is reproducible.
+Record a live result only when it is reproducible and useful. Prefer:
 
-A family may move from `liveStatus: pending` to `verified` only with a non-empty `liveEvidence` reference describing the tested journey. A failure should record the smallest safe reproduction in a GitHub issue and, where possible, a sanitized fixture committed with its regression test.
+- a sanitized focused fixture plus regression test for a generic-engine defect;
+- a redacted GitHub compatibility report when the failure depends on real browser/site behavior;
+- a short PR/release note when a compatibility fix materially changes supported behavior.
 
-Do not mark an ATS adapter as `candidate` or `implemented` unless `reproducibleFailure` is non-empty. CI enforces this gate.
+Do not maintain a parallel family-status JSON or promote adapter states through metadata. An adapter candidate must point directly to the reproducible failure that justifies it.
 
 ## Failure triage
 
