@@ -17,6 +17,7 @@ Optional authorities that exist because Jobflow has concrete need:
 
 - `.agents/DESIGN.md` — visual system, interaction behavior, responsive rules, and UI composition.
 - `.agents/RELEASE.md` — extension integration, versioning, packaging, release workflow, and rollback constraints.
+- `.agents/SECURITY.md` — vault, cryptography, sensitive disclosure, permissions, privacy, and security verification boundaries.
 - `.agents/skills/*/SKILL.md` — reusable specialist guidance; load only when its trigger matches the requested work.
 
 Read only the documents relevant to the requested change, but always inspect `.agents/CURRENT_ITERATION.md` when continuing active work.
@@ -27,7 +28,7 @@ When sources disagree, use this order:
 
 1. explicit current user instruction
 2. `.agents/PROJECT.md` and approved material decisions
-3. `.agents/ARCHITECTURE.md`, `.agents/DESIGN.md`, and other applicable specialized authorities
+3. `.agents/ARCHITECTURE.md`, `.agents/DESIGN.md`, `.agents/SECURITY.md`, and other applicable specialized authorities
 4. `.agents/CURRENT_ITERATION.md`
 5. `.agents/CODE_PATTERNS.md` and `.agents/QUALITY.md`
 6. current code and tests
