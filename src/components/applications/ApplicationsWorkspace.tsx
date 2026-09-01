@@ -443,7 +443,8 @@ export function ApplicationsWorkspace({
               {editingId === null ? 'Add job' : 'Edit job'}
             </h3>
             <p className="m-0 text-xs text-app-subtle">
-              Capture only the context needed to decide and execute the next move.
+              Capture only the context needed to decide and execute the next
+              move.
             </p>
           </div>
           <FieldGrid>
@@ -515,7 +516,9 @@ export function ApplicationsWorkspace({
               label="Application deadline"
               type="date"
               value={draft.deadline ?? ''}
-              onChange={(event) => updateDraft({ deadline: event.target.value })}
+              onChange={(event) =>
+                updateDraft({ deadline: event.target.value })
+              }
             />
             <TextField
               label="Source"
@@ -592,7 +595,8 @@ export function ApplicationsWorkspace({
           </div>
         </div>
         <p className="m-0 text-xs text-app-subtle">
-          {activeCount} active {opportunityLabel} · {actionableCount} need action
+          {activeCount} active {opportunityLabel} · {actionableCount} need
+          action
         </p>
       </div>
 
