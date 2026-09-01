@@ -115,7 +115,8 @@ describe('PopupPage', () => {
     expect(await screen.findByText('Recommended')).toBeTruthy();
     expect(screen.getAllByText('Backend Engineer').length).toBeGreaterThan(0);
 
-    const selector = screen.getByLabelText<HTMLSelectElement>('Use for this page');
+    const selector =
+      screen.getByLabelText<HTMLSelectElement>('Use for this page');
     fireEvent.change(selector, { target: { value: 'devops' } });
     await waitFor(() => expect(onSelectVariant).toHaveBeenCalledWith('devops'));
 
