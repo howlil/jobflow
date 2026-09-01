@@ -310,9 +310,9 @@ export function ApplicationsWorkspace({
   const selectedApplication =
     selectedApplicationId === null
       ? null
-      : (applications.find(
+      : applications.find(
           (application) => application.id === selectedApplicationId,
-        ) ?? null);
+        ) ?? null;
 
   const form = formOpen ? (
     <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
@@ -321,7 +321,8 @@ export function ApplicationsWorkspace({
           {editingId === null ? 'Add job' : 'Edit job'}
         </h3>
         <p className="m-0 text-xs text-app-subtle">
-          Capture only the context needed to decide and execute the next move.
+          Capture only the context needed to decide and execute the next
+          move.
         </p>
       </div>
       <FieldGrid>
@@ -478,8 +479,12 @@ export function ApplicationsWorkspace({
           onBack={backToPipeline}
           onEdit={() => openEditForm(selectedApplication)}
           onDelete={() => deleteApplication(selectedApplication.id)}
-          onChangeStage={(stage) => changeStage(selectedApplication.id, stage)}
-          onCompleteAction={() => completeFollowUp(selectedApplication.id)}
+          onChangeStage={(stage) =>
+            changeStage(selectedApplication.id, stage)
+          }
+          onCompleteAction={() =>
+            completeFollowUp(selectedApplication.id)
+          }
         />
       </Section>
     );
