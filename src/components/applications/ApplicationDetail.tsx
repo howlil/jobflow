@@ -54,7 +54,9 @@ function DetailValue({
 }
 
 function ProgressTrack({ application }: { application: JobApplication }) {
-  const activeStageIndex = ACTIVE_APPLICATION_STAGES.indexOf(application.stage);
+  const activeStageIndex = ACTIVE_APPLICATION_STAGES.findIndex(
+    (stage) => stage === application.stage,
+  );
 
   return (
     <div className="grid gap-3">
