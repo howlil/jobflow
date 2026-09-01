@@ -19,58 +19,55 @@ function createService(
 }
 
 describe('ApplicationsWorkspace', () => {
-  it(
-    'shows the active funnel and opens closed opportunities in the same detail surface',
-    async () => {
-      const applications: JobApplication[] = [
-        {
-          id: 'active',
-          company: 'Gojek',
-          role: 'Backend Engineer',
-          stage: 'applied',
-          priority: 'p0',
-          nextAction: 'Follow up recruiter',
-          deadline: '2026-09-05',
-          createdAt: '2026-08-30T00:00:00.000Z',
-          updatedAt: '2026-08-30T03:00:00.000Z',
-        },
-        {
-          id: 'closed',
-          company: 'Traveloka',
-          role: 'Platform Engineer',
-          stage: 'rejected',
-          notes: 'Role closed after final review.',
-          createdAt: '2026-08-30T00:00:00.000Z',
-          updatedAt: '2026-08-30T02:00:00.000Z',
-        },
-      ];
-      render(<ApplicationsWorkspace service={createService(applications)} />);
+  it('shows the active funnel and opens closed opportunities in the same detail surface', async () => {
+    const applications: JobApplication[] = [
+      {
+        id: 'active',
+        company: 'Gojek',
+        role: 'Backend Engineer',
+        stage: 'applied',
+        priority: 'p0',
+        nextAction: 'Follow up recruiter',
+        deadline: '2026-09-05',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T03:00:00.000Z',
+      },
+      {
+        id: 'closed',
+        company: 'Traveloka',
+        role: 'Platform Engineer',
+        stage: 'rejected',
+        notes: 'Role closed after final review.',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T02:00:00.000Z',
+      },
+    ];
+    render(<ApplicationsWorkspace service={createService(applications)} />);
 
-      expect(await screen.findByText('Backend Engineer')).not.toBeNull();
-      expect(screen.getByText('P0 · Apply ASAP')).not.toBeNull();
-      expect(screen.getByText('Next: Follow up recruiter')).not.toBeNull();
-      expect(
-        screen.getByRole('heading', { name: 'Job pipeline' }),
-      ).not.toBeNull();
-      expect(screen.queryByLabelText('Company')).toBeNull();
+    expect(await screen.findByText('Backend Engineer')).not.toBeNull();
+    expect(screen.getByText('P0 · Apply ASAP')).not.toBeNull();
+    expect(screen.getByText('Next: Follow up recruiter')).not.toBeNull();
+    expect(
+      screen.getByRole('heading', { name: 'Job pipeline' }),
+    ).not.toBeNull();
+    expect(screen.queryByLabelText('Company')).toBeNull();
 
-      fireEvent.click(screen.getByRole('button', { name: 'Closed 1' }));
-      fireEvent.click(
-        screen.getByRole('button', {
-          name: 'View Traveloka Platform Engineer details',
-        }),
-      );
+    fireEvent.click(screen.getByRole('button', { name: 'Closed 1' }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'View Traveloka Platform Engineer details',
+      }),
+    );
 
-      expect(screen.getByText('Role closed after final review.')).not.toBeNull();
-      expect(
-        screen.getByText('This opportunity is closed as Rejected.'),
-      ).not.toBeNull();
-      expect(
-        screen.getByRole('button', { name: 'Back to pipeline' }),
-      ).not.toBeNull();
-      expect(screen.queryByRole('button', { name: 'Mark done' })).toBeNull();
-    },
-  );
+    expect(screen.getByText('Role closed after final review.')).not.toBeNull();
+    expect(
+      screen.getByText('This opportunity is closed as Rejected.'),
+    ).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Back to pipeline' }),
+    ).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Mark done' })).toBeNull();
+  });
 
   it('creates jobs from an on-demand pipeline form', async () => {
     const service = createService();
@@ -201,69 +198,66 @@ describe('ApplicationsWorkspace', () => {
     expect(screen.getByText('Job updated.')).not.toBeNull();
   });
 
-  it(
-    'preserves the needs-action view and search after returning from detail',
-    async () => {
-      const applications: JobApplication[] = [
-        {
-          id: 'gojek-due',
-          company: 'Gojek',
-          role: 'Backend Engineer',
-          stage: 'applied',
-          nextAction: 'Follow up recruiter',
-          nextActionAt: '2000-01-01',
-          notes: 'Follow up with recruiter.',
-          createdAt: '2026-08-30T00:00:00.000Z',
-          updatedAt: '2026-08-30T03:00:00.000Z',
-        },
-        {
-          id: 'gojek-future',
-          company: 'Gojek',
-          role: 'Platform Engineer',
-          stage: 'applied',
-          nextActionAt: '2999-01-01',
-          createdAt: '2026-08-30T00:00:00.000Z',
-          updatedAt: '2026-08-30T02:00:00.000Z',
-        },
-        {
-          id: 'traveloka-due',
-          company: 'Traveloka',
-          role: 'Software Engineer',
-          stage: 'interview',
-          nextActionAt: '2000-01-02',
-          createdAt: '2026-08-30T00:00:00.000Z',
-          updatedAt: '2026-08-30T01:00:00.000Z',
-        },
-      ];
-      render(<ApplicationsWorkspace service={createService(applications)} />);
+  it('preserves the needs-action view and search after returning from detail', async () => {
+    const applications: JobApplication[] = [
+      {
+        id: 'gojek-due',
+        company: 'Gojek',
+        role: 'Backend Engineer',
+        stage: 'applied',
+        nextAction: 'Follow up recruiter',
+        nextActionAt: '2000-01-01',
+        notes: 'Follow up with recruiter.',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T03:00:00.000Z',
+      },
+      {
+        id: 'gojek-future',
+        company: 'Gojek',
+        role: 'Platform Engineer',
+        stage: 'applied',
+        nextActionAt: '2999-01-01',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T02:00:00.000Z',
+      },
+      {
+        id: 'traveloka-due',
+        company: 'Traveloka',
+        role: 'Software Engineer',
+        stage: 'interview',
+        nextActionAt: '2000-01-02',
+        createdAt: '2026-08-30T00:00:00.000Z',
+        updatedAt: '2026-08-30T01:00:00.000Z',
+      },
+    ];
+    render(<ApplicationsWorkspace service={createService(applications)} />);
 
-      await screen.findByText('Backend Engineer');
-      fireEvent.change(screen.getByLabelText('Search jobs'), {
-        target: { value: 'gojek' },
-      });
-      fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
-      fireEvent.click(
-        screen.getByRole('button', {
-          name: 'View Gojek Backend Engineer details',
-        }),
-      );
+    await screen.findByText('Backend Engineer');
+    fireEvent.change(screen.getByLabelText('Search jobs'), {
+      target: { value: 'gojek' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Needs action 2' }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'View Gojek Backend Engineer details',
+      }),
+    );
 
-      expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
-      fireEvent.click(screen.getByRole('button', { name: 'Back to pipeline' }));
+    expect(screen.getByText('Follow up with recruiter.')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Back to pipeline' }));
 
-      expect(
-        (screen.getByLabelText('Search jobs') as HTMLInputElement).value,
-      ).toBe('gojek');
-      expect(
-        screen.getByRole('button', { name: 'Needs action 2' }).getAttribute(
-          'aria-pressed',
-        ),
-      ).toBe('true');
-      expect(screen.getByText('Backend Engineer')).not.toBeNull();
-      expect(screen.queryByText('Software Engineer')).toBeNull();
-      expect(screen.queryByText('Platform Engineer')).toBeNull();
-    },
-  );
+    expect(
+      (screen.getByLabelText('Search jobs') as HTMLInputElement).value,
+    ).toBe('gojek');
+    expect(
+      screen.getByRole('button', { name: 'Needs action 2' }).getAttribute(
+        'aria-pressed',
+      ),
+    ).toBe('true');
+    expect(screen.getByText('Backend Engineer')).not.toBeNull();
+    expect(screen.queryByText('Software Engineer')).toBeNull();
+    expect(screen.queryByText('Platform Engineer')).toBeNull();
+  });
 
   it('completes the explicit next action from application detail', async () => {
     const application: JobApplication = {
