@@ -25,7 +25,10 @@ export class ChromeCorrectionRepository implements CorrectionRepository {
     if (value === undefined) return createEmptyStoredCorrections();
 
     const envelope = parseStoredCorrections(value);
-    if (stored[CORRECTION_STORAGE_KEY] === undefined) {
+    if (
+      stored[CORRECTION_STORAGE_KEY] === undefined ||
+      value.schemaVersion !== envelope.schemaVersion
+    ) {
       await this.save(envelope.entries);
     }
     return envelope;
@@ -33,7 +36,7 @@ export class ChromeCorrectionRepository implements CorrectionRepository {
 
   private async save(entries: FieldCorrection[]): Promise<void> {
     await browser.storage.local.set({
-      [CORRECTION_STORAGE_KEY]: { schemaVersion: 1, entries },
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 2, entries },
     });
   }
 
