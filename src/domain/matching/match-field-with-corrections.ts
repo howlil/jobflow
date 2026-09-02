@@ -79,11 +79,10 @@ export function matchFieldWithCorrections(
     };
   }
 
-  if (base.status === 'ready') return base;
+  if (base.status === 'ready' || base.status === 'review') return base;
 
   const reusable = matchReusableAnswer(context, customAnswers);
   if (reusable.status === 'ready-answer') return reusable;
-  if (base.status === 'review') return base;
   if (reusable.status === 'review-answer') return reusable;
 
   return base;
