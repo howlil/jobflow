@@ -14,20 +14,25 @@ import {
 export const CORRECTION_STORAGE_KEY = 'jobflow.corrections';
 const LEGACY_CORRECTION_STORAGE_KEY = 'fillio.corrections';
 
+function storedSchemaVersion(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null) return undefined;
+  return (value as { schemaVersion?: unknown }).schemaVersion;
+}
+
 export class ChromeCorrectionRepository implements CorrectionRepository {
   private async load(): Promise<StoredCorrectionEnvelope> {
     const stored = await browser.storage.local.get([
       CORRECTION_STORAGE_KEY,
       LEGACY_CORRECTION_STORAGE_KEY,
     ]);
-    const value =
-      stored[CORRECTION_STORAGE_KEY] ?? stored[LEGACY_CORRECTION_STORAGE_KEY];
+    const currentValue = stored[CORRECTION_STORAGE_KEY];
+    const value = currentValue ?? stored[LEGACY_CORRECTION_STORAGE_KEY];
     if (value === undefined) return createEmptyStoredCorrections();
 
     const envelope = parseStoredCorrections(value);
     if (
-      stored[CORRECTION_STORAGE_KEY] === undefined ||
-      value.schemaVersion !== envelope.schemaVersion
+      currentValue === undefined ||
+      storedSchemaVersion(currentValue) !== envelope.schemaVersion
     ) {
       await this.save(envelope.entries);
     }
