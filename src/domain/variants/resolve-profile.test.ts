@@ -64,7 +64,7 @@ describe('resolveApplicationProfile', () => {
     expect(base.jobPreferences.preferredLocations).toEqual(['Padang']);
   });
 
-  it('does not apply variant fields whose resolution semantics are deferred', () => {
+  it('applies reusable-answer overrides by stable intent while leaving deferred preference semantics unchanged', () => {
     const base = createEmptyStoredProfile(
       '2026-08-13T00:00:00.000Z',
     ).baseProfile;
@@ -74,7 +74,14 @@ describe('resolveApplicationProfile', () => {
         id: 'base-answer',
         question: 'Why this role?',
         answer: 'Base answer',
-        canonicalIntent: 'motivation',
+        canonicalIntent: 'application.motivation.role',
+        tags: [],
+      },
+      {
+        id: 'base-other',
+        question: 'Anything else?',
+        answer: 'Base other answer',
+        canonicalIntent: 'application.additional',
         tags: [],
       },
     ];
@@ -87,10 +94,10 @@ describe('resolveApplicationProfile', () => {
       customAnswers: [
         {
           id: 'variant-answer',
-          question: 'Why this role?',
+          question: 'Why do you want this backend role?',
           answer: 'Variant answer',
-          canonicalIntent: 'motivation',
-          tags: [],
+          canonicalIntent: 'application.motivation.role',
+          tags: ['backend motivation'],
         },
       ],
     };
@@ -98,7 +105,11 @@ describe('resolveApplicationProfile', () => {
     const resolved = resolveApplicationProfile(base, variant);
 
     expect(resolved.jobPreferences.employmentTypes).toEqual(['full-time']);
-    expect(resolved.customAnswers).toEqual(base.customAnswers);
+    expect(resolved.customAnswers).toEqual([
+      variant.customAnswers?.[0],
+      base.customAnswers[1],
+    ]);
+    expect(base.customAnswers[0]?.answer).toBe('Base answer');
   });
 
   it('clones the base profile when no variant is selected', () => {
