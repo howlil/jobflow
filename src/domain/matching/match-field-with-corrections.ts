@@ -1,13 +1,29 @@
-import type { FieldCorrection } from '../corrections/correction-schema';
+import {
+  isReusableAnswerCorrectionTarget,
+  reusableAnswerIdFromCorrectionTarget,
+  type FieldCorrection,
+} from '../corrections/correction-schema';
 import type { FieldContext } from '../forms/field-context';
+import type { BaseProfile } from '../profile/profile-schema';
 import type { CanonicalField } from './canonical-fields';
 import { matchField, type MatchResult } from './match-field';
+import {
+  matchReusableAnswer,
+  type ReusableAnswerMatchResult,
+} from './reusable-answers';
 
 export type CorrectionAwareMatchResult =
   | MatchResult
+  | Exclude<ReusableAnswerMatchResult, { status: 'unknown-answer' }>
   | {
       status: 'ready';
       field: CanonicalField;
+      reason: 'user-correction';
+      sensitivity: 'normal';
+    }
+  | {
+      status: 'ready-answer';
+      answerId: string;
       reason: 'user-correction';
       sensitivity: 'normal';
     }
@@ -19,6 +35,7 @@ export type CorrectionAwareMatchResult =
 export function matchFieldWithCorrections(
   context: FieldContext,
   corrections: FieldCorrection[],
+  customAnswers: BaseProfile['customAnswers'] = [],
 ): CorrectionAwareMatchResult {
   const base = matchField(context);
   if (
@@ -35,15 +52,39 @@ export function matchFieldWithCorrections(
       entry.fieldFingerprint === context.fieldFingerprint,
   );
 
-  if (correction === undefined) return base;
-  if (correction.target === 'ignore') {
-    return { status: 'unknown', reason: 'user-ignored' };
+  if (correction !== undefined) {
+    if (correction.target === 'ignore') {
+      return { status: 'unknown', reason: 'user-ignored' };
+    }
+
+    if (isReusableAnswerCorrectionTarget(correction.target)) {
+      const answerId = reusableAnswerIdFromCorrectionTarget(correction.target);
+      const answer = customAnswers.find((item) => item.id === answerId);
+      if (answer !== undefined && answer.answer.trim().length > 0) {
+        return {
+          status: 'ready-answer',
+          answerId,
+          reason: 'user-correction',
+          sensitivity: 'normal',
+        };
+      }
+      return base;
+    }
+
+    return {
+      status: 'ready',
+      field: correction.target,
+      reason: 'user-correction',
+      sensitivity: 'normal',
+    };
   }
 
-  return {
-    status: 'ready',
-    field: correction.target,
-    reason: 'user-correction',
-    sensitivity: 'normal',
-  };
+  if (base.status === 'ready') return base;
+
+  const reusable = matchReusableAnswer(context, customAnswers);
+  if (reusable.status === 'ready-answer') return reusable;
+  if (base.status === 'review') return base;
+  if (reusable.status === 'review-answer') return reusable;
+
+  return base;
 }
