@@ -133,7 +133,7 @@ export function FloatingPanel({
     setFillStatus(
       failed === 0
         ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled.`
-        : `${filled} of ${results.length} fields filled. ${failed} need manual input.`,
+        : `${filled} of ${results.length} fields filled. ${failed} ${failed === 1 ? 'needs' : 'need'} manual input.`,
     );
   }
 
