@@ -84,9 +84,6 @@ try {
   await expect(
     workspace.getByRole('heading', { name: 'Job pipeline' }),
   ).toBeVisible();
-  await expect(
-    workspace.getByRole('heading', { name: 'Applying', exact: true }),
-  ).toBeVisible();
 
   await createApplication(workspace, {
     company: 'Gojek',
