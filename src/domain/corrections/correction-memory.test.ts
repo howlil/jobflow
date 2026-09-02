@@ -104,6 +104,20 @@ describe('correction memory', () => {
     });
   });
 
+  it('keeps canonical ambiguity in Review ahead of automatic reusable answers', () => {
+    expect(
+      matchFieldWithCorrections(field({ label: 'Name' }), [], [
+        {
+          id: 'name-answer',
+          question: 'Name',
+          answer: 'Do not auto-fill this answer',
+          canonicalIntent: 'custom.name',
+          tags: [],
+        },
+      ]),
+    ).toMatchObject({ status: 'review' });
+  });
+
   it('never lets a correction override sensitive or file fail-closed guards', () => {
     expect(
       matchFieldWithCorrections(field({ label: 'Date of birth' }), [
