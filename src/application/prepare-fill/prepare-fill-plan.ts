@@ -132,8 +132,9 @@ export function prepareFillPlan(
     }
 
     if (item.match.status === 'ready-answer') {
+      const answerId = item.match.answerId;
       const answer = profile.customAnswers.find(
-        (candidate) => candidate.id === item.match.answerId,
+        (candidate) => candidate.id === answerId,
       );
       if (answer === undefined || answer.answer.trim().length === 0) {
         plan.unknown.push(item);
