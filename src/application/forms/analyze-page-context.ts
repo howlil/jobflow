@@ -5,6 +5,10 @@ import {
 } from '../../domain/documents/classify-document-field';
 import { recommendDocumentsForVariant } from '../../domain/documents/recommend-document';
 import type { FieldContext } from '../../domain/forms/field-context';
+import {
+  reusableAnswerOptions,
+  type ReusableAnswerOption,
+} from '../../domain/matching/reusable-answers';
 import type {
   BaseProfile,
   DocumentMetadata,
@@ -32,6 +36,7 @@ export type AnalyzedPageContext = {
   activeVariantId: string | null;
   variantOptions: PageVariantOption[];
   documentFields: PageDocumentFieldSummary[];
+  reusableAnswers: ReusableAnswerOption[];
 };
 
 type AnalyzePageContextInput = {
@@ -136,6 +141,7 @@ export function analyzePageContext({
     activeVariantId,
     variantOptions,
     documentFields,
+    reusableAnswers: reusableAnswerOptions(profile.customAnswers),
   };
 }
 
