@@ -7,7 +7,7 @@ Jobflow is a `0.x` browser extension. Integration, release readiness, and distri
 - `master` is the protected integration branch.
 - Repository configuration permits squash merge and does not permit merge commits or rebase merge.
 - A merge to `master` is not automatically a product release.
-- Short-lived branches/PRs are integration tools; milestone/sprint names do not define branch lifetime.
+- Short-lived branches/PRs are integration tools; milestone or work-item names do not define branch lifetime.
 
 ## Versioning
 

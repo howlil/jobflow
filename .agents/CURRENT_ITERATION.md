@@ -1,56 +1,39 @@
 # Current Iteration
 
-**Status:** Idle — Core Autofill Coverage & Verified Fill completed. No next milestone is active.
+**Status:** Idle — no product milestone is currently active.
 
-## Completed Milestone
+## Current Product Position
 
-**Goal:** Core Autofill Coverage & Verified Fill
+The last completed milestone was **Core Autofill Coverage & Verified Fill**. Jobflow now has deterministic reusable-answer matching, bounded scalar autofill coverage, scoped correction learning, native choice-control handling, and observed fill outcomes while preserving fail-closed behavior and explicit execution boundaries.
 
-**Outcome:** Existing safe profile facts and reusable application answers now flow deterministically through FieldContext → MatchResult → FillPlan → explicit DOM fill, while explicit Fill reports observed success or partial failure without weakening fail-closed behavior.
+Detailed completed work and verification history live in Git/PR records rather than this file.
 
-## Delivered
+## Active Milestone
 
-- Added bounded scalar coverage for address line 1/2, professional summary, and notice period.
-- Added deterministic reusable-answer matching from exact question/tag evidence; similar questions remain Review and unrelated questions remain Unknown.
-- Preserved sensitive classification priority over reusable answers.
-- Added application-variant reusable-answer overrides through stable canonical intents.
-- Extended site/form/field-scoped correction memory to existing reusable answers with v1 → v2 migration compatibility.
-- Preserved deterministic select/radio matching and added explicit yes/no checkbox resolution without guessing unsupported options.
-- Added per-instruction `filled` / `not-found` / `unsupported` DOM outcomes and concise success/partial-failure feedback in the in-page assistant.
-- Added focused regression coverage for matching, migration, choice controls, disappeared controls, partial failure, and visible fill outcomes.
-- Updated stale browser acceptance assertions to the current compact popup, reusable-field review wording, and empty-pipeline behavior.
+None.
 
-## Verification
+There is no authorized product outcome, vertical slice, or logical change currently in progress.
 
-Required gate passed on the final implementation head before closure:
+## Next Move
 
-```text
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm format:check
-pnpm build
-pnpm verify:manifest
-```
+When the user requests the next product/engineering direction:
 
-Targeted browser runtime evidence also passed:
+1. inspect the current product gap against `.agents/PROJECT.md`, architecture/security boundaries, and actual code state;
+2. shape one bounded **high-value core milestone** with a meaningful complete outcome rather than a collection of micro-slices or nice-to-have polish;
+3. define demonstrable vertical slices only where they help execute the complete outcome;
+4. once authorized, execute those slices continuously until the milestone outcome is release-ready, unless a material stop condition is reached;
+5. use accumulated proportional verification evidence at the milestone gate instead of restarting a full verification ceremony after every small change.
 
-```text
-pnpm test:e2e
-```
+Do not reactivate historical sprint plans or infer new product scope from completed work.
 
-## Boundaries Preserved
+## State Discipline
 
-Not introduced:
+While work is active, keep this file limited to:
 
-- ATS-specific production adapters without reproducible generic-engine failure
-- AI/LLM matching or generated answers
-- experience/education repeated-record autofill
-- automatic Submit / Apply / Next
-- automatic document attachment
-- backend/cloud sync, analytics, job discovery, or Action Queue work
-- browser permission expansion
+- milestone outcome and boundaries
+- current vertical slice/logical change
+- material blockers or unresolved decisions
+- verification evidence that still matters to the active outcome
+- the single next meaningful action
 
-## Next Action
-
-STOP. Await the next user-approved milestone; do not invent or auto-activate scope.
+Remove completed slice detail once it no longer helps execute the active milestone. Durable history belongs in Git; durable material decisions belong in `.agents/DECISIONS.md`.
