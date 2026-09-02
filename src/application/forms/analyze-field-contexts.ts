@@ -27,7 +27,11 @@ export function analyzeFieldContexts(
 ): PageAnalysis {
   const analysis = fields.map((context) => ({
     context,
-    match: matchFieldWithCorrections(context, corrections),
+    match: matchFieldWithCorrections(
+      context,
+      corrections,
+      profile.customAnswers,
+    ),
   }));
   const plan = prepareFillPlan(analysis, profile);
 
