@@ -18,9 +18,13 @@ import type { ApplicationDraft } from '../../application/applications/applicatio
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
-import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
+import {
+  reusableAnswerCorrectionTarget,
+  type CorrectionTarget,
+} from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
 import type { CanonicalField } from '../../domain/matching/canonical-fields';
+import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
 import type { SensitiveVaultStatus } from './FloatingPanel';
 
 const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
@@ -31,6 +35,8 @@ const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
   'contact.email.primary': 'Primary email',
   'contact.phone.primary': 'Primary phone',
   'contact.whatsapp': 'WhatsApp',
+  'contact.address.line1': 'Address line 1',
+  'contact.address.line2': 'Address line 2',
   'contact.address.city': 'City',
   'contact.address.state': 'State / province',
   'contact.address.country': 'Country',
@@ -39,9 +45,11 @@ const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
   'links.github': 'GitHub',
   'links.portfolio': 'Portfolio',
   'professional.headline': 'Professional headline',
+  'professional.summary': 'Professional summary',
   'jobPreferences.willingToRelocate': 'Willing to relocate',
   'jobPreferences.willingToTravel': 'Willing to travel',
   'jobPreferences.availabilityDate': 'Availability date',
+  'jobPreferences.noticePeriod': 'Notice period',
 };
 
 export function floatingFieldLabel(context: FieldContext): string {
@@ -76,6 +84,8 @@ export function AssistantHomeView({
   summary,
   attachableDocuments,
   documentStatus,
+  fillStatus,
+  teachableUnknownCount,
   onAttachDocument,
   onFill,
   onOpenOptions,
@@ -86,6 +96,8 @@ export function AssistantHomeView({
   summary: PageAnalysisSummary;
   attachableDocuments: PageDocumentFieldSummary[];
   documentStatus: Record<string, string>;
+  fillStatus: string | null;
+  teachableUnknownCount: number;
   onAttachDocument: (item: PageDocumentFieldSummary) => void | Promise<void>;
   onFill: () => void;
   onOpenOptions?: () => void;
@@ -97,6 +109,7 @@ export function AssistantHomeView({
     summary.ready === 0
       ? 'No safe fields ready to fill yet'
       : `Fill ${summary.ready} ready ${summary.ready === 1 ? 'field' : 'fields'}`;
+  const reviewCount = summary.needsReview + teachableUnknownCount;
 
   return (
     <div className="jobflow-panel__body">
@@ -124,6 +137,11 @@ export function AssistantHomeView({
         <CheckCircle2 aria-hidden="true" size={16} />
         {fillLabel}
       </button>
+      {fillStatus !== null ? (
+        <small className="jobflow-panel__status" role="status">
+          {fillStatus}
+        </small>
+      ) : null}
 
       {attachableDocuments.length > 0 ? (
         <section
@@ -175,19 +193,19 @@ export function AssistantHomeView({
         </section>
       ) : null}
 
-      {summary.needsReview > 0 || summary.sensitive > 0 ? (
+      {reviewCount > 0 || summary.sensitive > 0 ? (
         <section className="jobflow-panel__section">
           <div className="jobflow-panel__section-heading">
             <span>Needs attention</span>
           </div>
           <div className="jobflow-panel__menu">
-            {summary.needsReview > 0 ? (
+            {reviewCount > 0 ? (
               <button type="button" onClick={onOpenReview}>
                 <span>
                   <HelpCircle aria-hidden="true" size={15} />
-                  Review ambiguous fields
+                  Review reusable fields
                 </span>
-                <strong>{summary.needsReview}</strong>
+                <strong>{reviewCount}</strong>
               </button>
             ) : null}
             {summary.sensitive > 0 ? (
@@ -345,12 +363,81 @@ export function AssistantPipelineView({
   );
 }
 
+function ReviewItem({
+  item,
+  onRemember,
+}: {
+  item: FillAnalysis;
+  onRemember:
+    | ((context: FieldContext, target: CorrectionTarget) => void)
+    | undefined;
+}) {
+  const label = floatingFieldLabel(item.context);
+  if (item.match.status !== 'review' && item.match.status !== 'review-answer') {
+    return null;
+  }
+
+  return (
+    <div
+      className="jobflow-panel__review"
+      key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+    >
+      <strong>{label}</strong>
+      <div className="jobflow-panel__review-actions">
+        {item.match.status === 'review'
+          ? item.match.candidates.map((candidate) => {
+              const candidateLabel = CANONICAL_FIELD_LABELS[candidate.field];
+              return (
+                <button
+                  className="jobflow-panel__action jobflow-panel__action--secondary"
+                  type="button"
+                  key={candidate.field}
+                  aria-label={`Use ${candidateLabel} for ${label}`}
+                  onClick={() => onRemember?.(item.context, candidate.field)}
+                >
+                  {candidateLabel}
+                </button>
+              );
+            })
+          : item.match.candidates.map((candidate) => (
+              <button
+                className="jobflow-panel__action jobflow-panel__action--secondary"
+                type="button"
+                key={candidate.id}
+                aria-label={`Use ${candidate.label} for ${label}`}
+                onClick={() =>
+                  onRemember?.(
+                    item.context,
+                    reusableAnswerCorrectionTarget(candidate.id),
+                  )
+                }
+              >
+                {candidate.label}
+              </button>
+            ))}
+        <button
+          className="jobflow-panel__action jobflow-panel__action--secondary"
+          type="button"
+          aria-label={`Ignore ${label}`}
+          onClick={() => onRemember?.(item.context, 'ignore')}
+        >
+          Ignore
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function AssistantReviewView({
   reviewItems,
+  unknownItems,
+  reusableAnswers,
   onBack,
   onRemember,
 }: {
   reviewItems: FillAnalysis[];
+  unknownItems: FillAnalysis[];
+  reusableAnswers: ReusableAnswerOption[];
   onBack: () => void;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
 }) {
@@ -367,42 +454,55 @@ export function AssistantReviewView({
         <p className="jobflow-panel__section-label">Review</p>
         <h2>Resolve ambiguous fields</h2>
       </div>
-      {reviewItems.map((item) => {
-        if (item.match.status !== 'review') return null;
-        const label = floatingFieldLabel(item.context);
-        return (
-          <div
-            className="jobflow-panel__review"
-            key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
-          >
-            <strong>{label}</strong>
-            <div className="jobflow-panel__review-actions">
-              {item.match.candidates.map((candidate) => {
-                const candidateLabel = CANONICAL_FIELD_LABELS[candidate.field];
-                return (
+      {reviewItems.map((item) => (
+        <ReviewItem
+          item={item}
+          onRemember={onRemember}
+          key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+        />
+      ))}
+      {unknownItems.length > 0 && reusableAnswers.length > 0 ? (
+        <div>
+          <p className="jobflow-panel__section-label">Teach this form</p>
+          {unknownItems.map((item) => {
+            const label = floatingFieldLabel(item.context);
+            return (
+              <div
+                className="jobflow-panel__review"
+                key={`${item.context.formFingerprint}:${item.context.fieldFingerprint}`}
+              >
+                <strong>{label}</strong>
+                <div className="jobflow-panel__review-actions">
+                  {reusableAnswers.map((answer) => (
+                    <button
+                      className="jobflow-panel__action jobflow-panel__action--secondary"
+                      type="button"
+                      key={answer.id}
+                      aria-label={`Use ${answer.label} for ${label}`}
+                      onClick={() =>
+                        onRemember?.(
+                          item.context,
+                          reusableAnswerCorrectionTarget(answer.id),
+                        )
+                      }
+                    >
+                      {answer.label}
+                    </button>
+                  ))}
                   <button
                     className="jobflow-panel__action jobflow-panel__action--secondary"
                     type="button"
-                    key={candidate.field}
-                    aria-label={`Use ${candidateLabel} for ${label}`}
-                    onClick={() => onRemember?.(item.context, candidate.field)}
+                    aria-label={`Ignore ${label}`}
+                    onClick={() => onRemember?.(item.context, 'ignore')}
                   >
-                    {candidateLabel}
+                    Ignore
                   </button>
-                );
-              })}
-              <button
-                className="jobflow-panel__action jobflow-panel__action--secondary"
-                type="button"
-                aria-label={`Ignore ${label}`}
-                onClick={() => onRemember?.(item.context, 'ignore')}
-              >
-                Ignore
-              </button>
-            </div>
-          </div>
-        );
-      })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
     </section>
   );
 }

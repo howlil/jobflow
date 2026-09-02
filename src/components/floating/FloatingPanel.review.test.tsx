@@ -39,7 +39,7 @@ it('lets the user remember or ignore a Review field after opening review', () =>
 
   fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
   fireEvent.click(
-    screen.getByRole('button', { name: /Review ambiguous fields/i }),
+    screen.getByRole('button', { name: /Review reusable fields/i }),
   );
   fireEvent.click(
     screen.getByRole('button', {
@@ -50,4 +50,49 @@ it('lets the user remember or ignore a Review field after opening review', () =>
   expect(screen.queryByText('personal.legalName.first')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Ignore Name' }));
   expect(remember).toHaveBeenCalledWith(context, 'ignore');
+});
+
+it('lets the user teach an unknown field with an existing reusable answer', () => {
+  const remember = vi.fn();
+  const context = {
+    controlKind: 'textarea' as const,
+    inputType: 'textarea',
+    label: 'Motivation statement',
+    name: 'motivation',
+    id: '',
+    placeholder: '',
+    ariaLabel: '',
+    options: [],
+    sectionText: '',
+    origin: 'site',
+    formFingerprint: 'form',
+    fieldFingerprint: 'unknown-field',
+  };
+
+  render(
+    <FloatingPanel
+      summary={{ ready: 0, needsReview: 0, sensitive: 0, unknown: 1, total: 1 }}
+      unknownItems={[
+        {
+          context,
+          match: { status: 'unknown', reason: 'no-match' },
+        },
+      ]}
+      reusableAnswers={[{ id: 'answer-1', label: 'Why this role?' }]}
+      onFill={vi.fn()}
+      onRemember={remember}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
+  fireEvent.click(
+    screen.getByRole('button', { name: /Review reusable fields/i }),
+  );
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Use Why this role? for Motivation statement',
+    }),
+  );
+
+  expect(remember).toHaveBeenCalledWith(context, 'answer:answer-1');
 });

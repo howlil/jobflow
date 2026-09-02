@@ -1,33 +1,28 @@
 # Current Iteration
 
-**Status:** Idle — Rich Application Lifecycle completed. No next milestone is active.
+**Status:** Idle — Core Autofill Coverage & Verified Fill completed. No next milestone is active.
 
 ## Completed Milestone
 
-**Goal:** Rich Application Lifecycle
+**Goal:** Core Autofill Coverage & Verified Fill
 
-**Outcome:** Pipeline remains a compact operational overview while Application Detail carries the precise opportunity lifecycle, history, important dates, closure outcome, and deterministic next-action guidance.
+**Outcome:** Existing safe profile facts and reusable application answers now flow deterministically through FieldContext → MatchResult → FillPlan → explicit DOM fill, while explicit Fill reports observed success or partial failure without weakening fail-closed behavior.
 
-## Feature Shape Delivered
+## Delivered
 
-- Primary lifecycle: Saved → Applying → Applied → Interview → Offer → Closed.
-- Assessment, recruiter review, technical interview, system design, Accepted, Rejected, and Withdrawn remain lifecycle detail/outcomes rather than extra board columns.
-- Application Detail exposes lifecycle history, important stage dates, explicit closure outcome, and deterministic guidance.
-- Explicit user-entered next actions take precedence over deterministic guidance.
-- Closed opportunities are grouped by Accepted / Rejected / Withdrawn.
-- Existing v1/v2 application data migrates to schema v3 without dropping job context.
-- Lifecycle state remains local-only in the applications domain/service.
-
-## Repository State Preserved
-
-- Lean repository cleanup remains integrated; removed verification/process ceremony is not restored.
-- Toolbar popup remains a compact current-page entry surface; removed readiness/dashboard ceremony is not restored.
-- Supported persistence migrations remain because migration compatibility is not cleanup debt.
-- Playwright browser E2E remains an opt-in diagnostic rather than a mandatory CI/release blocker.
+- Added bounded scalar coverage for address line 1/2, professional summary, and notice period.
+- Added deterministic reusable-answer matching from exact question/tag evidence; similar questions remain Review and unrelated questions remain Unknown.
+- Preserved sensitive classification priority over reusable answers.
+- Added application-variant reusable-answer overrides through stable canonical intents.
+- Extended site/form/field-scoped correction memory to existing reusable answers with v1 → v2 migration compatibility.
+- Preserved deterministic select/radio matching and added explicit yes/no checkbox resolution without guessing unsupported options.
+- Added per-instruction `filled` / `not-found` / `unsupported` DOM outcomes and concise success/partial-failure feedback in the in-page assistant.
+- Added focused regression coverage for matching, migration, choice controls, disappeared controls, partial failure, and visible fill outcomes.
+- Updated stale browser acceptance assertions to the current compact popup, reusable-field review wording, and empty-pipeline behavior.
 
 ## Verification
 
-Required milestone gate:
+Required gate passed on the final implementation head before closure:
 
 ```text
 pnpm test
@@ -38,22 +33,24 @@ pnpm build
 pnpm verify:manifest
 ```
 
-The milestone is complete only with the required repository gate green on its final exact integration head.
+Targeted browser runtime evidence also passed:
 
-## Open Risks / Deferred Scope
+```text
+pnpm test:e2e
+```
 
-No active blocker remains for this milestone.
+## Boundaries Preserved
 
-Deferred until explicitly approved:
+Not introduced:
 
-- backend or cloud sync
-- job discovery
-- AI dependency
-- interview log
-- fit score
-- analytics dashboard
-- unrelated architecture refactors
+- ATS-specific production adapters without reproducible generic-engine failure
+- AI/LLM matching or generated answers
+- experience/education repeated-record autofill
+- automatic Submit / Apply / Next
+- automatic document attachment
+- backend/cloud sync, analytics, job discovery, or Action Queue work
+- browser permission expansion
 
 ## Next Action
 
-STOP. Await the next user-approved milestone; do not invent or auto-activate additional product scope.
+STOP. Await the next user-approved milestone; do not invent or auto-activate scope.

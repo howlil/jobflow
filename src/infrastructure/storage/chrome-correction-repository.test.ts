@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { browser } from 'wxt/browser';
 import { fakeBrowser } from 'wxt/testing/fake-browser';
 
-import type { FieldCorrection } from '../../domain/corrections/correction-schema';
+import {
+  reusableAnswerCorrectionTarget,
+  type FieldCorrection,
+} from '../../domain/corrections/correction-schema';
 import {
   ChromeCorrectionRepository,
   CORRECTION_STORAGE_KEY,
@@ -67,6 +70,22 @@ describe('ChromeCorrectionRepository', () => {
     );
   });
 
+  it('persists reusable-answer correction targets', async () => {
+    const repository = new ChromeCorrectionRepository();
+    const correction = entry({
+      target: reusableAnswerCorrectionTarget('answer-1'),
+    });
+
+    await repository.upsert(correction);
+
+    await expect(repository.listAll()).resolves.toEqual([correction]);
+    await expect(
+      browser.storage.local.get(CORRECTION_STORAGE_KEY),
+    ).resolves.toEqual({
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 2, entries: [correction] },
+    });
+  });
+
   it('lists all corrections for management UI', async () => {
     const repository = new ChromeCorrectionRepository();
     await repository.upsert(entry());
@@ -91,7 +110,22 @@ describe('ChromeCorrectionRepository', () => {
     await expect(
       browser.storage.local.get(CORRECTION_STORAGE_KEY),
     ).resolves.toEqual({
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 2, entries: [correction] },
+    });
+  });
+
+  it('upgrades current v1 correction storage on load', async () => {
+    const correction = entry();
+    await browser.storage.local.set({
       [CORRECTION_STORAGE_KEY]: { schemaVersion: 1, entries: [correction] },
+    });
+    const repository = new ChromeCorrectionRepository();
+
+    await expect(repository.listAll()).resolves.toEqual([correction]);
+    await expect(
+      browser.storage.local.get(CORRECTION_STORAGE_KEY),
+    ).resolves.toEqual({
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 2, entries: [correction] },
     });
   });
 
@@ -135,7 +169,7 @@ describe('ChromeCorrectionRepository', () => {
 
   it('rejects malformed persisted data', async () => {
     await browser.storage.local.set({
-      [CORRECTION_STORAGE_KEY]: { schemaVersion: 1, entries: [{}] },
+      [CORRECTION_STORAGE_KEY]: { schemaVersion: 2, entries: [{}] },
     });
     const repository = new ChromeCorrectionRepository();
     await expect(

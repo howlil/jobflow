@@ -130,24 +130,20 @@ async function launchExtension(userDataDir) {
 }
 
 async function getServiceWorker(context) {
-  let [serviceWorker] = context.serviceWorkers();
-  serviceWorker ??= await context.waitForEvent('serviceworker');
-  return serviceWorker;
+  let [worker] = context.serviceWorkers();
+  worker ??= await context.waitForEvent('serviceworker');
+  return worker;
 }
 
 async function getExtensionId(context) {
-  const serviceWorker = await getServiceWorker(context);
-  const extensionId = serviceWorker.url().split('/')[2];
-  if (!extensionId) {
-    throw new Error(
-      `Could not determine extension id from ${serviceWorker.url()}`,
-    );
-  }
+  const worker = await getServiceWorker(context);
+  const extensionId = worker.url().split('/')[2];
+  if (!extensionId) throw new Error('Could not determine extension id');
   return extensionId;
 }
 
-const userDataDir = await mkdtemp(join(tmpdir(), 'jobflow-e2e-'));
 const fixture = await startFixtureServer();
+const userDataDir = await mkdtemp(join(tmpdir(), 'jobflow-smoke-'));
 let context;
 
 try {
@@ -156,7 +152,6 @@ try {
   let page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-
   await page.getByRole('button', { name: 'Personal', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
   await page.getByLabel('Last name').fill('Tester');
@@ -188,7 +183,12 @@ try {
   );
 
   await page.goto(`chrome-extension://${extensionId}/${popupPath}`);
-  await expect(page.getByText('3 of 6 profile sections ready')).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Current application' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Open workspace' }),
+  ).toBeVisible();
 
   await page.goto(fixture.url);
   await expect(page.locator('jobflow-form-assistant')).toBeAttached();
@@ -217,6 +217,7 @@ try {
     total: 11,
   });
 
+  expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
   await page.getByRole('button', { name: 'Fill 7 ready fields' }).click();
 
   await expect(page.getByLabel('First name')).toHaveValue('Smoke');
@@ -235,14 +236,23 @@ try {
   await expect(page.getByLabel('Date of birth')).toHaveValue('');
   await expect(page.getByLabel('Resume')).toHaveValue('');
   await expect(page.getByLabel('Favorite color')).toHaveValue('');
-
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
   expect(await page.evaluate(() => globalThis.__eventLog)).toEqual(
     expect.arrayContaining([
       'first_name:input',
       'first_name:change',
+      'last_name:input',
+      'last_name:change',
+      'email:input',
+      'email:change',
+      'phone:input',
+      'phone:change',
+      'city:input',
       'city:change',
+      'linkedin:input',
+      'linkedin:change',
       'github:input',
+      'github:change',
     ]),
   );
 } finally {

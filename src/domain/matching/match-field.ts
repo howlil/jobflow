@@ -85,6 +85,26 @@ const ALIASES: AliasDefinition[] = [
     aliases: ['whatsapp', 'whatsapp number', 'nomor whatsapp'],
   },
   {
+    field: 'contact.address.line1',
+    aliases: [
+      'address',
+      'address line 1',
+      'street address',
+      'street address line 1',
+      'alamat',
+      'alamat jalan',
+    ],
+  },
+  {
+    field: 'contact.address.line2',
+    aliases: [
+      'address line 2',
+      'street address line 2',
+      'apartment suite unit',
+      'alamat baris 2',
+    ],
+  },
+  {
     field: 'contact.address.city',
     aliases: [
       'city',
@@ -128,6 +148,16 @@ const ALIASES: AliasDefinition[] = [
     aliases: ['professional headline', 'career headline', 'headline'],
   },
   {
+    field: 'professional.summary',
+    aliases: [
+      'professional summary',
+      'career summary',
+      'profile summary',
+      'professional profile',
+      'ringkasan profesional',
+    ],
+  },
+  {
     field: 'jobPreferences.willingToRelocate',
     aliases: [
       'willing to relocate',
@@ -151,6 +181,15 @@ const ALIASES: AliasDefinition[] = [
       'available from',
       'available start date',
       'tanggal mulai tersedia',
+    ],
+  },
+  {
+    field: 'jobPreferences.noticePeriod',
+    aliases: [
+      'notice period',
+      'current notice period',
+      'required notice period',
+      'masa pemberitahuan',
     ],
   },
 ];

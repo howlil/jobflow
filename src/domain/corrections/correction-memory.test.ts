@@ -5,6 +5,7 @@ import { matchFieldWithCorrections } from '../matching/match-field-with-correcti
 import {
   createEmptyStoredCorrections,
   parseStoredCorrections,
+  reusableAnswerCorrectionTarget,
   type FieldCorrection,
 } from './correction-schema';
 
@@ -77,6 +78,50 @@ describe('correction memory', () => {
     ).toEqual({ status: 'unknown', reason: 'user-ignored' });
   });
 
+  it('resolves a remembered reusable answer only when the answer still exists', () => {
+    const target = reusableAnswerCorrectionTarget('answer-1');
+    const answers = [
+      {
+        id: 'answer-1',
+        question: 'Why this role?',
+        answer: 'Because it matches my experience.',
+        canonicalIntent: 'application.motivation.role',
+        tags: [],
+      },
+    ];
+
+    expect(
+      matchFieldWithCorrections(
+        field({ label: 'Motivation statement' }),
+        [correction({ target })],
+        answers,
+      ),
+    ).toEqual({
+      status: 'ready-answer',
+      answerId: 'answer-1',
+      reason: 'user-correction',
+      sensitivity: 'normal',
+    });
+  });
+
+  it('keeps canonical ambiguity in Review ahead of automatic reusable answers', () => {
+    expect(
+      matchFieldWithCorrections(
+        field({ label: 'Name' }),
+        [],
+        [
+          {
+            id: 'name-answer',
+            question: 'Name',
+            answer: 'Do not auto-fill this answer',
+            canonicalIntent: 'custom.name',
+            tags: [],
+          },
+        ],
+      ),
+    ).toMatchObject({ status: 'review' });
+  });
+
   it('never lets a correction override sensitive or file fail-closed guards', () => {
     expect(
       matchFieldWithCorrections(field({ label: 'Date of birth' }), [
@@ -97,21 +142,30 @@ describe('correction memory', () => {
     ).toEqual({ status: 'unknown', reason: 'file-input' });
   });
 
-  it('creates and parses a versioned mapping-only correction envelope', () => {
+  it('creates and parses a versioned correction envelope', () => {
     const envelope = createEmptyStoredCorrections();
     envelope.entries.push(correction());
 
     expect(parseStoredCorrections(envelope)).toEqual(envelope);
   });
 
+  it('upgrades v1 envelopes without losing canonical corrections', () => {
+    expect(
+      parseStoredCorrections({
+        schemaVersion: 1,
+        entries: [correction()],
+      }),
+    ).toEqual({ schemaVersion: 2, entries: [correction()] });
+  });
+
   it('rejects future schema versions and unsupported correction targets', () => {
     expect(() =>
-      parseStoredCorrections({ schemaVersion: 2, entries: [] }),
+      parseStoredCorrections({ schemaVersion: 3, entries: [] }),
     ).toThrow();
 
     expect(() =>
       parseStoredCorrections({
-        schemaVersion: 1,
+        schemaVersion: 2,
         entries: [correction({ target: 'ignore' })].map((entry) => ({
           ...entry,
           target: 'sensitive.dateOfBirth',

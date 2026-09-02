@@ -1,11 +1,10 @@
-import type { FillInstruction } from '../../application/prepare-fill/prepare-fill-plan';
+import type {
+  FillExecutionResult,
+  FillInstruction,
+  FillValue,
+} from '../../application/prepare-fill/prepare-fill-plan';
 import { normalizeFieldText } from '../../domain/matching/normalize-field-text';
 import { scanDomFields, type ScannedDomField } from './extract-field-contexts';
-
-export type FillResult = {
-  fieldFingerprint: string;
-  status: 'filled' | 'not-found' | 'unsupported';
-};
 
 function dispatchEvents(control: HTMLElement, includeInput = true): void {
   if (includeInput) {
@@ -83,6 +82,16 @@ function fillRadio(field: ScannedDomField, value: string): boolean {
   return true;
 }
 
+function booleanValue(value: FillValue): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value !== 'string') return null;
+
+  const normalized = normalizeFieldText(value);
+  if (['yes', 'true', '1', 'ya', 'iya'].includes(normalized)) return true;
+  if (['no', 'false', '0', 'tidak'].includes(normalized)) return false;
+  return null;
+}
+
 function fillField(
   field: ScannedDomField,
   instruction: FillInstruction,
@@ -98,8 +107,9 @@ function fillField(
 
   if (instruction.controlKind === 'checkbox') {
     if (!(first instanceof HTMLInputElement)) return false;
-    if (typeof instruction.value !== 'boolean') return false;
-    setChecked(first, instruction.value);
+    const checked = booleanValue(instruction.value);
+    if (checked === null) return false;
+    setChecked(first, checked);
     return true;
   }
 
@@ -128,7 +138,7 @@ export function applyFillInstructions(
   root: ParentNode,
   origin: string,
   instructions: FillInstruction[],
-): FillResult[] {
+): FillExecutionResult[] {
   const fields = scanDomFields(root, origin);
   const byFingerprint = new Map(
     fields.map((field) => [field.context.fieldFingerprint, field]),

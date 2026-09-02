@@ -6,6 +6,8 @@ export const CANONICAL_FIELDS = [
   'contact.email.primary',
   'contact.phone.primary',
   'contact.whatsapp',
+  'contact.address.line1',
+  'contact.address.line2',
   'contact.address.city',
   'contact.address.state',
   'contact.address.country',
@@ -14,9 +16,11 @@ export const CANONICAL_FIELDS = [
   'links.github',
   'links.portfolio',
   'professional.headline',
+  'professional.summary',
   'jobPreferences.willingToRelocate',
   'jobPreferences.willingToTravel',
   'jobPreferences.availabilityDate',
+  'jobPreferences.noticePeriod',
 ] as const;
 
 export type CanonicalField = (typeof CANONICAL_FIELDS)[number];

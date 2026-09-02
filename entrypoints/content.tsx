@@ -162,6 +162,8 @@ export default defineContentScript({
           <FloatingPanel
             summary={currentContext.analysis.summary}
             reviewItems={currentContext.analysis.plan.needsReview}
+            unknownItems={currentContext.analysis.plan.unknown}
+            reusableAnswers={currentContext.reusableAnswers}
             sensitiveItems={currentContext.analysis.plan.sensitive}
             documentFields={currentContext.documentFields}
             vaultStatus={currentVaultStatus}
@@ -173,8 +175,8 @@ export default defineContentScript({
               signals: collectPageSignals(document),
             })}
             onFill={() => {
-              if (currentContext === null) return;
-              applyFillInstructions(
+              if (currentContext === null) return [];
+              return applyFillInstructions(
                 document,
                 location.origin,
                 currentContext.analysis.plan.ready,
