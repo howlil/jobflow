@@ -17,7 +17,7 @@ it('reports verified partial fill outcomes to the user', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
   fireEvent.click(screen.getByRole('button', { name: 'Fill 2 ready fields' }));
 
-  expect(screen.getByRole('status')).toHaveTextContent(
+  expect(screen.getByRole('status').textContent).toBe(
     '1 of 2 fields filled. 1 need manual input.',
   );
 });
