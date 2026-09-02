@@ -4,9 +4,13 @@ import { PanelRightClose } from 'lucide-react';
 import type { ApplicationDraft } from '../../application/applications/application-service';
 import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
-import type { FillAnalysis } from '../../application/prepare-fill/prepare-fill-plan';
+import type {
+  FillAnalysis,
+  FillExecutionResult,
+} from '../../application/prepare-fill/prepare-fill-plan';
 import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
+import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
 import {
   AssistantHomeView,
   AssistantPipelineView,
@@ -22,6 +26,8 @@ type AssistantView = 'home' | 'pipeline' | 'review' | 'sensitive';
 type FloatingPanelProps = {
   summary: PageAnalysisSummary;
   reviewItems?: FillAnalysis[];
+  unknownItems?: FillAnalysis[];
+  reusableAnswers?: ReusableAnswerOption[];
   sensitiveItems?: FillAnalysis[];
   documentFields?: PageDocumentFieldSummary[];
   vaultStatus?: SensitiveVaultStatus;
@@ -29,7 +35,7 @@ type FloatingPanelProps = {
   siteHost?: string;
   variantName?: string | null;
   applicationDraft?: ApplicationDraft | null;
-  onFill: () => void;
+  onFill: () => FillExecutionResult[] | void;
   onSaveApplication?: (draft: ApplicationDraft) => Promise<void>;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
   onOpenOptions?: () => void;
@@ -44,6 +50,8 @@ type FloatingPanelProps = {
 export function FloatingPanel({
   summary,
   reviewItems = [],
+  unknownItems = [],
+  reusableAnswers = [],
   sensitiveItems = [],
   documentFields = [],
   vaultStatus,
@@ -68,7 +76,20 @@ export function FloatingPanel({
   const [applicationStatus, setApplicationStatus] = useState<string | null>(
     null,
   );
-  const attentionCount = summary.needsReview + summary.sensitive;
+  const [fillStatus, setFillStatus] = useState<string | null>(null);
+  const teachableUnknownItems = useMemo(
+    () =>
+      reusableAnswers.length === 0
+        ? []
+        : unknownItems.filter(
+            (item) =>
+              item.context.controlKind !== 'file' &&
+              item.context.inputType !== 'file',
+          ),
+    [reusableAnswers, unknownItems],
+  );
+  const attentionCount =
+    summary.needsReview + summary.sensitive + teachableUnknownItems.length;
   const attachableDocuments = useMemo(
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
@@ -103,6 +124,19 @@ export function FloatingPanel({
     setDocumentStatus((current) => ({ ...current, [key]: message }));
   }
 
+  function fillReadyFields() {
+    const results = onFill();
+    if (results === undefined) return;
+
+    const filled = results.filter((result) => result.status === 'filled').length;
+    const failed = results.length - filled;
+    setFillStatus(
+      failed === 0
+        ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled.`
+        : `${filled} of ${results.length} fields filled. ${failed} need manual input.`,
+    );
+  }
+
   return (
     <aside
       className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`}
@@ -131,8 +165,10 @@ export function FloatingPanel({
               summary={summary}
               attachableDocuments={attachableDocuments}
               documentStatus={documentStatus}
+              fillStatus={fillStatus}
+              teachableUnknownCount={teachableUnknownItems.length}
               onAttachDocument={attachDocument}
-              onFill={onFill}
+              onFill={fillReadyFields}
               onOpenReview={() => setView('review')}
               onOpenSensitive={() => setView('sensitive')}
               {...(applicationDraft === null || onSaveApplication === undefined
@@ -166,6 +202,8 @@ export function FloatingPanel({
           {view === 'review' ? (
             <AssistantReviewView
               reviewItems={reviewItems}
+              unknownItems={teachableUnknownItems}
+              reusableAnswers={reusableAnswers}
               onBack={() => setView('home')}
               {...(onRemember === undefined ? {} : { onRemember })}
             />
