@@ -33,7 +33,8 @@ describe('core autofill coverage', () => {
     ).baseProfile;
     profile.contact.address.line1 = '123 Example Street';
     profile.contact.address.line2 = 'Unit 5';
-    profile.professional.summary = 'Backend engineer focused on reliable systems.';
+    profile.professional.summary =
+      'Backend engineer focused on reliable systems.';
     profile.jobPreferences.noticePeriod = '30 days';
 
     const analysis = analyzeFieldContexts(

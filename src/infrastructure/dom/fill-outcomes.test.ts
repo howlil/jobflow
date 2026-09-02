@@ -107,20 +107,24 @@ describe('verified fill outcomes', () => {
     const last = contexts.find((item) => item.name === 'last_name')!;
     document.querySelector('[name="first_name"]')?.remove();
 
-    const results = applyFillInstructions(document, 'https://jobs.example.test', [
-      {
-        fieldFingerprint: first.fieldFingerprint,
-        field: 'personal.legalName.first',
-        value: 'Maya',
-        controlKind: 'input',
-      },
-      {
-        fieldFingerprint: last.fieldFingerprint,
-        field: 'personal.legalName.last',
-        value: 'Putri',
-        controlKind: 'input',
-      },
-    ]);
+    const results = applyFillInstructions(
+      document,
+      'https://jobs.example.test',
+      [
+        {
+          fieldFingerprint: first.fieldFingerprint,
+          field: 'personal.legalName.first',
+          value: 'Maya',
+          controlKind: 'input',
+        },
+        {
+          fieldFingerprint: last.fieldFingerprint,
+          field: 'personal.legalName.last',
+          value: 'Putri',
+          controlKind: 'input',
+        },
+      ],
+    );
 
     expect(results).toEqual([
       { fieldFingerprint: first.fieldFingerprint, status: 'not-found' },

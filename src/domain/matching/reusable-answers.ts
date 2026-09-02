@@ -33,9 +33,7 @@ export type ReusableAnswerMatchResult =
 
 function answerLabel(answer: ReusableAnswer): string {
   return (
-    answer.question.trim() ||
-    answer.canonicalIntent.trim() ||
-    'Reusable answer'
+    answer.question.trim() || answer.canonicalIntent.trim() || 'Reusable answer'
   );
 }
 
@@ -48,12 +46,7 @@ export function reusableAnswerOptions(
 }
 
 function contextSignals(context: FieldContext): string[] {
-  return [
-    context.label,
-    context.ariaLabel,
-    context.placeholder,
-    context.name,
-  ]
+  return [context.label, context.ariaLabel, context.placeholder, context.name]
     .map(normalizeFieldText)
     .filter(Boolean);
 }

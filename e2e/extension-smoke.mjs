@@ -183,8 +183,12 @@ try {
   );
 
   await page.goto(`chrome-extension://${extensionId}/${popupPath}`);
-  await expect(page.getByRole('heading', { name: 'Current application' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Open workspace' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Current application' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Open workspace' }),
+  ).toBeVisible();
 
   await page.goto(fixture.url);
   await expect(page.locator('jobflow-form-assistant')).toBeAttached();

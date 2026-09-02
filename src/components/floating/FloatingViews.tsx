@@ -368,7 +368,9 @@ function ReviewItem({
   onRemember,
 }: {
   item: FillAnalysis;
-  onRemember: ((context: FieldContext, target: CorrectionTarget) => void) | undefined;
+  onRemember:
+    | ((context: FieldContext, target: CorrectionTarget) => void)
+    | undefined;
 }) {
   const label = floatingFieldLabel(item.context);
   if (item.match.status !== 'review' && item.match.status !== 'review-answer') {

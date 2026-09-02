@@ -128,7 +128,9 @@ export function FloatingPanel({
     const results = onFill();
     if (results === undefined) return;
 
-    const filled = results.filter((result) => result.status === 'filled').length;
+    const filled = results.filter(
+      (result) => result.status === 'filled',
+    ).length;
     const failed = results.length - filled;
     setFillStatus(
       failed === 0
