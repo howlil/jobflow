@@ -5,12 +5,23 @@ import type { SensitiveCanonicalField } from '../../domain/matching/sensitive-fi
 import type { BaseProfile } from '../../domain/profile/profile-schema';
 
 export type FillValue = string | boolean | string[];
+export type FillInstructionField =
+  | CanonicalField
+  | SensitiveCanonicalField
+  | `customAnswer:${string}`;
 
 export type FillInstruction = {
   fieldFingerprint: string;
-  field: CanonicalField | SensitiveCanonicalField;
+  field: FillInstructionField;
   value: FillValue;
   controlKind: FieldContext['controlKind'];
+};
+
+export type FillExecutionStatus = 'filled' | 'not-found' | 'unsupported';
+
+export type FillExecutionResult = {
+  fieldFingerprint: string;
+  status: FillExecutionStatus;
 };
 
 export type FillAnalysis = {
@@ -50,6 +61,10 @@ function profileValue(
       return primaryValue(profile.contact.phones);
     case 'contact.whatsapp':
       return profile.contact.whatsapp;
+    case 'contact.address.line1':
+      return profile.contact.address.line1;
+    case 'contact.address.line2':
+      return profile.contact.address.line2;
     case 'contact.address.city':
       return profile.contact.address.city;
     case 'contact.address.state':
@@ -66,12 +81,16 @@ function profileValue(
       return profile.links.portfolio;
     case 'professional.headline':
       return profile.professional.headline;
+    case 'professional.summary':
+      return profile.professional.summary;
     case 'jobPreferences.willingToRelocate':
       return profile.jobPreferences.willingToRelocate;
     case 'jobPreferences.willingToTravel':
       return profile.jobPreferences.willingToTravel;
     case 'jobPreferences.availabilityDate':
       return profile.jobPreferences.availabilityDate;
+    case 'jobPreferences.noticePeriod':
+      return profile.jobPreferences.noticePeriod;
   }
 }
 
@@ -94,7 +113,10 @@ export function prepareFillPlan(
   };
 
   for (const item of analysis) {
-    if (item.match.status === 'review') {
+    if (
+      item.match.status === 'review' ||
+      item.match.status === 'review-answer'
+    ) {
       plan.needsReview.push(item);
       continue;
     }
@@ -106,6 +128,23 @@ export function prepareFillPlan(
 
     if (item.match.status === 'sensitive') {
       plan.sensitive.push(item);
+      continue;
+    }
+
+    if (item.match.status === 'ready-answer') {
+      const answer = profile.customAnswers.find(
+        (candidate) => candidate.id === item.match.answerId,
+      );
+      if (answer === undefined || answer.answer.trim().length === 0) {
+        plan.unknown.push(item);
+        continue;
+      }
+      plan.ready.push({
+        fieldFingerprint: item.context.fieldFingerprint,
+        field: `customAnswer:${answer.id}`,
+        value: answer.answer,
+        controlKind: item.context.controlKind,
+      });
       continue;
     }
 
