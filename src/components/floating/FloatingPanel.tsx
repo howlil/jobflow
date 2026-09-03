@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PanelRightClose } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import type { ApplicationDraft } from '../../application/applications/application-service';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
@@ -183,6 +184,7 @@ export function FloatingPanel({
     null,
   );
   const [fillStatus, setFillStatus] = useState<string | null>(null);
+  const reduceMotion = useReducedMotion();
   const teachableUnknownItems = useMemo(
     () =>
       reusableAnswers.length === 0
@@ -266,101 +268,131 @@ export function FloatingPanel({
       className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`}
       aria-label="Job Flow form assistant"
     >
-      {isOpen ? (
-        <section className="jobflow-panel" aria-label="Job Flow assistant menu">
-          <header className="jobflow-panel__header">
-            <div>
-              <span className="jobflow-panel__eyebrow">Job Flow</span>
-              <strong>{variantName || 'Application assistant'}</strong>
-              <span className="jobflow-panel__host">{siteHost}</span>
-            </div>
-            <button
-              className="jobflow-panel__icon-button"
-              type="button"
-              aria-label="Close Job Flow"
-              onClick={() => setIsOpen(false)}
-            >
-              <PanelRightClose aria-hidden="true" size={18} />
-            </button>
-          </header>
+      <AnimatePresence initial={false}>
+        {isOpen ? (
+          <motion.section
+            className="jobflow-panel"
+            aria-label="Job Flow assistant menu"
+            initial={reduceMotion ? false : { opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 16 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.18, ease: 'easeOut' }
+            }
+          >
+            <header className="jobflow-panel__header">
+              <div>
+                <span className="jobflow-panel__eyebrow">Job Flow</span>
+                <strong>{variantName || 'Application assistant'}</strong>
+                <span className="jobflow-panel__host">{siteHost}</span>
+              </div>
+              <button
+                className="jobflow-panel__icon-button"
+                type="button"
+                aria-label="Close Job Flow"
+                onClick={() => setIsOpen(false)}
+              >
+                <PanelRightClose aria-hidden="true" size={18} />
+              </button>
+            </header>
 
-          {view === 'home' ? (
-            <>
-              <ApplicationProfileSection
-                variantOptions={variantOptions}
-                activeVariantId={activeVariantId}
-                variantRecommendation={variantRecommendation}
-                {...(onSelectVariant === undefined ? {} : { onSelectVariant })}
-              />
-              <CompletionCoverage summary={summary} />
-              <AssistantHomeView
-                summary={summary}
-                attachableDocuments={attachableDocuments}
-                documentStatus={documentStatus}
-                fillStatus={fillStatus}
-                teachableUnknownCount={teachableUnknownItems.length}
-                onAttachDocument={attachDocument}
-                onFill={fillReadyFields}
-                onOpenReview={() => setView('review')}
-                onOpenSensitive={() => setView('sensitive')}
-                {...(applicationDraft === null ||
-                onSaveApplication === undefined
-                  ? {}
-                  : { onOpenPipeline: () => setView('pipeline') })}
-                {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-              />
-            </>
-          ) : null}
-
-          {view === 'pipeline' &&
-          applicationDraft !== null &&
-          onSaveApplication !== undefined ? (
-            <AssistantPipelineView
-              initialDraft={applicationDraft}
-              status={applicationStatus}
-              onBack={() => setView('home')}
-              onSave={async (draft) => {
-                setApplicationStatus('Saving...');
-                try {
-                  await onSaveApplication(draft);
-                  setApplicationStatus('Saved to pipeline.');
-                } catch {
-                  setApplicationStatus(
-                    'Company, role, and a valid URL are required.',
-                  );
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                className="jobflow-panel__view"
+                key={view}
+                initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -3 }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 0.12, ease: 'easeOut' }
                 }
-              }}
-            />
-          ) : null}
+              >
+                {view === 'home' ? (
+                  <>
+                    <ApplicationProfileSection
+                      variantOptions={variantOptions}
+                      activeVariantId={activeVariantId}
+                      variantRecommendation={variantRecommendation}
+                      {...(onSelectVariant === undefined
+                        ? {}
+                        : { onSelectVariant })}
+                    />
+                    <CompletionCoverage summary={summary} />
+                    <AssistantHomeView
+                      summary={summary}
+                      attachableDocuments={attachableDocuments}
+                      documentStatus={documentStatus}
+                      fillStatus={fillStatus}
+                      teachableUnknownCount={teachableUnknownItems.length}
+                      onAttachDocument={attachDocument}
+                      onFill={fillReadyFields}
+                      onOpenReview={() => setView('review')}
+                      onOpenSensitive={() => setView('sensitive')}
+                      {...(applicationDraft === null ||
+                      onSaveApplication === undefined
+                        ? {}
+                        : { onOpenPipeline: () => setView('pipeline') })}
+                      {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
+                    />
+                  </>
+                ) : null}
 
-          {view === 'review' ? (
-            <AssistantReviewView
-              reviewItems={reviewItems}
-              unknownItems={teachableUnknownItems}
-              reusableAnswers={reusableAnswers}
-              onBack={() => setView('home')}
-              {...(onRemember === undefined ? {} : { onRemember })}
-            />
-          ) : null}
+                {view === 'pipeline' &&
+                applicationDraft !== null &&
+                onSaveApplication !== undefined ? (
+                  <AssistantPipelineView
+                    initialDraft={applicationDraft}
+                    status={applicationStatus}
+                    onBack={() => setView('home')}
+                    onSave={async (draft) => {
+                      setApplicationStatus('Saving...');
+                      try {
+                        await onSaveApplication(draft);
+                        setApplicationStatus('Saved to pipeline.');
+                      } catch {
+                        setApplicationStatus(
+                          'Company, role, and a valid URL are required.',
+                        );
+                      }
+                    }}
+                  />
+                ) : null}
 
-          {view === 'sensitive' ? (
-            <AssistantSensitiveView
-              sensitiveItems={sensitiveItems}
-              sensitiveError={sensitiveError}
-              passphrase={passphrase}
-              siteHost={siteHost}
-              onBack={() => setView('home')}
-              onPassphraseChange={setPassphrase}
-              {...(vaultStatus === undefined ? {} : { vaultStatus })}
-              {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-              {...(onUnlockSensitive === undefined
-                ? {}
-                : { onUnlockSensitive })}
-              {...(onFillSensitive === undefined ? {} : { onFillSensitive })}
-            />
-          ) : null}
-        </section>
-      ) : null}
+                {view === 'review' ? (
+                  <AssistantReviewView
+                    reviewItems={reviewItems}
+                    unknownItems={teachableUnknownItems}
+                    reusableAnswers={reusableAnswers}
+                    onBack={() => setView('home')}
+                    {...(onRemember === undefined ? {} : { onRemember })}
+                  />
+                ) : null}
+
+                {view === 'sensitive' ? (
+                  <AssistantSensitiveView
+                    sensitiveItems={sensitiveItems}
+                    sensitiveError={sensitiveError}
+                    passphrase={passphrase}
+                    siteHost={siteHost}
+                    onBack={() => setView('home')}
+                    onPassphraseChange={setPassphrase}
+                    {...(vaultStatus === undefined ? {} : { vaultStatus })}
+                    {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
+                    {...(onUnlockSensitive === undefined
+                      ? {}
+                      : { onUnlockSensitive })}
+                    {...(onFillSensitive === undefined ? {} : { onFillSensitive })}
+                  />
+                ) : null}
+              </motion.div>
+            </AnimatePresence>
+          </motion.section>
+        ) : null}
+      </AnimatePresence>
 
       <button
         className="jobflow-launcher"
