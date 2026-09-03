@@ -32,10 +32,13 @@ if (JSON.stringify(matches) !== JSON.stringify(expectedMatches)) {
   );
 }
 
-if (!manifest.action?.default_popup) {
-  throw new Error('Popup entrypoint missing from manifest');
+if (!manifest.action) {
+  throw new Error('Toolbar action missing from manifest');
+}
+if (manifest.action.default_popup) {
+  throw new Error('Toolbar action must not use a popup surface');
 }
 
 if (!manifest.options_ui?.page && !manifest.options_page) {
-  throw new Error('Options entrypoint missing from manifest');
+  throw new Error('Workspace entrypoint missing from manifest');
 }
