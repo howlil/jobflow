@@ -112,7 +112,6 @@ function waitForRecordIncrease(
     }
 
     let settled = false;
-    let timer: ReturnType<typeof setTimeout>;
     const observer = new MutationObserver(() => {
       if (detectedRecordCount(root, origin, kind) > previousCount) {
         finish(true);
@@ -127,7 +126,7 @@ function waitForRecordIncrease(
     };
 
     observer.observe(observerRoot, { childList: true, subtree: true });
-    timer = setTimeout(() => {
+    const timer = setTimeout(() => {
       finish(detectedRecordCount(root, origin, kind) > previousCount);
     }, timeoutMs);
   });
