@@ -108,7 +108,7 @@ export function CorrectionMemorySection({
         </StatusMessage>
       ) : null}
       {!loaded ? (
-        <p className="m-0 text-xs leading-5 text-app-text">
+        <p className="m-0 text-[13px] leading-5 text-app-text">
           Loading learned mappings…
         </p>
       ) : null}
@@ -124,7 +124,6 @@ export function CorrectionMemorySection({
               key={origin}
               action={
                 <Button
-                  className="min-h-8 px-2 py-1"
                   aria-label={`Reset ${label}`}
                   onClick={() => void resetOrigin(origin)}
                 >
@@ -148,12 +147,12 @@ export function CorrectionMemorySection({
                     >
                       <div className="grid min-w-0 gap-1.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          <strong className="text-xs font-semibold text-app-ink">
+                          <strong className="text-sm font-semibold text-app-ink">
                             {entry.target}
                           </strong>
                           {stale ? <Chip>Review stale</Chip> : null}
                         </div>
-                        <div className="break-all text-[11px] leading-4 text-app-subtle">
+                        <div className="break-all font-mono text-xs leading-5 text-app-subtle">
                           Form {entry.formFingerprint} · Field{' '}
                           {entry.fieldFingerprint}
                         </div>
@@ -186,7 +185,7 @@ export function CorrectionMemorySection({
           </ActionRow>
         ) : (
           <div className="grid gap-3 border-t border-app-border pt-4">
-            <p className="m-0 text-xs leading-5 text-app-text">
+            <p className="m-0 text-[13px] leading-5 text-app-text">
               This removes all learned field corrections from local storage.
             </p>
             <ActionRow>

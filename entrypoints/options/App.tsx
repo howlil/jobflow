@@ -38,10 +38,10 @@ const applicationService = createApplicationService(applicationRepository);
 
 const saveIndicatorTone: Record<ProfileSaveState, string> = {
   clean: 'bg-app-border-strong',
-  dirty: 'bg-amber-600',
+  dirty: 'bg-app-warning',
   saving: 'bg-app-ink',
-  saved: 'bg-emerald-700',
-  error: 'bg-red-700',
+  saved: 'bg-app-success',
+  error: 'bg-app-danger',
 };
 
 export default function App() {
@@ -71,7 +71,7 @@ export default function App() {
   ) : (
     <div className="flex items-center gap-2" role="status" aria-live="polite">
       <span
-        className={`h-2 w-2 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
         aria-hidden="true"
       />
       <span>{saveStatus.text}</span>
@@ -84,7 +84,7 @@ export default function App() {
       title={WORKSPACE_SECTION_TITLES[activeSection]}
       meta={workspaceMeta}
     >
-      <div className="grid gap-5">
+      <div className="grid gap-0">
         {activeSection === 'documents' ? (
           <CvImportSection
             workflow={cvImportWorkflow}

@@ -51,6 +51,22 @@ describe('options App', () => {
     ).not.toBeNull();
   });
 
+  it('explicitly expands and collapses the desktop sidebar', () => {
+    render(<App />);
+
+    const expand = screen.getByRole('button', { name: 'Expand sidebar' });
+    expect(expand.getAttribute('aria-expanded')).toBe('false');
+
+    fireEvent.click(expand);
+    const collapse = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(collapse.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(collapse);
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).not.toBeNull();
+  });
+
   it('preserves an unsaved profile draft while visiting Autofill Memory', async () => {
     render(<App />);
 

@@ -1,18 +1,25 @@
 export const FLOATING_STYLES = `
 .jobflow-assistant {
+  --jobflow-bg: #fafafa;
   --jobflow-surface: #ffffff;
   --jobflow-surface-glass: rgba(255, 255, 255, .94);
   --jobflow-surface-subtle: #f7f7f7;
+  --jobflow-surface-muted: #f7f7f7;
   --jobflow-text: #171717;
-  --jobflow-muted: #666666;
-  --jobflow-border: #e5e5e5;
-  --jobflow-border-strong: #d4d4d4;
-  --jobflow-danger: #a61b12;
-  --jobflow-danger-bg: #fff2f0;
+  --jobflow-muted: #525252;
+  --jobflow-subtle: #737373;
+  --jobflow-border: #dedede;
+  --jobflow-border-strong: #c9c9c9;
+  --jobflow-accent: #171717;
+  --jobflow-accent-strong: #0a0a0a;
+  --jobflow-accent-soft: #e5e5e5;
+  --jobflow-danger: #dc2626;
+  --jobflow-danger-bg: #fef2f2;
+  --jobflow-shadow-overlay: 0 12px 28px rgba(0, 0, 0, .14);
   --jobflow-shadow-popover: 0 18px 48px rgba(23, 23, 23, .16);
   color: var(--jobflow-text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 13px;
+  font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
   line-height: 1.45;
   pointer-events: none;
 }
@@ -76,7 +83,7 @@ export const FLOATING_STYLES = `
   height: 20px;
   place-items: center;
   padding: 0 4px;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--jobflow-surface);
   border-radius: 999px;
   background: #171717;
   color: #ffffff;
@@ -86,38 +93,29 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel {
   position: fixed;
-  z-index: 2147483646;
+  z-index: 2147483647;
   right: 18px;
   bottom: 78px;
   display: flex;
-  width: min(390px, calc(100vw - 36px));
-  max-height: min(640px, calc(100vh - 108px));
   flex-direction: column;
+  width: min(392px, calc(100vw - 28px));
+  max-height: min(640px, calc(100vh - 104px));
   overflow: hidden;
-  border: 1px solid var(--jobflow-border);
+  border: 1px solid var(--jobflow-border-strong);
   border-radius: 16px;
-  background: var(--jobflow-surface-glass);
+  background: rgba(255, 255, 255, .98);
   box-shadow: var(--jobflow-shadow-popover);
-  backdrop-filter: blur(18px);
-  animation: jobflow-popup-in 140ms cubic-bezier(.2, .8, .2, 1);
-}
-
-.jobflow-panel button,
-.jobflow-panel input,
-.jobflow-panel textarea,
-.jobflow-panel select {
-  font: inherit;
+  backdrop-filter: blur(16px);
+  animation: jobflow-popup-in 140ms ease-out;
 }
 
 .jobflow-panel__header {
   display: flex;
-  min-height: 58px;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 14px 14px 10px;
   border-bottom: 1px solid var(--jobflow-border);
-  background: rgba(255, 255, 255, .92);
 }
 
 .jobflow-panel__header > div {
@@ -126,23 +124,21 @@ export const FLOATING_STYLES = `
   gap: 2px;
 }
 
-.jobflow-panel__header strong {
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 720;
-  letter-spacing: -.018em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.jobflow-panel__eyebrow,
-.jobflow-panel__section-label,
-.jobflow-panel__section-heading span {
+.jobflow-panel__eyebrow {
   color: var(--jobflow-muted);
   font-size: 10px;
-  font-weight: 740;
-  letter-spacing: .07em;
+  font-weight: 750;
+  letter-spacing: .08em;
   text-transform: uppercase;
+}
+
+.jobflow-panel__header strong {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 720;
+  letter-spacing: -.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .jobflow-panel__host {
@@ -155,8 +151,8 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__icon-button {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
@@ -600,6 +596,24 @@ export const FLOATING_STYLES = `
     width: calc(100vw - 24px);
     max-height: calc(100vh - 92px);
     border-radius: 14px;
+  }
+}
+
+@media (any-pointer: coarse) {
+  .jobflow-panel__icon-button,
+  .jobflow-panel__fill,
+  .jobflow-panel__action,
+  .jobflow-panel__action--secondary,
+  .jobflow-panel__action--primary,
+  .jobflow-panel__back,
+  .jobflow-panel__unlock input,
+  .jobflow-panel__form input,
+  .jobflow-panel__form select {
+    min-height: 44px;
+  }
+
+  .jobflow-panel__icon-button {
+    min-width: 44px;
   }
 }
 

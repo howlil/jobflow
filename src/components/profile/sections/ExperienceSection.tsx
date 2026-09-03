@@ -98,7 +98,7 @@ export function ExperienceSection({
                         {experience.title || 'Untitled role'}
                       </span>
                       {summaryContext === '' ? null : (
-                        <span className="truncate text-[11px] font-medium text-app-subtle">
+                        <span className="truncate text-[13px] font-medium text-app-subtle">
                           {summaryContext}
                         </span>
                       )}

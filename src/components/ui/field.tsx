@@ -26,7 +26,7 @@ export function FieldFrame({
   return (
     <label
       className={classes(
-        'grid min-w-0 content-start gap-1.5 text-xs font-semibold text-app-text',
+        'grid min-w-0 content-start gap-1.5 text-[13px] font-medium text-app-text',
         className,
       )}
       {...props}
@@ -34,11 +34,11 @@ export function FieldFrame({
       <span>{label}</span>
       {children}
       {error ? (
-        <span className="text-[11px] font-medium leading-4 text-red-700">
+        <span className="text-[13px] font-medium leading-4 text-app-danger">
           {error}
         </span>
       ) : hint ? (
-        <span className="text-[11px] font-normal leading-4 text-app-subtle">
+        <span className="text-[13px] font-normal leading-4 text-app-subtle">
           {hint}
         </span>
       ) : null}

@@ -11,14 +11,14 @@ export function StatusMessage({
 }) {
   const toneClass = {
     neutral: 'border-app-border bg-app-muted text-app-text',
-    success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-    danger: 'border-red-200 bg-red-50 text-red-700',
-    warning: 'border-amber-200 bg-amber-50 text-amber-800',
+    success: 'border-app-success/30 bg-app-success-soft text-app-success',
+    danger: 'border-app-danger/30 bg-app-danger-soft text-app-danger',
+    warning: 'border-app-warning/30 bg-app-warning-soft text-app-warning',
   }[tone];
   return (
     <p
       className={classes(
-        'm-0 w-full rounded-control border px-3 py-2.5 text-xs leading-5',
+        'm-0 w-full rounded-control border px-3 py-2.5 text-sm leading-5',
         toneClass,
         className,
       )}

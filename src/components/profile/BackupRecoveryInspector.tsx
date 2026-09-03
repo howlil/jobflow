@@ -74,7 +74,7 @@ export function BackupRecoveryInspector({
           <strong className="text-sm font-semibold text-app-ink">
             Validated backup
           </strong>
-          <p className="m-0 text-xs leading-5 text-app-text">
+          <p className="m-0 text-[13px] leading-5 text-app-text">
             Exported{' '}
             {new Date(backup.exportedAt).toLocaleDateString('en-GB', {
               day: '2-digit',
