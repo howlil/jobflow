@@ -34,18 +34,18 @@ export function SectionHeader({
         className,
       )}
     >
-      <div className="grid min-w-0 gap-1.5">
+      <div className="grid min-w-0 gap-1">
         {eyebrow ? (
-          <p className="m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+          <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
             {eyebrow}
           </p>
         ) : null}
-        <div className="grid gap-1.5">
-          <h2 className="m-0 text-base font-semibold tracking-tight text-app-ink">
+        <div className="grid gap-1">
+          <h2 className="m-0 text-[15px] font-semibold tracking-tight text-app-ink">
             {title}
           </h2>
           {description ? (
-            <p className="m-0 max-w-3xl text-xs leading-5 text-app-text">
+            <p className="m-0 max-w-3xl text-[13px] leading-5 text-app-subtle">
               {description}
             </p>
           ) : null}
