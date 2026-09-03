@@ -16,10 +16,7 @@ import type { FieldContext } from '../../domain/forms/field-context';
 import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import { ApplicationClosureView } from './ApplicationClosureView';
-import {
-  AssistantHomeView,
-  AssistantSensitiveView,
-} from './FloatingViews';
+import { AssistantHomeView, AssistantSensitiveView } from './FloatingViews';
 import { ReliabilityReviewView } from './ReliabilityReviewView';
 
 export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
@@ -164,7 +161,10 @@ function ApplicationProfileSection({
       : `Automatic recommendation: ${variantOptions.find((item) => item.id === recommended)?.name ?? 'application profile'}.`;
 
   return (
-    <section className="jobflow-panel__section" aria-label="Application profile">
+    <section
+      className="jobflow-panel__section"
+      aria-label="Application profile"
+    >
       <div className="jobflow-panel__section-heading">
         <span>Application profile</span>
       </div>
