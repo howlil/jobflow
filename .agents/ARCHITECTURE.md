@@ -61,7 +61,7 @@ entrypoints
   WXT runtime shells and extension mounting/wiring
 
 e2e
-  browser acceptance journeys
+  optional browser diagnostic fixtures; not a merge/release acceptance layer
 ```
 
 Dependency direction:

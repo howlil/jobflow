@@ -10,7 +10,7 @@ src/domain/           pure domain models, validation, policy, migrations
 src/application/      use-case orchestration and application services
 src/infrastructure/   browser/DOM/storage/crypto adapters
 src/components/       React UI primitives, layouts, and domain UI
-e2e/                  browser acceptance journeys
+e2e/                  optional browser diagnostic fixtures; not a required gate
 ```
 
 Prefer behavior/domain ownership over generic `utils`, `helpers`, `manager`, or `service` dumping grounds.
@@ -117,7 +117,7 @@ If two modules need each other's internals, re-evaluate ownership instead of int
 
 ## Frequently used commands
 
-Exact verification ownership lives in `.agents/QUALITY.md`; common development commands are:
+Exact verification ownership lives in `.agents/QUALITY.md`; common deterministic development commands are:
 
 ```bash
 pnpm dev
@@ -126,5 +126,4 @@ pnpm typecheck
 pnpm lint
 pnpm format
 pnpm build
-pnpm test:e2e
 ```

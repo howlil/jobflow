@@ -15,7 +15,7 @@ Use Semantic Versioning with `0.x` expectations:
 
 - `0.MINOR.0` for a meaningful user capability or intentionally breaking behavior with a safe migration path.
 - `0.x.PATCH` for a bug, security, or compatibility fix without intentional feature expansion.
-- Prerelease suffixes such as `-alpha.N` or `-beta.N` may be used for trusted testing when useful.
+- Prerelease suffixes such as `-alpha.N` or `-beta.N` may be used for trusted distribution when useful.
 
 Use one canonical version source. Do not bump versions for every development change.
 
@@ -39,20 +39,20 @@ checkout
  -> publish immutable GitHub release from the verified tag
 ```
 
-Browser E2E and compatibility-specific validation are risk-based diagnostics, not unconditional release ceremony. Run focused evidence before tagging when the release actually touches those boundaries.
+Manual acceptance testing, browser E2E/black-box testing, live-browser verification, and manual visual review are not release qualification gates. When a release touches a browser/runtime-specific boundary, use deterministic repository-owned tests around the owned contract and document any residual environment risk that cannot be automated.
 
 Do not claim a release exists unless the tag/workflow/release artifact was actually observed.
 
 ## Release-critical review
 
-In addition to baseline quality gates, require relevant focused evidence when a release touches:
+In addition to baseline quality gates, require relevant automated focused evidence when a release touches:
 
 - persisted schema/migrations
 - browser permission or generated-manifest behavior
 - vault/crypto/sensitive disclosure
 - privacy/network/data-flow boundaries
 - shared autofill/matcher compatibility
-- critical browser runtime journeys
+- cross-runtime message, storage, or lifecycle contracts owned by the repository
 
 ## Release notes
 
