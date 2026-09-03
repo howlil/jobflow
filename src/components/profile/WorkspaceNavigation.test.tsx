@@ -23,7 +23,9 @@ describe('WorkspaceNavigation', () => {
     expect(
       screen.getByRole('button', { name: 'Application Profiles' }),
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Autofill Memory' })).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Autofill Memory' }),
+    ).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: 'Experience' }));
     expect(onChange).toHaveBeenCalledWith('experience');
