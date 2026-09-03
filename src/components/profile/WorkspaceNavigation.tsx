@@ -46,7 +46,7 @@ type WorkspaceNavigationProps = {
 };
 
 const navItemBase =
-  'flex min-h-9 w-full items-center gap-2 rounded-control border px-2 py-1.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2';
+  'flex h-9 min-h-9 w-full items-center gap-2 rounded-control border px-2 text-left text-sm font-medium transition-colors focus-visible:border-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft';
 
 export function WorkspaceNavigation({
   activeSection,
@@ -78,7 +78,7 @@ export function WorkspaceNavigation({
       >
         {groups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+            <p className="mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle opacity-0 transition-opacity group-hover/sidebar:opacity-100 group-focus-within/sidebar:opacity-100">
               {group.label}
             </p>
             <div className="grid gap-1">
@@ -90,15 +90,23 @@ export function WorkspaceNavigation({
                     className={`${navItemBase} ${
                       active
                         ? 'border-app-border bg-app-muted text-app-ink'
-                        : 'border-transparent text-app-text hover:bg-app-muted hover:text-app-ink'
+                        : 'border-transparent text-app-text hover:border-app-border hover:text-app-ink'
                     }`}
                     type="button"
                     key={item.id}
                     aria-current={active ? 'page' : undefined}
+                    title={item.label}
                     onClick={() => onChange(item.id)}
                   >
-                    <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
-                    <span>{item.label}</span>
+                    <Icon
+                      className="shrink-0"
+                      aria-hidden="true"
+                      size={18}
+                      strokeWidth={1.8}
+                    />
+                    <span className="truncate opacity-0 transition-opacity group-hover/sidebar:opacity-100 group-focus-within/sidebar:opacity-100">
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}
