@@ -16,27 +16,81 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Classify verification scope
+        id: scope
+        shell: bash
+        run: |
+          runtime=true
+
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            runtime=false
+            while IFS= read -r file; do
+              [[ -z "$file" ]] && continue
+              case "$file" in
+                *.md|.agents/*) ;;
+                *) runtime=true; break ;;
+              esac
+            done < <(git diff --name-only HEAD^1 HEAD)
+          fi
+
+          echo "runtime=$runtime" >> "$GITHUB_OUTPUT"
+
       - uses: pnpm/action-setup@v5
+        if: steps.scope.outputs.runtime == 'true'
         with:
           version: 11.21.0
           run_install: false
+
       - uses: actions/setup-node@v6
+        if: steps.scope.outputs.runtime == 'true'
         with:
           node-version: '24'
           cache: pnpm
+
       - name: Install dependencies
+        if: steps.scope.outputs.runtime == 'true'
         run: pnpm install --frozen-lockfile
-      - name: Test
-        run: pnpm test
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Lint
-        run: pnpm lint
-      - name: Format check
-        run: pnpm format:check
-      - name: Build
-        run: pnpm build
+
+      - name: Run deterministic verification lanes
+        if: steps.scope.outputs.runtime == 'true'
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+
+          pnpm test &
+          test_pid=$!
+
+          (
+            pnpm typecheck &&
+            pnpm lint &&
+            pnpm format:check &&
+            pnpm build
+          ) &
+          quality_pid=$!
+
+          if ! wait "$test_pid"; then
+            echo "::error::Behavior test lane failed"
+            status=1
+          fi
+
+          if ! wait "$quality_pid"; then
+            echo "::error::Static/build lane failed"
+            status=1
+          fi
+
+          exit "$status"
+
       - name: Verify generated extension
+        if: steps.scope.outputs.runtime == 'true'
         run: pnpm verify:manifest
+
+      - name: Verify documentation-only change
+        if: steps.scope.outputs.runtime != 'true'
+        run: echo "Runtime verification skipped because this pull request changes documentation/agent knowledge only."
