@@ -11,7 +11,7 @@ const KIND_TERMS = {
   education: ['education', 'academic', 'school'],
 } as const;
 
-const ADD_TERMS = ['add', 'add another', 'add more', 'new'];
+const ADD_TERMS = ['add', 'add another', 'add more', 'new'] as const;
 
 function detectedRecordCount(
   root: ParentNode,
@@ -52,20 +52,26 @@ function containsAny(value: string, terms: readonly string[]): boolean {
   return terms.some((term) => value.includes(normalizeFieldText(term)));
 }
 
+function hasExplicitAddIntent(label: string): boolean {
+  return ADD_TERMS.some(
+    (term) => label === term || label.startsWith(`${normalizeFieldText(term)} `),
+  );
+}
+
 function isAddControlForKind(
   control: HTMLElement,
   kind: keyof StructuredRecordTargets,
 ): boolean {
   if (
-    control instanceof HTMLButtonElement &&
-    (control.type === 'submit' || control.disabled)
+    (control instanceof HTMLButtonElement || control instanceof HTMLInputElement) &&
+    control.disabled
   ) {
     return false;
   }
   if (control.getAttribute('aria-disabled') === 'true') return false;
 
   const label = controlText(control);
-  if (!containsAny(label, ADD_TERMS)) return false;
+  if (!hasExplicitAddIntent(label)) return false;
 
   const kindTerms = KIND_TERMS[kind];
   if (containsAny(label, kindTerms)) return true;
@@ -106,6 +112,12 @@ function waitForRecordIncrease(
     }
 
     let settled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const observer = new MutationObserver(() => {
+      if (detectedRecordCount(root, origin, kind) > previousCount) {
+        finish(true);
+      }
+    });
     const finish = (result: boolean) => {
       if (settled) return;
       settled = true;
@@ -113,13 +125,9 @@ function waitForRecordIncrease(
       clearTimeout(timer);
       resolve(result);
     };
-    const observer = new MutationObserver(() => {
-      if (detectedRecordCount(root, origin, kind) > previousCount) {
-        finish(true);
-      }
-    });
+
     observer.observe(observerRoot, { childList: true, subtree: true });
-    const timer = setTimeout(() => {
+    timer = setTimeout(() => {
       finish(detectedRecordCount(root, origin, kind) > previousCount);
     }, timeoutMs);
   });
