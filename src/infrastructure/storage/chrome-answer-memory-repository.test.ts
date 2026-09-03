@@ -8,7 +8,8 @@ vi.mock('wxt/browser', () => ({
       local: {
         get: vi.fn(async (key: string) => ({ [key]: storage.get(key) })),
         set: vi.fn(async (value: Record<string, unknown>) => {
-          for (const [key, entry] of Object.entries(value)) storage.set(key, entry);
+          for (const [key, entry] of Object.entries(value))
+            storage.set(key, entry);
         }),
       },
     },
