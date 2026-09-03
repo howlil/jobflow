@@ -20,22 +20,22 @@ const groups = [
     items: [{ id: 'applications', label: 'Pipeline', icon: ClipboardList }],
   },
   {
-    label: 'Career kit',
+    label: 'Career',
     items: [
-      { id: 'personal', label: 'Personal', icon: UserRound },
+      { id: 'personal', label: 'Profile', icon: UserRound },
       { id: 'experience', label: 'Experience', icon: BriefcaseBusiness },
       { id: 'education', label: 'Education', icon: GraduationCap },
       { id: 'documents', label: 'Documents', icon: FileText },
-      { id: 'preferences', label: 'Preferences', icon: MapPin },
-      { id: 'variants', label: 'Variants', icon: ListChecks },
+      { id: 'variants', label: 'Application Profiles', icon: ListChecks },
     ],
   },
   {
-    label: 'Data & privacy',
+    label: 'Settings & data',
     items: [
-      { id: 'sensitive', label: 'Sensitive data', icon: ShieldCheck },
-      { id: 'corrections', label: 'Corrections', icon: History },
-      { id: 'backup', label: 'Backup', icon: FileArchive },
+      { id: 'preferences', label: 'Preferences', icon: MapPin },
+      { id: 'sensitive', label: 'Privacy & Sensitive', icon: ShieldCheck },
+      { id: 'corrections', label: 'Autofill Memory', icon: History },
+      { id: 'backup', label: 'Backup & Recovery', icon: FileArchive },
     ],
   },
 ] as const;
@@ -74,7 +74,7 @@ export function WorkspaceNavigation({
 
       <nav
         className="hidden space-y-4 md:block"
-        aria-label="Career workspace sections"
+        aria-label="Jobflow workspace sections"
       >
         {groups.map((group) => (
           <div key={group.label}>

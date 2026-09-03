@@ -1,21 +1,22 @@
 # Job Flow
 
-Job Flow is a local-first Chromium extension for career-form autofill. It keeps a reusable career profile on-device, analyzes supported HTTP/HTTPS application forms, recommends a role-specific application variant from local page signals, and fills only approved fields after explicit user action.
+Job Flow is a local-first Chromium extension for career-form autofill. It keeps a reusable career profile on-device, analyzes supported HTTP/HTTPS application forms, recommends a role-specific Application Profile from local page signals, and fills only approved fields after explicit user action.
 
 ## Current Behavior
 
-- Full-page responsive career workspace for core contact, professional, experience, education, skills, job preferences, languages, certifications, projects, reusable answers, documents, correction memory, vault, and backup/recovery.
+- Full-page responsive Workspace for application pipeline, career profile, experience, education, documents, Application Profiles, preferences, sensitive data, Autofill Memory, and backup/recovery.
 - One-page sticky section navigation rather than a setup wizard.
 - Local CV import for text-based PDF, DOCX, and TXT. Extraction stays on-device, produces a deterministic review draft, and never overwrites the profile before explicit selection/import.
 - CV/document binaries are stored separately in extension-origin IndexedDB; `chrome.storage.local` keeps structured profile/document metadata only.
-- Base profile plus lightweight application variants.
-- Deterministic current-page application-variant recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
-- Compact toolbar popup with current-page form status, application-profile selection, and one workspace entry action; detailed document/fill operations stay in the in-page assistant.
-- In-page 48px floating launcher for detected forms. The detailed assistant opens only after a user click and becomes viewport-safe on narrow pages.
+- Base profile plus lightweight Application Profiles backed by the existing local variant model.
+- Deterministic current-page Application Profile recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
+- Context-aware toolbar action: on a supported application form it opens the in-page Assistant; otherwise it opens Workspace. Job Flow does not expose a separate toolbar popup product surface.
+- In-page 48px floating launcher for detected forms. The detailed Assistant opens only after a user click or explicit toolbar action and becomes viewport-safe on narrow pages.
+- Current-page Application Profile selection lives in the Assistant alongside the operations it affects.
 - Ready / Needs review / Sensitive / Unknown field classification.
 - Explicit normal-field fill only; no automatic fill on scan.
 - Dynamic form re-analysis for multi-step or changing forms.
-- Per-site/form/field correction memory plus an Options UI to inspect/delete mappings, reset a site, reset all, and review stale mappings.
+- Per-site/form/field Autofill Memory with Workspace controls to inspect/delete mappings, reset a site, reset all, and review stale mappings.
 - Sensitive Data Vault for encrypted-at-rest sensitive values.
 - Sensitive fields require vault setup/unlock plus a separate current-site approval before fill.
 - Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
@@ -56,6 +57,17 @@ Load the built extension:
 2. Enable Developer mode.
 3. Click Load unpacked.
 4. Select `.output/chrome-mv3`.
+
+## Product Surfaces
+
+Job Flow intentionally has two product surfaces:
+
+```text
+Application page -> In-page Assistant -> analyze / select profile / fill / review / attach / sensitive / capture
+Career management -> Workspace -> pipeline / profile / documents / Application Profiles / data settings
+```
+
+The browser toolbar is only a context-aware launcher into one of those surfaces.
 
 ## CV Import And Documents
 

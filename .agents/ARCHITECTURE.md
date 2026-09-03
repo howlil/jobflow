@@ -7,7 +7,7 @@ Jobflow is a local-first Manifest V3 browser extension built with WXT, React, Ty
 ## Runtime topology
 
 ```text
-Options / Popup / In-page UI
+Workspace / In-page Assistant
           |
           v
 Application orchestration
@@ -20,28 +20,29 @@ Infrastructure adapters
 DOM | browser messaging | storage | IndexedDB | Web Crypto
 ```
 
+The browser toolbar action is a launcher owned by the background runtime, not a separate product UI. It asks the active content script to open the Assistant; if no supported application context is available it opens Workspace.
+
 ### Content script
 
 Owns:
 
 - DOM discovery and extraction
 - relevant dynamic-page observation
-- isolated in-page assistant mounting
+- isolated in-page Assistant mounting
+- current-page Application Profile override/re-analysis
 - execution of approved fill instructions
 
 It must not own canonical profile persistence, application persistence policy, vault passphrase/key lifecycle, or business matching policy.
 
 ### Background service worker
 
-Owns browser-level coordination where required and the sensitive-vault session boundary. Treat the Manifest V3 worker as ephemeral; durable state must not depend on module lifetime.
+Owns browser-level coordination where required, context-aware toolbar routing, Workspace opening, and the sensitive-vault session boundary. Treat the Manifest V3 worker as ephemeral; durable state must not depend on module lifetime.
 
-### Options / popup / in-page React UI
+### Workspace / in-page React UI
 
 Own presentation, local interaction state, and explicit user actions. Matching policy, storage migrations, and crypto policy do not belong in React components.
 
 ## Module ownership
-
-Repository code is organized around these boundaries:
 
 ```text
 src/domain
@@ -88,7 +89,7 @@ host DOM
  -> site correction lookup
  -> deterministic matcher
  -> MatchResult
- -> resolve profile/application variant
+ -> resolve base profile + optional application variant
  -> fill policy + sensitivity policy
  -> FillPlan
  -> user review / approval
@@ -114,12 +115,12 @@ Do not busy-poll or perform full re-analysis for every mutation. Ignore Jobflow'
 ## Persistence ownership
 
 - Base career profile: one versioned canonical local profile.
-- Application variants: lightweight overrides over the base profile.
+- Application variants: lightweight overrides over the base profile, surfaced to users as Application Profiles.
 - Applications: versioned local collection with explicit migrations.
-- Corrections: local persistence scoped to site/form/field identity.
+- Corrections: local persistence scoped to site/form/field identity, surfaced as Autofill Memory.
 - Documents: metadata plus extension-owned local binaries.
 - Sensitive vault: encrypted local persistence, separate from normal profile storage.
-- Page analysis: ephemeral and reconstructable.
+- Page analysis and current page override: ephemeral and reconstructable.
 
 Validate untrusted persisted/imported/message/DOM data at the boundary. Persisted schema changes require sequential migration and compatibility evidence.
 
@@ -136,8 +137,10 @@ Validate untrusted persisted/imported/message/DOM data at the boundary. Persiste
 
 Jobflow has two materially different rendering environments:
 
-1. Full-tab extension workspace/popup React surfaces using shared Tailwind tokens and owned reusable components.
-2. In-page assistant rendered in an isolated Shadow DOM; host-page CSS must not control it and document-level Tailwind must not be assumed to cross the boundary.
+1. Full-tab Workspace using shared Tailwind tokens and owned reusable components.
+2. In-page Assistant rendered in an isolated Shadow DOM; host-page CSS must not control it and document-level Tailwind must not be assumed to cross the boundary.
+
+There is no browser-action popup React surface. The technical `options` entrypoint may remain because it is a browser-extension shell detail; user-facing semantics are Workspace.
 
 Visual and interaction rules are owned by `.agents/DESIGN.md`.
 

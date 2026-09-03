@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { PanelRightClose } from 'lucide-react';
 
 import type { ApplicationDraft } from '../../application/applications/application-service';
-import type { PageDocumentFieldSummary } from '../../application/forms/page-messages';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
+import type {
+  PageDocumentFieldSummary,
+  PageVariantOption,
+} from '../../application/forms/page-messages';
 import type {
   FillAnalysis,
   FillExecutionResult,
@@ -11,6 +14,7 @@ import type {
 import type { CorrectionTarget } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
 import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
+import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
 import {
   AssistantHomeView,
   AssistantPipelineView,
@@ -34,11 +38,16 @@ type FloatingPanelProps = {
   sensitiveError?: string | null;
   siteHost?: string;
   variantName?: string | null;
+  variantOptions?: PageVariantOption[];
+  activeVariantId?: string | null;
+  variantRecommendation?: VariantRecommendation | null;
+  openRequestId?: number;
   applicationDraft?: ApplicationDraft | null;
   onFill: () =>
     | FillExecutionResult[]
     | void
     | Promise<FillExecutionResult[] | void>;
+  onSelectVariant?: (variantId: string | null) => void;
   onSaveApplication?: (draft: ApplicationDraft) => Promise<void>;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
   onOpenOptions?: () => void;
@@ -85,6 +94,60 @@ function CompletionCoverage({ summary }: { summary: PageAnalysisSummary }) {
   );
 }
 
+function ApplicationProfileSection({
+  variantOptions,
+  activeVariantId,
+  variantRecommendation,
+  onSelectVariant,
+}: {
+  variantOptions: PageVariantOption[];
+  activeVariantId: string | null;
+  variantRecommendation: VariantRecommendation | null;
+  onSelectVariant?: (variantId: string | null) => void;
+}) {
+  if (variantOptions.length === 0 || onSelectVariant === undefined) return null;
+
+  const recommended =
+    variantRecommendation?.variantId === undefined
+      ? null
+      : (variantRecommendation?.variantId ?? null);
+  const recommendationLabel =
+    recommended === null
+      ? 'Automatic recommendation uses your base career profile.'
+      : `Automatic recommendation: ${
+          variantOptions.find((item) => item.id === recommended)?.name ??
+          'application profile'
+        }.`;
+
+  return (
+    <section
+      className="jobflow-panel__section"
+      aria-label="Application profile"
+    >
+      <div className="jobflow-panel__section-heading">
+        <span>Application profile</span>
+      </div>
+      <div className="jobflow-panel__form">
+        <label>
+          Use for this page
+          <select
+            value={activeVariantId ?? ''}
+            onChange={(event) => onSelectVariant(event.target.value || null)}
+          >
+            <option value="">Automatic</option>
+            {variantOptions.map((variant) => (
+              <option value={variant.id} key={variant.id}>
+                {variant.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <small>{recommendationLabel}</small>
+      </div>
+    </section>
+  );
+}
+
 export function FloatingPanel({
   summary,
   reviewItems = [],
@@ -96,8 +159,13 @@ export function FloatingPanel({
   sensitiveError = null,
   siteHost = 'this site',
   variantName = null,
+  variantOptions = [],
+  activeVariantId = null,
+  variantRecommendation = null,
+  openRequestId = 0,
   applicationDraft = null,
   onFill,
+  onSelectVariant,
   onSaveApplication,
   onRemember,
   onOpenOptions,
@@ -132,6 +200,10 @@ export function FloatingPanel({
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
   );
+
+  useEffect(() => {
+    if (openRequestId > 0) setIsOpen(true);
+  }, [openRequestId]);
 
   useEffect(() => {
     if (!isOpen) setView('home');
@@ -214,6 +286,12 @@ export function FloatingPanel({
 
           {view === 'home' ? (
             <>
+              <ApplicationProfileSection
+                variantOptions={variantOptions}
+                activeVariantId={activeVariantId}
+                variantRecommendation={variantRecommendation}
+                {...(onSelectVariant === undefined ? {} : { onSelectVariant })}
+              />
               <CompletionCoverage summary={summary} />
               <AssistantHomeView
                 summary={summary}

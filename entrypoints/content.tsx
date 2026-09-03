@@ -16,7 +16,10 @@ import {
 } from '../src/application/forms/page-messages';
 import { createSensitiveFillInstructions } from '../src/application/vault/sensitive-values';
 import type { SensitiveFieldPath } from '../src/application/vault/vault-messages';
-import { OPEN_WORKSPACE } from '../src/application/workspace/workspace-messages';
+import {
+  isToggleAssistantMessage,
+  OPEN_WORKSPACE,
+} from '../src/application/workspace/workspace-messages';
 import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
@@ -74,6 +77,8 @@ export default defineContentScript({
     let pageVariantOverrideId: string | null = null;
     let knownVariantIds = new Set<string>();
     let forceAnalyzePage: (() => void) | null = null;
+    let requestAssistantOpen: (() => boolean) | null = null;
+    let assistantOpenRequestId = 0;
 
     const messageListener = (message: unknown) => {
       if (isGetPageAnalysisMessage(message)) {
@@ -81,6 +86,11 @@ export default defineContentScript({
       }
       if (isGetPageContextMessage(message)) {
         return Promise.resolve(toPageContextResponse(currentContext));
+      }
+      if (isToggleAssistantMessage(message)) {
+        return Promise.resolve({
+          available: requestAssistantOpen?.() ?? false,
+        });
       }
       if (isSetPageVariantMessage(message)) {
         if (
@@ -172,6 +182,15 @@ export default defineContentScript({
             sensitiveError={sensitiveError}
             siteHost={location.host}
             variantName={variantName}
+            variantOptions={currentContext.variantOptions}
+            activeVariantId={currentContext.activeVariantId}
+            variantRecommendation={currentContext.variantRecommendation}
+            openRequestId={assistantOpenRequestId}
+            onSelectVariant={(variantId) => {
+              if (variantId !== null && !knownVariantIds.has(variantId)) return;
+              pageVariantOverrideId = variantId;
+              analyzePage(true);
+            }}
             applicationDraft={applicationService.createDraftFromPageCapture({
               url: location.href,
               signals: collectPageSignals(document),
@@ -225,6 +244,18 @@ export default defineContentScript({
             }}
           />,
         );
+      };
+
+      requestAssistantOpen = () => {
+        if (
+          currentContext === null ||
+          currentContext.analysis.summary.total === 0
+        ) {
+          return false;
+        }
+        assistantOpenRequestId += 1;
+        renderPanel();
+        return true;
       };
 
       const analyzePage = (force = false) => {
@@ -354,6 +385,7 @@ export default defineContentScript({
     } catch {
       currentContext = null;
       forceAnalyzePage = null;
+      requestAssistantOpen = null;
     }
   },
 });

@@ -4,9 +4,17 @@
 
 ## Current Product Position
 
-The last completed milestone was **Reliable Complex Application Completion**. Jobflow now carries the existing deterministic autofill model through substantially more realistic application forms: ordered Experience and Education records can map into repeated sections, clearly identified repeated sections can expand only after explicit Fill, semantic ARIA combobox/listbox and choice controls use generic fail-closed adapters, dynamic/custom-control mutations trigger the existing bounded re-analysis flow, matching embedded frames run the same isolated content-script behavior, and the in-page assistant exposes structured coverage plus unresolved work before submission.
+The last completed milestone was **Unified Job Application Workflow**. Jobflow now exposes two coherent user-facing product surfaces instead of three overlapping ones:
 
-The existing trust boundaries remain unchanged: no automatic Submit/Next, no automatic document attachment, no ATS-specific runtime branches, no backend/cloud/AI/telemetry dependency, and no persisted profile/application schema migration was introduced by this milestone.
+- **In-page Assistant** owns current-application execution: page analysis, Application Profile recommendation/selection, explicit fill, unresolved review, document attachment, sensitive disclosure, and application capture.
+- **Workspace** owns Pipeline, career/profile data, documents, Application Profiles, preferences, Privacy & Sensitive Data, Autofill Memory, and Backup & Recovery.
+- The browser toolbar action is a context-aware launcher: it opens the Assistant when the active page has supported application fields and otherwise opens Workspace. The separate browser-action popup surface and its legacy ownership have been removed.
+
+The milestone preserved existing trust and architecture boundaries: no automatic Submit/Next, no automatic document attachment, no persisted profile/application schema migration, no ATS-specific runtime branch, and no backend/cloud/AI/telemetry dependency.
+
+## Verification Evidence
+
+The release-ready PR gate passed the repository's required deterministic checks, including behavior tests, typecheck, lint, format check, production build, and generated-manifest verification. The extension smoke journey was updated to cover popup-free assistant launching and preserve explicit-fill/no-submit assertions for targeted browser diagnostics.
 
 Detailed completed work and verification history live in Git/PR records rather than this file.
 
@@ -21,7 +29,7 @@ There is no authorized product outcome, vertical slice, or logical change curren
 When the user requests the next product/engineering direction:
 
 1. inspect the current product gap against `.agents/PROJECT.md`, architecture/security boundaries, and actual code state;
-2. shape one bounded **high-value core milestone** with a meaningful complete outcome rather than a collection of micro-slices or nice-to-have polish;
+2. shape one bounded high-value core milestone with a meaningful complete outcome rather than a collection of micro-slices or nice-to-have polish;
 3. define demonstrable vertical slices only where they help execute the complete outcome;
 4. once authorized, execute those slices continuously until the milestone outcome is release-ready, unless a material stop condition is reached;
 5. use accumulated proportional verification evidence at the milestone gate instead of restarting a full verification ceremony after every small change.
