@@ -89,7 +89,11 @@ function currentAnswerForContext(
       return control.getAttribute('aria-checked') === 'true';
     });
     if (selected instanceof HTMLInputElement) return selected.value.trim();
-    return selected?.getAttribute('aria-label')?.trim() ?? selected?.textContent?.trim() ?? '';
+    return (
+      selected?.getAttribute('aria-label')?.trim() ??
+      selected?.textContent?.trim() ??
+      ''
+    );
   }
 
   const control = scanned.controls[0];
