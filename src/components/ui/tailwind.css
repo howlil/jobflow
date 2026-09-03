@@ -263,7 +263,7 @@
 
   .profile-page input[type='checkbox'],
   .workspace-tool-section input[type='checkbox'] {
-    @apply h-[18px] w-[18px] rounded border-app-border-strong accent-app-ink;
+    @apply h-[18px] w-[18px] rounded-control border-app-border-strong accent-app-ink;
   }
 
   .record-list {
@@ -363,20 +363,6 @@
 
   .workspace-card-title {
     @apply text-sm font-semibold text-app-ink;
-  }
-
-  /* Migration guard: legacy workspace metadata used 11px and pipeline lanes
-     used a tinted neutral fill. Keep old call sites visually compliant while
-     ownership moves into shared primitives over time. */
-  .profile-page .text-\[11px\],
-  .workspace-tool-section .text-\[11px\],
-  #applications .text-\[11px\] {
-    font-size: 0.8125rem;
-    line-height: 1.25rem;
-  }
-
-  #applications .bg-app-muted\/30 {
-    background-color: rgb(var(--app-surface) / 1);
   }
 
   .jobflow-visually-hidden {
