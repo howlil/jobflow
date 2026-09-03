@@ -26,14 +26,18 @@ describe('FloatingPanel', () => {
 
     fireEvent.click(launcher);
 
-    expect(screen.getByRole('tablist', { name: 'Job Flow tools' })).toBeTruthy();
+    expect(
+      screen.getByRole('tablist', { name: 'Job Flow tools' }),
+    ).toBeTruthy();
     expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       'Autofill3',
       'Pipeline',
       'Sensitive1',
     ]);
     expect(
-      screen.getByRole('tab', { name: /Autofill/ }).getAttribute('aria-selected'),
+      screen
+        .getByRole('tab', { name: /Autofill/ })
+        .getAttribute('aria-selected'),
     ).toBe('true');
 
     const summary = screen.getByLabelText('Form analysis summary');
