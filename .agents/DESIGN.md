@@ -359,9 +359,9 @@ Use short operational copy, e.g. `8 fields ready`, `Review ambiguous fields`, `A
 
 Avoid repeated local-first explanations, marketing claims, and generic AI-assistant language inside utility surfaces.
 
-## Interaction and visual verification
+## Interaction contract
 
-Before claiming a UI flow release-ready, verify only the representative states/widths relevant to the changed surface, with emphasis on:
+The following are design concerns when a changed surface affects them; they are not a manual release checklist:
 
 ```text
 entry point        obvious starting point
@@ -378,13 +378,6 @@ sensitive data     detect/review/unlock/fill stay explicit
 document attach    recommendation never implies auto-attachment
 ```
 
-Representative widths when affected:
+Protect interaction and accessibility semantics with deterministic component/DOM tests where the behavior warrants regression coverage, plus static/build checks for the affected surface. Responsive layout should follow the documented contracts at the widths the implementation supports.
 
-- 2560, 1920, 1440 desktop workspace
-- 1024 tablet workspace
-- 390 mobile workspace
-- collapsed launcher
-- expanded assistant desktop
-- expanded assistant narrow viewport
-
-A real visual audit should use current screenshots of the target flow. Source inspection is not visual-release evidence.
+Screenshots, browser inspection, and device review may be used opportunistically for design debugging or product observation, but they are not merge, release-readiness, or acceptance gates. Do not require manual visual evidence when repository-owned deterministic checks already cover the changed behavior.
