@@ -15,12 +15,12 @@ import type { CorrectionTarget } from '../../domain/corrections/correction-schem
 import type { FieldContext } from '../../domain/forms/field-context';
 import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
 import type { VariantRecommendation } from '../../domain/variants/recommend-variant';
+import { ApplicationClosureView } from './ApplicationClosureView';
 import {
   AssistantHomeView,
-  AssistantPipelineView,
-  AssistantReviewView,
   AssistantSensitiveView,
 } from './FloatingViews';
+import { ReliabilityReviewView } from './ReliabilityReviewView';
 
 export type SensitiveVaultStatus = 'not-configured' | 'locked' | 'unlocked';
 export type DocumentAttachStatus = 'attached' | 'missing' | 'unsupported';
@@ -50,6 +50,7 @@ type FloatingPanelProps = {
   onSelectVariant?: (variantId: string | null) => void;
   onSaveApplication?: (draft: ApplicationDraft) => Promise<void>;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
+  onRememberCurrentAnswer?: (context: FieldContext) => Promise<boolean>;
   onOpenOptions?: () => void;
   onUnlockSensitive?: (passphrase: string) => void;
   onFillSensitive?: () => void;
@@ -73,10 +74,7 @@ function CompletionCoverage({ summary }: { summary: PageAnalysisSummary }) {
   if (rows.length === 0) return null;
 
   return (
-    <section
-      className="jobflow-panel__section"
-      aria-label="Structured application coverage"
-    >
+    <section className="jobflow-panel__section" aria-label="Structured application coverage">
       <div className="jobflow-panel__section-heading">
         <span>Application coverage</span>
       </div>
@@ -84,11 +82,39 @@ function CompletionCoverage({ summary }: { summary: PageAnalysisSummary }) {
         {rows.map(([label, coverage]) => (
           <div key={label}>
             <span>{label}</span>
-            <strong>
-              {coverage.detectedRecords} / {coverage.profileRecords} records
-            </strong>
+            <strong>{coverage.detectedRecords} / {coverage.profileRecords} records</strong>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function LocalCompletionDiagnostics({
+  summary,
+  filled,
+  failed,
+  remembered,
+  attached,
+}: {
+  summary: PageAnalysisSummary;
+  filled: number;
+  failed: number;
+  remembered: number;
+  attached: number;
+}) {
+  const unresolved = summary.needsReview + summary.unknown + summary.sensitive;
+  return (
+    <section className="jobflow-panel__section" aria-label="Local completion diagnostics">
+      <div className="jobflow-panel__section-heading">
+        <span>Local completion</span>
+      </div>
+      <div className="jobflow-panel__menu">
+        <div><span>Filled this session</span><strong>{filled}</strong></div>
+        <div><span>Remembered answers</span><strong>{remembered}</strong></div>
+        <div><span>Documents attached</span><strong>{attached}</strong></div>
+        <div><span>Needs attention</span><strong>{unresolved}</strong></div>
+        {failed > 0 ? <div><span>Manual fallback</span><strong>{failed}</strong></div> : null}
       </div>
     </section>
   );
@@ -106,40 +132,21 @@ function ApplicationProfileSection({
   onSelectVariant?: (variantId: string | null) => void;
 }) {
   if (variantOptions.length === 0 || onSelectVariant === undefined) return null;
-
-  const recommended =
-    variantRecommendation?.variantId === undefined
-      ? null
-      : (variantRecommendation?.variantId ?? null);
+  const recommended = variantRecommendation?.variantId ?? null;
   const recommendationLabel =
     recommended === null
       ? 'Automatic recommendation uses your base career profile.'
-      : `Automatic recommendation: ${
-          variantOptions.find((item) => item.id === recommended)?.name ??
-          'application profile'
-        }.`;
+      : `Automatic recommendation: ${variantOptions.find((item) => item.id === recommended)?.name ?? 'application profile'}.`;
 
   return (
-    <section
-      className="jobflow-panel__section"
-      aria-label="Application profile"
-    >
-      <div className="jobflow-panel__section-heading">
-        <span>Application profile</span>
-      </div>
+    <section className="jobflow-panel__section" aria-label="Application profile">
+      <div className="jobflow-panel__section-heading"><span>Application profile</span></div>
       <div className="jobflow-panel__form">
         <label>
           Use for this page
-          <select
-            value={activeVariantId ?? ''}
-            onChange={(event) => onSelectVariant(event.target.value || null)}
-          >
+          <select value={activeVariantId ?? ''} onChange={(event) => onSelectVariant(event.target.value || null)}>
             <option value="">Automatic</option>
-            {variantOptions.map((variant) => (
-              <option value={variant.id} key={variant.id}>
-                {variant.name}
-              </option>
-            ))}
+            {variantOptions.map((variant) => <option value={variant.id} key={variant.id}>{variant.name}</option>)}
           </select>
         </label>
         <small>{recommendationLabel}</small>
@@ -168,6 +175,7 @@ export function FloatingPanel({
   onSelectVariant,
   onSaveApplication,
   onRemember,
+  onRememberCurrentAnswer,
   onOpenOptions,
   onUnlockSensitive,
   onFillSensitive,
@@ -176,71 +184,52 @@ export function FloatingPanel({
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<AssistantView>('home');
   const [passphrase, setPassphrase] = useState('');
-  const [documentStatus, setDocumentStatus] = useState<Record<string, string>>(
-    {},
-  );
-  const [applicationStatus, setApplicationStatus] = useState<string | null>(
-    null,
-  );
+  const [documentStatus, setDocumentStatus] = useState<Record<string, string>>({});
+  const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [fillStatus, setFillStatus] = useState<string | null>(null);
+  const [filledCount, setFilledCount] = useState(0);
+  const [failedCount, setFailedCount] = useState(0);
+  const [rememberedCount, setRememberedCount] = useState(0);
+  const [attachedCount, setAttachedCount] = useState(0);
   const teachableUnknownItems = useMemo(
-    () =>
-      reusableAnswers.length === 0
-        ? []
-        : unknownItems.filter(
-            (item) =>
-              item.context.controlKind !== 'file' &&
-              item.context.inputType !== 'file',
-          ),
-    [reusableAnswers, unknownItems],
+    () => unknownItems.filter((item) => item.context.controlKind !== 'file' && item.context.inputType !== 'file'),
+    [unknownItems],
   );
-  const attentionCount =
-    summary.needsReview + summary.sensitive + summary.unknown;
+  const attentionCount = summary.needsReview + summary.sensitive + summary.unknown;
   const attachableDocuments = useMemo(
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
   );
 
-  useEffect(() => {
-    if (openRequestId > 0) setIsOpen(true);
-  }, [openRequestId]);
-
-  useEffect(() => {
-    if (!isOpen) setView('home');
-  }, [isOpen]);
-
+  useEffect(() => { if (openRequestId > 0) setIsOpen(true); }, [openRequestId]);
+  useEffect(() => { if (!isOpen) setView('home'); }, [isOpen]);
   useEffect(() => {
     if (!isOpen) return undefined;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsOpen(false);
-    };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setIsOpen(false); };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen]);
 
   async function attachDocument(item: PageDocumentFieldSummary) {
-    if (item.recommendedDocument === null || onAttachDocument === undefined) {
-      return;
-    }
+    if (item.recommendedDocument === null || onAttachDocument === undefined) return;
     const key = item.fieldFingerprint;
     setDocumentStatus((current) => ({ ...current, [key]: 'Attaching…' }));
     const result = await onAttachDocument(key, item.recommendedDocument.id);
-    const message =
-      result === 'attached'
-        ? 'Attached'
-        : result === 'missing'
-          ? 'Stored file is unavailable. Open profile to replace it.'
-          : 'This site blocked direct attachment. Use the site file picker.';
+    const message = result === 'attached'
+      ? 'Attached'
+      : result === 'missing'
+        ? 'Stored file is unavailable. Open Documents to replace it.'
+        : 'This site blocked direct attachment. Use the site file picker.';
+    if (result === 'attached') setAttachedCount((count) => count + 1);
     setDocumentStatus((current) => ({ ...current, [key]: message }));
   }
 
   function updateFillStatus(results: FillExecutionResult[]) {
-    const filled = results.filter(
-      (result) => result.status === 'filled',
-    ).length;
+    const filled = results.filter((result) => result.status === 'filled').length;
     const failed = results.length - filled;
-    const unresolved =
-      summary.needsReview + summary.sensitive + summary.unknown;
+    setFilledCount((count) => count + filled);
+    setFailedCount((count) => count + failed);
+    const unresolved = summary.needsReview + summary.sensitive + summary.unknown;
     setFillStatus(
       failed === 0 && unresolved === 0
         ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled. Reusable data complete — review before submitting.`
@@ -253,19 +242,21 @@ export function FloatingPanel({
   function fillReadyFields() {
     const result = onFill();
     if (result instanceof Promise) {
-      void result.then((results) => {
-        if (results !== undefined) updateFillStatus(results);
-      });
+      void result.then((results) => { if (results !== undefined) updateFillStatus(results); });
       return;
     }
     if (result !== undefined) updateFillStatus(result);
   }
 
+  async function rememberCurrentAnswer(context: FieldContext): Promise<boolean> {
+    if (onRememberCurrentAnswer === undefined) return false;
+    const remembered = await onRememberCurrentAnswer(context);
+    if (remembered) setRememberedCount((count) => count + 1);
+    return remembered;
+  }
+
   return (
-    <aside
-      className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`}
-      aria-label="Job Flow form assistant"
-    >
+    <aside className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`} aria-label="Job Flow form assistant">
       {isOpen ? (
         <section className="jobflow-panel" aria-label="Job Flow assistant menu">
           <header className="jobflow-panel__header">
@@ -274,24 +265,14 @@ export function FloatingPanel({
               <strong>{variantName || 'Application assistant'}</strong>
               <span className="jobflow-panel__host">{siteHost}</span>
             </div>
-            <button
-              className="jobflow-panel__icon-button"
-              type="button"
-              aria-label="Close Job Flow"
-              onClick={() => setIsOpen(false)}
-            >
+            <button className="jobflow-panel__icon-button" type="button" aria-label="Close Job Flow" onClick={() => setIsOpen(false)}>
               <PanelRightClose aria-hidden="true" size={18} />
             </button>
           </header>
 
           {view === 'home' ? (
             <>
-              <ApplicationProfileSection
-                variantOptions={variantOptions}
-                activeVariantId={activeVariantId}
-                variantRecommendation={variantRecommendation}
-                {...(onSelectVariant === undefined ? {} : { onSelectVariant })}
-              />
+              <ApplicationProfileSection variantOptions={variantOptions} activeVariantId={activeVariantId} variantRecommendation={variantRecommendation} {...(onSelectVariant === undefined ? {} : { onSelectVariant })} />
               <CompletionCoverage summary={summary} />
               <AssistantHomeView
                 summary={summary}
@@ -303,43 +284,38 @@ export function FloatingPanel({
                 onFill={fillReadyFields}
                 onOpenReview={() => setView('review')}
                 onOpenSensitive={() => setView('sensitive')}
-                {...(applicationDraft === null ||
-                onSaveApplication === undefined
-                  ? {}
-                  : { onOpenPipeline: () => setView('pipeline') })}
+                {...(applicationDraft === null || onSaveApplication === undefined ? {} : { onOpenPipeline: () => setView('pipeline') })}
                 {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
               />
+              <LocalCompletionDiagnostics summary={summary} filled={filledCount} failed={failedCount} remembered={rememberedCount} attached={attachedCount} />
             </>
           ) : null}
 
-          {view === 'pipeline' &&
-          applicationDraft !== null &&
-          onSaveApplication !== undefined ? (
-            <AssistantPipelineView
+          {view === 'pipeline' && applicationDraft !== null && onSaveApplication !== undefined ? (
+            <ApplicationClosureView
               initialDraft={applicationDraft}
               status={applicationStatus}
               onBack={() => setView('home')}
               onSave={async (draft) => {
-                setApplicationStatus('Saving...');
+                setApplicationStatus('Saving…');
                 try {
                   await onSaveApplication(draft);
-                  setApplicationStatus('Saved to pipeline.');
+                  setApplicationStatus(draft.stage === 'applied' ? 'Marked as applied in Pipeline.' : 'Saved to Pipeline.');
                 } catch {
-                  setApplicationStatus(
-                    'Company, role, and a valid URL are required.',
-                  );
+                  setApplicationStatus('Company, role, and a valid URL are required.');
                 }
               }}
             />
           ) : null}
 
           {view === 'review' ? (
-            <AssistantReviewView
+            <ReliabilityReviewView
               reviewItems={reviewItems}
               unknownItems={teachableUnknownItems}
               reusableAnswers={reusableAnswers}
               onBack={() => setView('home')}
               {...(onRemember === undefined ? {} : { onRemember })}
+              {...(onRememberCurrentAnswer === undefined ? {} : { onRememberCurrentAnswer: rememberCurrentAnswer })}
             />
           ) : null}
 
@@ -353,33 +329,16 @@ export function FloatingPanel({
               onPassphraseChange={setPassphrase}
               {...(vaultStatus === undefined ? {} : { vaultStatus })}
               {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-              {...(onUnlockSensitive === undefined
-                ? {}
-                : { onUnlockSensitive })}
+              {...(onUnlockSensitive === undefined ? {} : { onUnlockSensitive })}
               {...(onFillSensitive === undefined ? {} : { onFillSensitive })}
             />
           ) : null}
         </section>
       ) : null}
 
-      <button
-        className="jobflow-launcher"
-        type="button"
-        aria-label={isOpen ? 'Close Job Flow' : 'Open Job Flow'}
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((current) => !current)}
-      >
-        <span className="jobflow-launcher__mark" aria-hidden="true">
-          J
-        </span>
-        {attentionCount > 0 && !isOpen ? (
-          <span
-            className="jobflow-launcher__badge"
-            aria-label={`${attentionCount} items need attention`}
-          >
-            {attentionCount > 9 ? '9+' : attentionCount}
-          </span>
-        ) : null}
+      <button className="jobflow-launcher" type="button" aria-label={isOpen ? 'Close Job Flow' : 'Open Job Flow'} aria-expanded={isOpen} onClick={() => setIsOpen((current) => !current)}>
+        <span className="jobflow-launcher__mark" aria-hidden="true">J</span>
+        {attentionCount > 0 && !isOpen ? <span className="jobflow-launcher__badge" aria-label={`${attentionCount} items need attention`}>{attentionCount > 9 ? '9+' : attentionCount}</span> : null}
       </button>
     </aside>
   );
