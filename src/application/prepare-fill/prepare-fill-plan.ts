@@ -1,13 +1,22 @@
-import type { FieldContext } from '../../domain/forms/field-context';
+import type {
+  EducationRecordField,
+  ExperienceRecordField,
+  FieldContext,
+  StructuredRecordContext,
+} from '../../domain/forms/field-context';
 import type { CanonicalField } from '../../domain/matching/canonical-fields';
 import type { CorrectionAwareMatchResult } from '../../domain/matching/match-field-with-corrections';
 import type { SensitiveCanonicalField } from '../../domain/matching/sensitive-fields';
 import type { BaseProfile } from '../../domain/profile/profile-schema';
 
 export type FillValue = string | boolean | string[];
+export type StructuredFillInstructionField =
+  | `professional.experiences.${number}.${ExperienceRecordField}`
+  | `professional.education.${number}.${EducationRecordField}`;
 export type FillInstructionField =
   | CanonicalField
   | SensitiveCanonicalField
+  | StructuredFillInstructionField
   | `customAnswer:${string}`;
 
 export type FillInstruction = {
@@ -94,6 +103,67 @@ function profileValue(
   }
 }
 
+function structuredProfileValue(
+  profile: BaseProfile,
+  context: StructuredRecordContext,
+): FillValue | null {
+  if (context.kind === 'experience') {
+    const record = profile.professional.experiences[context.recordIndex];
+    if (record === undefined) return null;
+    switch (context.field) {
+      case 'company':
+        return record.company;
+      case 'title':
+        return record.title;
+      case 'employmentType':
+        return record.employmentType;
+      case 'location':
+        return record.location;
+      case 'startDate':
+        return record.startDate;
+      case 'endDate':
+        return record.endDate;
+      case 'current':
+        return record.current;
+      case 'description':
+        return record.description;
+    }
+  } else {
+    const record = profile.professional.education[context.recordIndex];
+    if (record === undefined) return null;
+    switch (context.field) {
+      case 'institution':
+        return record.institution;
+      case 'degree':
+        return record.degree;
+      case 'fieldOfStudy':
+        return record.fieldOfStudy;
+      case 'location':
+        return record.location;
+      case 'startDate':
+        return record.startDate;
+      case 'endDate':
+        return record.endDate;
+      case 'gpa':
+        return record.gpa === null ? null : String(record.gpa);
+      case 'maxGpa':
+        return record.maxGpa === null ? null : String(record.maxGpa);
+      case 'description':
+        return record.description;
+    }
+  }
+
+  return null;
+}
+
+function structuredInstructionField(
+  context: StructuredRecordContext,
+): StructuredFillInstructionField {
+  return context.kind === 'experience'
+    ? `professional.experiences.${context.recordIndex}.${context.field}`
+    : `professional.education.${context.recordIndex}.${context.field}`;
+}
+
 function hasFillValue(value: FillValue | null): value is FillValue {
   if (value === null) return false;
   if (typeof value === 'boolean') return true;
@@ -113,6 +183,21 @@ export function prepareFillPlan(
   };
 
   for (const item of analysis) {
+    if (item.context.structuredRecord !== undefined) {
+      const value = structuredProfileValue(profile, item.context.structuredRecord);
+      if (!hasFillValue(value)) {
+        plan.unknown.push(item);
+        continue;
+      }
+      plan.ready.push({
+        fieldFingerprint: item.context.fieldFingerprint,
+        field: structuredInstructionField(item.context.structuredRecord),
+        value,
+        controlKind: item.context.controlKind,
+      });
+      continue;
+    }
+
     if (
       item.match.status === 'review' ||
       item.match.status === 'review-answer'

@@ -27,6 +27,7 @@ import { attachFileToField } from '../src/infrastructure/dom/attach-file-control
 import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
 import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
 import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
+import { ensureStructuredRecordSlots } from '../src/infrastructure/dom/structured-record-sections';
 import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
 import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
 import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
@@ -60,6 +61,7 @@ function collectPageSignals(document: Document): string[] {
 
 export default defineContentScript({
   matches: ['http://*/*', 'https://*/*'],
+  allFrames: true,
   runAt: 'document_idle',
   world: 'ISOLATED',
 
@@ -174,7 +176,16 @@ export default defineContentScript({
               url: location.href,
               signals: collectPageSignals(document),
             })}
-            onFill={() => {
+            onFill={async () => {
+              if (currentContext === null) return [];
+              const structured = currentContext.analysis.summary.structured;
+              if (structured !== undefined) {
+                await ensureStructuredRecordSlots(document, location.origin, {
+                  experience: structured.experience.profileRecords,
+                  education: structured.education.profileRecords,
+                });
+                analyzePage(true);
+              }
               if (currentContext === null) return [];
               return applyFillInstructions(
                 document,

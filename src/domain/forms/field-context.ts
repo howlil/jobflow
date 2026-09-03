@@ -11,6 +11,39 @@ export type FieldOption = {
   label: string;
 };
 
+export type ExperienceRecordField =
+  | 'company'
+  | 'title'
+  | 'employmentType'
+  | 'location'
+  | 'startDate'
+  | 'endDate'
+  | 'current'
+  | 'description';
+
+export type EducationRecordField =
+  | 'institution'
+  | 'degree'
+  | 'fieldOfStudy'
+  | 'location'
+  | 'startDate'
+  | 'endDate'
+  | 'gpa'
+  | 'maxGpa'
+  | 'description';
+
+export type StructuredRecordContext =
+  | {
+      kind: 'experience';
+      recordIndex: number;
+      field: ExperienceRecordField;
+    }
+  | {
+      kind: 'education';
+      recordIndex: number;
+      field: EducationRecordField;
+    };
+
 export type FieldContext = {
   controlKind: ControlKind;
   inputType: string;
@@ -24,4 +57,5 @@ export type FieldContext = {
   origin: string;
   formFingerprint: string;
   fieldFingerprint: string;
+  structuredRecord?: StructuredRecordContext;
 };
