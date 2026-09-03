@@ -11,7 +11,7 @@ export function RecordCard({
   return (
     <article
       className={classes(
-        'relative grid gap-3 rounded-app border border-app-border bg-app-surface-glass p-3 shadow-record backdrop-blur-xl',
+        'relative grid gap-3 rounded-control border border-app-border bg-app-surface p-3 shadow-none',
         className,
       )}
       {...props}
@@ -45,13 +45,13 @@ export function RecordHeader({
           {title}
         </strong>
         {context ? (
-          <span className="truncate text-[11px] font-medium text-app-subtle">
+          <span className="truncate text-[13px] font-medium text-app-subtle">
             {context}
           </span>
         ) : null}
       </div>
       {meta ? (
-        <span className="text-[11px] font-medium text-app-subtle sm:text-right">
+        <span className="text-[13px] font-medium text-app-subtle sm:text-right">
           {meta}
         </span>
       ) : null}
