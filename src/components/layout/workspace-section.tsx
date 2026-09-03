@@ -55,20 +55,20 @@ function HelpPopover({ title, help }: HelpPopoverProps) {
     >
       <button
         type="button"
-        className="grid h-6 w-6 place-items-center rounded-control border border-transparent text-app-subtle transition hover:border-app-border hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2"
+        className="grid h-9 w-9 place-items-center rounded-control border border-transparent bg-transparent text-app-subtle transition-colors hover:border-app-border hover:text-app-ink focus-visible:border-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
         aria-label={helpLabel(title)}
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
       >
-        <CircleHelp aria-hidden="true" size={14} strokeWidth={1.8} />
+        <CircleHelp aria-hidden="true" size={16} strokeWidth={1.8} />
       </button>
       {open ? (
         <div
-          className="absolute left-0 top-7 z-50 w-64 max-w-[calc(100vw-2rem)] rounded-app border border-app-border bg-app-surface-glass p-2.5 text-left shadow-popover backdrop-blur-xl"
+          className="absolute left-0 top-10 z-50 w-64 max-w-[calc(100vw-2rem)] rounded-overlay border border-app-border bg-app-surface p-3 text-left shadow-overlay"
           role="dialog"
           aria-label={helpLabel(title)}
         >
-          <p className="m-0 text-xs font-normal leading-5 text-app-text">
+          <p className="m-0 text-[13px] font-normal leading-5 text-app-text">
             {help ?? fallbackHelp(title)}
           </p>
         </div>
@@ -92,7 +92,7 @@ export function WorkspaceSection({
   return (
     <details
       className={classes(
-        'group rounded-app border border-app-border bg-app-surface-glass p-3 shadow-section backdrop-blur-xl',
+        'group border-b border-app-border bg-app-surface px-4 pb-4 sm:px-5 sm:pb-5',
         className,
       )}
       open={defaultOpen}
@@ -121,18 +121,18 @@ export function WorkspaceSectionHeader({
   return (
     <summary
       className={classes(
-        '-m-3 mb-0 flex cursor-pointer list-none items-start justify-between gap-3 rounded-app px-3 py-2.5 outline-none transition hover:bg-app-muted/70 focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-inset group-open:mb-3 group-open:rounded-b-none group-open:border-b group-open:border-app-border [&::-webkit-details-marker]:hidden',
+        '-mx-4 mb-0 flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 border-b border-transparent px-4 py-2.5 outline-none transition-colors hover:bg-transparent focus-visible:ring-2 focus-visible:ring-app-accent-soft focus-visible:ring-inset group-open:mb-4 group-open:border-app-border sm:-mx-5 sm:px-5 sm:group-open:mb-5 [&::-webkit-details-marker]:hidden',
         className,
       )}
     >
-      <div className="grid min-w-0 gap-1.5">
+      <div className="grid min-w-0 gap-1">
         {eyebrow ? (
-          <p className="m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+          <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
             {eyebrow}
           </p>
         ) : null}
         <div className="flex min-w-0 items-center gap-1.5">
-          <h2 className="m-0 min-w-0 truncate text-base font-semibold tracking-tight text-app-ink">
+          <h2 className="m-0 min-w-0 truncate text-[15px] font-semibold tracking-tight text-app-ink">
             {title}
           </h2>
           <HelpPopover title={title} help={helpContent} />
@@ -143,7 +143,7 @@ export function WorkspaceSectionHeader({
           <div onClick={(event) => event.stopPropagation()}>{action}</div>
         ) : null}
         <span
-          className="grid h-6 w-6 place-items-center text-sm text-app-subtle transition-transform group-open:rotate-180"
+          className="grid h-9 w-9 place-items-center text-app-subtle transition-transform group-open:rotate-180"
           aria-hidden="true"
         >
           <ChevronDown size={16} strokeWidth={1.8} />
@@ -171,12 +171,12 @@ export function WorkspaceSubsection({
   return (
     <details
       className={classes(
-        'group rounded-app border border-app-border bg-app-surface-glass p-3 shadow-section backdrop-blur-xl',
+        'group border-t border-app-border bg-app-surface pt-4 first:border-t-0 first:pt-0',
         className,
       )}
       open={defaultOpen}
     >
-      <summary className="-m-3 mb-0 flex cursor-pointer list-none items-center justify-between gap-3 rounded-app px-3 py-2.5 outline-none transition hover:bg-app-muted/70 focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-inset group-open:mb-3 group-open:rounded-b-none group-open:border-b group-open:border-app-border [&::-webkit-details-marker]:hidden">
+      <summary className="mb-0 flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-app-accent-soft group-open:mb-3 [&::-webkit-details-marker]:hidden">
         <div className="flex min-w-0 items-center gap-1.5">
           <h3 className="m-0 min-w-0 truncate text-sm font-semibold text-app-ink">
             {title}
@@ -188,7 +188,7 @@ export function WorkspaceSubsection({
             <div onClick={(event) => event.stopPropagation()}>{action}</div>
           ) : null}
           <span
-            className="grid h-6 w-6 place-items-center text-sm text-app-subtle transition-transform group-open:rotate-180"
+            className="grid h-9 w-9 place-items-center text-app-subtle transition-transform group-open:rotate-180"
             aria-hidden="true"
           >
             <ChevronDown size={16} strokeWidth={1.8} />
