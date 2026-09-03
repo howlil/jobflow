@@ -39,6 +39,45 @@ describe('FloatingPanel', () => {
     expect(fill).toHaveBeenCalledTimes(1);
   });
 
+  it('shows structured application coverage for reusable career records', () => {
+    render(
+      <FloatingPanel
+        summary={{
+          ready: 9,
+          needsReview: 1,
+          sensitive: 0,
+          unknown: 1,
+          total: 11,
+          structured: {
+            experience: {
+              profileRecords: 2,
+              detectedRecords: 2,
+              readyRecords: 2,
+              readyFields: 6,
+              unresolvedFields: 0,
+            },
+            education: {
+              profileRecords: 1,
+              detectedRecords: 1,
+              readyRecords: 1,
+              readyFields: 3,
+              unresolvedFields: 0,
+            },
+          },
+        }}
+        onFill={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
+
+    const coverage = screen.getByLabelText('Structured application coverage');
+    expect(coverage.textContent).toContain('Experience');
+    expect(coverage.textContent).toContain('2 / 2 records');
+    expect(coverage.textContent).toContain('Education');
+    expect(coverage.textContent).toContain('1 / 1 records');
+  });
+
   it('disables fill when no fields are ready', () => {
     render(
       <FloatingPanel

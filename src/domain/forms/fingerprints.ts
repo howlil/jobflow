@@ -25,6 +25,9 @@ export function createFieldFingerprint(context: FieldContext): string {
           `${normalizeFieldText(option.value)}:${normalizeFieldText(option.label)}`,
       )
       .join('|'),
+    context.structuredRecord === undefined
+      ? ''
+      : `${context.structuredRecord.kind}:${context.structuredRecord.recordIndex}:${context.structuredRecord.field}`,
   ];
 
   return `fld_${hashText(stableParts.join('::'))}`;

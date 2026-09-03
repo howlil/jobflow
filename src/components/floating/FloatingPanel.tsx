@@ -35,7 +35,10 @@ type FloatingPanelProps = {
   siteHost?: string;
   variantName?: string | null;
   applicationDraft?: ApplicationDraft | null;
-  onFill: () => FillExecutionResult[] | void;
+  onFill: () =>
+    | FillExecutionResult[]
+    | void
+    | Promise<FillExecutionResult[] | void>;
   onSaveApplication?: (draft: ApplicationDraft) => Promise<void>;
   onRemember?: (context: FieldContext, target: CorrectionTarget) => void;
   onOpenOptions?: () => void;
@@ -46,6 +49,41 @@ type FloatingPanelProps = {
     documentId: string,
   ) => Promise<DocumentAttachStatus>;
 };
+
+function CompletionCoverage({ summary }: { summary: PageAnalysisSummary }) {
+  const structured = summary.structured;
+  if (structured === undefined) return null;
+
+  const rows = [
+    ['Experience', structured.experience] as const,
+    ['Education', structured.education] as const,
+  ].filter(
+    ([, coverage]) =>
+      coverage.profileRecords > 0 || coverage.detectedRecords > 0,
+  );
+  if (rows.length === 0) return null;
+
+  return (
+    <section
+      className="jobflow-panel__section"
+      aria-label="Structured application coverage"
+    >
+      <div className="jobflow-panel__section-heading">
+        <span>Application coverage</span>
+      </div>
+      <div className="jobflow-panel__menu">
+        {rows.map(([label, coverage]) => (
+          <div key={label}>
+            <span>{label}</span>
+            <strong>
+              {coverage.detectedRecords} / {coverage.profileRecords} records
+            </strong>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export function FloatingPanel({
   summary,
@@ -89,7 +127,7 @@ export function FloatingPanel({
     [reusableAnswers, unknownItems],
   );
   const attentionCount =
-    summary.needsReview + summary.sensitive + teachableUnknownItems.length;
+    summary.needsReview + summary.sensitive + summary.unknown;
   const attachableDocuments = useMemo(
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
@@ -124,19 +162,31 @@ export function FloatingPanel({
     setDocumentStatus((current) => ({ ...current, [key]: message }));
   }
 
-  function fillReadyFields() {
-    const results = onFill();
-    if (results === undefined) return;
-
+  function updateFillStatus(results: FillExecutionResult[]) {
     const filled = results.filter(
       (result) => result.status === 'filled',
     ).length;
     const failed = results.length - filled;
+    const unresolved =
+      summary.needsReview + summary.sensitive + summary.unknown;
     setFillStatus(
-      failed === 0
-        ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled.`
-        : `${filled} of ${results.length} fields filled. ${failed} ${failed === 1 ? 'needs' : 'need'} manual input.`,
+      failed === 0 && unresolved === 0
+        ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled. Reusable data complete — review before submitting.`
+        : failed === 0
+          ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled. ${unresolved} ${unresolved === 1 ? 'item remains' : 'items remain'} for review or manual input.`
+          : `${filled} of ${results.length} fields filled. ${failed} ${failed === 1 ? 'needs' : 'need'} manual input.`,
     );
+  }
+
+  function fillReadyFields() {
+    const result = onFill();
+    if (result instanceof Promise) {
+      void result.then((results) => {
+        if (results !== undefined) updateFillStatus(results);
+      });
+      return;
+    }
+    if (result !== undefined) updateFillStatus(result);
   }
 
   return (
@@ -163,21 +213,25 @@ export function FloatingPanel({
           </header>
 
           {view === 'home' ? (
-            <AssistantHomeView
-              summary={summary}
-              attachableDocuments={attachableDocuments}
-              documentStatus={documentStatus}
-              fillStatus={fillStatus}
-              teachableUnknownCount={teachableUnknownItems.length}
-              onAttachDocument={attachDocument}
-              onFill={fillReadyFields}
-              onOpenReview={() => setView('review')}
-              onOpenSensitive={() => setView('sensitive')}
-              {...(applicationDraft === null || onSaveApplication === undefined
-                ? {}
-                : { onOpenPipeline: () => setView('pipeline') })}
-              {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-            />
+            <>
+              <CompletionCoverage summary={summary} />
+              <AssistantHomeView
+                summary={summary}
+                attachableDocuments={attachableDocuments}
+                documentStatus={documentStatus}
+                fillStatus={fillStatus}
+                teachableUnknownCount={teachableUnknownItems.length}
+                onAttachDocument={attachDocument}
+                onFill={fillReadyFields}
+                onOpenReview={() => setView('review')}
+                onOpenSensitive={() => setView('sensitive')}
+                {...(applicationDraft === null ||
+                onSaveApplication === undefined
+                  ? {}
+                  : { onOpenPipeline: () => setView('pipeline') })}
+                {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
+              />
+            </>
           ) : null}
 
           {view === 'pipeline' &&

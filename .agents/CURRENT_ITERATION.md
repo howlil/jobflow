@@ -4,7 +4,9 @@
 
 ## Current Product Position
 
-The last completed milestone was **Core Autofill Coverage & Verified Fill**. Jobflow now has deterministic reusable-answer matching, bounded scalar autofill coverage, scoped correction learning, native choice-control handling, and observed fill outcomes while preserving fail-closed behavior and explicit execution boundaries.
+The last completed milestone was **Reliable Complex Application Completion**. Jobflow now carries the existing deterministic autofill model through substantially more realistic application forms: ordered Experience and Education records can map into repeated sections, clearly identified repeated sections can expand only after explicit Fill, semantic ARIA combobox/listbox and choice controls use generic fail-closed adapters, dynamic/custom-control mutations trigger the existing bounded re-analysis flow, matching embedded frames run the same isolated content-script behavior, and the in-page assistant exposes structured coverage plus unresolved work before submission.
+
+The existing trust boundaries remain unchanged: no automatic Submit/Next, no automatic document attachment, no ATS-specific runtime branches, no backend/cloud/AI/telemetry dependency, and no persisted profile/application schema migration was introduced by this milestone.
 
 Detailed completed work and verification history live in Git/PR records rather than this file.
 
