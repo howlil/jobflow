@@ -11,7 +11,7 @@ export function ApplicationClosureView({
 }: {
   initialDraft: ApplicationDraft;
   status: string | null;
-  onBack: () => void;
+  onBack?: () => void;
   onSave: (draft: ApplicationDraft) => void | Promise<void>;
 }) {
   const [draft, setDraft] = useState<ApplicationDraft>(initialDraft);
@@ -27,10 +27,12 @@ export function ApplicationClosureView({
 
   return (
     <section className="jobflow-panel__detail" aria-label="Application closure">
-      <button className="jobflow-panel__back" type="button" onClick={onBack}>
-        <ArrowLeft aria-hidden="true" size={15} />
-        Back
-      </button>
+      {onBack !== undefined ? (
+        <button className="jobflow-panel__back" type="button" onClick={onBack}>
+          <ArrowLeft aria-hidden="true" size={15} />
+          Back
+        </button>
+      ) : null}
       <div>
         <p className="jobflow-panel__section-label">Pipeline</p>
         <h2>Close the application loop</h2>
