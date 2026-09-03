@@ -45,24 +45,24 @@ describe('options App', () => {
       screen.getByRole('heading', { level: 1, name: 'Pipeline' }),
     ).not.toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Corrections' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Autofill Memory' }));
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Corrections' }),
+      screen.getByRole('heading', { level: 1, name: 'Autofill Memory' }),
     ).not.toBeNull();
   });
 
-  it('preserves an unsaved profile draft while visiting Corrections', async () => {
+  it('preserves an unsaved profile draft while visiting Autofill Memory', async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Personal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Profile' }));
     const firstName =
       await screen.findByLabelText<HTMLInputElement>('First name');
     fireEvent.change(firstName, { target: { value: 'Draft name' } });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Corrections' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Autofill Memory' }));
     expect(screen.getByText('Correction memory')).not.toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Personal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Profile' }));
     expect(screen.getByLabelText<HTMLInputElement>('First name').value).toBe(
       'Draft name',
     );
