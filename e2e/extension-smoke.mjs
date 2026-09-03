@@ -9,11 +9,10 @@ const manifest = JSON.parse(
   await readFile(join(extensionDir, 'manifest.json'), 'utf8'),
 );
 const optionsPath = manifest.options_ui?.page ?? manifest.options_page;
-const popupPath = manifest.action?.default_popup;
 
-if (!optionsPath || !popupPath) {
+if (!optionsPath || !manifest.action || manifest.action.default_popup) {
   throw new Error(
-    'Expected options and popup entrypoints in generated manifest',
+    'Expected a workspace entrypoint and popup-free toolbar action in generated manifest',
   );
 }
 
@@ -152,7 +151,7 @@ try {
   let page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page.getByRole('button', { name: 'Personal', exact: true }).click();
+  await page.getByRole('button', { name: 'Profile', exact: true }).click();
   await page.getByLabel('First name').fill('Smoke');
   await page.getByLabel('Last name').fill('Tester');
 
@@ -174,30 +173,36 @@ try {
   page = await context.newPage();
 
   await page.goto(`chrome-extension://${extensionId}/${optionsPath}`);
-  await page.getByRole('button', { name: 'Personal', exact: true }).click();
+  await page.getByRole('button', { name: 'Profile', exact: true }).click();
   await expect(page.getByLabel('First name')).toHaveValue('Smoke');
   await expect(page.getByLabel('Last name')).toHaveValue('Tester');
-
   await expect(page.getByLabel('Primary email')).toHaveValue(
     'smoke@example.com',
   );
 
-  await page.goto(`chrome-extension://${extensionId}/${popupPath}`);
-  await expect(
-    page.getByRole('heading', { name: 'Current application' }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open workspace' }),
-  ).toBeVisible();
-
   await page.goto(fixture.url);
   await expect(page.locator('jobflow-form-assistant')).toBeAttached();
-  await page.getByRole('button', { name: 'Open Job Flow' }).click();
+
+  const serviceWorker = await getServiceWorker(context);
+  const toolbarResult = await serviceWorker.evaluate(async () => {
+    const extensionApi = globalThis.chrome;
+    const [tab] = await extensionApi.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    if (tab?.id === undefined) throw new Error('Active fixture tab not found');
+    return extensionApi.tabs.sendMessage(tab.id, {
+      type: 'jobflow:assistant/toggle',
+    });
+  });
+  expect(toolbarResult).toEqual({ available: true });
+  await expect(
+    page.getByRole('button', { name: 'Close Job Flow' }),
+  ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Fill 7 ready fields' }),
   ).toBeVisible();
 
-  const serviceWorker = await getServiceWorker(context);
   const summary = await serviceWorker.evaluate(async () => {
     const extensionApi = globalThis.chrome;
     const [tab] = await extensionApi.tabs.query({
