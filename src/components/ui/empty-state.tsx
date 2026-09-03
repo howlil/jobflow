@@ -9,7 +9,7 @@ export function EmptyState({
   return (
     <div
       className={classes(
-        'flex min-h-10 items-center justify-between gap-3 border-y border-app-border py-2 text-xs text-app-text',
+        'flex min-h-10 items-center justify-between gap-3 border-y border-app-border py-2 text-[13px] text-app-text',
         className,
       )}
       {...props}
