@@ -197,8 +197,11 @@ try {
   });
   expect(toolbarResult).toEqual({ available: true });
   await expect(
-    page.getByRole('button', { name: 'Close Job Flow' }),
+    page.getByRole('button', { name: 'Close Job Flow' }).first(),
   ).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Autofill/ })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Pipeline' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Sensitive/ })).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Fill 7 ready fields' }),
   ).toBeVisible();
@@ -258,7 +261,7 @@ try {
   await page.getByRole('button', { name: 'Fill 8 ready fields' }).click();
   await expect(page.getByLabel('Favorite color')).toHaveValue('Blue');
 
-  await page.getByRole('button', { name: 'Review and save this job' }).click();
+  await page.getByRole('tab', { name: 'Pipeline' }).click();
   await page.getByLabel('Company').fill('Example Co');
   await page.getByLabel('Role').fill('Backend Engineer');
   await page.getByRole('button', { name: 'Mark as applied' }).click();
