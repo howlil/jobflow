@@ -114,10 +114,16 @@ function ApplicationProfileSection({
   const recommendationLabel =
     recommended === null
       ? 'Automatic recommendation uses your base career profile.'
-      : `Automatic recommendation: ${variantOptions.find((item) => item.id === recommended)?.name ?? 'application profile'}.`;
+      : `Automatic recommendation: ${
+          variantOptions.find((item) => item.id === recommended)?.name ??
+          'application profile'
+        }.`;
 
   return (
-    <section className="jobflow-panel__section" aria-label="Application profile">
+    <section
+      className="jobflow-panel__section"
+      aria-label="Application profile"
+    >
       <div className="jobflow-panel__section-heading">
         <span>Application profile</span>
       </div>
