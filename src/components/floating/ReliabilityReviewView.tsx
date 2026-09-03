@@ -77,7 +77,10 @@ export function ReliabilityReviewView({
         const answerCandidates =
           item.match.status === 'review-answer' ? item.match.candidates : [];
         return (
-          <div className="jobflow-panel__review" key={`${item.context.formFingerprint}:${key}`}>
+          <div
+            className="jobflow-panel__review"
+            key={`${item.context.formFingerprint}:${key}`}
+          >
             <strong>{label}</strong>
             <small>{reasonFor(item)}</small>
 
@@ -101,7 +104,7 @@ export function ReliabilityReviewView({
               </div>
             ) : null}
 
-            {item.match.status === 'unknown' || item.match.status === 'unknown-answer' ? (
+            {item.match.status === 'unknown' ? (
               <div className="jobflow-panel__review-actions">
                 {reusableAnswers.slice(0, 3).map((answer) => (
                   <button
