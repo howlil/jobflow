@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 import { ChevronDown, CircleHelp } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import { classes } from '../ui/classnames';
 
@@ -27,6 +28,7 @@ function fallbackHelp(title: ReactNode): ReactNode {
 function HelpPopover({ title, help }: HelpPopoverProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!open) return;
@@ -62,17 +64,31 @@ function HelpPopover({ title, help }: HelpPopoverProps) {
       >
         <CircleHelp aria-hidden="true" size={16} strokeWidth={1.8} />
       </button>
-      {open ? (
-        <div
-          className="absolute left-0 top-10 z-50 w-64 max-w-[calc(100vw-2rem)] rounded-overlay border border-app-border bg-app-surface p-3 text-left shadow-overlay"
-          role="dialog"
-          aria-label={helpLabel(title)}
-        >
-          <p className="m-0 text-[13px] font-normal leading-5 text-app-text">
-            {help ?? fallbackHelp(title)}
-          </p>
-        </div>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {open ? (
+          <motion.div
+            className="absolute left-0 top-10 z-50 w-64 max-w-[calc(100vw-2rem)] rounded-overlay border border-app-border bg-app-surface p-3 text-left shadow-overlay"
+            role="dialog"
+            aria-label={helpLabel(title)}
+            initial={reduceMotion ? false : { opacity: 0, y: -4, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: -3, scale: 0.985 }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.12, ease: 'easeOut' }
+            }
+          >
+            <p className="m-0 text-[13px] font-normal leading-5 text-app-text">
+              {help ?? fallbackHelp(title)}
+            </p>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
