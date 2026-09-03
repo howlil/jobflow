@@ -88,7 +88,10 @@ function controlledOptionRoot(control: HTMLElement): ParentNode {
   return control.ownerDocument;
 }
 
-function findCustomOption(control: HTMLElement, value: string): HTMLElement | null {
+function findCustomOption(
+  control: HTMLElement,
+  value: string,
+): HTMLElement | null {
   const normalized = normalizeFieldText(value);
   const root = controlledOptionRoot(control);
   const options = Array.from(

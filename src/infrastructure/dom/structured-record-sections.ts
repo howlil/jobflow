@@ -33,7 +33,10 @@ function controlText(control: HTMLElement): string {
     );
   }
   return normalizeFieldText(
-    control.getAttribute('aria-label') || control.title || control.textContent || '',
+    control.getAttribute('aria-label') ||
+      control.title ||
+      control.textContent ||
+      '',
   );
 }
 
@@ -54,7 +57,8 @@ function containsAny(value: string, terms: readonly string[]): boolean {
 
 function hasExplicitAddIntent(label: string): boolean {
   return ADD_TERMS.some(
-    (term) => label === term || label.startsWith(`${normalizeFieldText(term)} `),
+    (term) =>
+      label === term || label.startsWith(`${normalizeFieldText(term)} `),
   );
 }
 
@@ -63,7 +67,8 @@ function isAddControlForKind(
   kind: keyof StructuredRecordTargets,
 ): boolean {
   if (
-    (control instanceof HTMLButtonElement || control instanceof HTMLInputElement) &&
+    (control instanceof HTMLButtonElement ||
+      control instanceof HTMLInputElement) &&
     control.disabled
   ) {
     return false;
@@ -146,12 +151,7 @@ async function ensureKindSlots(
     if (addControl === null) break;
 
     addControl.click();
-    const increased = await waitForRecordIncrease(
-      root,
-      origin,
-      kind,
-      detected,
-    );
+    const increased = await waitForRecordIncrease(root, origin, kind, detected);
     if (!increased) break;
     detected = detectedRecordCount(root, origin, kind);
   }

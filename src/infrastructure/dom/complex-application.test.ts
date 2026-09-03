@@ -111,16 +111,25 @@ describe('complex application completion', () => {
     );
     expect(results.every((result) => result.status === 'filled')).toBe(true);
     expect(
-      (document.querySelector('[name="experience[0][company]"]') as HTMLInputElement)
-        .value,
+      (
+        document.querySelector(
+          '[name="experience[0][company]"]',
+        ) as HTMLInputElement
+      ).value,
     ).toBe('Gojek');
     expect(
-      (document.querySelector('[name="experience[1][company]"]') as HTMLInputElement)
-        .value,
+      (
+        document.querySelector(
+          '[name="experience[1][company]"]',
+        ) as HTMLInputElement
+      ).value,
     ).toBe('Traveloka');
     expect(
-      (document.querySelector('[name="education[0][school]"]') as HTMLInputElement)
-        .value,
+      (
+        document.querySelector(
+          '[name="education[0][school]"]',
+        ) as HTMLInputElement
+      ).value,
     ).toBe('Universitas Indonesia');
   });
 
@@ -141,15 +150,23 @@ describe('complex application completion', () => {
     `;
 
     const padang = document.querySelector<HTMLElement>('[data-value="Padang"]');
-    padang?.addEventListener('click', () => padang.setAttribute('aria-selected', 'true'));
+    padang?.addEventListener('click', () =>
+      padang.setAttribute('aria-selected', 'true'),
+    );
     const relocate = document.querySelector<HTMLElement>('[role="checkbox"]');
-    relocate?.addEventListener('click', () => relocate.setAttribute('aria-checked', 'true'));
+    relocate?.addEventListener('click', () =>
+      relocate.setAttribute('aria-checked', 'true'),
+    );
     const hybrid = document.querySelector<HTMLElement>('[data-value="hybrid"]');
-    hybrid?.addEventListener('click', () => hybrid.setAttribute('aria-checked', 'true'));
+    hybrid?.addEventListener('click', () =>
+      hybrid.setAttribute('aria-checked', 'true'),
+    );
 
     const fields = extractFieldContexts(document, 'https://jobs.example.test');
     const city = fields.find((field) => field.ariaLabel === 'City');
-    const checkbox = fields.find((field) => field.ariaLabel === 'Willing to relocate');
+    const checkbox = fields.find(
+      (field) => field.ariaLabel === 'Willing to relocate',
+    );
     const radio = fields.find((field) => field.label === 'Work arrangement');
     if (city === undefined || checkbox === undefined || radio === undefined) {
       throw new Error('Expected semantic controls');
@@ -177,7 +194,11 @@ describe('complex application completion', () => {
     ];
 
     expect(
-      applyFillInstructions(document, 'https://jobs.example.test', instructions),
+      applyFillInstructions(
+        document,
+        'https://jobs.example.test',
+        instructions,
+      ),
     ).toEqual([
       { fieldFingerprint: city.fieldFingerprint, status: 'filled' },
       { fieldFingerprint: checkbox.fieldFingerprint, status: 'filled' },
@@ -213,10 +234,9 @@ describe('complex application completion', () => {
         <label>Company <input name="experience[1][company]" /></label>
         <label>Job title <input name="experience[1][title]" /></label>
       `;
-      document.getElementById('experience-section')?.insertBefore(
-        fieldset,
-        document.getElementById('add-experience'),
-      );
+      document
+        .getElementById('experience-section')
+        ?.insertBefore(fieldset, document.getElementById('add-experience'));
     });
 
     await expect(

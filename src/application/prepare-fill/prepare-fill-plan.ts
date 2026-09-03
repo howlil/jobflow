@@ -184,7 +184,10 @@ export function prepareFillPlan(
 
   for (const item of analysis) {
     if (item.context.structuredRecord !== undefined) {
-      const value = structuredProfileValue(profile, item.context.structuredRecord);
+      const value = structuredProfileValue(
+        profile,
+        item.context.structuredRecord,
+      );
       if (!hasFillValue(value)) {
         plan.unknown.push(item);
         continue;

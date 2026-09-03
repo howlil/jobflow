@@ -57,7 +57,10 @@ function CompletionCoverage({ summary }: { summary: PageAnalysisSummary }) {
   const rows = [
     ['Experience', structured.experience] as const,
     ['Education', structured.education] as const,
-  ].filter(([, coverage]) => coverage.profileRecords > 0 || coverage.detectedRecords > 0);
+  ].filter(
+    ([, coverage]) =>
+      coverage.profileRecords > 0 || coverage.detectedRecords > 0,
+  );
   if (rows.length === 0) return null;
 
   return (
@@ -164,7 +167,8 @@ export function FloatingPanel({
       (result) => result.status === 'filled',
     ).length;
     const failed = results.length - filled;
-    const unresolved = summary.needsReview + summary.sensitive + summary.unknown;
+    const unresolved =
+      summary.needsReview + summary.sensitive + summary.unknown;
     setFillStatus(
       failed === 0 && unresolved === 0
         ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled. Reusable data complete — review before submitting.`
@@ -221,7 +225,8 @@ export function FloatingPanel({
                 onFill={fillReadyFields}
                 onOpenReview={() => setView('review')}
                 onOpenSensitive={() => setView('sensitive')}
-                {...(applicationDraft === null || onSaveApplication === undefined
+                {...(applicationDraft === null ||
+                onSaveApplication === undefined
                   ? {}
                   : { onOpenPipeline: () => setView('pipeline') })}
                 {...(onOpenOptions === undefined ? {} : { onOpenOptions })}

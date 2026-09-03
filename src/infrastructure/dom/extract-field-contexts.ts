@@ -91,7 +91,10 @@ function controlKind(control: LiveControl): ControlKind {
   const role = control.getAttribute('role');
   if (role === 'checkbox') return 'checkbox';
   if (role === 'radio') return 'radio';
-  if (role === 'combobox' || control.getAttribute('aria-haspopup') === 'listbox') {
+  if (
+    role === 'combobox' ||
+    control.getAttribute('aria-haspopup') === 'listbox'
+  ) {
     return 'select';
   }
   return 'input';
@@ -177,7 +180,8 @@ function customOptions(control: LiveControl): FieldOption[] {
         cleanText(option.getAttribute('value')) ||
         cleanText(option.textContent),
       label:
-        cleanText(option.getAttribute('aria-label')) || cleanText(option.textContent),
+        cleanText(option.getAttribute('aria-label')) ||
+        cleanText(option.textContent),
     }),
   );
 }
@@ -192,7 +196,8 @@ function sectionText(control: LiveControl): string {
     ':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6, :scope > legend',
   );
   return (
-    cleanText(heading?.textContent) || cleanText(container.getAttribute('aria-label'))
+    cleanText(heading?.textContent) ||
+    cleanText(container.getAttribute('aria-label'))
   );
 }
 
@@ -278,11 +283,21 @@ function containsAny(value: string, terms: readonly string[]): boolean {
 }
 
 function experienceField(signals: string): ExperienceRecordField | null {
-  if (containsAny(signals, ['employment type', 'job type'])) return 'employmentType';
-  if (containsAny(signals, ['start date', 'date started', 'from date', 'start month'])) {
+  if (containsAny(signals, ['employment type', 'job type']))
+    return 'employmentType';
+  if (
+    containsAny(signals, [
+      'start date',
+      'date started',
+      'from date',
+      'start month',
+    ])
+  ) {
     return 'startDate';
   }
-  if (containsAny(signals, ['end date', 'date ended', 'to date', 'end month'])) {
+  if (
+    containsAny(signals, ['end date', 'date ended', 'to date', 'end month'])
+  ) {
     return 'endDate';
   }
   if (
@@ -296,11 +311,27 @@ function experienceField(signals: string): ExperienceRecordField | null {
   ) {
     return 'current';
   }
-  if (containsAny(signals, ['description', 'responsibilities', 'responsibility', 'achievements'])) {
+  if (
+    containsAny(signals, [
+      'description',
+      'responsibilities',
+      'responsibility',
+      'achievements',
+    ])
+  ) {
     return 'description';
   }
-  if (containsAny(signals, ['company', 'employer', 'organization'])) return 'company';
-  if (containsAny(signals, ['job title', 'position title', 'position', 'role', 'title'])) {
+  if (containsAny(signals, ['company', 'employer', 'organization']))
+    return 'company';
+  if (
+    containsAny(signals, [
+      'job title',
+      'position title',
+      'position',
+      'role',
+      'title',
+    ])
+  ) {
     return 'title';
   }
   if (containsAny(signals, ['location', 'city'])) return 'location';
@@ -308,19 +339,33 @@ function experienceField(signals: string): ExperienceRecordField | null {
 }
 
 function educationField(signals: string): EducationRecordField | null {
-  if (containsAny(signals, ['max gpa', 'maximum gpa', 'gpa scale'])) return 'maxGpa';
+  if (containsAny(signals, ['max gpa', 'maximum gpa', 'gpa scale']))
+    return 'maxGpa';
   if (containsAny(signals, ['gpa', 'grade point average'])) return 'gpa';
-  if (containsAny(signals, ['field of study', 'major', 'study field', 'program'])) {
+  if (
+    containsAny(signals, ['field of study', 'major', 'study field', 'program'])
+  ) {
     return 'fieldOfStudy';
   }
-  if (containsAny(signals, ['institution', 'university', 'college', 'school'])) {
+  if (
+    containsAny(signals, ['institution', 'university', 'college', 'school'])
+  ) {
     return 'institution';
   }
   if (containsAny(signals, ['degree', 'qualification'])) return 'degree';
-  if (containsAny(signals, ['start date', 'date started', 'from date', 'start year'])) {
+  if (
+    containsAny(signals, [
+      'start date',
+      'date started',
+      'from date',
+      'start year',
+    ])
+  ) {
     return 'startDate';
   }
-  if (containsAny(signals, ['end date', 'graduation date', 'to date', 'end year'])) {
+  if (
+    containsAny(signals, ['end date', 'graduation date', 'to date', 'end year'])
+  ) {
     return 'endDate';
   }
   if (containsAny(signals, ['description', 'activities'])) return 'description';
@@ -331,19 +376,33 @@ function educationField(signals: string): EducationRecordField | null {
 type StructuredKind = StructuredRecordContext['kind'];
 type StructuredField = ExperienceRecordField | EducationRecordField;
 
-function fieldForKind(kind: StructuredKind, context: FieldContext): StructuredField | null {
+function fieldForKind(
+  kind: StructuredKind,
+  context: FieldContext,
+): StructuredField | null {
   const signals = fieldSignals(context);
-  return kind === 'experience' ? experienceField(signals) : educationField(signals);
+  return kind === 'experience'
+    ? experienceField(signals)
+    : educationField(signals);
 }
 
-function hasDirectKindSignal(kind: StructuredKind, context: FieldContext): boolean {
+function hasDirectKindSignal(
+  kind: StructuredKind,
+  context: FieldContext,
+): boolean {
   const signals = normalizeFieldText(
     [context.sectionText, context.name, context.id].join(' '),
   );
-  return containsAny(signals, kind === 'experience' ? EXPERIENCE_TERMS : EDUCATION_TERMS);
+  return containsAny(
+    signals,
+    kind === 'experience' ? EXPERIENCE_TERMS : EDUCATION_TERMS,
+  );
 }
 
-function rawContextForControl(control: LiveControl, origin: string): FieldContext {
+function rawContextForControl(
+  control: LiveControl,
+  origin: string,
+): FieldContext {
   const options =
     control instanceof HTMLSelectElement
       ? selectOptions(control)
@@ -360,7 +419,8 @@ function nearestRecordContainer(
   origin: string,
 ): Element | null {
   let current = control.parentElement;
-  const requiredAnchor = kind === 'experience' ? ['company', 'title'] : ['institution', 'degree'];
+  const requiredAnchor =
+    kind === 'experience' ? ['company', 'title'] : ['institution', 'degree'];
 
   while (current !== null && !(current instanceof HTMLFormElement)) {
     const descendants = Array.from(
@@ -369,10 +429,14 @@ function nearestRecordContainer(
     if (descendants.length >= 2 && descendants.length <= 12) {
       const fields = new Set(
         descendants
-          .map((candidate) => fieldForKind(kind, rawContextForControl(candidate, origin)))
+          .map((candidate) =>
+            fieldForKind(kind, rawContextForControl(candidate, origin)),
+          )
           .filter((field): field is StructuredField => field !== null),
       );
-      const hasAnchor = requiredAnchor.some((anchor) => fields.has(anchor as StructuredField));
+      const hasAnchor = requiredAnchor.some((anchor) =>
+        fields.has(anchor as StructuredField),
+      );
       if (fields.size >= 2 && hasAnchor) return current;
     }
     current = current.parentElement;
@@ -381,12 +445,17 @@ function nearestRecordContainer(
   return null;
 }
 
-function explicitRecordIndex(control: LiveControl, context: FieldContext): number | null {
+function explicitRecordIndex(
+  control: LiveControl,
+  context: FieldContext,
+): number | null {
   const identity = `${context.name} ${context.id}`;
   const bracket = /\[(\d+)\]/.exec(identity);
   if (bracket !== null) return Number(bracket[1]);
 
-  const keyword = /(?:experience|employment|education|school)[_-]?(\d+)/i.exec(identity);
+  const keyword = /(?:experience|employment|education|school)[_-]?(\d+)/i.exec(
+    identity,
+  );
   if (keyword !== null) return Math.max(0, Number(keyword[1]) - 1);
 
   const section = /(?:experience|employment|education)\s+(\d+)/i.exec(
@@ -413,7 +482,8 @@ function assignStructuredRecordContexts(
         const structuredField = fieldForKind(kind, field.context);
         if (structuredField === null) return null;
         const container = nearestRecordContainer(control, kind, origin);
-        if (!hasDirectKindSignal(kind, field.context) && container === null) return null;
+        if (!hasDirectKindSignal(kind, field.context) && container === null)
+          return null;
         return { field, control, structuredField, container };
       })
       .filter(
@@ -436,9 +506,14 @@ function assignStructuredRecordContexts(
     ).sort(documentOrder);
 
     for (const candidate of candidates) {
-      const explicitIndex = explicitRecordIndex(candidate.control, candidate.field.context);
+      const explicitIndex = explicitRecordIndex(
+        candidate.control,
+        candidate.field.context,
+      );
       const containerIndex =
-        candidate.container === null ? 0 : Math.max(0, containers.indexOf(candidate.container));
+        candidate.container === null
+          ? 0
+          : Math.max(0, containers.indexOf(candidate.container));
       const recordIndex = explicitIndex ?? containerIndex;
       const structuredRecord =
         kind === 'experience'
@@ -498,13 +573,16 @@ export function scanDomFields(
       handledRadioGroups.add(groupKey);
 
       const groupControls = controls.filter(
-        (candidate) => controlKind(candidate) === 'radio' && sameRadioGroup(candidate, control),
+        (candidate) =>
+          controlKind(candidate) === 'radio' &&
+          sameRadioGroup(candidate, control),
       );
       const options = groupControls.map((candidate) => ({
         value:
           candidate instanceof HTMLInputElement
             ? candidate.value
-            : cleanText(candidate.getAttribute('data-value')) || optionLabel(candidate),
+            : cleanText(candidate.getAttribute('data-value')) ||
+              optionLabel(candidate),
         label: optionLabel(candidate),
       }));
       fields.push({

@@ -3,22 +3,21 @@ name: CI
 on:
   pull_request:
     branches: ['master']
+  push:
+    branches: ['master']
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: ci-format-${{ github.event.pull_request.number }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  format-final-candidate:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
       - uses: pnpm/action-setup@v5
         with:
           version: 11.21.0
@@ -29,27 +28,15 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Format M10 files and restore canonical CI
-        run: |
-          pnpm exec prettier --write \
-            entrypoints/content.tsx \
-            src/application/forms/analyze-field-contexts.ts \
-            src/application/prepare-fill/prepare-fill-plan.ts \
-            src/components/floating/FloatingPanel.test.tsx \
-            src/components/floating/FloatingPanel.tsx \
-            src/domain/forms/field-context.ts \
-            src/domain/forms/fingerprints.ts \
-            src/infrastructure/dom/complex-application.test.ts \
-            src/infrastructure/dom/extract-field-contexts.ts \
-            src/infrastructure/dom/fill-controls.ts \
-            src/infrastructure/dom/observe-form-mutations.ts \
-            src/infrastructure/dom/structured-record-sections.ts
-          git checkout origin/master -- .github/workflows/ci.yml
-          git diff --check
-      - name: Commit canonical formatting
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/ci.yml entrypoints/content.tsx src/application/forms/analyze-field-contexts.ts src/application/prepare-fill/prepare-fill-plan.ts src/components/floating/FloatingPanel.test.tsx src/components/floating/FloatingPanel.tsx src/domain/forms/field-context.ts src/domain/forms/fingerprints.ts src/infrastructure/dom/complex-application.test.ts src/infrastructure/dom/extract-field-contexts.ts src/infrastructure/dom/fill-controls.ts src/infrastructure/dom/observe-form-mutations.ts src/infrastructure/dom/structured-record-sections.ts
-          git commit -m 'chore: finalize M10 formatting'
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+      - name: Test
+        run: pnpm test
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Format check
+        run: pnpm format:check
+      - name: Build
+        run: pnpm build
+      - name: Verify generated extension
+        run: pnpm verify:manifest
