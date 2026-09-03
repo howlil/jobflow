@@ -78,7 +78,7 @@ export function WorkspaceNavigation({
       >
         {groups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle opacity-0 transition-opacity group-hover/sidebar:opacity-100 group-focus-within/sidebar:opacity-100">
+            <p className="pointer-events-none mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle opacity-0 transition-opacity duration-100 group-data-[expanded=true]/sidebar:opacity-100">
               {group.label}
             </p>
             <div className="grid gap-1">
@@ -104,7 +104,7 @@ export function WorkspaceNavigation({
                       size={18}
                       strokeWidth={1.8}
                     />
-                    <span className="truncate opacity-0 transition-opacity group-hover/sidebar:opacity-100 group-focus-within/sidebar:opacity-100">
+                    <span className="pointer-events-none truncate opacity-0 transition-opacity duration-100 group-data-[expanded=true]/sidebar:opacity-100">
                       {item.label}
                     </span>
                   </button>
