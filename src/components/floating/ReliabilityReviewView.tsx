@@ -200,7 +200,9 @@ export function ReliabilityReviewView({
                 Manual only
               </button>
             </div>
-            {statuses[key] ? <small role="status">{statuses[key]}</small> : null}
+            {statuses[key] ? (
+              <small role="status">{statuses[key]}</small>
+            ) : null}
           </div>
         );
       })}
