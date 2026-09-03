@@ -11,16 +11,18 @@ Job Flow is a local-first Chromium extension for career-form autofill. It keeps 
 - Base profile plus lightweight Application Profiles backed by the existing local variant model.
 - Deterministic current-page Application Profile recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
 - Context-aware toolbar action: on a supported application form it opens the in-page Assistant; otherwise it opens Workspace. Job Flow does not expose a separate toolbar popup product surface.
-- In-page 48px floating launcher for detected forms. The detailed Assistant opens only after a user click or explicit toolbar action and becomes viewport-safe on narrow pages.
-- Current-page Application Profile selection lives in the Assistant alongside the operations it affects.
+- One 48px floating launcher at the bottom-right of detected application pages. Clicking it opens a compact in-page popup with exactly three top-level tabs: **Autofill**, **Pipeline**, and **Sensitive**.
+- Current-page Application Profile selection, safe fill, unresolved review, Answer Memory, explicit document attachment, and local completion status live under the Autofill tab.
+- The Pipeline tab reviews/saves the current job and can explicitly mark it applied after the user submits on the employer site; capture updates an existing exact-job-URL record instead of creating a duplicate.
 - Ready / Needs review / Sensitive / Unknown field classification.
 - Explicit normal-field fill only; no automatic fill on scan.
 - Dynamic form re-analysis for multi-step or changing forms.
 - Per-site/form/field Autofill Memory with Workspace controls to inspect/delete mappings, reset a site, reset all, and review stale mappings.
+- Non-sensitive stable answers can be explicitly remembered from the current page and reused by the deterministic matcher on equivalent future application questions.
 - Sensitive Data Vault for encrypted-at-rest sensitive values.
 - Sensitive fields require vault setup/unlock plus a separate current-site approval before fill.
 - Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
-- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
+- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the Autofill tab. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
 - Versioned normal-profile backup export/import validated through the same persisted-schema parser, plus backup diagnostics before recovery. Sensitive vault values are never exported as plaintext.
 - Compatibility fixtures provide deterministic regression evidence; optional live ATS observation may be used for debugging/product feedback but is not a CI, merge, or release gate.
 - No auto-submit, auto-next, backend, cloud sync, analytics, or AI dependency.
@@ -63,7 +65,7 @@ Load the built extension for development/debugging when needed:
 Job Flow intentionally has two product surfaces:
 
 ```text
-Application page -> In-page Assistant -> analyze / select profile / fill / review / attach / sensitive / capture
+Application page -> floating launcher -> Assistant popup -> Autofill / Pipeline / Sensitive
 Career management -> Workspace -> pipeline / profile / documents / Application Profiles / data settings
 ```
 

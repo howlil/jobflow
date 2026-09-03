@@ -30,9 +30,10 @@ Owns:
 - relevant dynamic-page observation
 - isolated in-page Assistant mounting
 - current-page Application Profile override/re-analysis
+- reading an explicitly user-entered current field value when the user chooses to remember it
 - execution of approved fill instructions
 
-It must not own canonical profile persistence, application persistence policy, vault passphrase/key lifecycle, or business matching policy.
+It must not own canonical profile persistence, vault passphrase/key lifecycle, or business matching policy. Reusable Answer Memory is a separate validated local store and is not canonical career profile state.
 
 ### Background service worker
 
@@ -87,6 +88,7 @@ content script -> wholesale decrypted vault state
 host DOM
  -> scan / extract serializable FieldContext
  -> site correction lookup
+ -> load canonical profile + reusable Answer Memory
  -> deterministic matcher
  -> MatchResult
  -> resolve base profile + optional application variant
@@ -97,7 +99,22 @@ host DOM
  -> normal browser/page events
 ```
 
-A semantic match is evidence, not authorization to mutate the page.
+A semantic match is evidence, not authorization to mutate the page. Remembered answers may become deterministic reusable-answer evidence, but ambiguous matches still remain review-only.
+
+## Answer-memory feedback loop
+
+```text
+unresolved normal field
+ -> user enters answer on host page
+ -> explicit Remember current answer
+ -> read only that field's current value
+ -> validate + persist local Answer Memory entry
+ -> persist exact field correction for current site/form/field
+ -> re-analyze page
+ -> future equivalent question can reuse remembered answer through existing matcher
+```
+
+Sensitive fields do not enter this normal Answer Memory path; sensitive values remain behind the vault/disclosure boundary.
 
 ## Dynamic-page flow
 
@@ -116,11 +133,12 @@ Do not busy-poll or perform full re-analysis for every mutation. Ignore Jobflow'
 
 - Base career profile: one versioned canonical local profile.
 - Application variants: lightweight overrides over the base profile, surfaced to users as Application Profiles.
-- Applications: versioned local collection with explicit migrations.
+- Reusable Answer Memory: separately versioned and validated local non-sensitive question/answer entries; it feeds the existing reusable-answer matcher and does not mutate the canonical profile schema.
+- Applications: versioned local collection with explicit migrations; current-page capture may update the existing exact-job-URL record rather than create a duplicate.
 - Corrections: local persistence scoped to site/form/field identity, surfaced as Autofill Memory.
 - Documents: metadata plus extension-owned local binaries.
-- Sensitive vault: encrypted local persistence, separate from normal profile storage.
-- Page analysis and current page override: ephemeral and reconstructable.
+- Sensitive vault: encrypted local persistence, separate from normal profile and Answer Memory storage.
+- Page analysis, completion diagnostics, and current page override: ephemeral and reconstructable.
 
 Validate untrusted persisted/imported/message/DOM data at the boundary. Persisted schema changes require sequential migration and compatibility evidence.
 
@@ -140,7 +158,7 @@ Jobflow has two materially different rendering environments:
 1. Full-tab Workspace using shared Tailwind tokens and owned reusable components.
 2. In-page Assistant rendered in an isolated Shadow DOM; host-page CSS must not control it and document-level Tailwind must not be assumed to cross the boundary.
 
-There is no browser-action popup React surface. The technical `options` entrypoint may remain because it is a browser-extension shell detail; user-facing semantics are Workspace.
+There is no browser-action popup React surface. The in-page Assistant itself uses a single bottom-right floating launcher that opens a compact three-tab popup for Autofill, Pipeline, and Sensitive actions. The technical `options` entrypoint may remain because it is a browser-extension shell detail; user-facing semantics are Workspace.
 
 Visual and interaction rules are owned by `.agents/DESIGN.md`.
 

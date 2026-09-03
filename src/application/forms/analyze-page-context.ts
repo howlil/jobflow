@@ -7,6 +7,7 @@ import { recommendDocumentsForVariant } from '../../domain/documents/recommend-d
 import type { FieldContext } from '../../domain/forms/field-context';
 import {
   reusableAnswerOptions,
+  type ReusableAnswer,
   type ReusableAnswerOption,
 } from '../../domain/matching/reusable-answers';
 import type {
@@ -45,6 +46,7 @@ type AnalyzePageContextInput = {
   corrections: FieldCorrection[];
   pageSignals: string[];
   variantOverrideId: string | null;
+  rememberedAnswers?: ReusableAnswer[];
 };
 
 function documentSummary(
@@ -87,6 +89,7 @@ export function analyzePageContext({
   corrections,
   pageSignals,
   variantOverrideId,
+  rememberedAnswers = [],
 }: AnalyzePageContextInput): AnalyzedPageContext {
   const variantOptions = envelope.variants.map((variant) => ({
     id: variant.id,
@@ -112,6 +115,8 @@ export function analyzePageContext({
     envelope.baseProfile,
     selectedVariant,
   );
+  const effectiveAnswers = [...rememberedAnswers, ...profile.customAnswers];
+  profile.customAnswers = effectiveAnswers;
   const documents = recommendDocumentsForVariant(
     envelope.baseProfile,
     selectedVariant,
@@ -141,7 +146,7 @@ export function analyzePageContext({
     activeVariantId,
     variantOptions,
     documentFields,
-    reusableAnswers: reusableAnswerOptions(profile.customAnswers),
+    reusableAnswers: reusableAnswerOptions(effectiveAnswers),
   };
 }
 

@@ -148,32 +148,47 @@ Navigation is domain-oriented. Current product grouping centers on Work, Career 
 
 ### In-page assistant
 
-The assistant overlays the host page and never becomes part of the site's layout.
+The assistant overlays the host page and never becomes part of the site's layout. It is a compact contextual popup, not a sidebar or drawer.
 
 Collapsed launcher:
 
 ```text
 position: fixed
-right: 0
-top: 50%
-approx. 42x56 desktop
-highest extension z-index
+right: 14–18px
+bottom: 14–18px
+approx. 46–48px circle
+highest extension interaction z-index
 ```
 
-Expanded panel:
+Expanded popup:
 
 ```text
 position: fixed
-top: 0
-right: 0
-bottom: 0
-width: min(368px, 100vw)
-height: 100dvh
-border-left only
-internal scroll
+right: 12–18px
+bottom: ~70–78px
+width: min(~390px, viewport minus safe gutters)
+max-height: viewport minus launcher/header clearance
+rounded bordered popover
+internal content scroll only
 ```
 
-On narrow viewports it may occupy full width. The assistant is mounted in Shadow DOM; its styling isolation is intentional and must not be removed merely because the workspace uses Tailwind.
+The popup has exactly three top-level tabs:
+
+```text
+Autofill
+  page analysis, Application Profile, safe fill, unresolved review,
+  remembered answers, explicit document attachment, local completion status
+
+Pipeline
+  review/save current job, follow-up details, explicit mark-as-applied
+
+Sensitive
+  sensitive-field review, vault unlock/setup, explicit current-site fill
+```
+
+Unresolved-field review is a subflow of **Autofill**, not a fourth top-level tab. The launcher remains the single persistent in-page entry point. Do not restore a full-height right drawer or mid-right edge handle unless the product interaction model is explicitly changed again.
+
+On narrow viewports the popup uses viewport gutters and bounded height rather than becoming a permanent full-screen panel. The assistant is mounted in Shadow DOM; its styling isolation is intentional and must not be removed merely because the workspace uses Tailwind.
 
 ## Tailwind and component ownership
 
@@ -346,7 +361,7 @@ Detection never authorizes automatic attachment or submission.
 ```text
 detect sensitive field
  -> show label/count only
- -> user opens Sensitive view
+ -> user opens Sensitive tab
  -> unlock vault if needed
  -> explicit current-site fill action
 ```
@@ -358,26 +373,3 @@ Unlocking is not disclosure consent. Do not expose sensitive values longer than 
 Use short operational copy, e.g. `8 fields ready`, `Review ambiguous fields`, `Attach backend-cv.pdf`, `Import selected data`, `Open profile workspace`.
 
 Avoid repeated local-first explanations, marketing claims, and generic AI-assistant language inside utility surfaces.
-
-## Interaction contract
-
-The following are design concerns when a changed surface affects them; they are not a manual release checklist:
-
-```text
-entry point        obvious starting point
-primary action     one obvious next action
-state preservation expected drafts/navigation survive
-feedback           specific save/import/fill/review status
-errors             appear near cause
-escape route       cancel/close/back without data loss
-keyboard           logical tab order; Escape closes overlays
-mobile             controls reachable without horizontal scroll
-overflow           long labels/URLs/filenames do not collide
-loading            dimensions remain stable
-sensitive data     detect/review/unlock/fill stay explicit
-document attach    recommendation never implies auto-attachment
-```
-
-Protect interaction and accessibility semantics with deterministic component/DOM tests where the behavior warrants regression coverage, plus static/build checks for the affected surface. Responsive layout should follow the documented contracts at the widths the implementation supports.
-
-Screenshots, browser inspection, and device review may be used opportunistically for design debugging or product observation, but they are not merge, release-readiness, or acceptance gates. Do not require manual visual evidence when repository-owned deterministic checks already cover the changed behavior.

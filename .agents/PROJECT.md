@@ -31,6 +31,9 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 - Matching evidence does not itself authorize DOM mutation; execution goes through an explicit fill plan.
 - Unknown or low-confidence fields remain untouched.
 - The user can review ambiguous mappings and corrections.
+- Stable non-sensitive answers entered manually may be explicitly remembered and reused on equivalent future application questions.
+- Ambiguous reusable-answer matches require user review rather than automatic reuse.
+- Autofill Memory corrections and remembered answers feed future analysis; users should not need to administer mappings during the normal application journey.
 - Jobflow never automatically clicks Apply, Submit, Next, or equivalent navigation.
 - File attachment remains explicit for the specific detected field.
 - Current-page Application Profile recommendation and override belong in the in-page Assistant because they directly affect the current application analysis/fill plan.
@@ -49,6 +52,7 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 - CV text extraction is local and review-before-import.
 - Selecting a CV for import does not overwrite the profile without review.
 - Detecting a document field does not authorize automatic attachment.
+- The Assistant may recommend a stored document and report missing/unsupported attachment states, but attachment remains a separate explicit user action.
 
 ### Application pipeline
 
@@ -56,6 +60,8 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 - Pipeline is the operational home for application work.
 - Application Detail is the focused execution surface for one opportunity.
 - The pipeline supports create/read/update/delete, priority, next-action tracking, deadlines, explicit stage changes, and terminal outcomes.
+- Current-page capture may update an existing opportunity with the same job URL instead of creating duplicate records.
+- Marking an opportunity Applied is an explicit Jobflow action after the user submits on the employer site; Jobflow does not submit on the user's behalf.
 - Job capture remains user-reviewed; Jobflow is not a job-discovery platform.
 
 ## Primary product surfaces
@@ -63,7 +69,7 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 Jobflow has two user-facing product surfaces:
 
 - **Workspace** — full-tab management surface for Pipeline, career profile, documents, Application Profiles, preferences, privacy/sensitive data, Autofill Memory, and backup/recovery.
-- **In-page Assistant** — current-application execution surface for page analysis, Application Profile selection, fill review, explicit attachment, sensitive disclosure, and application capture.
+- **In-page Assistant** — current-application execution surface for page analysis, Application Profile selection, fill review, explicit attachment, sensitive disclosure, application capture, and privacy-safe local completion diagnostics.
 
 The browser toolbar icon is a context-aware launcher, not a third product surface: on a supported application page it opens the in-page Assistant; otherwise it opens Workspace. There is no separate browser-action popup workflow.
 
@@ -73,10 +79,11 @@ Interaction and visual authority for these surfaces lives in `.agents/DESIGN.md`
 
 - Canonical career facts: local versioned base profile.
 - Application-specific differences: lightweight local variant overrides surfaced as Application Profiles.
+- Reusable Answer Memory: separately versioned local non-sensitive question/answer memory; it does not replace canonical career facts or the sensitive vault.
 - Application pipeline: versioned local application storage.
 - Document binaries: extension-owned local document storage.
 - Sensitive data: encrypted local vault with separate unlock/session handling.
-- Page analysis: ephemeral per-page state.
+- Page analysis and completion diagnostics: ephemeral per-page/session state.
 - Host pages do not own Jobflow career data.
 
 ## Product invariants
