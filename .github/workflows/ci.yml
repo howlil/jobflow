@@ -70,7 +70,11 @@ jobs:
           (
             pnpm typecheck &&
             pnpm lint &&
-            pnpm format:check &&
+            if ! pnpm format:check; then
+              pnpm format
+              git diff -- src/components/floating/FloatingPanel.tsx src/components/floating/FloatingPanel.test.tsx
+              exit 1
+            fi &&
             pnpm build
           ) &
           quality_pid=$!
