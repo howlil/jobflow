@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Jobflow reduces repetitive data entry and operational friction during job applications. The user owns one canonical local career profile; Jobflow detects application forms, maps fields deterministically, recommends an application variant, and fills approved safe data without taking over submission.
+Jobflow reduces repetitive data entry and operational friction during job applications. The user owns one canonical local career profile; Jobflow detects application forms, maps fields deterministically, recommends an application profile, and fills approved safe data without taking over submission.
 
 The product succeeds by being reliably useful, conservative when uncertain, and explicit about sensitive disclosure. Supporting every ATS is not the goal.
 
@@ -15,7 +15,7 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 ### Career profile
 
 - One canonical reusable career profile is the source of truth for reusable facts.
-- Application variants are lightweight overrides, not duplicated full profiles.
+- User-facing **Application Profiles** are lightweight overrides over the base profile; the persisted/domain model may continue to use the internal term `variant`.
 - Experience and Projects are the user-facing skill-authoring sources.
 - The active skill inventory is the case-insensitive unique union of skills linked from Experience and Projects.
 - Skill proficiency/level and years-of-experience are not part of the current user-facing skill model.
@@ -33,6 +33,7 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 - The user can review ambiguous mappings and corrections.
 - Jobflow never automatically clicks Apply, Submit, Next, or equivalent navigation.
 - File attachment remains explicit for the specific detected field.
+- Current-page Application Profile recommendation and override belong in the in-page Assistant because they directly affect the current application analysis/fill plan.
 
 ### Sensitive data
 
@@ -59,16 +60,19 @@ A job seeker using Chromium desktop who wants a local-first workspace for reusab
 
 ## Primary product surfaces
 
-- Full-tab career/workspace surface for profile, documents, pipeline, variants, vault, corrections, and backup/recovery.
-- In-page assistant for current-site analysis, fill review, explicit attachment, and sensitive disclosure.
-- Browser-action popup as a compact entry surface.
+Jobflow has two user-facing product surfaces:
+
+- **Workspace** — full-tab management surface for Pipeline, career profile, documents, Application Profiles, preferences, privacy/sensitive data, Autofill Memory, and backup/recovery.
+- **In-page Assistant** — current-application execution surface for page analysis, Application Profile selection, fill review, explicit attachment, sensitive disclosure, and application capture.
+
+The browser toolbar icon is a context-aware launcher, not a third product surface: on a supported application page it opens the in-page Assistant; otherwise it opens Workspace. There is no separate browser-action popup workflow.
 
 Interaction and visual authority for these surfaces lives in `.agents/DESIGN.md`.
 
 ## Data ownership and trust boundaries
 
 - Canonical career facts: local versioned base profile.
-- Application-specific differences: lightweight local variant overrides.
+- Application-specific differences: lightweight local variant overrides surfaced as Application Profiles.
 - Application pipeline: versioned local application storage.
 - Document binaries: extension-owned local document storage.
 - Sensitive data: encrypted local vault with separate unlock/session handling.
@@ -104,6 +108,7 @@ Until explicitly authorized, do not introduce:
 - speculative ATS adapters without a reproducible generic-engine failure
 - analytics containing applicant/profile/form data
 - framework rewrites without current measured need
+- a separate popup product surface that duplicates Assistant or Workspace responsibilities
 
 ## Material open decisions
 
