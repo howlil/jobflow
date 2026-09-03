@@ -159,10 +159,7 @@ export function FloatingPanel({
     setDocumentStatus((current) => ({ ...current, [key]: message }));
   }
 
-  async function fillReadyFields() {
-    const results = await onFill();
-    if (results === undefined) return;
-
+  function updateFillStatus(results: FillExecutionResult[]) {
     const filled = results.filter(
       (result) => result.status === 'filled',
     ).length;
@@ -175,6 +172,17 @@ export function FloatingPanel({
           ? `${filled} ${filled === 1 ? 'field' : 'fields'} filled. ${unresolved} ${unresolved === 1 ? 'item remains' : 'items remain'} for review or manual input.`
           : `${filled} of ${results.length} fields filled. ${failed} ${failed === 1 ? 'needs' : 'need'} manual input.`,
     );
+  }
+
+  function fillReadyFields() {
+    const result = onFill();
+    if (result instanceof Promise) {
+      void result.then((results) => {
+        if (results !== undefined) updateFillStatus(results);
+      });
+      return;
+    }
+    if (result !== undefined) updateFillStatus(result);
   }
 
   return (

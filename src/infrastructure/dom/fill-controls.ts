@@ -199,8 +199,12 @@ function fillField(
   if (typeof instruction.value !== 'string') return false;
 
   if (first instanceof HTMLInputElement) {
+    const expectedValue =
+      first.type === 'date'
+        ? browserDateValue(instruction.value)
+        : instruction.value;
     setInputValue(first, instruction.value);
-    return first.value === browserDateValue(instruction.value);
+    return first.value === expectedValue;
   }
 
   if (first instanceof HTMLTextAreaElement) {

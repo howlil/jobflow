@@ -77,6 +77,23 @@ export function analyzeFieldContexts(
     ),
   }));
   const plan = prepareFillPlan(analysis, profile);
+  const experience = structuredCoverage(
+    'experience',
+    profile.professional.experiences.length,
+    fields,
+    plan,
+  );
+  const education = structuredCoverage(
+    'education',
+    profile.professional.education.length,
+    fields,
+    plan,
+  );
+  const hasStructuredCoverage =
+    experience.profileRecords > 0 ||
+    experience.detectedRecords > 0 ||
+    education.profileRecords > 0 ||
+    education.detectedRecords > 0;
 
   return {
     plan,
@@ -86,20 +103,14 @@ export function analyzeFieldContexts(
       sensitive: plan.sensitive.length,
       unknown: plan.unknown.length,
       total: fields.length,
-      structured: {
-        experience: structuredCoverage(
-          'experience',
-          profile.professional.experiences.length,
-          fields,
-          plan,
-        ),
-        education: structuredCoverage(
-          'education',
-          profile.professional.education.length,
-          fields,
-          plan,
-        ),
-      },
+      ...(hasStructuredCoverage
+        ? {
+            structured: {
+              experience,
+              education,
+            },
+          }
+        : {}),
     },
   };
 }
