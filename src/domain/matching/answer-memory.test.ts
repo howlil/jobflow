@@ -43,10 +43,7 @@ describe('answer memory', () => {
       fieldFingerprint: 'field-b',
     };
     expect(
-      matchReusableAnswer(
-        nextContext,
-        answerMemoryAsReusableAnswers(memory),
-      ),
+      matchReusableAnswer(nextContext, answerMemoryAsReusableAnswers(memory)),
     ).toEqual({
       status: 'ready-answer',
       answerId: 'memory-answer-1',
