@@ -11,5 +11,8 @@ export default defineConfig({
     name: 'Job Flow',
     description: 'Local-first career form autofill',
     permissions: ['storage'],
+    action: {
+      default_title: 'Open Job Flow',
+    },
   },
 });
