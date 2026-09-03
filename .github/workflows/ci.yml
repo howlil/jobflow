@@ -28,6 +28,23 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Format probe
+        run: |
+          pnpm exec prettier --write \
+            entrypoints/content.tsx \
+            src/application/forms/analyze-field-contexts.ts \
+            src/application/prepare-fill/prepare-fill-plan.ts \
+            src/components/floating/FloatingPanel.test.tsx \
+            src/components/floating/FloatingPanel.tsx \
+            src/domain/forms/field-context.ts \
+            src/domain/forms/fingerprints.ts \
+            src/infrastructure/dom/complex-application.test.ts \
+            src/infrastructure/dom/extract-field-contexts.ts \
+            src/infrastructure/dom/fill-controls.ts \
+            src/infrastructure/dom/observe-form-mutations.ts \
+            src/infrastructure/dom/structured-record-sections.ts
+          git diff -- entrypoints src/application src/components src/domain src/infrastructure
+          exit 1
       - name: Test
         run: pnpm test
       - name: Typecheck
