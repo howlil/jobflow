@@ -462,6 +462,7 @@ export function FloatingPanel({
                 sensitiveError={sensitiveError}
                 passphrase={passphrase}
                 siteHost={siteHost}
+                onBack={() => setActiveTab('autofill')}
                 onPassphraseChange={setPassphrase}
                 {...(vaultStatus === undefined ? {} : { vaultStatus })}
                 {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
