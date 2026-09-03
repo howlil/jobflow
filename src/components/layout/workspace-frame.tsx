@@ -97,9 +97,7 @@ export function WorkspaceFrame({
                     className="min-w-0 flex-1"
                     initial={reduceMotion ? false : { opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={
-                      reduceMotion ? { opacity: 0 } : { opacity: 0, x: -4 }
-                    }
+                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -4 }}
                     transition={
                       reduceMotion
                         ? { duration: 0 }

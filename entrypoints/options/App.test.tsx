@@ -62,7 +62,9 @@ describe('options App', () => {
     expect(collapse.getAttribute('aria-expanded')).toBe('true');
 
     fireEvent.click(collapse);
-    expect(screen.getByRole('button', { name: 'Expand sidebar' })).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Expand sidebar' }),
+    ).not.toBeNull();
   });
 
   it('preserves an unsaved profile draft while visiting Autofill Memory', async () => {
