@@ -328,7 +328,10 @@ export function FloatingPanel({
       aria-label="Job Flow form assistant"
     >
       {isOpen ? (
-        <section className="jobflow-panel" aria-label="Job Flow assistant popup">
+        <section
+          className="jobflow-panel"
+          aria-label="Job Flow assistant popup"
+        >
           <header className="jobflow-panel__header">
             <div>
               <span className="jobflow-panel__eyebrow">Job Flow</span>
@@ -345,7 +348,11 @@ export function FloatingPanel({
             </button>
           </header>
 
-          <div className="jobflow-panel__tabs" role="tablist" aria-label="Job Flow tools">
+          <div
+            className="jobflow-panel__tabs"
+            role="tablist"
+            aria-label="Job Flow tools"
+          >
             <button
               type="button"
               role="tab"
@@ -389,7 +396,9 @@ export function FloatingPanel({
                   variantOptions={variantOptions}
                   activeVariantId={activeVariantId}
                   variantRecommendation={variantRecommendation}
-                  {...(onSelectVariant === undefined ? {} : { onSelectVariant })}
+                  {...(onSelectVariant === undefined
+                    ? {}
+                    : { onSelectVariant })}
                 />
                 <CompletionCoverage summary={summary} />
                 <AssistantHomeView
@@ -451,7 +460,9 @@ export function FloatingPanel({
               ) : (
                 <div className="jobflow-panel__empty">
                   <strong>No job details detected yet.</strong>
-                  <span>Open this tab on a supported job application page.</span>
+                  <span>
+                    Open this tab on a supported job application page.
+                  </span>
                 </div>
               )
             ) : null}
