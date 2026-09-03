@@ -91,7 +91,7 @@ export function LinkedSkillEditor({
             >
               <span>{linkedName}</span>
               <button
-                className="grid h-5 w-5 place-items-center rounded text-app-subtle transition hover:bg-app-muted hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink"
+                className="grid h-5 w-5 place-items-center rounded-control text-app-subtle transition-colors hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
                 type="button"
                 aria-label={`Remove ${linkedName} from ${contextLabel}`}
                 onClick={() => onRemove(linkedName)}
@@ -102,7 +102,7 @@ export function LinkedSkillEditor({
           ))}
         </div>
       ) : (
-        <p className="m-0 text-[11px] leading-4 text-app-subtle">
+        <p className="m-0 text-[13px] leading-5 text-app-subtle">
           No skills linked yet.
         </p>
       )}
