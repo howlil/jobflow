@@ -3,12 +3,12 @@ import { browser } from 'wxt/browser';
 import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root';
 import { defineContentScript } from 'wxt/utils/define-content-script';
 
+import { createApplicationService } from '../src/application/applications/application-service';
 import {
   analyzePageContext,
   type AnalyzedPageContext,
   toPageContextResponse,
 } from '../src/application/forms/analyze-page-context';
-import { createApplicationService } from '../src/application/applications/application-service';
 import {
   isGetPageAnalysisMessage,
   isGetPageContextMessage,
@@ -20,31 +20,42 @@ import {
   isToggleAssistantMessage,
   OPEN_WORKSPACE,
 } from '../src/application/workspace/workspace-messages';
-import type { CorrectionTarget } from '../src/domain/corrections/correction-schema';
+import {
+  reusableAnswerCorrectionTarget,
+  type CorrectionTarget,
+} from '../src/domain/corrections/correction-schema';
 import type { FieldContext } from '../src/domain/forms/field-context';
 import { createFieldSetFingerprint } from '../src/domain/forms/field-set-fingerprint';
+import {
+  answerMemoryAsReusableAnswers,
+  rememberAnswer,
+} from '../src/domain/matching/answer-memory';
 import { createEmptyStoredProfile } from '../src/domain/profile/create-empty-profile';
 import { parseStoredProfile } from '../src/domain/profile/migrations';
 import type { StoredProfileEnvelope } from '../src/domain/profile/profile-schema';
-import { attachFileToField } from '../src/infrastructure/dom/attach-file-control';
-import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
-import { extractFieldContexts } from '../src/infrastructure/dom/extract-field-contexts';
-import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
-import { ensureStructuredRecordSlots } from '../src/infrastructure/dom/structured-record-sections';
-import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
-import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
-import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
-import { ChromeApplicationRepository } from '../src/infrastructure/storage/chrome-application-repository';
-import {
-  ChromeProfileRepository,
-  PROFILE_STORAGE_KEY,
-} from '../src/infrastructure/storage/chrome-profile-repository';
 import {
   FloatingPanel,
   type DocumentAttachStatus,
   type SensitiveVaultStatus,
 } from '../src/components/floating/FloatingPanel';
 import { FLOATING_STYLES } from '../src/components/floating/floating-styles';
+import { attachFileToField } from '../src/infrastructure/dom/attach-file-control';
+import { applyFillInstructions } from '../src/infrastructure/dom/fill-controls';
+import {
+  extractFieldContexts,
+  scanDomFields,
+} from '../src/infrastructure/dom/extract-field-contexts';
+import { observeRelevantFormMutations } from '../src/infrastructure/dom/observe-form-mutations';
+import { ensureStructuredRecordSlots } from '../src/infrastructure/dom/structured-record-sections';
+import { ChromeDocumentClient } from '../src/infrastructure/messaging/chrome-document-client';
+import { ChromeVaultClient } from '../src/infrastructure/messaging/chrome-vault-client';
+import { ChromeAnswerMemoryRepository } from '../src/infrastructure/storage/chrome-answer-memory-repository';
+import { ChromeApplicationRepository } from '../src/infrastructure/storage/chrome-application-repository';
+import { ChromeCorrectionRepository } from '../src/infrastructure/storage/chrome-correction-repository';
+import {
+  ChromeProfileRepository,
+  PROFILE_STORAGE_KEY,
+} from '../src/infrastructure/storage/chrome-profile-repository';
 
 function collectPageSignals(document: Document): string[] {
   const metaDescription = document.querySelector<HTMLMetaElement>(
@@ -59,6 +70,48 @@ function collectPageSignals(document: Document): string[] {
 
   return [document.title, metaDescription ?? '', ...headings].filter(
     (value) => value.length > 0,
+  );
+}
+
+function currentAnswerForContext(
+  document: Document,
+  origin: string,
+  context: FieldContext,
+): string {
+  const scanned = scanDomFields(document, origin).find(
+    (field) => field.context.fieldFingerprint === context.fieldFingerprint,
+  );
+  if (scanned === undefined) return '';
+
+  if (context.controlKind === 'radio') {
+    const selected = scanned.controls.find((control) => {
+      if (control instanceof HTMLInputElement) return control.checked;
+      return control.getAttribute('aria-checked') === 'true';
+    });
+    if (selected instanceof HTMLInputElement) return selected.value.trim();
+    return (
+      selected?.getAttribute('aria-label')?.trim() ??
+      selected?.textContent?.trim() ??
+      ''
+    );
+  }
+
+  const control = scanned.controls[0];
+  if (
+    control instanceof HTMLInputElement ||
+    control instanceof HTMLTextAreaElement ||
+    control instanceof HTMLSelectElement
+  ) {
+    if (control instanceof HTMLInputElement && control.type === 'checkbox') {
+      return control.checked ? 'Yes' : 'No';
+    }
+    return control.value.trim();
+  }
+
+  return (
+    control?.getAttribute('aria-valuetext')?.trim() ??
+    control?.textContent?.trim() ??
+    ''
   );
 }
 
@@ -131,6 +184,7 @@ export default defineContentScript({
       applyProfileEnvelope(envelope);
 
       const correctionRepository = new ChromeCorrectionRepository();
+      const answerMemoryRepository = new ChromeAnswerMemoryRepository();
       const applicationService = createApplicationService(
         new ChromeApplicationRepository(),
       );
@@ -139,6 +193,7 @@ export default defineContentScript({
       let corrections = await correctionRepository.listForOrigin(
         location.origin,
       );
+      let answerMemory = await answerMemoryRepository.load();
       await refreshVaultStatus();
 
       async function refreshVaultStatus() {
@@ -216,7 +271,16 @@ export default defineContentScript({
               void browser.runtime.sendMessage({ type: OPEN_WORKSPACE });
             }}
             onSaveApplication={async (draft) => {
-              await applicationService.create(draft);
+              const existing = (await applicationService.list()).find(
+                (application) =>
+                  draft.jobUrl !== undefined &&
+                  application.jobUrl === draft.jobUrl,
+              );
+              if (existing === undefined) {
+                await applicationService.create(draft);
+              } else {
+                await applicationService.update(existing.id, draft);
+              }
             }}
             onUnlockSensitive={(passphrase) => {
               void unlockSensitive(passphrase);
@@ -226,6 +290,32 @@ export default defineContentScript({
             }}
             onRemember={(context, target) => {
               void rememberCorrection(context, target);
+            }}
+            onRememberCurrentAnswer={async (context) => {
+              const value = currentAnswerForContext(
+                document,
+                location.origin,
+                context,
+              );
+              if (!value) return false;
+
+              answerMemory = rememberAnswer(answerMemory, context, value);
+              await answerMemoryRepository.save(answerMemory);
+              const remembered = answerMemory.entries[0];
+              if (remembered !== undefined) {
+                await correctionRepository.upsert({
+                  origin: context.origin,
+                  formFingerprint: context.formFingerprint,
+                  fieldFingerprint: context.fieldFingerprint,
+                  target: reusableAnswerCorrectionTarget(remembered.id),
+                  updatedAt: new Date().toISOString(),
+                });
+                corrections = await correctionRepository.listForOrigin(
+                  location.origin,
+                );
+              }
+              analyzePage(true);
+              return true;
             }}
             onAttachDocument={async (
               fieldFingerprint,
@@ -270,6 +360,7 @@ export default defineContentScript({
           corrections,
           pageSignals: collectPageSignals(document),
           variantOverrideId: pageVariantOverrideId,
+          rememberedAnswers: answerMemoryAsReusableAnswers(answerMemory),
         });
         renderPanel();
       };

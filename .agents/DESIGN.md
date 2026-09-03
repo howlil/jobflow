@@ -186,12 +186,17 @@ Button size variants must not create route-local height drift. Horizontal paddin
 
 Inputs and actions belong to one control system.
 
+<<<<<<< HEAD
 ### Idle
+=======
+The assistant overlays the host page and never becomes part of the site's layout. It is a compact contextual popup, not a sidebar or drawer.
+>>>>>>> origin/master
 
 - transparent fill inherited from parent surface;
 - visible low-contrast border;
 - readable neutral text.
 
+<<<<<<< HEAD
 ### Hover
 
 - fill normally remains unchanged;
@@ -203,6 +208,45 @@ Inputs and actions belong to one control system.
 - focus is the strongest normal boundary state;
 - use the shared monochrome focus border/ring;
 - focus must remain visible in supported themes.
+=======
+```text
+position: fixed
+right: 14–18px
+bottom: 14–18px
+approx. 46–48px circle
+highest extension interaction z-index
+```
+
+Expanded popup:
+
+```text
+position: fixed
+right: 12–18px
+bottom: ~70–78px
+width: min(~390px, viewport minus safe gutters)
+max-height: viewport minus launcher/header clearance
+rounded bordered popover
+internal content scroll only
+```
+
+The popup has exactly three top-level tabs:
+
+```text
+Autofill
+  page analysis, Application Profile, safe fill, unresolved review,
+  remembered answers, explicit document attachment, local completion status
+
+Pipeline
+  review/save current job, follow-up details, explicit mark-as-applied
+
+Sensitive
+  sensitive-field review, vault unlock/setup, explicit current-site fill
+```
+
+Unresolved-field review is a subflow of **Autofill**, not a fourth top-level tab. The launcher remains the single persistent in-page entry point. Do not restore a full-height right drawer or mid-right edge handle unless the product interaction model is explicitly changed again.
+
+On narrow viewports the popup uses viewport gutters and bounded height rather than becoming a permanent full-screen panel. The assistant is mounted in Shadow DOM; its styling isolation is intentional and must not be removed merely because the workspace uses Tailwind.
+>>>>>>> origin/master
 
 ### Disabled/read-only
 

@@ -197,8 +197,11 @@ try {
   });
   expect(toolbarResult).toEqual({ available: true });
   await expect(
-    page.getByRole('button', { name: 'Close Job Flow' }),
+    page.getByRole('button', { name: 'Close Job Flow' }).first(),
   ).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Autofill/ })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Pipeline' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Sensitive/ })).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Fill 7 ready fields' }),
   ).toBeVisible();
@@ -241,6 +244,42 @@ try {
   await expect(page.getByLabel('Date of birth')).toHaveValue('');
   await expect(page.getByLabel('Resume')).toHaveValue('');
   await expect(page.getByLabel('Favorite color')).toHaveValue('');
+
+  await page.getByLabel('Favorite color').fill('Blue');
+  await page.getByRole('button', { name: 'Review reusable fields' }).click();
+  await page.getByRole('button', { name: 'Remember current answer' }).click();
+  await expect(
+    page.getByText(
+      'Remembered. Future equivalent questions can reuse this answer.',
+    ),
+  ).toBeVisible();
+  await page.getByLabel('Favorite color').fill('');
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Fill 8 ready fields' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Fill 8 ready fields' }).click();
+  await expect(page.getByLabel('Favorite color')).toHaveValue('Blue');
+
+  await page.getByRole('tab', { name: 'Pipeline' }).click();
+  await page.getByLabel('Company').fill('Example Co');
+  await page.getByLabel('Role').fill('Backend Engineer');
+  await page.getByRole('button', { name: 'Mark as applied' }).click();
+  await expect(page.getByText('Marked as applied in Pipeline.')).toBeVisible();
+
+  const storedApplications = await serviceWorker.evaluate(async () => {
+    const stored = await globalThis.chrome.storage.local.get(
+      'jobflow.applications',
+    );
+    return stored['jobflow.applications'];
+  });
+  expect(storedApplications.applications).toHaveLength(1);
+  expect(storedApplications.applications[0]).toMatchObject({
+    company: 'Example Co',
+    role: 'Backend Engineer',
+    stage: 'applied',
+  });
+
   expect(await page.evaluate(() => globalThis.__submitCount)).toBe(0);
   expect(await page.evaluate(() => globalThis.__eventLog)).toEqual(
     expect.arrayContaining([
@@ -258,6 +297,8 @@ try {
       'linkedin:change',
       'github:input',
       'github:change',
+      'favorite_color:input',
+      'favorite_color:change',
     ]),
   );
 } finally {

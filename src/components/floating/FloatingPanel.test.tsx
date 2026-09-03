@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { FloatingPanel } from './FloatingPanel';
 
 describe('FloatingPanel', () => {
-  it('starts as a small launcher and expands only after explicit click', () => {
+  it('starts as one floating launcher and opens a three-tab popup', () => {
     const fill = vi.fn();
 
     render(
@@ -25,6 +25,20 @@ describe('FloatingPanel', () => {
     expect(launcher.getAttribute('aria-expanded')).toBe('false');
 
     fireEvent.click(launcher);
+
+    expect(
+      screen.getByRole('tablist', { name: 'Job Flow tools' }),
+    ).toBeTruthy();
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'Autofill3',
+      'Pipeline',
+      'Sensitive1',
+    ]);
+    expect(
+      screen
+        .getByRole('tab', { name: /Autofill/ })
+        .getAttribute('aria-selected'),
+    ).toBe('true');
 
     const summary = screen.getByLabelText('Form analysis summary');
     expect(summary.textContent).toContain('3 ready');
@@ -135,7 +149,7 @@ describe('FloatingPanel', () => {
     expect(attach).toHaveBeenCalledWith('resume-field', 'resume-1');
   });
 
-  it('requires review and captures follow-up details before saving the current page', async () => {
+  it('uses the Pipeline tab to capture follow-up details for the current page', async () => {
     const saveApplication = vi.fn().mockResolvedValue(undefined);
     render(
       <FloatingPanel
@@ -161,9 +175,7 @@ describe('FloatingPanel', () => {
 
     expect(saveApplication).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Open Job Flow' }));
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Review and save this job' }),
-    );
+    fireEvent.click(screen.getByRole('tab', { name: 'Pipeline' }));
 
     expect(screen.getByLabelText<HTMLInputElement>('Company').value).toBe(
       'Acme',
