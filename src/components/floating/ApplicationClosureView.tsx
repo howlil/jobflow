@@ -26,10 +26,7 @@ export function ApplicationClosureView({
   }
 
   return (
-    <section
-      className="jobflow-panel__detail"
-      aria-label="Application closure"
-    >
+    <section className="jobflow-panel__detail" aria-label="Application closure">
       <button className="jobflow-panel__back" type="button" onClick={onBack}>
         <ArrowLeft aria-hidden="true" size={15} />
         Back
