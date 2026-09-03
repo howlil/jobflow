@@ -80,7 +80,7 @@ function ProgressTrack({ application }: { application: JobApplication }) {
                 }`}
               />
               <span
-                className={`truncate text-xs font-medium ${
+                className={`truncate text-[13px] font-medium ${
                   current ? 'text-app-ink' : 'text-app-subtle'
                 }`}
               >
@@ -91,7 +91,7 @@ function ProgressTrack({ application }: { application: JobApplication }) {
         })}
       </div>
       {closed ? (
-        <p className="m-0 text-xs text-app-subtle">
+        <p className="m-0 text-[13px] text-app-subtle">
           This opportunity is closed
           {application.substage === undefined
             ? '.'
@@ -211,7 +211,7 @@ export function ApplicationDetail({
             ) : (
               <p className="m-0 text-sm text-app-subtle">Lifecycle complete.</p>
             )}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-app-subtle">
+            <div className="flex flex-wrap items-center gap-2 text-[13px] text-app-subtle">
               {dueStatus !== null ? (
                 <span className="rounded-control border border-app-warning/30 bg-app-warning-soft px-2 py-1 text-app-warning">
                   {dueStatus}
@@ -328,7 +328,7 @@ export function ApplicationDetail({
                       ? STAGE_LABELS[entry.stage]
                       : SUBSTAGE_LABELS[entry.substage]}
                   </span>
-                  <span className="text-xs text-app-subtle">
+                  <span className="text-[13px] text-app-subtle">
                     {STAGE_LABELS[entry.stage]} · {displayDate(entry.enteredAt)}
                   </span>
                 </li>
