@@ -26,11 +26,13 @@ Color is semantic. Elevation represents a real overlay layer. Rounded rectangles
 
 - Global header height: **56px**.
 - Collapsed navigation rail width: **56px**.
-- Hover/focus expands navigation to approximately **240px** as an overlay.
+- Navigation expands only through an explicit **Expand sidebar** control and collapses through an explicit **Collapse sidebar** control.
+- Expanded navigation is approximately **240px** and overlays the workspace rather than resizing it.
 - Expanded navigation MUST NOT resize or reflow main workspace content.
 - Main workspace begins immediately after the 56px rail and below the 56px header.
 - Sidebar owns navigation only.
 - Header owns current workspace context and suitable global/status metadata.
+- Hover or focus may improve a control's visual affordance, but MUST NOT silently change persistent sidebar expansion state.
 
 ### Workspace geometry
 
@@ -44,7 +46,7 @@ Full-tab career/application/data operations are edge-to-edge structural workspac
 
 ### Mobile
 
-Mobile may use a conventional full-width navigation selector rather than the desktop rail. Preserve the same authorized destinations and interaction semantics.
+Mobile uses the same single navigation owner with a conventional full-width selector rather than the desktop rail. Preserve the same authorized destinations and interaction semantics. Do not duplicate interactive navigation trees merely to support responsive layout.
 
 ## 3. One-workspace-fill invariant
 
@@ -103,7 +105,7 @@ accent-strong     #0A0A0A
 accent-soft       #E5E5E5
 danger            #DC2626
 warning           #D97706
-info               #0284C7
+info              #0284C7
 success           #059669
 ```
 
@@ -154,7 +156,7 @@ technical mono         12–13px
 real page/object title 20–24px when needed
 ```
 
-Compactness comes from layout and chrome, not unreadable 10–11px body text. Uppercase eyebrow text may use 11px because it is short navigational metadata.
+Compactness comes from layout and chrome, not unreadable 10–11px body text. Uppercase eyebrow text may use 11px because it is short navigational metadata. Tiny numeric notification badges may be smaller when their geometry requires it; body/helper/record metadata may not use that exception.
 
 ## 6. Geometry
 
@@ -293,8 +295,12 @@ Record grammar:
 
 ## 10. Navigation
 
-Desktop sidebar defaults to the 56px icon rail. Hover/keyboard focus expands it as a non-reflowing overlay.
+Desktop sidebar defaults to the 56px icon rail and uses explicit user-owned expansion state.
 
+- **Expand sidebar** changes the overlay rail from 56px to approximately 240px.
+- **Collapse sidebar** returns it to 56px.
+- Expansion/collapse does not reflow the main workspace.
+- Labels are revealed only while expanded; collapsed icons retain accessible names/tooltips.
 - Active navigation may use a restrained neutral fill because it communicates selection.
 - Idle navigation does not show persistent borders.
 - Generic UI icons come from `lucide-react` only.
@@ -328,7 +334,7 @@ rows
 pagination/result count
 ```
 
-Use deliberate separators and stable geometry. Long URLs, job titles, company names, document names, and identifiers truncate or wrap deliberately rather than stretching the workspace.
+Pipeline lanes share the normal workspace/surface fill. Lane grouping may use a 1px boundary and 6px radius but not a tinted neutral background or elevation. Long URLs, job titles, company names, document names, and identifiers truncate or wrap deliberately rather than stretching the workspace.
 
 ## 13. Floating in-page assistant
 
@@ -402,13 +408,40 @@ Avoid marketing claims, generic AI-assistant language, and repeated explanations
 ## 16. Responsive, motion, accessibility
 
 - Desktop remains the primary density target for the options workspace.
-- Mobile exposes the same core navigation destinations.
+- Mobile exposes the same core navigation destinations through the same navigation owner.
 - Preserve keyboard access and visible focus states.
-- Hover-only navigation expansion has an equivalent focus-within path.
 - Color is never the only indicator of critical state.
 - Coarse-pointer controls raise targets to at least 44px.
 - Respect `prefers-reduced-motion` globally and inside Shadow DOM.
 - Avoid noisy live announcements during background/local refresh.
+
+### Motion ownership
+
+Use **Motion for React** (`motion/react`) only when motion materially improves spatial orientation or explains presence/state change.
+
+Approved Motion owners:
+
+- desktop sidebar width transition and sidebar-label reveal;
+- true overlay/popover enter/exit presence;
+- in-page assistant panel enter/exit;
+- in-page assistant view changes where the user moves between Home, Pipeline, Review, and Sensitive contexts.
+
+Keep these as CSS transitions instead of Motion:
+
+- hover/focus color and stroke changes;
+- button press feedback;
+- field focus/validation styling;
+- ordinary table/list rows;
+- static forms and section layout;
+- routine loading/status copy.
+
+Motion characteristics:
+
+- sidebar width may use a restrained critically damped spring with no bounce-heavy character;
+- overlays/view changes use short approximately 120–180ms opacity/translation transitions;
+- do not animate large decorative distances, continuous loops, shimmer, glow, or gratuitous scale;
+- one component has one transition owner: do not stack a legacy CSS keyframe on top of Motion;
+- reduced-motion mode collapses these transitions to effectively immediate state changes.
 
 ## 17. Explicit anti-patterns
 
@@ -426,6 +459,8 @@ Do not introduce:
 - 10–11px body/helper text everywhere;
 - full-page loaders for local operations;
 - duplicated navigation/context labels;
+- hover-only persistent navigation state;
+- multiple animation systems owning the same transition;
 - hidden safety/error information for visual cleanliness.
 
 ## 18. Ownership and change rule
@@ -435,8 +470,10 @@ Before implementing UI/layout/styling work:
 1. Read this file.
 2. Identify the shared token/primitive/shell that owns the visual behavior.
 3. Fix systemic behavior centrally rather than patching many feature files.
-4. Keep feature-local overrides only when the workflow is genuinely different.
-5. Preserve product behavior, consent boundaries, accessibility, loading, empty, disabled, focus, and error states.
-6. Run repository-owned unit tests, typecheck, lint/format checks, and production build appropriate to the affected frontend/extension scope.
+4. Remove migration guards once their feature call-sites have been normalized; do not make compatibility overrides the permanent design architecture.
+5. Keep feature-local overrides only when the workflow is genuinely different.
+6. Preserve product behavior, consent boundaries, accessibility, loading, empty, disabled, focus, and error states.
+7. Use Motion only for the approved presence/geometry transitions above and keep reduced-motion behavior equivalent.
+8. Run repository-owned unit tests, typecheck, lint/format checks, and production build appropriate to the affected frontend/extension scope.
 
-The target is one coherent Jobflow workspace: **same neutral fill, structural strokes, semantic color only when meaningful, one control geometry, repeated entities without decorative elevation, and one consistent overlay grammar.**
+The target is one coherent Jobflow workspace: **same neutral fill, structural strokes, semantic color only when meaningful, one control geometry, repeated entities without decorative elevation, one explicit navigation interaction model, and one consistent overlay/motion grammar.**

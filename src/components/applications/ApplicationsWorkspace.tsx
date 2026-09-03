@@ -116,7 +116,7 @@ function PipelineCard({
         meta={`Updated ${displayDate(application.updatedAt)}`}
       />
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-app-subtle">
+      <div className="flex flex-wrap items-center gap-2 text-[13px] font-medium text-app-subtle">
         {application.priority !== undefined ? (
           <span className="rounded-control border border-app-border px-2 py-1 text-app-ink">
             {PRIORITY_LABELS[application.priority]}
@@ -133,32 +133,32 @@ function PipelineCard({
           </span>
         ) : null}
         {dueStatus !== null ? (
-          <span className="rounded-control border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">
+          <span className="rounded-control border border-app-warning/30 bg-app-warning-soft px-2 py-1 text-app-warning">
             {dueStatus}
           </span>
         ) : null}
       </div>
 
       {application.nextAction ? (
-        <p className="m-0 text-xs font-medium text-app-text">
+        <p className="m-0 text-[13px] font-medium text-app-text">
           Next: {application.nextAction}
         </p>
       ) : null}
 
       {application.deadline ? (
-        <p className="m-0 text-xs text-app-subtle">
+        <p className="m-0 text-[13px] text-app-subtle">
           Deadline: {displayDate(application.deadline)}
         </p>
       ) : null}
 
       {showFollowUpNote && followUpNote ? (
-        <p className="m-0 whitespace-pre-wrap text-xs leading-5 text-app-text">
+        <p className="m-0 whitespace-pre-wrap text-[13px] leading-5 text-app-text">
           {followUpNote}
         </p>
       ) : null}
 
       {contextualDetail !== null ? (
-        <p className="m-0 text-xs text-app-subtle">{contextualDetail}</p>
+        <p className="m-0 text-[13px] text-app-subtle">{contextualDetail}</p>
       ) : null}
 
       <ActionRow>
@@ -361,12 +361,12 @@ export function ApplicationsWorkspace({
   const substageOptions = APPLICATION_SUBSTAGES_BY_STAGE[draft.stage];
 
   const form = formOpen ? (
-    <div className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-3">
+    <div className="grid gap-3 rounded-control border border-app-border bg-app-surface p-3">
       <div className="grid gap-1">
         <h3 className="m-0 text-sm font-semibold text-app-ink">
           {editingId === null ? 'Add job' : 'Edit job'}
         </h3>
-        <p className="m-0 text-xs text-app-subtle">
+        <p className="m-0 text-[13px] text-app-subtle">
           Capture only the context needed to decide and execute the next move.
         </p>
       </div>
@@ -646,14 +646,14 @@ export function ApplicationsWorkspace({
             </Button>
           </div>
         </div>
-        <p className="m-0 text-xs text-app-subtle">
+        <p className="m-0 text-[13px] text-app-subtle">
           {activeCount} active {opportunityLabel} · {actionableCount} need
           action
         </p>
       </div>
 
       {loading ? (
-        <p className="m-0 text-xs text-app-text">Loading pipeline...</p>
+        <p className="m-0 text-[13px] text-app-text">Loading pipeline...</p>
       ) : applications.length === 0 ? (
         <EmptyState>No jobs in your pipeline yet.</EmptyState>
       ) : visibleApplications.length === 0 ? (
@@ -667,14 +667,14 @@ export function ApplicationsWorkspace({
               );
               return (
                 <section
-                  className="grid content-start gap-3 rounded-lg border border-app-border bg-app-muted/30 p-3"
+                  className="grid content-start gap-3 rounded-control border border-app-border bg-app-surface p-3"
                   key={stage}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="m-0 text-xs font-semibold uppercase tracking-[0.05em] text-app-ink">
+                    <h3 className="m-0 text-[13px] font-semibold uppercase tracking-[0.05em] text-app-ink">
                       {STAGE_LABELS[stage]}
                     </h3>
-                    <span className="text-[11px] font-medium text-app-subtle">
+                    <span className="text-[13px] font-medium text-app-subtle">
                       {items.length}
                     </span>
                   </div>
@@ -720,14 +720,14 @@ export function ApplicationsWorkspace({
             );
             return (
               <section
-                className="grid content-start gap-3 rounded-lg border border-app-border bg-app-muted/30 p-3"
+                className="grid content-start gap-3 rounded-control border border-app-border bg-app-surface p-3"
                 key={substage}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="m-0 text-xs font-semibold uppercase tracking-[0.05em] text-app-ink">
+                  <h3 className="m-0 text-[13px] font-semibold uppercase tracking-[0.05em] text-app-ink">
                     {SUBSTAGE_LABELS[substage]}
                   </h3>
-                  <span className="text-[11px] font-medium text-app-subtle">
+                  <span className="text-[13px] font-medium text-app-subtle">
                     {items.length}
                   </span>
                 </div>
