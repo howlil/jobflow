@@ -5,6 +5,50 @@
 @layer base {
   :root {
     color-scheme: light;
+    --app-bg: 250 250 250;
+    --app-surface: 255 255 255;
+    --app-surface-raised: 255 255 255;
+    --app-surface-muted: 247 247 247;
+    --app-border: 222 222 222;
+    --app-border-strong: 201 201 201;
+    --app-ink: 23 23 23;
+    --app-muted: 82 82 82;
+    --app-subtle: 115 115 115;
+    --app-accent: 23 23 23;
+    --app-accent-strong: 10 10 10;
+    --app-accent-soft: 229 229 229;
+    --app-danger: 220 38 38;
+    --app-danger-soft: 254 242 242;
+    --app-warning: 217 119 6;
+    --app-warning-soft: 255 251 235;
+    --app-info: 2 132 199;
+    --app-info-soft: 240 249 255;
+    --app-success: 5 150 105;
+    --app-success-soft: 236 253 245;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --app-bg: 10 10 10;
+    --app-surface: 20 20 20;
+    --app-surface-raised: 23 23 23;
+    --app-surface-muted: 26 26 26;
+    --app-border: 48 48 48;
+    --app-border-strong: 74 74 74;
+    --app-ink: 250 250 250;
+    --app-muted: 163 163 163;
+    --app-subtle: 115 115 115;
+    --app-accent: 250 250 250;
+    --app-accent-strong: 255 255 255;
+    --app-accent-soft: 51 51 51;
+    --app-danger: 248 113 113;
+    --app-danger-soft: 69 10 10;
+    --app-warning: 251 191 36;
+    --app-warning-soft: 69 26 3;
+    --app-info: 56 189 248;
+    --app-info-soft: 8 47 73;
+    --app-success: 52 211 153;
+    --app-success-soft: 6 78 59;
   }
 
   * {
@@ -17,6 +61,7 @@
 
   html {
     @apply bg-app-bg font-sans text-app-ink antialiased;
+    font-size: 16px;
     text-rendering: optimizeLegibility;
   }
 
@@ -31,16 +76,23 @@
     font: inherit;
   }
 
+  input,
+  select,
+  textarea {
+    @apply text-app-ink;
+    background: transparent;
+  }
+
   ::selection {
-    @apply bg-app-ink text-white;
+    @apply bg-app-accent-strong text-app-surface;
   }
 }
 
 @layer components {
-  /* Compatibility grammar for call sites not yet expressed through React
-     primitives. New repeated interface patterns belong in primitives.tsx. */
+  /* Compatibility grammar. Repeated visual behavior belongs in shared React
+     primitives; these selectors keep legacy call sites on the same system. */
   .jobflow-button {
-    @apply inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-control border border-app-border-strong bg-app-surface-glass px-2.5 py-1.5 text-xs font-semibold text-app-ink shadow-none backdrop-blur-xl transition-colors hover:border-app-ink hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex h-9 min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-app-border bg-transparent px-3 text-sm font-medium text-app-ink shadow-none transition-colors hover:border-app-border-strong focus-visible:border-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .jobflow-button:active:not(:disabled) {
@@ -49,47 +101,47 @@
 
   .jobflow-button-primary,
   .jobflow-button-accent {
-    @apply border-app-ink bg-app-ink text-white hover:border-black hover:bg-black;
+    @apply border-app-ink bg-app-ink text-app-surface hover:border-app-accent-strong hover:bg-app-accent-strong;
   }
 
   .jobflow-button-secondary {
-    @apply bg-app-surface-glass;
+    @apply bg-transparent;
   }
 
   .jobflow-button-ghost {
-    @apply border-transparent bg-transparent text-app-text hover:border-transparent hover:bg-app-muted hover:text-app-ink;
+    @apply border-transparent bg-transparent text-app-text hover:border-app-border hover:text-app-ink;
   }
 
   .jobflow-button-danger {
-    @apply border-red-200 bg-red-50 text-red-700 hover:border-red-600 hover:bg-red-600 hover:text-white;
+    @apply border-app-danger bg-app-danger text-white hover:brightness-95;
   }
 
   .jobflow-icon-button {
-    @apply grid h-9 w-9 place-items-center rounded-control border border-app-border bg-app-surface-glass text-app-ink backdrop-blur-xl transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-ink;
+    @apply grid h-9 w-9 place-items-center rounded-control border border-app-border bg-transparent text-app-ink transition-colors hover:border-app-border-strong focus-visible:border-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft;
   }
 
   .jobflow-chip {
-    @apply inline-flex min-h-6 items-center gap-1 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[11px] font-medium leading-5 text-app-text;
+    @apply inline-flex min-h-6 items-center gap-1.5 rounded-control border border-app-border bg-app-muted px-2 py-0.5 text-[13px] font-medium leading-5 text-app-text;
   }
 
   .jobflow-chip-strong {
-    @apply border-app-border-strong bg-app-surface-glass font-semibold text-app-ink backdrop-blur-xl;
+    @apply border-app-border-strong bg-app-surface font-semibold text-app-ink;
   }
 
   .jobflow-status,
   .profile-section > [role='status'],
   .profile-section > [role='alert'] {
-    @apply m-0 w-full rounded-control border border-app-border bg-app-muted px-2.5 py-2 text-xs leading-5 text-app-text;
+    @apply m-0 w-full rounded-control border border-app-border bg-app-muted px-3 py-2.5 text-sm leading-5 text-app-text;
   }
 
   .jobflow-status-success,
   .profile-section > [role='status'] {
-    @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+    @apply border-app-success/30 bg-app-success-soft text-app-success;
   }
 
   .jobflow-status-danger,
   .profile-section > [role='alert'] {
-    @apply border-red-200 bg-red-50 text-red-700;
+    @apply border-app-danger/30 bg-app-danger-soft text-app-danger;
   }
 
   .workspace-section-wrap {
@@ -98,7 +150,7 @@
 
   .profile-page h2,
   .workspace-tool-section__header h2 {
-    @apply m-0 text-lg font-semibold tracking-tight text-app-ink;
+    @apply m-0 text-[15px] font-semibold tracking-tight text-app-ink;
   }
 
   .profile-page h3,
@@ -108,18 +160,24 @@
 
   .eyebrow,
   .workspace-kicker {
-    @apply m-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
+    @apply m-0 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle;
   }
 
   .muted,
   .profile-readiness-intro,
   .workspace-tool-section__header p,
   .cv-dropzone p {
-    @apply m-0 text-xs leading-5 text-app-text;
+    @apply m-0 text-[13px] leading-5 text-app-text;
+  }
+
+  /* First-level operational regions are structural, not floating cards. */
+  .profile-readiness,
+  .workspace-tool-section {
+    @apply grid gap-4 border-b border-app-border bg-app-surface px-5 py-4 shadow-none;
   }
 
   .profile-readiness {
-    @apply mb-3 grid gap-3 rounded-app border border-app-border bg-app-surface-glass p-3 shadow-section backdrop-blur-xl;
+    @apply mb-0 gap-3;
   }
 
   .jobflow-section-heading,
@@ -131,7 +189,7 @@
   .jobflow-section-heading > div,
   .section-heading > div,
   .workspace-tool-section__header > div {
-    @apply grid min-w-0 gap-1.5;
+    @apply grid min-w-0 gap-1;
   }
 
   .profile-readiness-details {
@@ -139,7 +197,7 @@
   }
 
   .profile-readiness-label {
-    @apply m-0 text-[11px] font-semibold text-app-ink;
+    @apply m-0 text-[13px] font-medium text-app-ink;
   }
 
   .profile-readiness-list {
@@ -147,12 +205,12 @@
   }
 
   .profile-readiness-list li {
-    @apply relative pl-3 text-[11px] text-app-text;
+    @apply relative pl-3 text-[13px] text-app-text;
   }
 
   .profile-readiness-list li::before {
     content: '';
-    @apply absolute left-0 top-[0.55em] h-1 w-1 rounded-full bg-amber-600;
+    @apply absolute left-0 top-[0.55em] h-1 w-1 rounded-full bg-app-warning;
   }
 
   .profile-readiness-actions,
@@ -165,12 +223,8 @@
     @apply grid gap-4 border-b border-app-border pb-5 last:border-b-0 last:pb-0;
   }
 
-  .workspace-tool-section {
-    @apply grid gap-4 rounded-app border border-app-border bg-app-surface-glass p-3 shadow-section backdrop-blur-xl;
-  }
-
   details.profile-section > summary {
-    @apply cursor-pointer list-none text-lg font-semibold tracking-tight text-app-ink;
+    @apply cursor-pointer list-none text-[15px] font-semibold tracking-tight text-app-ink;
   }
 
   details.profile-section > summary::-webkit-details-marker {
@@ -183,7 +237,7 @@
 
   .profile-page label,
   .workspace-tool-section label {
-    @apply grid gap-1.5 text-xs font-semibold text-app-text;
+    @apply grid gap-1.5 text-[13px] font-medium text-app-text;
   }
 
   .profile-page input:not([type='checkbox']):not([type='file']),
@@ -192,7 +246,7 @@
   .workspace-tool-section input:not([type='checkbox']):not([type='file']),
   .workspace-tool-section select,
   .workspace-tool-section textarea {
-    @apply w-full rounded-control border border-app-border bg-white/90 px-2.5 py-1.5 text-[13px] text-app-ink outline-none transition placeholder:text-app-subtle hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-border disabled:cursor-not-allowed disabled:bg-app-muted disabled:text-app-subtle;
+    @apply w-full rounded-control border border-app-border bg-transparent px-3 py-1.5 text-sm text-app-ink outline-none transition-colors placeholder:text-app-subtle hover:border-app-border-strong focus:border-app-ink focus:ring-2 focus:ring-app-accent-soft disabled:cursor-not-allowed disabled:bg-app-muted disabled:text-app-subtle;
   }
 
   .profile-page input:not([type='checkbox']):not([type='file']),
@@ -216,12 +270,10 @@
     @apply grid gap-3;
   }
 
-  .record-card {
-    @apply relative grid gap-3 rounded-app border border-app-border bg-app-surface-glass p-3 shadow-record backdrop-blur-xl;
-  }
-
+  /* Repeated entities retain an explicit inset boundary, but no elevation. */
+  .record-card,
   .workspace-card {
-    @apply grid gap-3 rounded-app border border-app-border bg-app-surface-glass p-3 shadow-section backdrop-blur-xl;
+    @apply relative grid gap-3 rounded-control border border-app-border bg-app-surface p-3 shadow-none;
   }
 
   details.record-card {
@@ -241,11 +293,11 @@
   }
 
   .record-summary-meta {
-    @apply shrink-0 text-[11px] font-medium text-app-subtle;
+    @apply shrink-0 text-[13px] font-medium text-app-subtle;
   }
 
   .description-preview-list {
-    @apply m-0 grid gap-1 rounded-control border border-app-border bg-white px-3 py-2 text-xs leading-5 text-app-text;
+    @apply m-0 grid gap-1 rounded-control border border-app-border bg-app-surface px-3 py-2 text-[13px] leading-5 text-app-text;
   }
 
   .description-preview-list li {
@@ -253,7 +305,7 @@
   }
 
   .jobflow-empty-row {
-    @apply flex min-h-10 items-center justify-between gap-3 border-y border-app-border py-2 text-xs text-app-text;
+    @apply flex min-h-10 items-center justify-between gap-3 border-y border-app-border py-2 text-[13px] text-app-text;
   }
 
   .default-variant {
@@ -270,11 +322,11 @@
   }
 
   .workspace-brand__mark {
-    @apply grid h-9 w-9 place-items-center rounded-control bg-app-ink text-xs font-bold text-white;
+    @apply grid h-9 w-9 place-items-center rounded-control bg-app-ink text-sm font-bold text-app-surface;
   }
 
   .cv-dropzone {
-    @apply grid min-h-[136px] place-items-center rounded-app border border-dashed border-app-border-strong bg-app-surface-glass p-4 text-center shadow-section backdrop-blur-xl;
+    @apply grid min-h-[136px] place-items-center rounded-control border border-dashed border-app-border-strong bg-app-surface p-4 text-center shadow-none;
   }
 
   .cv-dropzone__content {
@@ -286,7 +338,7 @@
   }
 
   .cv-preview__row {
-    @apply grid grid-cols-[auto_minmax(120px,0.6fr)_minmax(0,1.4fr)] items-start gap-2.5 border-b border-app-border py-2.5 text-xs last:border-b-0;
+    @apply grid grid-cols-[auto_minmax(120px,0.6fr)_minmax(0,1.4fr)] items-start gap-2.5 border-b border-app-border py-2.5 text-[13px] last:border-b-0;
   }
 
   .cv-preview__row > input[type='checkbox'] {
@@ -294,15 +346,15 @@
   }
 
   .cv-preview__value {
-    @apply min-w-0 text-xs leading-5 text-app-text;
+    @apply min-w-0 text-[13px] leading-5 text-app-text;
   }
 
   .document-row {
-    @apply flex items-start justify-between gap-3 border-b border-app-border py-2.5 text-xs last:border-b-0;
+    @apply flex items-start justify-between gap-3 border-b border-app-border py-2.5 text-[13px] last:border-b-0;
   }
 
   .document-row__meta {
-    @apply grid min-w-0 gap-1 text-xs leading-5 text-app-text;
+    @apply grid min-w-0 gap-1 text-[13px] leading-5 text-app-text;
   }
 
   .document-list {
@@ -327,9 +379,9 @@
       @apply flex-col items-stretch;
     }
 
-    .workspace-tool-section,
-    .profile-readiness {
-      @apply p-3;
+    .profile-readiness,
+    .workspace-tool-section {
+      @apply px-4 py-4;
     }
 
     .cv-preview__row {
@@ -342,8 +394,17 @@
   }
 
   @media (any-pointer: coarse) {
-    .jobflow-button {
+    .jobflow-button,
+    .jobflow-icon-button,
+    .profile-page input:not([type='checkbox']):not([type='file']),
+    .profile-page select,
+    .workspace-tool-section input:not([type='checkbox']):not([type='file']),
+    .workspace-tool-section select {
       min-height: 44px;
+    }
+
+    .jobflow-icon-button {
+      min-width: 44px;
     }
   }
 
