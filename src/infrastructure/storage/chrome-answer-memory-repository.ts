@@ -12,7 +12,9 @@ export class ChromeAnswerMemoryRepository {
   async load(): Promise<AnswerMemoryEnvelope> {
     const stored = await browser.storage.local.get(ANSWER_MEMORY_STORAGE_KEY);
     const raw = stored[ANSWER_MEMORY_STORAGE_KEY];
-    return raw === undefined ? createEmptyAnswerMemory() : parseAnswerMemory(raw);
+    return raw === undefined
+      ? createEmptyAnswerMemory()
+      : parseAnswerMemory(raw);
   }
 
   async save(memory: AnswerMemoryEnvelope): Promise<void> {
