@@ -365,6 +365,20 @@
     @apply text-sm font-semibold text-app-ink;
   }
 
+  /* Migration guard: legacy workspace metadata used 11px and pipeline lanes
+     used a tinted neutral fill. Keep old call sites visually compliant while
+     ownership moves into shared primitives over time. */
+  .profile-page .text-\[11px\],
+  .workspace-tool-section .text-\[11px\],
+  #applications .text-\[11px\] {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  #applications .bg-app-muted\/30 {
+    background-color: rgb(var(--app-surface) / 1);
+  }
+
   .jobflow-visually-hidden {
     @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
     clip: rect(0, 0, 0, 0);
