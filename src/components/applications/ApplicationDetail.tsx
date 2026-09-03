@@ -33,8 +33,8 @@ function DetailBlock({
   children: ReactNode;
 }) {
   return (
-    <section className="grid gap-3 rounded-lg border border-app-border bg-app-surface p-4">
-      <h3 className="m-0 text-[11px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
+    <section className="grid gap-3 border-t border-app-border pt-4 first:border-t-0 first:pt-0">
+      <h3 className="m-0 text-[13px] font-semibold uppercase tracking-[0.08em] text-app-subtle">
         {title}
       </h3>
       {children}
@@ -51,7 +51,7 @@ function DetailValue({
 }) {
   return (
     <div className="grid gap-1">
-      <span className="text-[11px] font-medium text-app-subtle">{label}</span>
+      <span className="text-[13px] font-medium text-app-subtle">{label}</span>
       <div className="text-sm text-app-text">{children}</div>
     </div>
   );
@@ -80,7 +80,7 @@ function ProgressTrack({ application }: { application: JobApplication }) {
                 }`}
               />
               <span
-                className={`truncate text-[10px] font-medium ${
+                className={`truncate text-xs font-medium ${
                   current ? 'text-app-ink' : 'text-app-subtle'
                 }`}
               >
@@ -152,7 +152,7 @@ export function ApplicationDetail({
 
   return (
     <div
-      className="grid gap-5"
+      className="grid gap-5 px-4 py-4 sm:px-5 sm:py-5"
       aria-label={`${application.company} application detail`}
     >
       <div>
@@ -173,7 +173,7 @@ export function ApplicationDetail({
         }
       />
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium">
+      <div className="flex flex-wrap items-center gap-2 text-[13px] font-medium">
         <span className="rounded-control border border-app-border px-2 py-1 text-app-ink">
           {STAGE_LABELS[application.stage]}
         </span>
@@ -192,7 +192,7 @@ export function ApplicationDetail({
         </span>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
+      <div className="grid gap-5 border-t border-app-border pt-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)] xl:gap-8">
         <div className="grid content-start gap-4">
           <DetailBlock title="Next action">
             {application.nextAction !== undefined ? (
@@ -201,7 +201,7 @@ export function ApplicationDetail({
               </p>
             ) : suggestedAction !== null ? (
               <div className="grid gap-1">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-app-subtle">
+                <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-app-subtle">
                   Suggested next
                 </span>
                 <p className="m-0 text-sm font-medium text-app-text">
@@ -213,7 +213,7 @@ export function ApplicationDetail({
             )}
             <div className="flex flex-wrap items-center gap-2 text-xs text-app-subtle">
               {dueStatus !== null ? (
-                <span className="rounded-control border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">
+                <span className="rounded-control border border-app-warning/30 bg-app-warning-soft px-2 py-1 text-app-warning">
                   {dueStatus}
                 </span>
               ) : null}
@@ -286,7 +286,7 @@ export function ApplicationDetail({
                 </ActionRow>
 
                 <div className="grid gap-2 border-t border-app-border pt-3">
-                  <span className="text-[11px] font-medium text-app-subtle">
+                  <span className="text-[13px] font-medium text-app-subtle">
                     Close opportunity
                   </span>
                   <ActionRow>
@@ -347,7 +347,7 @@ export function ApplicationDetail({
           </DetailBlock>
         </div>
 
-        <div className="grid content-start gap-4">
+        <div className="grid content-start gap-4 xl:border-l xl:border-app-border xl:pl-8">
           <DetailBlock title="Important dates">
             {hasImportantDates ? (
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
@@ -428,7 +428,7 @@ export function ApplicationDetail({
             </div>
           </DetailBlock>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end border-t border-app-border pt-4">
             <Button variant="danger" onClick={() => void onDelete()}>
               <Trash2 aria-hidden="true" size={14} />
               Delete job
