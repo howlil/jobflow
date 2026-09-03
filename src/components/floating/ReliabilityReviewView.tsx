@@ -7,8 +7,34 @@ import {
   type CorrectionTarget,
 } from '../../domain/corrections/correction-schema';
 import type { FieldContext } from '../../domain/forms/field-context';
+import type { CanonicalField } from '../../domain/matching/canonical-fields';
 import type { ReusableAnswerOption } from '../../domain/matching/reusable-answers';
 import { floatingFieldLabel } from './FloatingViews';
+
+const CANONICAL_FIELD_LABELS: Record<CanonicalField, string> = {
+  'personal.legalName.first': 'First name',
+  'personal.legalName.middle': 'Middle name',
+  'personal.legalName.last': 'Last name',
+  'personal.preferredName': 'Preferred name',
+  'contact.email.primary': 'Primary email',
+  'contact.phone.primary': 'Primary phone',
+  'contact.whatsapp': 'WhatsApp',
+  'contact.address.line1': 'Address line 1',
+  'contact.address.line2': 'Address line 2',
+  'contact.address.city': 'City',
+  'contact.address.state': 'State / province',
+  'contact.address.country': 'Country',
+  'contact.address.postalCode': 'Postal code',
+  'links.linkedin': 'LinkedIn',
+  'links.github': 'GitHub',
+  'links.portfolio': 'Portfolio',
+  'professional.headline': 'Professional headline',
+  'professional.summary': 'Professional summary',
+  'jobPreferences.willingToRelocate': 'Willing to relocate',
+  'jobPreferences.willingToTravel': 'Willing to travel',
+  'jobPreferences.availabilityDate': 'Availability date',
+  'jobPreferences.noticePeriod': 'Notice period',
+};
 
 function reasonFor(item: FillAnalysis): string {
   if (item.match.status === 'review-answer') {
@@ -41,7 +67,10 @@ export function ReliabilityReviewView({
   async function rememberCurrent(item: FillAnalysis) {
     if (onRememberCurrentAnswer === undefined) return;
     const key = item.context.fieldFingerprint;
-    setStatuses((current) => ({ ...current, [key]: 'Reading current answer…' }));
+    setStatuses((current) => ({
+      ...current,
+      [key]: 'Reading current answer…',
+    }));
     const remembered = await onRememberCurrentAnswer(item.context);
     setStatuses((current) => ({
       ...current,
@@ -52,7 +81,10 @@ export function ReliabilityReviewView({
   }
 
   return (
-    <section className="jobflow-panel__detail" aria-label="Fields needing review">
+    <section
+      className="jobflow-panel__detail"
+      aria-label="Fields needing review"
+    >
       <button className="jobflow-panel__back" type="button" onClick={onBack}>
         <ArrowLeft aria-hidden="true" size={15} />
         Back
@@ -61,7 +93,9 @@ export function ReliabilityReviewView({
         <p className="jobflow-panel__section-label">Needs attention</p>
         <h2>Finish unresolved fields</h2>
         <p className="jobflow-panel__helper">
-          Jobflow explains why each field was left alone. Confirm a known answer, remember what you entered manually, or leave the field for manual-only completion.
+          Jobflow explains why each field was left alone. Confirm a known
+          answer, remember what you entered manually, or leave the field for
+          manual-only completion.
         </p>
       </div>
 
@@ -74,8 +108,6 @@ export function ReliabilityReviewView({
       {items.map((item) => {
         const label = floatingFieldLabel(item.context);
         const key = item.context.fieldFingerprint;
-        const answerCandidates =
-          item.match.status === 'review-answer' ? item.match.candidates : [];
         return (
           <div
             className="jobflow-panel__review"
@@ -84,13 +116,36 @@ export function ReliabilityReviewView({
             <strong>{label}</strong>
             <small>{reasonFor(item)}</small>
 
-            {answerCandidates.length > 0 ? (
+            {item.match.status === 'review' ? (
               <div className="jobflow-panel__review-actions">
-                {answerCandidates.map((candidate) => (
+                {item.match.candidates.map((candidate) => {
+                  const candidateLabel =
+                    CANONICAL_FIELD_LABELS[candidate.field];
+                  return (
+                    <button
+                      className="jobflow-panel__action jobflow-panel__action--secondary"
+                      type="button"
+                      key={candidate.field}
+                      aria-label={`Use ${candidateLabel} for ${label}`}
+                      onClick={() =>
+                        onRemember?.(item.context, candidate.field)
+                      }
+                    >
+                      {candidateLabel}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {item.match.status === 'review-answer' ? (
+              <div className="jobflow-panel__review-actions">
+                {item.match.candidates.map((candidate) => (
                   <button
                     className="jobflow-panel__action jobflow-panel__action--secondary"
                     type="button"
                     key={candidate.id}
+                    aria-label={`Use ${candidate.label} for ${label}`}
                     onClick={() =>
                       onRemember?.(
                         item.context,
@@ -98,7 +153,7 @@ export function ReliabilityReviewView({
                       )
                     }
                   >
-                    Use {candidate.label}
+                    {candidate.label}
                   </button>
                 ))}
               </div>
@@ -111,6 +166,7 @@ export function ReliabilityReviewView({
                     className="jobflow-panel__action jobflow-panel__action--secondary"
                     type="button"
                     key={answer.id}
+                    aria-label={`Use ${answer.label} for ${label}`}
                     onClick={() =>
                       onRemember?.(
                         item.context,
@@ -118,7 +174,7 @@ export function ReliabilityReviewView({
                       )
                     }
                   >
-                    Use {answer.label}
+                    {answer.label}
                   </button>
                 ))}
                 {onRememberCurrentAnswer !== undefined ? (
@@ -137,6 +193,7 @@ export function ReliabilityReviewView({
               <button
                 className="jobflow-panel__action jobflow-panel__action--secondary"
                 type="button"
+                aria-label={`Ignore ${label}`}
                 onClick={() => onRemember?.(item.context, 'ignore')}
               >
                 <HelpCircle aria-hidden="true" size={14} />
