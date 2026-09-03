@@ -6,7 +6,7 @@ export function Section({ className, ...props }: HTMLAttributes<HTMLElement>) {
   return (
     <section
       className={classes(
-        'grid gap-4 border-b border-app-border pb-5 last:border-b-0 last:pb-0',
+        'grid gap-4 border-b border-app-border bg-app-surface px-4 py-4 last:border-b-0 sm:px-5 sm:py-5',
         className,
       )}
       {...props}
