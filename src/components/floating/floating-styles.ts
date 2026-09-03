@@ -111,7 +111,6 @@ export const FLOATING_STYLES = `
   background: var(--jobflow-surface);
   box-shadow: var(--jobflow-shadow-overlay);
   scrollbar-width: thin;
-  animation: jobflow-panel-in 160ms cubic-bezier(.2, .8, .2, 1);
 }
 
 .jobflow-panel button,
@@ -192,8 +191,10 @@ export const FLOATING_STYLES = `
   flex: 0 0 auto;
 }
 
-.jobflow-panel__body {
+.jobflow-panel__body,
+.jobflow-panel__view {
   display: grid;
+  min-height: 0;
 }
 
 .jobflow-panel__summary {
@@ -537,11 +538,6 @@ export const FLOATING_STYLES = `
   font-weight: 650;
 }
 
-@keyframes jobflow-panel-in {
-  from { opacity: .7; transform: translateX(24px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 @media (max-width: 560px) {
   .jobflow-panel {
     left: 0;
@@ -576,7 +572,6 @@ export const FLOATING_STYLES = `
 @media (prefers-reduced-motion: reduce) {
   .jobflow-launcher,
   .jobflow-panel {
-    animation: none;
     transition: none;
   }
 }
