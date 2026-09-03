@@ -88,7 +88,9 @@ export default defineContentScript({
         return Promise.resolve(toPageContextResponse(currentContext));
       }
       if (isToggleAssistantMessage(message)) {
-        return Promise.resolve({ available: requestAssistantOpen?.() ?? false });
+        return Promise.resolve({
+          available: requestAssistantOpen?.() ?? false,
+        });
       }
       if (isSetPageVariantMessage(message)) {
         if (
