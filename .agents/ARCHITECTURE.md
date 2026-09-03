@@ -62,7 +62,7 @@ entrypoints
   WXT runtime shells and extension mounting/wiring
 
 e2e
-  browser acceptance journeys
+  optional browser diagnostic fixtures; not a merge/release acceptance layer
 ```
 
 Dependency direction:
@@ -158,7 +158,7 @@ Jobflow has two materially different rendering environments:
 1. Full-tab Workspace using shared Tailwind tokens and owned reusable components.
 2. In-page Assistant rendered in an isolated Shadow DOM; host-page CSS must not control it and document-level Tailwind must not be assumed to cross the boundary.
 
-There is no browser-action popup React surface. The technical `options` entrypoint may remain because it is a browser-extension shell detail; user-facing semantics are Workspace.
+There is no browser-action popup React surface. The in-page Assistant itself uses a single bottom-right floating launcher that opens a compact three-tab popup for Autofill, Pipeline, and Sensitive actions. The technical `options` entrypoint may remain because it is a browser-extension shell detail; user-facing semantics are Workspace.
 
 Visual and interaction rules are owned by `.agents/DESIGN.md`.
 

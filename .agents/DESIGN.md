@@ -148,7 +148,7 @@ Navigation is domain-oriented. Current product grouping centers on Work, Career 
 
 ### In-page assistant
 
-The assistant overlays the host page and never becomes part of the site's layout. It is a compact contextual popup, not a sidebar/drawer.
+The assistant overlays the host page and never becomes part of the site's layout. It is a compact contextual popup, not a sidebar or drawer.
 
 Collapsed launcher:
 
@@ -373,33 +373,3 @@ Unlocking is not disclosure consent. Do not expose sensitive values longer than 
 Use short operational copy, e.g. `8 fields ready`, `Review ambiguous fields`, `Attach backend-cv.pdf`, `Import selected data`, `Open profile workspace`.
 
 Avoid repeated local-first explanations, marketing claims, and generic AI-assistant language inside utility surfaces.
-
-## Interaction and visual verification
-
-Before claiming a UI flow release-ready, verify only the representative states/widths relevant to the changed surface, with emphasis on:
-
-```text
-entry point        obvious starting point
-primary action     one obvious next action
-state preservation expected drafts/navigation survive
-feedback           specific save/import/fill/review status
-errors             appear near cause
-escape route       cancel/close/back without data loss
-keyboard           logical tab order; Escape closes overlays
-mobile             controls reachable without horizontal scroll
-overflow           long labels/URLs/filenames do not collide
-loading            dimensions remain stable
-sensitive data     detect/review/unlock/fill stay explicit
-document attach    recommendation never implies auto-attachment
-```
-
-Representative widths when affected:
-
-- 2560, 1920, 1440 desktop workspace
-- 1024 tablet workspace
-- 390 mobile workspace
-- collapsed bottom-right launcher
-- expanded assistant popup desktop
-- expanded assistant popup narrow viewport
-
-A real visual audit should use current screenshots of the target flow. Source inspection is not visual-release evidence.

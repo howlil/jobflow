@@ -11,18 +11,20 @@ Job Flow is a local-first Chromium extension for career-form autofill. It keeps 
 - Base profile plus lightweight Application Profiles backed by the existing local variant model.
 - Deterministic current-page Application Profile recommendation using local role, seniority, domain, and configured skill evidence with inspectable weighted scoring and default fallback.
 - Context-aware toolbar action: on a supported application form it opens the in-page Assistant; otherwise it opens Workspace. Job Flow does not expose a separate toolbar popup product surface.
-- In-page 48px floating launcher for detected forms. The detailed Assistant opens only after a user click or explicit toolbar action and becomes viewport-safe on narrow pages.
-- Current-page Application Profile selection lives in the Assistant alongside the operations it affects.
+- One 48px floating launcher at the bottom-right of detected application pages. Clicking it opens a compact in-page popup with exactly three top-level tabs: **Autofill**, **Pipeline**, and **Sensitive**.
+- Current-page Application Profile selection, safe fill, unresolved review, Answer Memory, explicit document attachment, and local completion status live under the Autofill tab.
+- The Pipeline tab reviews/saves the current job and can explicitly mark it applied after the user submits on the employer site; capture updates an existing exact-job-URL record instead of creating a duplicate.
 - Ready / Needs review / Sensitive / Unknown field classification.
 - Explicit normal-field fill only; no automatic fill on scan.
 - Dynamic form re-analysis for multi-step or changing forms.
 - Per-site/form/field Autofill Memory with Workspace controls to inspect/delete mappings, reset a site, reset all, and review stale mappings.
+- Non-sensitive stable answers can be explicitly remembered from the current page and reused by the deterministic matcher on equivalent future application questions.
 - Sensitive Data Vault for encrypted-at-rest sensitive values.
 - Sensitive fields require vault setup/unlock plus a separate current-site approval before fill.
 - Deterministic file-field intent classification for resume, cover letter, portfolio, transcript, certificate, or unknown.
-- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the page launcher. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
+- A stored recommended document can be attached to a recognized native file input only after the user presses **Attach** in the Autofill tab. Job Flow does not auto-attach and falls back to the site's manual file picker when direct assignment is unsupported.
 - Versioned normal-profile backup export/import validated through the same persisted-schema parser, plus backup diagnostics before recovery. Sensitive vault values are never exported as plaintext.
-- Compatibility fixtures and a privacy-safe live ATS validation/feedback workflow are maintained as targeted evidence rather than a synthetic CI status gate.
+- Compatibility fixtures provide deterministic regression evidence; optional live ATS observation may be used for debugging/product feedback but is not a CI, merge, or release gate.
 - No auto-submit, auto-next, backend, cloud sync, analytics, or AI dependency.
 
 ## Local Development
@@ -31,7 +33,7 @@ Requirements:
 
 - Node.js `>=22.13.0`
 - pnpm `11.21.0`
-- Chromium/Chrome only when browser diagnostics are needed
+- Chromium/Chrome only when optional browser diagnostics are needed
 
 Install dependencies:
 
@@ -51,7 +53,7 @@ Build an unpacked Chromium extension:
 pnpm build
 ```
 
-Load the built extension:
+Load the built extension for development/debugging when needed:
 
 1. Open `chrome://extensions/`.
 2. Enable Developer mode.
@@ -63,7 +65,7 @@ Load the built extension:
 Job Flow intentionally has two product surfaces:
 
 ```text
-Application page -> In-page Assistant -> analyze / select profile / fill / review / attach / sensitive / capture
+Application page -> floating launcher -> Assistant popup -> Autofill / Pipeline / Sensitive
 Career management -> Workspace -> pipeline / profile / documents / Application Profiles / data settings
 ```
 
@@ -83,7 +85,7 @@ Text-based PDF and DOCX are supported for extraction. Image-only/scanned PDF ext
 
 ## Verification
 
-Required repository gates are direct and deterministic:
+Required repository gates are direct, automated, and deterministic:
 
 ```powershell
 pnpm test
@@ -94,15 +96,15 @@ pnpm build
 pnpm verify:manifest
 ```
 
-Use `pnpm test:e2e` or `pnpm test:e2e:smoke` only when browser-runtime evidence is useful for the change. Tagged `v*` releases rerun the required gate, package the extension, generate a SHA-256 checksum, and then create the GitHub Release.
+Manual acceptance testing, browser E2E/black-box testing, live-browser verification, and manual visual review are not required merge or release gates. Tagged `v*` releases rerun the deterministic required gate, package the extension, generate a SHA-256 checksum, and then create the GitHub Release.
 
 ## Compatibility Strategy
 
 Job Flow prioritizes a generic form engine over ATS-specific production branches. The maintained compatibility corpus includes native and ATS-shaped field contexts, English/Indonesian labels, sensitive fields, file inputs, dynamic forms, and ambiguous questions. A vendor adapter is justified only after a reproducible generic-engine failure cannot be solved cleanly at the generic extraction/matching/filling layer.
 
-Compatibility documentation may record fixture/live evidence, but runtime compatibility claims must be supported by the relevant focused fixture or live validation rather than metadata alone.
+Compatibility claims used for merge/release confidence should come from deterministic fixtures or repository-owned integration evidence. Live-site observation can inform debugging or future fixture creation but does not function as a mandatory acceptance protocol.
 
-See `docs/compatibility.md` and `docs/ats-live-validation.md` for the evidence model, live validation protocol, and adapter gate.
+See `docs/compatibility.md` for the deterministic compatibility model. `docs/ats-live-validation.md` may be used as optional diagnostic/product-feedback guidance only.
 
 ## Security And Privacy
 
@@ -130,6 +132,6 @@ See `docs/privacy.md` for the beta privacy disclosure.
 
 ## Release
 
-The repository version is `0.1.0`. Create a distributable tag only from a verified `master` commit after PR review/CI and final manifest/privacy review. The release workflow is intentionally tag-driven and fail-closed; it must not be used to bypass required verification.
+The repository version is `0.1.0`. Create a distributable tag only from a verified `master` commit after PR review/CI and final manifest/privacy review. The release workflow is intentionally tag-driven and fail-closed; it must not be used to bypass required automated verification.
 
 For trusted GitHub beta distribution without Chrome Web Store publishing, see `docs/trusted-beta.md`. Chrome Web Store publication is intentionally outside the current execution scope.
