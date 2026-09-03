@@ -59,7 +59,11 @@ describe('answer memory', () => {
   it('updates the remembered value for the same normalized question', () => {
     vi.stubGlobal('crypto', { randomUUID: () => 'answer-1' });
     const first = rememberAnswer(createEmptyAnswerMemory(), context, 'No');
-    const second = rememberAnswer(first, { ...context, label: '  Do you require sponsorship? ' }, 'Yes');
+    const second = rememberAnswer(
+      first,
+      { ...context, label: '  Do you require sponsorship? ' },
+      'Yes',
+    );
 
     expect(second.entries).toHaveLength(1);
     expect(second.entries[0]?.answer).toBe('Yes');
