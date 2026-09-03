@@ -152,7 +152,7 @@ export function ApplicationDetail({
 
   return (
     <div
-      className="grid gap-5 px-4 py-4 sm:px-5 sm:py-5"
+      className="grid gap-5"
       aria-label={`${application.company} application detail`}
     >
       <div>
