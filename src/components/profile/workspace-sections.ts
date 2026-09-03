@@ -13,7 +13,7 @@ export type WorkspaceSection =
   | 'backup';
 
 export const WORKSPACE_SECTION_TITLES: Record<WorkspaceSection, string> = {
-  personal: 'Personal',
+  personal: 'Profile',
   contact: 'Contact',
   links: 'Links',
   experience: 'Experience',
@@ -21,8 +21,8 @@ export const WORKSPACE_SECTION_TITLES: Record<WorkspaceSection, string> = {
   applications: 'Pipeline',
   documents: 'Documents',
   preferences: 'Preferences',
-  variants: 'Variants',
-  sensitive: 'Sensitive',
-  corrections: 'Corrections',
-  backup: 'Backup',
+  variants: 'Application Profiles',
+  sensitive: 'Privacy & Sensitive Data',
+  corrections: 'Autofill Memory',
+  backup: 'Backup & Recovery',
 };
