@@ -70,11 +70,7 @@ jobs:
           (
             pnpm typecheck &&
             pnpm lint &&
-            if ! pnpm format:check; then
-              pnpm format
-              git diff -- entrypoints/content.tsx src/components/floating/ApplicationClosureView.tsx src/components/floating/FloatingPanel.tsx src/components/floating/ReliabilityReviewView.tsx src/domain/matching/answer-memory.test.ts
-              exit 1
-            fi &&
+            pnpm format:check &&
             pnpm build
           ) &
           quality_pid=$!
