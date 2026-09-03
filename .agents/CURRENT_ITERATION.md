@@ -1,41 +1,49 @@
 # Current Iteration
 
-**Status:** Active — Unified Job Application Workflow
+**Status:** Idle — no product milestone is currently active.
 
-## Milestone Outcome
+## Current Product Position
 
-Reduce Jobflow's user-facing product model from three overlapping surfaces to two coherent ones:
+The last completed milestone was **Unified Job Application Workflow**. Jobflow now exposes two coherent user-facing product surfaces instead of three overlapping ones:
 
-- **In-page Assistant** owns the current application workflow: page analysis, application-profile selection, fill/review, document attachment, sensitive disclosure, and application capture.
-- **Workspace** owns career/application/data management: Pipeline, career profile, documents, application profiles, privacy/data settings, autofill memory, and backup/recovery.
-- The browser toolbar icon becomes a context-aware launcher rather than opening a separate popup product surface.
+- **In-page Assistant** owns current-application execution: page analysis, Application Profile recommendation/selection, explicit fill, unresolved review, document attachment, sensitive disclosure, and application capture.
+- **Workspace** owns Pipeline, career/profile data, documents, Application Profiles, preferences, Privacy & Sensitive Data, Autofill Memory, and Backup & Recovery.
+- The browser toolbar action is a context-aware launcher: it opens the Assistant when the active page has supported application fields and otherwise opens Workspace. The separate browser-action popup surface and its legacy ownership have been removed.
 
-No autofill policy, persistence schema, vault cryptography, automatic-submit behavior, ATS-specific runtime handling, backend/cloud/AI boundary, or document-attachment authorization changes are part of this milestone.
-
-## Active Vertical Slice
-
-Execute the complete milestone continuously:
-
-1. toolbar action -> in-page Assistant when a supported application context exists; otherwise open Workspace;
-2. move current-page application-profile recommendation/selection from popup into Assistant;
-3. consolidate Workspace information architecture and user-facing terminology without unnecessary persistence migration;
-4. make Workspace the canonical user-facing management surface while retaining the technical `options` entrypoint where useful;
-5. remove popup entrypoint/components/tests/manifest ownership only after replacement behavior exists;
-6. verify the integrated application journey and required repository gates.
-
-## Material Constraints
-
-- Preserve explicit user-triggered fill.
-- Preserve no automatic Submit/Next/navigation.
-- Preserve explicit per-field document attachment.
-- Preserve sensitive-data vault/session/disclosure boundaries.
-- Keep browser APIs at runtime edges and page DOM work in the content-script shell.
-- Do not expand into general redesign, new ATS adapters, new application stages, AI matching, cloud sync, or schema redesign.
+The milestone preserved existing trust and architecture boundaries: no automatic Submit/Next, no automatic document attachment, no persisted profile/application schema migration, no ATS-specific runtime branch, and no backend/cloud/AI/telemetry dependency.
 
 ## Verification Evidence
 
-Accumulate proportional evidence while implementing. Final milestone gate requires the repository's deterministic checks plus targeted browser/runtime evidence for toolbar/content-script/manifest behavior.
+The release-ready PR gate passed the repository's required deterministic checks, including behavior tests, typecheck, lint, format check, production build, and generated-manifest verification. The extension smoke journey was updated to cover popup-free assistant launching and preserve explicit-fill/no-submit assertions for targeted browser diagnostics.
+
+Detailed completed work and verification history live in Git/PR records rather than this file.
+
+## Active Milestone
+
+None.
+
+There is no authorized product outcome, vertical slice, or logical change currently in progress.
 
 ## Next Move
 
-Complete the replacement workflow first, then delete popup legacy ownership and merge only when the integrated milestone is green.
+When the user requests the next product/engineering direction:
+
+1. inspect the current product gap against `.agents/PROJECT.md`, architecture/security boundaries, and actual code state;
+2. shape one bounded high-value core milestone with a meaningful complete outcome rather than a collection of micro-slices or nice-to-have polish;
+3. define demonstrable vertical slices only where they help execute the complete outcome;
+4. once authorized, execute those slices continuously until the milestone outcome is release-ready, unless a material stop condition is reached;
+5. use accumulated proportional verification evidence at the milestone gate instead of restarting a full verification ceremony after every small change.
+
+Do not reactivate historical sprint plans or infer new product scope from completed work.
+
+## State Discipline
+
+While work is active, keep this file limited to:
+
+- milestone outcome and boundaries
+- current vertical slice/logical change
+- material blockers or unresolved decisions
+- verification evidence that still matters to the active outcome
+- the single next meaningful action
+
+Remove completed slice detail once it no longer helps execute the active milestone. Durable history belongs in Git; durable material decisions belong in `.agents/DECISIONS.md`.
