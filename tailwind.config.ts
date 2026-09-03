@@ -34,7 +34,11 @@ export default {
       borderRadius: {
         app: '0.375rem',
         control: '0.375rem',
+        lg: '0.375rem',
         overlay: '0.5rem',
+      },
+      fontSize: {
+        xs: ['0.8125rem', { lineHeight: '1.25rem' }],
       },
       fontFamily: {
         sans: [
