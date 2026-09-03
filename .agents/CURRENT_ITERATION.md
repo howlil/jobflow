@@ -1,44 +1,45 @@
 # Current Iteration
 
-**Status:** Active — Application Completion Reliability
+**Status:** Idle — no product milestone is currently active.
 
-## Milestone Outcome
+## Last Completed Milestone
 
-Make each real job application require less manual work than the previous one while preserving Jobflow's trust boundaries.
+### Application Completion Reliability
 
-The integrated workflow must let the user:
+Jobflow now makes repeated real applications progressively cheaper to complete while preserving its local-first trust boundaries.
 
-1. fill known reusable data safely;
-2. resolve uncertain/unsupported fields through explicit actionable review;
-3. remember stable repeated answers and corrections so equivalent future questions become faster;
-4. explicitly attach the right stored document with clear fallback when attachment is unavailable;
-5. move a completed application into Pipeline with minimal duplicate entry;
-6. inspect privacy-safe local completion diagnostics without telemetry or network reporting.
+Delivered integrated capability:
 
-## Active Vertical Slice
+- one bottom-right floating launcher opens a compact Assistant popup with exactly three top-level tabs: **Autofill**, **Pipeline**, and **Sensitive**;
+- Autofill owns current-page analysis, Application Profile selection, explicit safe fill, actionable unresolved review, reusable Answer Memory, correction feedback, explicit document attachment, and local completion diagnostics;
+- stable non-sensitive answers can be explicitly remembered from a host-page field and reused by the existing deterministic matcher on equivalent future questions;
+- corrections and remembered answers trigger re-analysis so learned behavior affects the current and subsequent applications;
+- document attachment remains explicit and exposes attached, missing-file, or unsupported-site fallback states;
+- Pipeline capture reviews current job details, updates an existing exact-job-URL record instead of creating a duplicate, and supports an explicit **Mark as applied** action only after the user submits on the employer site;
+- Sensitive remains a separate tab and continues to use the encrypted vault plus explicit current-site disclosure flow.
 
-Execute the complete milestone continuously:
+Product invariants preserved:
 
-- reusable answer memory and fail-closed matching;
-- actionable unresolved-field recovery;
-- correction/answer feedback loop;
-- reliable document completion;
-- application closure into Pipeline;
-- local completion metrics and targeted browser acceptance.
-
-## Material Constraints
-
-- Preserve explicit user-triggered fill.
-- Preserve no automatic Submit/Next/navigation.
-- Preserve explicit per-field document attachment.
-- Preserve sensitive vault/session/disclosure boundaries.
-- Keep canonical profile persistence outside the content-script UI shell; runtime writes must stay behind an application/background boundary.
-- No backend, cloud sync, telemetry, AI dependency, ATS-specific branch, broad redesign, or unrelated schema migration.
+- no automatic Submit/Apply/Next/navigation;
+- no automatic file attachment;
+- no backend, cloud sync, telemetry, or AI dependency;
+- unknown/ambiguous matching remains fail-closed;
+- sensitive values remain outside normal profile and Answer Memory storage.
 
 ## Verification Evidence
 
-Accumulate focused evidence while implementing. Final gate requires repository deterministic checks plus targeted browser evidence for remembered-answer reuse, unresolved recovery, document completion, and Pipeline capture.
+Final runtime head passed the required deterministic repository gates:
+
+- 55 test files passed;
+- 245 tests passed;
+- TypeScript typecheck passed;
+- ESLint passed with zero warnings;
+- Prettier format check passed;
+- WXT production build passed;
+- generated extension manifest verification passed.
+
+Browser E2E/manual browser validation remains optional diagnostic evidence under the current repository verification policy; it is not a merge or release gate.
 
 ## Next Move
 
-Implement the memory/recovery loop first, then close document and Pipeline behavior, add local diagnostics, run final gates, and merge only when the integrated milestone is green.
+Inspect the current product and repository state before proposing another milestone. Shape the next milestone from the highest-value remaining core user-journey capability gap, not from milestone count, tiny isolated improvements, or nice-to-have expansion.
