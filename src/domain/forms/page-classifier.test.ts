@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest';
 import type { FieldContext } from './field-context';
 import { classifyApplicationPage } from './page-classifier';
 
-function field(label: string, origin: string, inputType = 'text'): FieldContext {
+function field(
+  label: string,
+  origin: string,
+  inputType = 'text',
+): FieldContext {
   return {
     controlKind: inputType === 'file' ? 'file' : 'input',
     inputType,
@@ -33,7 +37,11 @@ describe('classifyApplicationPage', () => {
       pageSignals: ['Software Engineer'],
     });
 
-    expect(result).toMatchObject({ kind: 'workday', supported: true, confidence: 'high' });
+    expect(result).toMatchObject({
+      kind: 'workday',
+      supported: true,
+      confidence: 'high',
+    });
   });
 
   it('activates on recruitment Google Forms', () => {
@@ -55,7 +63,11 @@ describe('classifyApplicationPage', () => {
   it('does not activate on ordinary Google Forms surveys', () => {
     const origin = 'https://docs.google.com';
     const result = classifyApplicationPage({
-      fields: [field('Name', origin), field('Email', origin), field('Feedback', origin)],
+      fields: [
+        field('Name', origin),
+        field('Email', origin),
+        field('Feedback', origin),
+      ],
       pageSignals: ['Product feedback survey'],
     });
 
@@ -73,13 +85,20 @@ describe('classifyApplicationPage', () => {
       pageSignals: ['Apply for Backend Engineer'],
     });
 
-    expect(result).toMatchObject({ kind: 'generic-job-application', supported: true });
+    expect(result).toMatchObject({
+      kind: 'generic-job-application',
+      supported: true,
+    });
   });
 
   it('stays inactive on arbitrary sites with generic inputs', () => {
     const origin = 'https://example.com';
     const result = classifyApplicationPage({
-      fields: [field('Search', origin), field('Email', origin), field('Comment', origin)],
+      fields: [
+        field('Search', origin),
+        field('Email', origin),
+        field('Comment', origin),
+      ],
       pageSignals: ['News and articles'],
     });
 
