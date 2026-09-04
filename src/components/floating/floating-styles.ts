@@ -2,7 +2,6 @@ export const FLOATING_STYLES = `
 .jobflow-assistant {
   --jobflow-bg: #fafafa;
   --jobflow-surface: #ffffff;
-  --jobflow-surface-glass: rgba(255, 255, 255, .94);
   --jobflow-surface-subtle: #f7f7f7;
   --jobflow-surface-muted: #f7f7f7;
   --jobflow-text: #171717;
@@ -16,7 +15,6 @@ export const FLOATING_STYLES = `
   --jobflow-danger: #dc2626;
   --jobflow-danger-bg: #fef2f2;
   --jobflow-shadow-overlay: 0 12px 28px rgba(0, 0, 0, .14);
-  --jobflow-shadow-popover: 0 18px 48px rgba(23, 23, 23, .16);
   color: var(--jobflow-text);
   font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
@@ -45,17 +43,17 @@ export const FLOATING_STYLES = `
   height: 48px;
   place-items: center;
   padding: 0;
-  border: 1px solid #0a0a0a;
+  border: 1px solid var(--jobflow-accent-strong);
   border-radius: 999px;
-  background: #171717;
-  color: #ffffff;
-  box-shadow: 0 10px 28px rgba(23, 23, 23, .22);
+  background: var(--jobflow-accent);
+  color: var(--jobflow-surface);
+  box-shadow: var(--jobflow-shadow-overlay);
   cursor: pointer;
   transition: transform 120ms ease, background 120ms ease;
 }
 
 .jobflow-launcher:hover {
-  background: #000000;
+  background: var(--jobflow-accent-strong);
   transform: translateY(-2px);
 }
 
@@ -85,8 +83,8 @@ export const FLOATING_STYLES = `
   padding: 0 4px;
   border: 2px solid var(--jobflow-surface);
   border-radius: 999px;
-  background: #171717;
-  color: #ffffff;
+  background: var(--jobflow-accent);
+  color: var(--jobflow-surface);
   font-size: 10px;
   font-weight: 800;
 }
@@ -102,11 +100,9 @@ export const FLOATING_STYLES = `
   max-height: min(640px, calc(100vh - 104px));
   overflow: hidden;
   border: 1px solid var(--jobflow-border-strong);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .98);
-  box-shadow: var(--jobflow-shadow-popover);
-  backdrop-filter: blur(16px);
-  animation: jobflow-popup-in 140ms ease-out;
+  border-radius: 8px;
+  background: var(--jobflow-surface);
+  box-shadow: var(--jobflow-shadow-overlay);
 }
 
 .jobflow-panel__header {
@@ -114,7 +110,7 @@ export const FLOATING_STYLES = `
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 14px 10px;
+  padding: 12px;
   border-bottom: 1px solid var(--jobflow-border);
 }
 
@@ -125,9 +121,9 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__eyebrow {
-  color: var(--jobflow-muted);
-  font-size: 10px;
-  font-weight: 750;
+  color: var(--jobflow-subtle);
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -135,7 +131,7 @@ export const FLOATING_STYLES = `
 .jobflow-panel__header strong {
   overflow: hidden;
   font-size: 15px;
-  font-weight: 720;
+  font-weight: 700;
   letter-spacing: -.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -144,26 +140,28 @@ export const FLOATING_STYLES = `
 .jobflow-panel__host {
   overflow: hidden;
   color: var(--jobflow-muted);
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .jobflow-panel__icon-button {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
-  border: 0;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: transparent;
   color: var(--jobflow-muted);
   cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 }
 
 .jobflow-panel__icon-button:hover {
+  border-color: var(--jobflow-border);
   background: var(--jobflow-surface-subtle);
   color: var(--jobflow-text);
 }
@@ -174,7 +172,7 @@ export const FLOATING_STYLES = `
   gap: 4px;
   padding: 6px;
   border-bottom: 1px solid var(--jobflow-border);
-  background: rgba(255, 255, 255, .88);
+  background: var(--jobflow-surface);
 }
 
 .jobflow-panel__tabs button {
@@ -185,39 +183,44 @@ export const FLOATING_STYLES = `
   justify-content: center;
   gap: 6px;
   padding: 7px 8px;
-  border: 0;
-  border-radius: 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: transparent;
   color: var(--jobflow-muted);
-  font-size: 11px;
-  font-weight: 680;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 }
 
 .jobflow-panel__tabs button:hover {
+  border-color: var(--jobflow-border);
   background: var(--jobflow-surface-subtle);
   color: var(--jobflow-text);
 }
 
 .jobflow-panel__tabs button.is-active {
-  background: #171717;
-  color: #ffffff;
+  border-color: var(--jobflow-accent);
+  background: var(--jobflow-accent);
+  color: var(--jobflow-surface);
 }
 
 .jobflow-panel__tabs button > span {
   display: grid;
-  min-width: 17px;
-  height: 17px;
+  min-width: 18px;
+  height: 18px;
   place-items: center;
   padding: 0 4px;
   border-radius: 999px;
-  background: rgba(127, 127, 127, .14);
-  font-size: 9px;
-  font-weight: 800;
+  background: var(--jobflow-surface-muted);
+  color: var(--jobflow-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .jobflow-panel__tabs button.is-active > span {
-  background: rgba(255, 255, 255, .16);
+  background: var(--jobflow-surface);
+  color: var(--jobflow-accent);
 }
 
 .jobflow-panel__content {
@@ -231,9 +234,11 @@ export const FLOATING_STYLES = `
   flex: 0 0 auto;
 }
 
+.jobflow-panel__view,
 .jobflow-panel__body,
 .jobflow-panel__menu {
   display: grid;
+  min-height: 0;
 }
 
 .jobflow-panel__summary {
@@ -241,7 +246,7 @@ export const FLOATING_STYLES = `
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 12px 10px;
+  padding: 12px 12px 10px;
 }
 
 .jobflow-panel__summary > div {
@@ -251,14 +256,14 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__summary strong {
   font-size: 19px;
-  font-weight: 720;
+  font-weight: 700;
   letter-spacing: -.035em;
 }
 
 .jobflow-panel__summary span,
 .jobflow-panel__summary small {
   color: var(--jobflow-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .jobflow-panel__summary small {
@@ -268,29 +273,31 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__fill {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin: 0 12px 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--jobflow-text);
-  border-radius: 9px;
-  background: var(--jobflow-text);
-  color: #ffffff;
-  font-weight: 700;
+  padding: 7px 12px;
+  border: 1px solid var(--jobflow-accent);
+  border-radius: 6px;
+  background: var(--jobflow-accent);
+  color: var(--jobflow-surface);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .jobflow-panel__fill:hover:not(:disabled),
 .jobflow-panel__action--primary:hover:not(:disabled) {
-  background: #000000;
+  border-color: var(--jobflow-accent-strong);
+  background: var(--jobflow-accent-strong);
 }
 
 .jobflow-panel__fill:disabled {
   border-color: var(--jobflow-border);
   background: var(--jobflow-surface-subtle);
-  color: var(--jobflow-muted);
+  color: var(--jobflow-subtle);
   cursor: not-allowed;
 }
 
@@ -307,7 +314,10 @@ export const FLOATING_STYLES = `
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 12px 6px;
+  padding: 10px 12px 6px;
+  color: var(--jobflow-muted);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .jobflow-panel__document {
@@ -329,14 +339,14 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__document-copy strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .jobflow-panel__document-copy span,
 .jobflow-panel__document-copy small {
   overflow: hidden;
   color: var(--jobflow-muted);
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -344,7 +354,7 @@ export const FLOATING_STYLES = `
 .jobflow-panel__menu > div,
 .jobflow-panel__menu button {
   display: flex;
-  min-height: 40px;
+  min-height: 36px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -353,6 +363,7 @@ export const FLOATING_STYLES = `
   border-top: 1px solid var(--jobflow-border);
   background: transparent;
   color: var(--jobflow-text);
+  font-size: 14px;
   text-align: left;
 }
 
@@ -376,13 +387,13 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__menu strong {
   color: var(--jobflow-muted);
-  font-size: 11px;
-  font-weight: 650;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .jobflow-panel__open-profile {
   display: flex;
-  min-height: 40px;
+  min-height: 36px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -391,7 +402,8 @@ export const FLOATING_STYLES = `
   border-top: 1px solid var(--jobflow-border);
   background: transparent;
   color: var(--jobflow-text);
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   text-align: left;
 }
@@ -405,33 +417,37 @@ export const FLOATING_STYLES = `
 .jobflow-panel__detail h2 {
   margin: 4px 0 0;
   font-size: 15px;
-  font-weight: 720;
+  font-weight: 700;
   letter-spacing: -.025em;
 }
 
 .jobflow-panel__back {
   display: inline-flex;
   width: max-content;
-  min-height: 34px;
+  min-height: 36px;
   align-items: center;
   gap: 6px;
   margin-left: -8px;
   padding: 7px 8px;
-  border: 0;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: transparent;
   color: var(--jobflow-muted);
+  font-size: 14px;
   cursor: pointer;
 }
 
 .jobflow-panel__section-label {
   margin: 0;
+  color: var(--jobflow-subtle);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .jobflow-panel__helper {
   margin: 7px 0 0;
   color: var(--jobflow-muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -443,7 +459,12 @@ export const FLOATING_STYLES = `
 }
 
 .jobflow-panel__review > strong {
-  font-size: 12px;
+  font-size: 14px;
+}
+
+.jobflow-panel__review > small {
+  color: var(--jobflow-muted);
+  font-size: 13px;
 }
 
 .jobflow-panel__review-actions {
@@ -459,17 +480,17 @@ export const FLOATING_STYLES = `
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 14px;
   cursor: pointer;
 }
 
 .jobflow-panel__action--secondary {
-  padding: 8px 12px;
+  padding: 7px 12px;
   border: 1px solid var(--jobflow-border-strong);
   background: var(--jobflow-surface);
   color: var(--jobflow-text);
-  font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .jobflow-panel__sensitive-list {
@@ -485,6 +506,7 @@ export const FLOATING_STYLES = `
   padding: 10px 0;
   border-bottom: 1px solid var(--jobflow-border);
   color: var(--jobflow-muted);
+  font-size: 13px;
 }
 
 .jobflow-panel__sensitive-error {
@@ -494,9 +516,10 @@ export const FLOATING_STYLES = `
   margin: 0;
   padding: 10px;
   border: 1px solid color-mix(in srgb, var(--jobflow-danger) 28%, transparent);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--jobflow-danger-bg);
   color: var(--jobflow-danger);
+  font-size: 13px;
 }
 
 .jobflow-panel__unlock,
@@ -514,8 +537,13 @@ export const FLOATING_STYLES = `
   display: grid;
   gap: 6px;
   color: var(--jobflow-muted);
-  font-size: 11px;
-  font-weight: 650;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.jobflow-panel__form small {
+  color: var(--jobflow-muted);
+  font-size: 13px;
 }
 
 .jobflow-panel__unlock input,
@@ -525,10 +553,18 @@ export const FLOATING_STYLES = `
   width: 100%;
   min-height: 36px;
   padding: 7px 10px;
-  border: 1px solid var(--jobflow-border-strong);
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid var(--jobflow-border);
+  border-radius: 6px;
+  background: var(--jobflow-surface);
   color: var(--jobflow-text);
+  font-size: 14px;
+}
+
+.jobflow-panel__unlock input:hover,
+.jobflow-panel__form input:hover,
+.jobflow-panel__form select:hover,
+.jobflow-panel__form textarea:hover {
+  border-color: var(--jobflow-border-strong);
 }
 
 .jobflow-panel__form textarea {
@@ -540,10 +576,10 @@ export const FLOATING_STYLES = `
   margin: 0 12px 10px;
   padding: 8px 10px;
   border: 1px solid var(--jobflow-border);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--jobflow-surface-subtle);
   color: var(--jobflow-muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .jobflow-panel__detail > .jobflow-panel__status {
@@ -553,11 +589,12 @@ export const FLOATING_STYLES = `
 .jobflow-panel__action--primary {
   min-height: 36px;
   padding: 7px 10px;
-  border: 1px solid var(--jobflow-text);
-  border-radius: 8px;
-  background: var(--jobflow-text);
-  color: #ffffff;
-  font-weight: 700;
+  border: 1px solid var(--jobflow-accent);
+  border-radius: 6px;
+  background: var(--jobflow-accent);
+  color: var(--jobflow-surface);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .jobflow-panel__empty {
@@ -570,16 +607,30 @@ export const FLOATING_STYLES = `
 
 .jobflow-panel__empty strong {
   color: var(--jobflow-text);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .jobflow-panel__empty span {
-  font-size: 11px;
+  font-size: 13px;
 }
 
-@keyframes jobflow-popup-in {
-  from { opacity: .65; transform: translateY(10px) scale(.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@media (prefers-color-scheme: dark) {
+  .jobflow-assistant {
+    --jobflow-bg: #0a0a0a;
+    --jobflow-surface: #141414;
+    --jobflow-surface-subtle: #1a1a1a;
+    --jobflow-surface-muted: #1a1a1a;
+    --jobflow-text: #fafafa;
+    --jobflow-muted: #a3a3a3;
+    --jobflow-subtle: #737373;
+    --jobflow-border: #303030;
+    --jobflow-border-strong: #4a4a4a;
+    --jobflow-accent: #fafafa;
+    --jobflow-accent-strong: #ffffff;
+    --jobflow-accent-soft: #333333;
+    --jobflow-danger: #f87171;
+    --jobflow-danger-bg: #450a0a;
+  }
 }
 
 @media (max-width: 520px) {
@@ -595,13 +646,16 @@ export const FLOATING_STYLES = `
     bottom: 70px;
     width: calc(100vw - 24px);
     max-height: calc(100vh - 92px);
-    border-radius: 14px;
+    border-radius: 8px;
   }
 }
 
 @media (any-pointer: coarse) {
   .jobflow-panel__icon-button,
   .jobflow-panel__fill,
+  .jobflow-panel__menu button,
+  .jobflow-panel__open-profile,
+  .jobflow-panel__tabs button,
   .jobflow-panel__action,
   .jobflow-panel__action--secondary,
   .jobflow-panel__action--primary,
@@ -619,8 +673,10 @@ export const FLOATING_STYLES = `
 
 @media (prefers-reduced-motion: reduce) {
   .jobflow-launcher,
-  .jobflow-panel {
-    animation: none;
+  .jobflow-panel button,
+  .jobflow-panel input,
+  .jobflow-panel textarea,
+  .jobflow-panel select {
     transition: none;
   }
 }
