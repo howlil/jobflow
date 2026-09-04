@@ -93,7 +93,7 @@ export function ProjectsSection({
                 <Trash2 aria-hidden="true" size={14} />
               </IconButton>
               <div className="grid gap-3 border-t border-app-border pt-3">
-                <FieldGrid columns={3}>
+                <FieldGrid>
                   <TextField
                     label="Project"
                     value={project.name}
@@ -117,6 +117,7 @@ export function ProjectsSection({
                     }
                   />
                   <TextField
+                    className="sm:col-span-2"
                     label="URL"
                     value={project.url}
                     onChange={(event) =>
