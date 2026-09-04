@@ -397,7 +397,9 @@ export function FloatingPanel({
                 onClick={() => setActiveTab('sensitive')}
               >
                 Sensitive
-                {summary.sensitive > 0 ? <span>{summary.sensitive}</span> : null}
+                {summary.sensitive > 0 ? (
+                  <span>{summary.sensitive}</span>
+                ) : null}
               </button>
             </div>
 
