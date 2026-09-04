@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import type { ApplicationDraft } from '../../application/applications/application-service';
 import type { PageAnalysisSummary } from '../../application/forms/analyze-field-contexts';
@@ -216,6 +217,7 @@ export function FloatingPanel({
   onFillSensitive,
   onAttachDocument,
 }: FloatingPanelProps) {
+  const reduceMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<AssistantTab>('autofill');
   const [autofillView, setAutofillView] = useState<AutofillView>('home');
@@ -247,6 +249,8 @@ export function FloatingPanel({
     () => documentFields.filter((item) => item.recommendedDocument !== null),
     [documentFields],
   );
+  const activeViewKey =
+    activeTab === 'autofill' ? `autofill:${autofillView}` : activeTab;
 
   useEffect(() => {
     if (openRequestId > 0) setIsOpen(true);
@@ -327,165 +331,199 @@ export function FloatingPanel({
       className={`jobflow-assistant${isOpen ? ' jobflow-assistant--open' : ''}`}
       aria-label="Job Flow form assistant"
     >
-      {isOpen ? (
-        <section
-          className="jobflow-panel"
-          aria-label="Job Flow assistant popup"
-        >
-          <header className="jobflow-panel__header">
-            <div>
-              <span className="jobflow-panel__eyebrow">Job Flow</span>
-              <strong>{variantName || 'Application assistant'}</strong>
-              <span className="jobflow-panel__host">{siteHost}</span>
-            </div>
-            <button
-              className="jobflow-panel__icon-button"
-              type="button"
-              aria-label="Close Job Flow"
-              onClick={() => setIsOpen(false)}
-            >
-              <X aria-hidden="true" size={18} />
-            </button>
-          </header>
-
-          <div
-            className="jobflow-panel__tabs"
-            role="tablist"
-            aria-label="Job Flow tools"
+      <AnimatePresence initial={false}>
+        {isOpen ? (
+          <motion.section
+            className="jobflow-panel"
+            aria-label="Job Flow assistant popup"
+            initial={reduceMotion ? false : { opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 14 }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.16,
+              ease: 'easeOut',
+            }}
           >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'autofill'}
-              className={activeTab === 'autofill' ? 'is-active' : undefined}
-              onClick={() => {
-                setActiveTab('autofill');
-                setAutofillView('home');
-              }}
-            >
-              Autofill
-              {autofillAttentionCount > 0 ? (
-                <span>{autofillAttentionCount}</span>
-              ) : null}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'pipeline'}
-              className={activeTab === 'pipeline' ? 'is-active' : undefined}
-              onClick={() => setActiveTab('pipeline')}
-            >
-              Pipeline
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'sensitive'}
-              className={activeTab === 'sensitive' ? 'is-active' : undefined}
-              onClick={() => setActiveTab('sensitive')}
-            >
-              Sensitive
-              {summary.sensitive > 0 ? <span>{summary.sensitive}</span> : null}
-            </button>
-          </div>
+            <header className="jobflow-panel__header">
+              <div>
+                <span className="jobflow-panel__eyebrow">Job Flow</span>
+                <strong>{variantName || 'Application assistant'}</strong>
+                <span className="jobflow-panel__host">{siteHost}</span>
+              </div>
+              <button
+                className="jobflow-panel__icon-button"
+                type="button"
+                aria-label="Close Job Flow"
+                onClick={() => setIsOpen(false)}
+              >
+                <X aria-hidden="true" size={18} />
+              </button>
+            </header>
 
-          <div className="jobflow-panel__content">
-            {activeTab === 'autofill' && autofillView === 'home' ? (
-              <>
-                <ApplicationProfileSection
-                  variantOptions={variantOptions}
-                  activeVariantId={activeVariantId}
-                  variantRecommendation={variantRecommendation}
-                  {...(onSelectVariant === undefined
-                    ? {}
-                    : { onSelectVariant })}
-                />
-                <CompletionCoverage summary={summary} />
-                <AssistantHomeView
-                  summary={summary}
-                  attachableDocuments={attachableDocuments}
-                  documentStatus={documentStatus}
-                  fillStatus={fillStatus}
-                  teachableUnknownCount={teachableUnknownItems.length}
-                  onAttachDocument={attachDocument}
-                  onFill={fillReadyFields}
-                  onOpenReview={() => setAutofillView('review')}
-                  onOpenSensitive={() => setActiveTab('sensitive')}
-                  {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-                />
-                <LocalCompletionDiagnostics
-                  summary={summary}
-                  filled={filledCount}
-                  failed={failedCount}
-                  remembered={rememberedCount}
-                  attached={attachedCount}
-                />
-              </>
-            ) : null}
+            <div
+              className="jobflow-panel__tabs"
+              role="tablist"
+              aria-label="Job Flow tools"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'autofill'}
+                className={activeTab === 'autofill' ? 'is-active' : undefined}
+                onClick={() => {
+                  setActiveTab('autofill');
+                  setAutofillView('home');
+                }}
+              >
+                Autofill
+                {autofillAttentionCount > 0 ? (
+                  <span>{autofillAttentionCount}</span>
+                ) : null}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'pipeline'}
+                className={activeTab === 'pipeline' ? 'is-active' : undefined}
+                onClick={() => setActiveTab('pipeline')}
+              >
+                Pipeline
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'sensitive'}
+                className={activeTab === 'sensitive' ? 'is-active' : undefined}
+                onClick={() => setActiveTab('sensitive')}
+              >
+                Sensitive
+                {summary.sensitive > 0 ? (
+                  <span>{summary.sensitive}</span>
+                ) : null}
+              </button>
+            </div>
 
-            {activeTab === 'autofill' && autofillView === 'review' ? (
-              <ReliabilityReviewView
-                reviewItems={reviewItems}
-                unknownItems={teachableUnknownItems}
-                reusableAnswers={reusableAnswers}
-                onBack={() => setAutofillView('home')}
-                {...(onRemember === undefined ? {} : { onRemember })}
-                {...(onRememberCurrentAnswer === undefined
-                  ? {}
-                  : { onRememberCurrentAnswer: rememberCurrentAnswer })}
-              />
-            ) : null}
-
-            {activeTab === 'pipeline' ? (
-              applicationDraft !== null && onSaveApplication !== undefined ? (
-                <ApplicationClosureView
-                  initialDraft={applicationDraft}
-                  status={applicationStatus}
-                  onSave={async (draft) => {
-                    setApplicationStatus('Saving…');
-                    try {
-                      await onSaveApplication(draft);
-                      setApplicationStatus(
-                        draft.stage === 'applied'
-                          ? 'Marked as applied in Pipeline.'
-                          : 'Saved to Pipeline.',
-                      );
-                    } catch {
-                      setApplicationStatus(
-                        'Company, role, and a valid URL are required.',
-                      );
-                    }
+            <div className="jobflow-panel__content">
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={activeViewKey}
+                  className="jobflow-panel__view"
+                  initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -3 }}
+                  transition={{
+                    duration: reduceMotion ? 0 : 0.12,
+                    ease: 'easeOut',
                   }}
-                />
-              ) : (
-                <div className="jobflow-panel__empty">
-                  <strong>No job details detected yet.</strong>
-                  <span>
-                    Open this tab on a supported job application page.
-                  </span>
-                </div>
-              )
-            ) : null}
+                >
+                  {activeTab === 'autofill' && autofillView === 'home' ? (
+                    <>
+                      <ApplicationProfileSection
+                        variantOptions={variantOptions}
+                        activeVariantId={activeVariantId}
+                        variantRecommendation={variantRecommendation}
+                        {...(onSelectVariant === undefined
+                          ? {}
+                          : { onSelectVariant })}
+                      />
+                      <CompletionCoverage summary={summary} />
+                      <AssistantHomeView
+                        summary={summary}
+                        attachableDocuments={attachableDocuments}
+                        documentStatus={documentStatus}
+                        fillStatus={fillStatus}
+                        teachableUnknownCount={teachableUnknownItems.length}
+                        onAttachDocument={attachDocument}
+                        onFill={fillReadyFields}
+                        onOpenReview={() => setAutofillView('review')}
+                        onOpenSensitive={() => setActiveTab('sensitive')}
+                        {...(onOpenOptions === undefined
+                          ? {}
+                          : { onOpenOptions })}
+                      />
+                      <LocalCompletionDiagnostics
+                        summary={summary}
+                        filled={filledCount}
+                        failed={failedCount}
+                        remembered={rememberedCount}
+                        attached={attachedCount}
+                      />
+                    </>
+                  ) : null}
 
-            {activeTab === 'sensitive' ? (
-              <AssistantSensitiveView
-                sensitiveItems={sensitiveItems}
-                sensitiveError={sensitiveError}
-                passphrase={passphrase}
-                siteHost={siteHost}
-                onBack={() => setActiveTab('autofill')}
-                onPassphraseChange={setPassphrase}
-                {...(vaultStatus === undefined ? {} : { vaultStatus })}
-                {...(onOpenOptions === undefined ? {} : { onOpenOptions })}
-                {...(onUnlockSensitive === undefined
-                  ? {}
-                  : { onUnlockSensitive })}
-                {...(onFillSensitive === undefined ? {} : { onFillSensitive })}
-              />
-            ) : null}
-          </div>
-        </section>
-      ) : null}
+                  {activeTab === 'autofill' && autofillView === 'review' ? (
+                    <ReliabilityReviewView
+                      reviewItems={reviewItems}
+                      unknownItems={teachableUnknownItems}
+                      reusableAnswers={reusableAnswers}
+                      onBack={() => setAutofillView('home')}
+                      {...(onRemember === undefined ? {} : { onRemember })}
+                      {...(onRememberCurrentAnswer === undefined
+                        ? {}
+                        : {
+                            onRememberCurrentAnswer: rememberCurrentAnswer,
+                          })}
+                    />
+                  ) : null}
+
+                  {activeTab === 'pipeline' ? (
+                    applicationDraft !== null &&
+                    onSaveApplication !== undefined ? (
+                      <ApplicationClosureView
+                        initialDraft={applicationDraft}
+                        status={applicationStatus}
+                        onSave={async (draft) => {
+                          setApplicationStatus('Saving…');
+                          try {
+                            await onSaveApplication(draft);
+                            setApplicationStatus(
+                              draft.stage === 'applied'
+                                ? 'Marked as applied in Pipeline.'
+                                : 'Saved to Pipeline.',
+                            );
+                          } catch {
+                            setApplicationStatus(
+                              'Company, role, and a valid URL are required.',
+                            );
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="jobflow-panel__empty">
+                        <strong>No job details detected yet.</strong>
+                        <span>
+                          Open this tab on a supported job application page.
+                        </span>
+                      </div>
+                    )
+                  ) : null}
+
+                  {activeTab === 'sensitive' ? (
+                    <AssistantSensitiveView
+                      sensitiveItems={sensitiveItems}
+                      sensitiveError={sensitiveError}
+                      passphrase={passphrase}
+                      siteHost={siteHost}
+                      onBack={() => setActiveTab('autofill')}
+                      onPassphraseChange={setPassphrase}
+                      {...(vaultStatus === undefined ? {} : { vaultStatus })}
+                      {...(onOpenOptions === undefined
+                        ? {}
+                        : { onOpenOptions })}
+                      {...(onUnlockSensitive === undefined
+                        ? {}
+                        : { onUnlockSensitive })}
+                      {...(onFillSensitive === undefined
+                        ? {}
+                        : { onFillSensitive })}
+                    />
+                  ) : null}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </motion.section>
+        ) : null}
+      </AnimatePresence>
 
       <button
         className="jobflow-launcher"

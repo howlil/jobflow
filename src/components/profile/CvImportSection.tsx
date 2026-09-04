@@ -359,6 +359,7 @@ export function CvImportSection({
             {preview.map((item) => (
               <label className="cv-preview__row" key={item.key}>
                 <input
+                  className="mt-0.5 h-[18px] w-[18px] shrink-0 rounded-control border-app-border-strong accent-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
                   type="checkbox"
                   checked={selected.has(item.key)}
                   onChange={() => toggle(item.key)}
