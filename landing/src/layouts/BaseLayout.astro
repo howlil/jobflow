@@ -1,0 +1,42 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Jobflow — Local-first job application autofill',
+  description = 'A local-first Chromium extension that reuses your career data, reviews uncertain fields, and fills job applications without taking over submission.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAFA" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0A0A" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-background font-sans text-ink antialiased">
+    <a
+      href="#main"
+      class="fixed left-3 top-3 z-[100] -translate-y-20 rounded-md border border-border-strong bg-surface px-3 py-2 text-sm font-medium text-ink focus:translate-y-0"
+    >
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>
