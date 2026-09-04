@@ -17,10 +17,12 @@ vi.mock('wxt/browser', () => ({
 }));
 
 import { createEmptyAnswerMemory } from '../../domain/matching/answer-memory';
+import { createEmptyStoredProfile } from '../../domain/profile/create-empty-profile';
 import {
   ANSWER_MEMORY_STORAGE_KEY,
   ChromeAnswerMemoryRepository,
 } from './chrome-answer-memory-repository';
+import { PROFILE_STORAGE_KEY } from './chrome-profile-repository';
 
 describe('ChromeAnswerMemoryRepository', () => {
   beforeEach(() => storage.clear());
@@ -45,5 +47,34 @@ describe('ChromeAnswerMemoryRepository', () => {
 
     expect(storage.get(ANSWER_MEMORY_STORAGE_KEY)).toEqual(memory);
     expect(await repository.load()).toEqual(memory);
+  });
+
+  it('stores remembered form answers in an application variant when a profile exists', async () => {
+    const profile = createEmptyStoredProfile('2026-09-05T00:00:00.000Z');
+    profile.variants.push({ id: 'backend', name: 'Backend', targetRoles: [] });
+    profile.preferences.defaultVariantId = 'backend';
+    storage.set(PROFILE_STORAGE_KEY, profile);
+
+    const repository = new ChromeAnswerMemoryRepository();
+    await repository.save({
+      schemaVersion: 1,
+      entries: [
+        {
+          id: 'memory-variant',
+          question: 'Why are you interested in this role?',
+          answer: 'I like high-scale backend systems.',
+          tags: [],
+          updatedAt: '2026-09-05T01:00:00.000Z',
+        },
+      ],
+    });
+
+    const storedProfile = storage.get(PROFILE_STORAGE_KEY) as ReturnType<
+      typeof createEmptyStoredProfile
+    >;
+    expect(storedProfile.variants[0]?.customAnswers?.[0]).toMatchObject({
+      id: 'memory-variant',
+      answer: 'I like high-scale backend systems.',
+    });
   });
 });

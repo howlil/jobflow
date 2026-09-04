@@ -5,6 +5,7 @@ import {
 } from '../../domain/documents/classify-document-field';
 import { recommendDocumentsForVariant } from '../../domain/documents/recommend-document';
 import type { FieldContext } from '../../domain/forms/field-context';
+import { classifyApplicationPage } from '../../domain/forms/page-classifier';
 import {
   reusableAnswerOptions,
   type ReusableAnswer,
@@ -91,6 +92,8 @@ export function analyzePageContext({
   variantOverrideId,
   rememberedAnswers = [],
 }: AnalyzePageContextInput): AnalyzedPageContext {
+  const pageClassification = classifyApplicationPage({ fields, pageSignals });
+  const eligibleFields = pageClassification.supported ? fields : [];
   const variantOptions = envelope.variants.map((variant) => ({
     id: variant.id,
     name: variant.name || 'Untitled variant',
@@ -121,7 +124,9 @@ export function analyzePageContext({
     envelope.baseProfile,
     selectedVariant,
   );
-  const fileFields = fields.filter((field) => field.controlKind === 'file');
+  const fileFields = eligibleFields.filter(
+    (field) => field.controlKind === 'file',
+  );
   const documentFields = fileFields.map((field, index) => {
     const classification = classifyDocumentFieldIntent(field);
     return {
@@ -138,7 +143,7 @@ export function analyzePageContext({
       ),
     };
   });
-  const analysis = analyzeFieldContexts(fields, profile, corrections);
+  const analysis = analyzeFieldContexts(eligibleFields, profile, corrections);
 
   return {
     analysis,

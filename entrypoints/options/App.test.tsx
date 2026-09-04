@@ -18,6 +18,13 @@ vi.mock(
   }),
 );
 
+vi.mock('../../src/infrastructure/storage/chrome-theme-repository', () => ({
+  ChromeThemeRepository: class {
+    load = vi.fn().mockResolvedValue('system');
+    save = vi.fn().mockResolvedValue(undefined);
+  },
+}));
+
 vi.mock('../../src/components/corrections/CorrectionMemorySection', () => ({
   CorrectionMemorySection: () => <div>Correction memory</div>,
 }));
@@ -41,6 +48,7 @@ describe('options App', () => {
     ).not.toBeNull();
     expect(screen.getByRole('banner')).not.toBeNull();
     expect(screen.getByRole('main')).not.toBeNull();
+    expect(screen.getByLabelText('Theme')).not.toBeNull();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Pipeline' }),
     ).not.toBeNull();

@@ -79,7 +79,7 @@ export function CertificationsSection({
                   title={certification.name || `Certification ${index + 1}`}
                   context={certification.issuer || 'Certification details'}
                 />
-                <FieldGrid columns={3}>
+                <FieldGrid>
                   <TextField
                     label="Certification"
                     value={certification.name}
@@ -104,13 +104,14 @@ export function CertificationsSection({
                     }
                   />
                   <TextField
-                    label="Credential URL"
-                    value={certification.url}
+                    label="Credential ID"
+                    value={certification.credentialId}
                     onChange={(event) =>
                       changeProfile((draft) => {
                         const item =
                           draft.baseProfile.professional.certifications[index];
-                        if (item !== undefined) item.url = event.target.value;
+                        if (item !== undefined)
+                          item.credentialId = event.target.value;
                       })
                     }
                   />
@@ -127,7 +128,6 @@ export function CertificationsSection({
                     }
                   />
                   <TextField
-                    className="lg:col-span-2"
                     label="Expiry date"
                     {...dateInputProps(certification.expiryDate)}
                     onChange={(event) =>
@@ -136,6 +136,18 @@ export function CertificationsSection({
                           draft.baseProfile.professional.certifications[index];
                         if (item !== undefined)
                           item.expiryDate = event.target.value;
+                      })
+                    }
+                  />
+                  <TextField
+                    className="sm:col-span-2"
+                    label="Credential URL"
+                    value={certification.url}
+                    onChange={(event) =>
+                      changeProfile((draft) => {
+                        const item =
+                          draft.baseProfile.professional.certifications[index];
+                        if (item !== undefined) item.url = event.target.value;
                       })
                     }
                   />
