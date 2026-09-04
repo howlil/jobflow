@@ -21,7 +21,7 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
       >
         <input
           ref={ref}
-          className="h-[18px] w-[18px] shrink-0 rounded border-app-border-strong accent-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
+          className="h-[18px] w-[18px] shrink-0 rounded-control border-app-border-strong accent-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
           type="checkbox"
           {...props}
         />
