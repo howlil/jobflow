@@ -72,7 +72,11 @@ export default function App() {
       {hideProfileSurface ? (
         <span>Stored locally</span>
       ) : (
-        <div className="flex items-center gap-2" role="status" aria-live="polite">
+        <div
+          className="flex items-center gap-2"
+          role="status"
+          aria-live="polite"
+        >
           <span
             className={`h-1.5 w-1.5 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
             aria-hidden="true"
