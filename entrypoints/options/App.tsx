@@ -23,6 +23,7 @@ import {
   WORKSPACE_SECTION_TITLES,
   type WorkspaceSection,
 } from '../../src/components/profile/workspace-sections';
+import { ThemeControl } from '../../src/components/theme/ThemeControl';
 
 const profileRepository = new ChromeProfileRepository();
 const applicationRepository = new ChromeApplicationRepository();
@@ -66,15 +67,20 @@ export default function App() {
     activeSection === 'corrections' ||
     activeSection === 'backup';
 
-  const workspaceMeta = hideProfileSurface ? (
-    'Stored locally'
-  ) : (
-    <div className="flex items-center gap-2" role="status" aria-live="polite">
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
-        aria-hidden="true"
-      />
-      <span>{saveStatus.text}</span>
+  const workspaceMeta = (
+    <div className="flex items-center gap-3">
+      {hideProfileSurface ? (
+        <span>Stored locally</span>
+      ) : (
+        <div className="flex items-center gap-2" role="status" aria-live="polite">
+          <span
+            className={`h-1.5 w-1.5 shrink-0 rounded-full ${saveIndicatorTone[saveStatus.state]}`}
+            aria-hidden="true"
+          />
+          <span>{saveStatus.text}</span>
+        </div>
+      )}
+      <ThemeControl />
     </div>
   );
 
