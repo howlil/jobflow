@@ -86,18 +86,19 @@ export function LinkedSkillEditor({
           {linkedSkills.map((linkedName) => (
             <Chip
               strong
-              className="pr-1"
+              className="min-h-9 pr-0"
               key={`${normalize(linkedName)}:${linkedName}`}
             >
-              <span>{linkedName}</span>
-              <button
-                className="grid h-5 w-5 place-items-center rounded-control text-app-subtle transition-colors hover:text-app-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-app-accent-soft"
-                type="button"
+              <span className="pl-1">{linkedName}</span>
+              <IconButton
+                size="xs"
+                className="border-transparent text-app-subtle hover:border-transparent hover:text-app-ink"
                 aria-label={`Remove ${linkedName} from ${contextLabel}`}
+                title={`Remove ${linkedName}`}
                 onClick={() => onRemove(linkedName)}
               >
-                <X aria-hidden="true" size={12} />
-              </button>
+                <X aria-hidden="true" size={14} />
+              </IconButton>
             </Chip>
           ))}
         </div>
