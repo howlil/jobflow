@@ -26,7 +26,7 @@ export function VariantsSection({
     <WorkspaceSection hidden={activeSection !== 'variants'}>
       <WorkspaceSectionHeader
         title="Application variants"
-        description="Keep factual data in the base profile; variants store only role-specific overrides and preferred documents."
+        description="Keep factual data in the base profile; variants store role-specific overrides, preferred documents, and answers explicitly learned from application forms."
         action={
           <IconButton
             size="sm"
@@ -156,6 +156,51 @@ export function VariantsSection({
                   ))}
                 </SelectField>
               </FieldGrid>
+
+              {(variant.customAnswers?.length ?? 0) > 0 ? (
+                <div className="grid gap-2 border-t border-app-border pt-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="m-0 text-[13px] font-semibold text-app-ink">
+                      Learned from forms
+                    </p>
+                    <span className="text-[12px] font-medium text-app-subtle">
+                      {variant.customAnswers?.length ?? 0} saved
+                    </span>
+                  </div>
+                  {variant.customAnswers?.map((answer, answerIndex) => (
+                    <div
+                      className="flex items-start justify-between gap-3 border-t border-app-border py-2 first:border-t-0"
+                      key={answer.id}
+                    >
+                      <div className="min-w-0">
+                        <p className="m-0 text-[13px] font-medium text-app-ink">
+                          {answer.question}
+                        </p>
+                        <p className="m-0 mt-1 line-clamp-2 text-[13px] leading-5 text-app-text">
+                          {answer.answer}
+                        </p>
+                      </div>
+                      <IconButton
+                        className="shrink-0"
+                        size="xs"
+                        tone="danger"
+                        aria-label={`Remove learned answer ${answerIndex + 1}`}
+                        title="Remove learned answer"
+                        onClick={() =>
+                          changeProfile((draft) => {
+                            draft.variants[index]?.customAnswers?.splice(
+                              answerIndex,
+                              1,
+                            );
+                          })
+                        }
+                      >
+                        <Trash2 aria-hidden="true" size={14} />
+                      </IconButton>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </RecordCard>
           ))}
         </div>
