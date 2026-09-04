@@ -157,7 +157,11 @@ export function classifyApplicationPage({
   const googleForms = hostMatches(hostname, 'docs.google.com');
   const knownAts = KNOWN_ATS_HOSTS.some((host) => hostMatches(hostname, host));
 
-  if (workday && fields.length >= 2 && (candidateFields >= 2 || employmentSignals > 0)) {
+  if (
+    workday &&
+    fields.length >= 2 &&
+    (candidateFields >= 2 || employmentSignals > 0)
+  ) {
     return {
       kind: 'workday',
       supported: true,
@@ -194,14 +198,15 @@ export function classifyApplicationPage({
   }
 
   if (
-    fields.length >= 3 &&
+    fields.length >= 2 &&
     candidateFields >= 2 &&
     (employmentSignals > 0 || jobPageSignals > 0)
   ) {
     return {
       kind: 'generic-job-application',
       supported: true,
-      confidence: employmentSignals > 0 && jobPageSignals > 0 ? 'high' : 'medium',
+      confidence:
+        employmentSignals > 0 && jobPageSignals > 0 ? 'high' : 'medium',
       reasons: ['generic-form', 'job-and-candidate-signals'],
     };
   }
