@@ -399,7 +399,7 @@ export function FloatingPanel({
             </div>
 
             <div className="jobflow-panel__content">
-              <AnimatePresence initial={false} mode="wait">
+              <AnimatePresence initial={false}>
                 <motion.div
                   key={activeViewKey}
                   className="jobflow-panel__view"
