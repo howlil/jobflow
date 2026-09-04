@@ -21,7 +21,7 @@
     "verify:manifest": "node scripts/verify-manifest.mjs",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --write . && git diff --exit-code"
   },
   "dependencies": {
     "lucide-react": "1.34.0",
