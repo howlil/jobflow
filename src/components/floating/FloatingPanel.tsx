@@ -339,7 +339,10 @@ export function FloatingPanel({
             initial={reduceMotion ? false : { opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 14 }}
-            transition={{ duration: reduceMotion ? 0 : 0.16, ease: 'easeOut' }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.16,
+              ease: 'easeOut',
+            }}
           >
             <header className="jobflow-panel__header">
               <div>
