@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const principles = [
+  {
+    label: 'Local-first',
+    text: 'Your career profile, documents, answer memory, and application pipeline stay on your device.',
+  },
+  {
+    label: 'Deterministic core',
+    text: 'Form matching is inspectable and predictable. Core autofill does not require an AI service.',
+  },
+  {
+    label: 'Explicit fill',
+    text: 'Jobflow prepares a fill plan. You decide when safe fields are written to the page.',
+  },
+  {
+    label: 'Fail closed',
+    text: 'Unknown, ambiguous, unsupported, and sensitive fields are left alone until you review them.',
+  },
+];
+
+const workflow = [
+  {
+    number: '01',
+    title: 'Keep one career profile',
+    text: 'Store reusable experience, projects, documents, and application-specific profile overrides once.',
+  },
+  {
+    number: '02',
+    title: 'Open an application',
+    text: 'Jobflow analyzes the current form and separates ready fields from items that need review.',
+  },
+  {
+    number: '03',
+    title: 'Review, then fill',
+    text: 'Approve safe data, resolve ambiguous questions, and disclose sensitive values only for the current site when needed.',
+  },
+  {
+    number: '04',
+    title: 'Track the opportunity',
+    text: 'Capture the role into your local pipeline and mark it applied only after you submit on the employer site.',
+  },
+];
+
+const trustRows = [
+  {
+    subject: 'Safe profile fields',
+    behavior: 'Prepared for explicit autofill',
+    boundary: 'Never submitted automatically',
+  },
+  {
+    subject: 'Unknown or ambiguous fields',
+    behavior: 'Held for review',
+    boundary: 'Never guessed into the page',
+  },
+  {
+    subject: 'Sensitive values',
+    behavior: 'Kept behind the encrypted local vault',
+    boundary: 'Require current-site disclosure approval',
+  },
+  {
+    subject: 'Files and resumes',
+    behavior: 'Stored and recommended locally',
+    boundary: 'Attachment remains an explicit action',
+  },
+];
+---
+
+<BaseLayout>
+  <header class="sticky top-0 z-50 border-b border-border bg-background">
+    <div class="mx-auto flex h-14 max-w-[1180px] items-center justify-between px-5 lg:px-6">
+      <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-[-0.02em] text-ink" aria-label="Jobflow home">
+        <span class="grid size-8 place-items-center rounded-md bg-accent text-sm font-bold text-background">J</span>
+        <span>Jobflow</span>
+      </a>
+
+      <nav class="hidden items-center gap-7 text-sm text-muted md:flex" aria-label="Primary navigation">
+        <a class="hover:text-ink" href="#product">Product</a>
+        <a class="hover:text-ink" href="#workflow">Workflow</a>
+        <a class="hover:text-ink" href="#trust">Trust model</a>
+      </nav>
+
+      <a
+        class="inline-flex h-9 items-center justify-center rounded-md border border-border-strong px-3.5 text-sm font-medium text-ink hover:border-ink"
+        href="https://github.com/howlil/jobflow"
+        target="_blank"
+        rel="noreferrer"
+      >
+        GitHub <span aria-hidden="true" class="ml-1.5">↗</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="top" class="mx-auto grid max-w-[1180px] gap-14 px-5 pb-16 pt-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-6 lg:pb-24 lg:pt-28">
+      <div>
+        <p class="mb-5 font-mono text-xs font-medium uppercase tracking-[0.14em] text-subtle">Local-first job application workspace</p>
+        <h1 class="max-w-[12ch] text-[clamp(2.6rem,5vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-ink">
+          Fill applications faster. Keep control of every field.
+        </h1>
+        <p class="mt-6 max-w-[620px] text-[17px] leading-7 text-muted">
+          Jobflow reuses your career data, detects application forms, and fills only what you approve. No account, no cloud profile, no automatic submit.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            class="inline-flex h-9 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-background hover:bg-accent-strong"
+            href="https://github.com/howlil/jobflow"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View source on GitHub <span aria-hidden="true" class="ml-1.5">↗</span>
+          </a>
+          <a class="inline-flex h-9 items-center justify-center rounded-md border border-border-strong px-4 text-sm font-medium text-ink hover:border-ink" href="#workflow">
+            See how it works
+          </a>
+        </div>
+        <p class="mt-5 text-sm text-subtle">Built for Chromium desktop. Your data stays local by default.</p>
+      </div>
+
+      <div id="product" class="relative rounded-lg border border-border-strong bg-surface" aria-label="Jobflow product preview">
+        <div class="flex h-11 items-center justify-between border-b border-border px-4">
+          <div class="flex items-center gap-2" aria-hidden="true">
+            <span class="size-2.5 rounded-full border border-border-strong"></span>
+            <span class="size-2.5 rounded-full border border-border-strong"></span>
+            <span class="size-2.5 rounded-full border border-border-strong"></span>
+          </div>
+          <span class="font-mono text-[11px] text-subtle">jobs.example.com/apply</span>
+          <span class="w-[46px]"></span>
+        </div>
+
+        <div class="min-h-[520px] p-5 sm:p-7">
+          <div class="max-w-[72%]">
+            <p class="text-sm font-semibold text-ink">Backend Engineer</p>
+            <p class="mt-1 text-xs text-subtle">Application form</p>
+
+            <div class="mt-6 space-y-4" aria-hidden="true">
+              <div>
+                <div class="mb-1.5 h-2.5 w-20 rounded-sm bg-accent-soft"></div>
+                <div class="h-9 rounded-md border border-border"></div>
+              </div>
+              <div>
+                <div class="mb-1.5 h-2.5 w-28 rounded-sm bg-accent-soft"></div>
+                <div class="h-9 rounded-md border border-border"></div>
+              </div>
+              <div>
+                <div class="mb-1.5 h-2.5 w-24 rounded-sm bg-accent-soft"></div>
+                <div class="h-9 rounded-md border border-border"></div>
+              </div>
+              <div>
+                <div class="mb-1.5 h-2.5 w-32 rounded-sm bg-accent-soft"></div>
+                <div class="h-24 rounded-md border border-border"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="absolute bottom-5 right-4 w-[min(360px,calc(100%-2rem))] overflow-hidden rounded-lg border border-border-strong bg-surface-raised shadow-[0_12px_28px_rgb(0_0_0/0.14)] sm:bottom-6 sm:right-6">
+            <div class="flex h-11 items-center justify-between border-b border-border px-4">
+              <div class="flex items-center gap-2">
+                <span class="size-2 rounded-full bg-success"></span>
+                <span class="text-sm font-semibold text-ink">Jobflow</span>
+              </div>
+              <span class="font-mono text-[11px] text-subtle">18 fields detected</span>
+            </div>
+            <div class="grid grid-cols-3 border-b border-border text-center text-xs font-medium">
+              <span class="border-r border-border bg-surface-muted px-2 py-2.5 text-ink">Autofill</span>
+              <span class="border-r border-border px-2 py-2.5 text-muted">Pipeline</span>
+              <span class="px-2 py-2.5 text-muted">Sensitive</span>
+            </div>
+            <div class="p-4">
+              <div class="flex items-start justify-between gap-4 border-b border-border pb-3">
+                <div>
+                  <p class="text-sm font-medium text-ink">Application Profile</p>
+                  <p class="mt-0.5 text-xs text-subtle">Base profile · recommended</p>
+                </div>
+                <button type="button" class="h-8 rounded-md border border-border-strong px-2.5 text-xs font-medium text-ink">Change</button>
+              </div>
+
+              <div class="grid grid-cols-3 divide-x divide-border border-b border-border py-3 text-center">
+                <div>
+                  <p class="font-mono text-base font-semibold text-ink">14</p>
+                  <p class="mt-0.5 text-[11px] text-subtle">Ready</p>
+                </div>
+                <div>
+                  <p class="font-mono text-base font-semibold text-warning">3</p>
+                  <p class="mt-0.5 text-[11px] text-subtle">Review</p>
+                </div>
+                <div>
+                  <p class="font-mono text-base font-semibold text-muted">1</p>
+                  <p class="mt-0.5 text-[11px] text-subtle">Sensitive</p>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-3 pt-3">
+                <p class="max-w-[180px] text-xs leading-5 text-subtle">Unknown and sensitive fields stay untouched.</p>
+                <button type="button" class="h-9 shrink-0 rounded-md bg-accent px-3 text-xs font-medium text-background">Fill 14 safe fields</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-y border-border">
+      <div class="mx-auto grid max-w-[1180px] md:grid-cols-2 lg:grid-cols-4">
+        {principles.map((item, index) => (
+          <div class:list={["px-5 py-7 lg:px-6", index < principles.length - 1 && "border-b border-border md:border-b-0 md:border-r"]}>
+            <p class="text-sm font-semibold text-ink">{item.label}</p>
+            <p class="mt-2 text-sm leading-6 text-muted">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="workflow" class="mx-auto grid max-w-[1180px] gap-12 px-5 py-20 lg:grid-cols-[0.7fr_1.3fr] lg:px-6 lg:py-28">
+      <div>
+        <p class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-subtle">How it works</p>
+        <h2 class="mt-4 max-w-[11ch] text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-4xl">One profile. Reused across real applications.</h2>
+        <p class="mt-5 max-w-md text-[15px] leading-7 text-muted">The workflow is intentionally conservative: automate repetitive entry, keep judgment and submission with you.</p>
+      </div>
+
+      <div class="border-t border-border">
+        {workflow.map((step) => (
+          <div class="grid gap-3 border-b border-border py-6 sm:grid-cols-[52px_210px_1fr] sm:items-start">
+            <span class="font-mono text-xs text-subtle">{step.number}</span>
+            <h3 class="text-[15px] font-semibold text-ink">{step.title}</h3>
+            <p class="text-sm leading-6 text-muted">{step.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="trust" class="border-y border-border bg-surface">
+      <div class="mx-auto max-w-[1180px] px-5 py-20 lg:px-6 lg:py-28">
+        <div class="grid gap-8 lg:grid-cols-2 lg:items-end">
+          <div>
+            <p class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-subtle">Trust model</p>
+            <h2 class="mt-4 max-w-[14ch] text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-4xl">Automation stops where consent starts.</h2>
+          </div>
+          <p class="max-w-xl text-[15px] leading-7 text-muted lg:justify-self-end">Jobflow reduces repetitive typing without becoming an autonomous application bot. Every boundary below is a product rule, not marketing copy.</p>
+        </div>
+
+        <div class="mt-10 overflow-hidden border-y border-border">
+          <div class="hidden grid-cols-[0.8fr_1fr_1fr] border-b border-border bg-surface-muted px-4 py-3 text-xs font-medium text-subtle sm:grid">
+            <span>Data / action</span>
+            <span>Jobflow behavior</span>
+            <span>Boundary</span>
+          </div>
+          {trustRows.map((row) => (
+            <div class="grid gap-2 border-b border-border px-4 py-5 last:border-b-0 sm:grid-cols-[0.8fr_1fr_1fr] sm:gap-6">
+              <p class="text-sm font-semibold text-ink">{row.subject}</p>
+              <p class="text-sm leading-6 text-muted">{row.behavior}</p>
+              <p class="text-sm leading-6 text-muted">{row.boundary}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto grid max-w-[1180px] gap-12 px-5 py-20 lg:grid-cols-[1fr_1fr] lg:px-6 lg:py-28">
+      <div>
+        <p class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-subtle">Built in the open</p>
+        <h2 class="mt-4 max-w-[13ch] text-3xl font-semibold tracking-[-0.035em] text-ink sm:text-4xl">Inspect the system you trust with career data.</h2>
+        <p class="mt-5 max-w-lg text-[15px] leading-7 text-muted">The repository is public. Review the matcher, local persistence, vault boundaries, extension permissions, and product decisions directly instead of relying on opaque claims.</p>
+        <a class="mt-7 inline-flex h-9 items-center justify-center rounded-md border border-border-strong px-4 text-sm font-medium text-ink hover:border-ink" href="https://github.com/howlil/jobflow" target="_blank" rel="noreferrer">
+          Browse repository <span aria-hidden="true" class="ml-1.5">↗</span>
+        </a>
+      </div>
+
+      <div class="border-y border-border font-mono text-xs">
+        <div class="flex items-center justify-between border-b border-border px-4 py-4"><span class="text-muted">storage</span><span class="text-ink">local</span></div>
+        <div class="flex items-center justify-between border-b border-border px-4 py-4"><span class="text-muted">core matcher</span><span class="text-ink">deterministic</span></div>
+        <div class="flex items-center justify-between border-b border-border px-4 py-4"><span class="text-muted">unknown fields</span><span class="text-ink">fail closed</span></div>
+        <div class="flex items-center justify-between border-b border-border px-4 py-4"><span class="text-muted">auto submit</span><span class="text-ink">never</span></div>
+        <div class="flex items-center justify-between px-4 py-4"><span class="text-muted">career data telemetry</span><span class="text-ink">none</span></div>
+      </div>
+    </section>
+
+    <section class="border-t border-border">
+      <div class="mx-auto flex max-w-[1180px] flex-col gap-8 px-5 py-16 sm:flex-row sm:items-center sm:justify-between lg:px-6">
+        <div>
+          <h2 class="text-2xl font-semibold tracking-[-0.03em] text-ink">Make the next application mostly review, not retyping.</h2>
+          <p class="mt-2 text-sm leading-6 text-muted">Start with the repository, inspect the code, and run Jobflow locally.</p>
+        </div>
+        <a class="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-background hover:bg-accent-strong" href="https://github.com/howlil/jobflow" target="_blank" rel="noreferrer">
+          Get Jobflow on GitHub <span aria-hidden="true" class="ml-1.5">↗</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-border">
+    <div class="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-7 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between lg:px-6">
+      <p>Jobflow · Local-first job application workflow</p>
+      <div class="flex gap-5">
+        <a class="hover:text-ink" href="https://github.com/howlil/jobflow" target="_blank" rel="noreferrer">Source</a>
+        <a class="hover:text-ink" href="https://github.com/howlil/jobflow/issues" target="_blank" rel="noreferrer">Issues</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>
