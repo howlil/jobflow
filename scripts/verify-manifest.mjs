@@ -47,9 +47,7 @@ if (JSON.stringify(matches) !== JSON.stringify(expectedMatches)) {
 }
 
 if (
-  matches.some(
-    (match) => match === 'http://*/*' || match === 'https://*/*',
-  )
+  matches.some((match) => match === 'http://*/*' || match === 'https://*/*')
 ) {
   throw new Error('Broad all-site content-script access must stay disabled');
 }
