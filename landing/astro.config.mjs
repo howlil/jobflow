@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       rolldownOptions: {
-        tsconfig: './tsconfig.json',
+        tsconfig: false,
       },
     },
   },
