@@ -29,7 +29,7 @@ const vaultBroker = createVaultBroker({
 });
 
 const documentBroker = createDocumentBroker(new IndexedDbDocumentRepository());
-const CONTENT_SCRIPT_FILE = 'content-scripts/content.js';
+const CONTENT_SCRIPT_FILE = '/content-scripts/content.js' as const;
 
 async function openWorkspace() {
   await browser.tabs.create({
