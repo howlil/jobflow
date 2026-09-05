@@ -22,7 +22,9 @@ describe('activateAssistantForTab', () => {
 
   it('injects on explicit toolbar activation when no content runtime exists', async () => {
     const api = ports();
-    api.toggleAssistant.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    api.toggleAssistant
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true);
     api.injectAssistant.mockResolvedValue(undefined);
 
     await expect(activateAssistantForTab(13, api)).resolves.toBe('injected');
