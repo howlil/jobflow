@@ -153,6 +153,7 @@ export function classifyApplicationPage({
 
   const workday =
     hostMatches(hostname, 'myworkdayjobs.com') ||
+    hostMatches(hostname, 'myworkdaysite.com') ||
     hostMatches(hostname, 'workdayjobs.com');
   const googleForms = hostMatches(hostname, 'docs.google.com');
   const knownAts = KNOWN_ATS_HOSTS.some((host) => hostMatches(hostname, host));
