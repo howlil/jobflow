@@ -1,7 +1,4 @@
-export type AssistantActivationResult =
-  | 'existing'
-  | 'injected'
-  | 'workspace';
+export type AssistantActivationResult = 'existing' | 'injected' | 'workspace';
 
 export type AssistantActivationPorts = {
   toggleAssistant(tabId: number): Promise<boolean>;
