@@ -4,42 +4,43 @@
 
 ## Last Completed Milestone
 
-### Application Completion Reliability
+### Scoped Page Activation & Trust Surface
 
-Jobflow now makes repeated real applications progressively cheaper to complete while preserving its local-first trust boundaries.
+Jobflow no longer runs its application-assistant content runtime on every ordinary HTTP(S) page while preserving coverage for real application forms.
 
 Delivered integrated capability:
 
-- one bottom-right floating launcher opens a compact Assistant popup with exactly three top-level tabs: **Autofill**, **Pipeline**, and **Sensitive**;
-- Autofill owns current-page analysis, Application Profile selection, explicit safe fill, actionable unresolved review, reusable Answer Memory, correction feedback, explicit document attachment, and local completion diagnostics;
-- stable non-sensitive answers can be explicitly remembered from a host-page field and reused by the existing deterministic matcher on equivalent future questions;
-- corrections and remembered answers trigger re-analysis so learned behavior affects the current and subsequent applications;
-- document attachment remains explicit and exposes attached, missing-file, or unsupported-site fallback states;
-- Pipeline capture reviews current job details, updates an existing exact-job-URL record instead of creating a duplicate, and supports an explicit **Mark as applied** action only after the user submits on the employer site;
-- Sensitive remains a separate tab and continues to use the encrypted vault plus explicit current-site disclosure flow.
+- automatic assistant loading is scoped to supported ATS/recruitment hosts instead of broad `http://*/*` and `https://*/*` matches;
+- Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Workable, iCIMS, Taleo, BambooHR, and Google Forms recruitment flows retain automatic activation paths;
+- Workday recognition includes both `myworkdayjobs.com` and `myworkdaysite.com` career hosts;
+- arbitrary employer application forms remain supported through explicit toolbar activation using temporary `activeTab` access plus the scripting API;
+- explicit toolbar activation preserves all-frame injection so embedded employer forms do not regress from the previous content-script behavior;
+- unsupported/restricted pages fail closed and fall back to opening the local Jobflow workspace rather than silently broadening page access;
+- generated-manifest verification now rejects broad all-site content-script matches and unexpected host permissions.
 
-Product invariants preserved:
+Product and trust invariants preserved:
 
 - no automatic Submit/Apply/Next/navigation;
-- no automatic file attachment;
-- no backend, cloud sync, telemetry, or AI dependency;
-- unknown/ambiguous matching remains fail-closed;
-- sensitive values remain outside normal profile and Answer Memory storage.
+- no silent collection or learning from arbitrary pages;
+- generic employer forms remain available without a permanent all-sites allowlist;
+- sensitive values remain behind the existing explicit vault/disclosure boundary;
+- no backend, cloud sync, telemetry, or AI dependency was introduced.
 
 ## Verification Evidence
 
-Final runtime head passed the required deterministic repository gates:
+Final implementation head passed the required deterministic repository gates:
 
-- 55 test files passed;
-- 245 tests passed;
+- 60 test files passed;
+- 264 tests passed;
 - TypeScript typecheck passed;
 - ESLint passed with zero warnings;
 - Prettier format check passed;
 - WXT production build passed;
-- generated extension manifest verification passed.
+- generated extension manifest verification passed;
+- generated manifest contains only the scoped recruitment content-script matches, requires `activeTab`, `scripting`, and `storage`, and contains no broad `host_permissions`.
 
 Browser E2E/manual browser validation remains optional diagnostic evidence under the current repository verification policy; it is not a merge or release gate.
 
 ## Next Move
 
-Inspect the current product and repository state before proposing another milestone. Shape the next milestone from the highest-value remaining core user-journey capability gap, not from milestone count, tiny isolated improvements, or nice-to-have expansion.
+Inspect the current product and repository state before choosing another milestone. Prioritize the highest-value remaining core application-completion or trust/reliability gap; do not create a milestone for theme polish alone.

@@ -3,6 +3,7 @@ import { browser } from 'wxt/browser';
 import { createDocumentBroker } from '../src/application/documents/document-broker';
 import { createVaultBroker } from '../src/application/vault/vault-broker';
 import { VaultSession } from '../src/application/vault/vault-session';
+import { activateAssistantForTab } from '../src/application/workspace/activate-assistant';
 import {
   isOpenWorkspaceMessage,
   TOGGLE_ASSISTANT,
@@ -28,6 +29,7 @@ const vaultBroker = createVaultBroker({
 });
 
 const documentBroker = createDocumentBroker(new IndexedDbDocumentRepository());
+const CONTENT_SCRIPT_FILE = '/content-scripts/content.js' as const;
 
 async function openWorkspace() {
   await browser.tabs.create({
@@ -35,26 +37,32 @@ async function openWorkspace() {
   });
 }
 
+async function toggleAssistant(tabId: number): Promise<boolean> {
+  const response: unknown = await browser.tabs.sendMessage(tabId, {
+    type: TOGGLE_ASSISTANT,
+  });
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'available' in response &&
+    response.available === true
+  );
+}
+
+async function injectAssistant(tabId: number): Promise<void> {
+  await browser.scripting.executeScript({
+    target: { tabId, allFrames: true },
+    files: [CONTENT_SCRIPT_FILE],
+  });
+}
+
 export default defineBackground(() => {
   browser.action.onClicked.addListener((tab) => {
-    if (tab.id === undefined) {
-      void openWorkspace();
-      return;
-    }
-
-    void browser.tabs
-      .sendMessage(tab.id, { type: TOGGLE_ASSISTANT })
-      .then((response: unknown) => {
-        const available =
-          typeof response === 'object' &&
-          response !== null &&
-          'available' in response &&
-          response.available === true;
-        if (!available) void openWorkspace();
-      })
-      .catch(() => {
-        void openWorkspace();
-      });
+    void activateAssistantForTab(tab.id, {
+      toggleAssistant,
+      injectAssistant,
+      openWorkspace,
+    });
   });
 
   browser.runtime.onMessage.addListener((message) => {

@@ -9,7 +9,8 @@ if (manifest.manifest_version !== 3) {
 }
 
 const permissions = [...(manifest.permissions ?? [])].sort();
-if (JSON.stringify(permissions) !== JSON.stringify(['storage'])) {
+const expectedPermissions = ['activeTab', 'scripting', 'storage'].sort();
+if (JSON.stringify(permissions) !== JSON.stringify(expectedPermissions)) {
   throw new Error(`Unexpected permissions: ${JSON.stringify(permissions)}`);
 }
 
@@ -25,11 +26,37 @@ const matches = [
     (manifest.content_scripts ?? []).flatMap((script) => script.matches ?? []),
   ),
 ].sort();
-const expectedMatches = ['http://*/*', 'https://*/*'].sort();
+const expectedMatches = [
+  'https://*.myworkdayjobs.com/*',
+  'https://*.myworkdaysite.com/*',
+  'https://*.workdayjobs.com/*',
+  'https://*.greenhouse.io/*',
+  'https://*.lever.co/*',
+  'https://*.ashbyhq.com/*',
+  'https://*.smartrecruiters.com/*',
+  'https://*.workable.com/*',
+  'https://*.icims.com/*',
+  'https://*.taleo.net/*',
+  'https://*.bamboohr.com/*',
+  'https://docs.google.com/forms/*',
+].sort();
 if (JSON.stringify(matches) !== JSON.stringify(expectedMatches)) {
   throw new Error(
     `Unexpected content-script matches: ${JSON.stringify(matches)}`,
   );
+}
+
+if (
+  matches.some((match) => match === 'http://*/*' || match === 'https://*/*')
+) {
+  throw new Error('Broad all-site content-script access must stay disabled');
+}
+
+const assistantScript = (manifest.content_scripts ?? []).find((script) =>
+  script.js?.includes('content-scripts/content.js'),
+);
+if (!assistantScript) {
+  throw new Error('Assistant content script missing from generated manifest');
 }
 
 if (!manifest.action) {

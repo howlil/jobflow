@@ -24,16 +24,22 @@ function field(
   };
 }
 
+function workdayFields(origin: string): FieldContext[] {
+  return [
+    field('First Name', origin),
+    field('Last Name', origin),
+    field('Email', origin),
+    field('Phone', origin),
+  ];
+}
+
 describe('classifyApplicationPage', () => {
-  it('activates on Workday candidate forms', () => {
-    const origin = 'https://acme.wd5.myworkdayjobs.com';
+  it.each([
+    'https://acme.wd5.myworkdayjobs.com',
+    'https://wd3.myworkdaysite.com',
+  ])('activates on Workday candidate host %s', (origin) => {
     const result = classifyApplicationPage({
-      fields: [
-        field('First Name', origin),
-        field('Last Name', origin),
-        field('Email', origin),
-        field('Phone', origin),
-      ],
+      fields: workdayFields(origin),
       pageSignals: ['Software Engineer'],
     });
 
