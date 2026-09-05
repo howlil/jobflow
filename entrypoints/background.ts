@@ -51,7 +51,7 @@ async function toggleAssistant(tabId: number): Promise<boolean> {
 
 async function injectAssistant(tabId: number): Promise<void> {
   await browser.scripting.executeScript({
-    target: { tabId },
+    target: { tabId, allFrames: true },
     files: [CONTENT_SCRIPT_FILE],
   });
 }
