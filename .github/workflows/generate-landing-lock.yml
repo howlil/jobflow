@@ -28,12 +28,15 @@ jobs:
         working-directory: landing
         run: pnpm install --lockfile-only
 
-      - name: Verify frozen install and Astro build
-        working-directory: landing
+      - name: Verify exact MyPaas builder path
+        shell: bash
         run: |
-          pnpm install --frozen-lockfile
-          pnpm run build
-          test -f dist/index.html
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/landing:/app" \
+            -w /app \
+            node:22-alpine \
+            sh -c 'corepack enable && pnpm install --frozen-lockfile && pnpm run build'
+          test -f landing/dist/index.html
 
       - name: Commit generated lockfile
         shell: bash
